@@ -1,17 +1,18 @@
+import { useRouter } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Text, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { styles } from './HomeScreen.styles';
 
 import { LanguageToggle } from '../../components/LanguageToggle';
 import type { SupportedLanguage } from '../../locales/i18n';
 import { setLanguage } from '../../store/settingsSlice';
-
+import { styles } from './homeScreen.styles';
 
 export const HomeScreen: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const router = useRouter();
 
   const currentLang = useSelector(
     (state: any) => state.settings.language as SupportedLanguage,
@@ -22,18 +23,34 @@ export const HomeScreen: React.FC = () => {
     dispatch(setLanguage(nextLang));
   };
 
+  const handleStartOnboarding = () => {
+    router.replace('/onboardingRoute');
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{t('dashboard.title')}</Text>
-      <Text style={styles.subtitle}>{t('alerts.time_up')}</Text>
+      <Image
+        source={require('../../../assets/images/homeImg.png')}
+        style={styles.homeImg}
+      />
+      <Text style={styles.title}>{t('app_name')}</Text>
 
       <View style={styles.buttonRow}>
         <LanguageToggle
           currentLanguage={currentLang}
           onToggle={toggleLanguage}
         />
+
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={handleStartOnboarding}
+        >
+          <Text style={styles.buttonText}>
+            {t('common.start', 'Start')}
+          </Text>
+        </TouchableOpacity>
       </View>
-      
     </View>
   );
 };
+

@@ -1,8 +1,17 @@
 {
+  "app_name": "ScreenTime Guardian",
   "common": {
     "save": "Save",
     "cancel": "Cancel",
     "back": "Back"
+  },
+  "onboarding": {
+    "step1_title": "Monitor & Protect",
+    "step1_desc": "Track screen time and block apps instantly.",
+    "step2_title": "Real-time Location",
+    "step2_desc": "Get your child's GPS location anytime.",
+    "step3_title": "Smart Reports",
+    "step3_desc": "Receive daily and weekly usage statistics."
   },
   "dashboard": {
     "title": "Parent Dashboard",
