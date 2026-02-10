@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { LanguageToggle } from '../../components/LanguageToggle';
 import type { SupportedLanguage } from '../../locales/i18n';
 import { setLanguage } from '../../store/settingsSlice';
-import { styles } from './homeScreen.styles';
+import { styles } from './HomeScreen.styles';
 
 export const HomeScreen: React.FC = () => {
   const { t } = useTranslation();

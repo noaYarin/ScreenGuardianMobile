@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FlatList, Text, View } from 'react-native';
 import { getOnboardingSlides, OnboardingSlide } from '../../../data/onBoardingData';
 // @ts-ignore
-import { styles } from './onboardingScreen.styles';
+import { styles } from './OnboardingScreen.styles';
 
 export const OnboardingScreen: React.FC = () => {
     const { t } = useTranslation();

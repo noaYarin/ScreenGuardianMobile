@@ -1,5 +1,5 @@
 import React from 'react';
-import { OnboardingScreen } from '../src/screens/onboarding/onboardingScreen';
+import { OnboardingScreen } from '../src/screens/Onboarding/OnboardingScreen';
 
 export default function Onboarding() {
   return <OnboardingScreen />;
