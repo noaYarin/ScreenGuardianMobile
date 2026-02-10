@@ -3,18 +3,20 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
-import { Platform } from 'react-native';
-
-const tintColorLight = '#0a7ea4';
+import { Dimensions, Platform } from 'react-native';
+const { width, height } = Dimensions.get('screen');
+const tintColorLight = '#BDE0FE'; 
 const tintColorDark = '#fff';
 
-export const Colors = {
+export const COLORS = {
   light: {
     text: '#11181C',
     background: '#fff',
     tint: tintColorLight,
     icon: '#687076',
     tabIconDefault: '#687076',
+    secondary: '#EAD2AC', //Beige color
+
     tabIconSelected: tintColorLight,
   },
   dark: {
@@ -51,3 +53,11 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+export const SIZES = {
+  width,
+  height,
+  radius: 140, 
+  padding: 20,
+  title: 26,
+  description: 17,
+};
