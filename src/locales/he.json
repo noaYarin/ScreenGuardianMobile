@@ -1,0 +1,14 @@
+{
+  "common": {
+    "save": "שמור",
+    "cancel": "בטל",
+    "back": "חזרה"
+  },
+  "dashboard": {
+    "title": "לוח בקרה להורה",
+    "lock_button": "נעל עכשיו"
+  },
+  "alerts": {
+    "time_up": "הזמן נגמר!"
+  }
+}

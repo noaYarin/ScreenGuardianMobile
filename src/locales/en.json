@@ -1,0 +1,14 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "back": "Back"
+  },
+  "dashboard": {
+    "title": "Parent Dashboard",
+    "lock_button": "Lock Now"
+  },
+  "alerts": {
+    "time_up": "Time is up!"
+  }
+}
