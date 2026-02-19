@@ -5,7 +5,12 @@
     "cancel": "בטל",
     "back": "חזרה"
   },
-      "onboarding": {
+  "language": {
+    "he": "עברית",
+    "en": "English"
+  },
+  "onboarding": {
+     "startOnboarding": "התחל",
     "step1_title": "ניטור והגנה",
     "step1_desc": "עקבו אחר זמן מסך וחסמו אפליקציות באופן מיידי",
     "step2_title": "מיקום בזמן אמת",
@@ -14,8 +19,12 @@
     "step3_desc": "קבלו נתונים סטטיסטיים ותובנות ברמה יומית ושבועית"
     },
   "dashboard": {
-    "title": "לוח בקרה להורה",
-    "lock_button": "נעל עכשיו"
+    "start": "התחל להשתמש באפליקציה"
+  },
+  "roleSelection": {
+    "title": "מי משתמש באפליקציה?",
+    "parent": "הורה",
+    "child": "ילד"
   },
   "alerts": {
     "time_up": "הזמן נגמר!"

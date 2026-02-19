@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from 'react-native';
 
 import type { SupportedLanguage } from '../locales/i18n';
+import { useTranslation } from '../hooks/use-translation';
 
 export interface LanguageToggleProps {
   currentLanguage: SupportedLanguage;
@@ -12,7 +13,10 @@ export const LanguageToggle: React.FC<LanguageToggleProps> = ({
   currentLanguage,
   onToggle,
 }) => {
-  const label = currentLanguage === 'en' ? 'עברית' : 'English';
+  const { t } = useTranslation();
+
+  const labelKey = currentLanguage === 'en' ? 'language.he' : 'language.en';
+  const label = t(labelKey);
 
   return <Button title={label} onPress={onToggle} />;
 };

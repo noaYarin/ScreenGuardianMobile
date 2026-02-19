@@ -5,7 +5,12 @@
     "cancel": "Cancel",
     "back": "Back"
   },
+  "language": {
+    "he": "עברית",
+    "en": "English"
+  },
   "onboarding": {
+    "startOnboarding": "Start",
     "step1_title": "Monitor & Protect",
     "step1_desc": "Track screen time and block apps instantly.",
     "step2_title": "Real-time Location",
@@ -14,8 +19,12 @@
     "step3_desc": "Receive daily and weekly usage statistics."
   },
   "dashboard": {
-    "title": "Parent Dashboard",
-    "lock_button": "Lock Now"
+    "start": "Start using the app"
+  },
+  "roleSelection": {
+    "title": "Who is using the app?",
+    "parent": "Parent",
+    "child": "Child"
   },
   "alerts": {
     "time_up": "Time is up!"
