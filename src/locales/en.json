@@ -23,8 +23,10 @@
   },
   "roleSelection": {
     "title": "Who is using the app?",
-    "parent": "Parent",
-    "child": "Child"
+    "parents": "Parents",
+    "childs": "Childs",
+    "childDescription": "Controlled use according to parent rules",
+    "parentDescription": "Management, Tracking, and Usage Settings"
   },
   "alerts": {
     "time_up": "Time is up!"

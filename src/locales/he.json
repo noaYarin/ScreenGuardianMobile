@@ -23,8 +23,10 @@
   },
   "roleSelection": {
     "title": "מי משתמש באפליקציה?",
-    "parent": "הורה",
-    "child": "ילד"
+    "parents": "הורים",
+    "childs": "ילדים",
+    "childDescription": "שימוש מבוקר לפי כללי ההורה",
+    "parentDescription": "ניהול, מעקב והגדרות שימוש"
   },
   "alerts": {
     "time_up": "הזמן נגמר!"
