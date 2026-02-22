@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { RoleSelectionScreen } from '../src/screens/RoleSelection/RoleSelectionScreen';
+import { RoleSelectionScreen } from '../src/screens/roleSelection/RoleSelectionScreen';
 
 export default function RoleSelectionRoute() {
   return <RoleSelectionScreen />;
