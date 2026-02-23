@@ -16,7 +16,7 @@ export const COLORS = {
     icon: '#687076',
     tabIconDefault: '#687076',
     secondary: '#EAD2AC', //Beige color
-
+    primary: '#3B82F6',
     tabIconSelected: tintColorLight,
   },
   dark: {
@@ -59,5 +59,6 @@ export const SIZES = {
   radius: 140, 
   padding: 20,
   title: 26,
-  description: 17,
+  subTitle: 19,
+  description: 16,
 };
