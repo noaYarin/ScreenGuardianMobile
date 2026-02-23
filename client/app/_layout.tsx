@@ -15,7 +15,8 @@ export default function RootLayout() {
     headerStyle: { backgroundColor: COLORS.light.tint }, 
   }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="onboardingRoute" options={{headerTitle: ""}} />
+          <Stack.Screen name="roleSelectionRoute" options={{headerTitle: ""}} />
         </Stack>
       </I18nextProvider>
     </ReduxProvider>

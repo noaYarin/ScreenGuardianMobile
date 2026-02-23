@@ -19,6 +19,29 @@ export const styles = StyleSheet.create({
     height: SIZES.height,
     borderRadius: SIZES.radius,
   },
+  link: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    fontSize: SIZES.description,
+    color: COLORS.light.icon,
+    padding: SIZES.padding,
+  marginBottom: 15,
+    textDecorationLine: 'underline',
+  },
+  iconContainer: {
+    backgroundColor: COLORS.light.primary,
+    borderRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 4,
+    marginBottom: 24,
+  },
   textContainer: {
     alignItems: 'center',
     paddingHorizontal: 30,
@@ -30,6 +53,12 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 15,
     letterSpacing: 0.5,
+  },
+  image: {
+    width: '100%',
+    height: '30%',
+    resizeMode: 'contain',
+    marginTop: SIZES.padding,
   },
   description: {
     fontSize: SIZES.description,
@@ -44,7 +73,6 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: SIZES.padding,
   },
   stepDot: {
     width: 8,
@@ -71,6 +99,11 @@ export const styles = StyleSheet.create({
     fontSize: SIZES.description,
     fontFamily: Fonts.rounded,
     textAlign: 'center',
+  },
+  footerContainer: {
+    height: '20%',
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: SIZES.padding,
   },
 });
 
