@@ -19,6 +19,22 @@ export const OnboardingScreen: React.FC = () => {
     router.replace('/roleSelectionRoute' as any);
   };
 
+  const handleSkipOnboarding = () => {
+    router.replace('/roleSelectionRoute' as any);
+  };
+
+  const handleNext = () => {
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex < slides.length) {
+      setCurrentIndex(nextIndex);
+      flatListRef.current?.scrollToIndex({
+        index: nextIndex,
+        animated: true,
+      });
+    }
+  };
+
   const handleMomentumScrollEnd = (
     event: NativeSyntheticEvent<NativeScrollEvent>,
   ) => {
