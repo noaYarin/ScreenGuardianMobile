@@ -4,7 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { COLORS } from '@/constants/theme';
 import i18n from '../src/locales/i18n';
-import store from '../src/store';
+import store from '../src/redux/store';
 
 export default function RootLayout() {
   return (

@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'react-native';
 
 import type { SupportedLanguage } from '../locales/i18n';
-import { useTranslation } from '../hooks/use-translation';
+import { useTranslation } from '../../hooks/use-translation';
 
 export interface LanguageToggleProps {
   currentLanguage: SupportedLanguage;

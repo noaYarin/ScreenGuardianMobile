@@ -1,8 +1,8 @@
 import { useSelector } from 'react-redux';
 
-import en from '../locales/en.json';
-import he from '../locales/he.json';
-import type { SupportedLanguage } from '../locales/i18n';
+import en from '../src/locales/en.json';
+import he from '../src/locales/he.json';
+import type { SupportedLanguage } from '../src/locales/i18n';
 
 const translations: Record<SupportedLanguage, typeof en> = {
   en,

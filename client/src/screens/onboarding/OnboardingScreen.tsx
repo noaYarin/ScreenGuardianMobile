@@ -5,7 +5,7 @@ import { FlatList, NativeScrollEvent, NativeSyntheticEvent, Text, TouchableOpaci
 
 import { SIZES } from '../../../constants/theme';
 import { getOnboardingSlides, OnboardingSlide } from '../../../data/onBoardingData';
-import { useTranslation } from '../../hooks/use-translation';
+import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './onboarding.styles';
 
 export const OnboardingScreen: React.FC = () => {
