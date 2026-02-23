@@ -1,10 +1,21 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { FlatList, NativeScrollEvent, NativeSyntheticEvent, Text, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import {
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Text,
+  View,
+  Image,
+} from 'react-native';
 
-import { SIZES } from '../../../constants/theme';
-import { getOnboardingSlides, OnboardingSlide } from '../../../data/onBoardingData';
+import { OnboardingButton } from '../../components/OnboardingButton';
+import { COLORS, SIZES } from '../../../constants/theme';
+import {
+  getOnboardingSlides,
+  OnboardingSlide,
+} from '../../../data/onBoardingData';
 import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './onboarding.styles';
 
@@ -14,6 +25,7 @@ export const OnboardingScreen: React.FC = () => {
   const slides: OnboardingSlide[] = getOnboardingSlides(t);
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef<FlatList<OnboardingSlide> | null>(null);
 
   const handleStartUsingApp = () => {
     router.replace('/roleSelectionRoute' as any);
@@ -45,39 +57,33 @@ export const OnboardingScreen: React.FC = () => {
 
   const renderItem = ({
     item,
-    index,
   }: {
     item: OnboardingSlide;
-    index: number;
   }) => {
-    const isLast = index === slides.length - 1;
 
     return (
+      <>
+       <Text style={styles.link} onPress={handleSkipOnboarding}> {t('dashboard.skip')}</Text>
       <View style={styles.slideContainer}>
-        <Feather name={item.icon} size={24} color="black" />
+        <View
+          style={styles.iconContainer}
+        >
+          <Feather name={item.icon} size={40} color={COLORS.light.background} />
+        </View>
         <View style={styles.textContainer}>
           <Text style={styles.title}>{item.title}</Text>
           <Text style={styles.description}>{item.description}</Text>
-        </View>
-
-        {isLast && (
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={handleStartUsingApp}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.startButtonText}>
-              {t('dashboard.start')}
-            </Text>
-          </TouchableOpacity>
-        )}
+        </View> 
+        {item.image && <Image source={item.image} style={styles.image}/>}
       </View>
+      </>
     );
   };
 
   return (
     <View style={styles.safeArea}>
       <FlatList
+        ref={flatListRef}
         data={slides}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
@@ -87,19 +93,33 @@ export const OnboardingScreen: React.FC = () => {
         onMomentumScrollEnd={handleMomentumScrollEnd}
       />
 
-      <View style={styles.stepsContainer}>
-        {slides.map((_, index) => {
-          const isActive = index === currentIndex;
-          return (
-            <View
-              key={index}
-              style={[
-                styles.stepDot,
-                isActive && styles.stepDotActive,
-              ]}
-            />
-          );
-        })}
+      <View style={styles.footerContainer}>
+        <View style={styles.stepsContainer}>
+          {slides.map((_, index) => {
+            const isActive = index === currentIndex;
+            return (
+              <View
+                key={index}
+                style={[styles.stepDot, isActive && styles.stepDotActive]}
+              />
+            );
+          })}
+        </View>
+
+        <OnboardingButton
+          label={
+            currentIndex < slides.length - 1
+              ? t('dashboard.next')
+              : t('dashboard.start')
+          }
+          onPress={
+            currentIndex < slides.length - 1
+              ? handleNext
+              : handleStartUsingApp
+          }
+          containerStyle={styles.startButton}
+          textStyle={styles.startButtonText}
+        />
       </View>
     </View>
   );
