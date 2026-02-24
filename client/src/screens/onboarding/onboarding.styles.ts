@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { COLORS, Fonts, SIZES } from '../../../constants/theme';
+import { APP_COLORS, COLORS, Fonts, SIZES } from '../../../constants/theme';
 
 export const styles = StyleSheet.create({
   safeArea: {
@@ -30,7 +30,7 @@ export const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
   iconContainer: {
-    backgroundColor: COLORS.light.primary,
+    backgroundColor: APP_COLORS.primaryBlue,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',

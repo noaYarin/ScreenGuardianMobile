@@ -1,7 +1,6 @@
-import React, { ReactNode, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
-  Image,
   ImageSourcePropType,
   Pressable,
   StyleProp,
@@ -9,7 +8,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-
+import { Image } from 'expo-image';
 import { roleCardStyles as styles } from './rolecard.styles';
 
 type RoleCardProps = {

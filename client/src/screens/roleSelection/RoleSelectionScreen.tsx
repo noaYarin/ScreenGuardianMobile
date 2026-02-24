@@ -5,7 +5,7 @@ import { Text, View } from 'react-native';
 import { RoleCard } from '../../components/RoleCard/RoleCard';
 import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './roleselection.styles';
-import { COLORS } from '../../../constants/theme';
+import { APP_COLORS, COLORS } from '../../../constants/theme';
 
 export const RoleSelectionScreen: React.FC = () => {
   const router = useRouter();
@@ -28,20 +28,20 @@ export const RoleSelectionScreen: React.FC = () => {
       <View style={styles.cardsContainer}>
           <RoleCard
             title={t('roleSelection.childs')}
-            imageSource={require('../../../assets/images/childrens.png')}
+            imageSource={require('../../../assets/images/childrens.webp')}
             description={t('roleSelection.childDescription')}
             onPress={handleChildSelect}
-            backgroundColor={COLORS.light.secondary}
+            backgroundColor={APP_COLORS.beige}
             avatarCircleBackground={COLORS.light.tint}
           />
 
           <RoleCard
             title={t('roleSelection.parents')}
-            imageSource={require('../../../assets/images/parents.png')}
+            imageSource={require('../../../assets/images/parents.webp')}
             description={t('roleSelection.parentDescription')}
             onPress={handleParentSelect}
             backgroundColor={COLORS.light.tint}
-            avatarCircleBackground={COLORS.light.secondary}
+            avatarCircleBackground={APP_COLORS.beige}
           />
       </View>
     </View>
