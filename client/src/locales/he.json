@@ -30,5 +30,55 @@
   },
   "alerts": {
     "time_up": "הזמן נגמר!"
-  }
+  },
+  "home": {
+    "title": "בית",
+    "accessibility": "נגישות",
+    "settings": "הגדרות",
+    "hello_user": "היי {{name}}",
+    "points": "נקודות: {{value}}",
+    "level": "רמה {{level}}",
+    "coins": "מטבעות: {{value}}",
+    "time_left_title": "זמן שנותר",
+    "time_left_warning": "את/ה קרוב/ה למגבלה",
+    "tile_apps": "אפליקציות",
+    "tile_extend": "בקשת הארכה",
+    "tile_shop": "חנות",
+    "tile_tasks": "מטלות",
+    "tile_achievements": "הישגים",
+    "tile_goals": "מטרות",
+    "tile_encouragement": "עידוד",
+    "tile_ideas": "רעיונות",
+    "tile_help": "עזרה",
+    "panic": "מצוקה",
+    "panic_a11y": "מעבר למסך מצוקה"
+  },
+  "distress": {
+    "title": "מצוקה",
+    "menu_a11y": "פתיחת תפריט",
+    "back_a11y": "חזרה",
+    "sos_a11y": "שליחת SOS",
+    "need_help": "צריך/ה עזרה?",
+    "tap_to_send": "לחץ/י על הכפתור כדי לשלוח התרעה",
+    "send_to": "נשלח אל",
+    "parents": "הורים",
+    "warning": "השתמש/י ב-SOS רק במקרה חירום אמיתי.",
+    "alert_title": "נשלח SOS",
+    "alert_desc": "נשלחה התרעה להורים."
+  },
+  "goals": {
+  "title": "מטרות",
+  "weekly_title": "מטרות השבוע",
+  "subtitle": "בואו נראה איך הולך!",
+  "total_progress": "התקדמות כללית",
+  "goal_less_than_2h": "השתמש בנייד פחות מ־2 שעות ביום",
+  "goal_no_screen_before_sleep": "בלי מסכים שעה לפני השינה",
+  "goal_learning_apps": "השתמש באפליקציות לימודיות",
+  "days_5_7": "5/7 ימים",
+  "days_6_7": "6/7 ימים",
+  "days_2_5": "2/5 ימים",
+  "completed_a11y": "המטרה הושלמה",
+  "not_completed_a11y": "המטרה לא הושלמה"
 }
+}
+

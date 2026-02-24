@@ -30,5 +30,55 @@
   },
   "alerts": {
     "time_up": "Time is up!"
-  }
+ },
+  "home": {
+    "title": "Home",
+    "accessibility": "Accessibility",
+    "settings": "Settings",
+    "hello_user": "Hi, {{name}}",
+    "points": "Points: {{value}}",
+    "level": "Level {{level}}",
+    "coins": "Coins: {{value}}",
+    "time_left_title": "Time left",
+    "time_left_warning": "You're close to the limit",
+    "tile_apps": "Apps",
+    "tile_extend": "Request more time",
+    "tile_shop": "Shop",
+    "tile_tasks": "Tasks",
+    "tile_achievements": "Achievements",
+    "tile_goals": "Goals",
+    "tile_encouragement": "Encouragement",
+    "tile_ideas": "Ideas",
+    "tile_help": "Help",
+    "panic": "SOS",
+    "panic_a11y": "Open distress screen"
+  },
+  "distress": {
+    "title": "SOS",
+    "menu_a11y": "Open menu",
+    "back_a11y": "Go back",
+    "sos_a11y": "Send SOS",
+    "need_help": "Need help?",
+    "tap_to_send": "Tap the button to send an alert",
+    "send_to": "Send to",
+    "parents": "Parents",
+    "warning": "Use SOS only in real emergencies.",
+    "alert_title": "SOS sent",
+    "alert_desc": "An alert was sent to your parents."
+  },
+  "goals": {
+  "title": "Goals",
+  "weekly_title": "Weekly Goals",
+  "subtitle": "Let’s see how you're doing!",
+  "total_progress": "Overall Progress",
+  "goal_less_than_2h": "Use less than 2 hours per day",
+  "goal_no_screen_before_sleep": "No screens one hour before sleep",
+  "goal_learning_apps": "Use educational apps",
+  "days_5_7": "5/7 days",
+  "days_6_7": "6/7 days",
+  "days_2_5": "2/5 days",
+  "completed_a11y": "Goal completed",
+  "not_completed_a11y": "Goal not completed"
 }
+}
+
