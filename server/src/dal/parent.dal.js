@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { ParentModel } from "../models/parent.model.js";
 import { AppError } from "../utils/appError.js";
 
@@ -6,12 +7,8 @@ export async function createParent(parentDoc) {
 }
 
 export async function findParentByEmail(email) {
-  // פה עדיף לא lean אם תרצי להשתמש ב-parent._id בצורה מלאה,
-  // אבל גם עם lean זה עובד כי _id נשאר
   return ParentModel.findOne({ email });
 }
-
-
 
 export async function pushChildToParent(parentId, childDoc) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
@@ -36,10 +33,33 @@ export async function getChildrenByParentId(parentId) {
     throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
   }
 
-  const parent = await ParentModel.findById(parentId, { children: 1 });
+  const parent = await ParentModel.findById(parentId, { children: 1 }).lean();
   if (!parent) {
     throw new AppError({ status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" });
   }
 
   return parent.children || [];
+}
+
+// ✅ חדש: soft delete / הפעלה מחדש לילד לפי children._id
+export async function updateChildActiveByParentId(parentId, childId, isActive) {
+  if (!mongoose.Types.ObjectId.isValid(parentId)) {
+    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
+  }
+  if (!mongoose.Types.ObjectId.isValid(childId)) {
+    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid childId" });
+  }
+
+  const updated = await ParentModel.findOneAndUpdate(
+    { _id: parentId, "children._id": childId },
+    { $set: { "children.$.isActive": isActive } },
+    { new: true, projection: { children: 1 } }
+  ).lean();
+
+  // אם לא נמצא הורה/ילד תואם
+  if (!updated) {
+    return null;
+  }
+
+  return updated;
 }

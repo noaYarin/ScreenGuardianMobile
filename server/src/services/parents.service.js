@@ -1,60 +1,59 @@
 import { AppError } from "../utils/appError.js";
-import { pushChildToParent, getChildrenByParentId } from "../dal/parent.dal.js";
+import {
+  pushChildToParent,
+  getChildrenByParentId,
+  updateChildActiveByParentId,
+} from "../dal/parent.dal.js";
 
-function generateChildId() {
-  // יוצר מזהה קצר ויחודי מספיק לראוטים (ללא ObjectId)
-  return `child_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-}
 
 export async function addChild(parentId, body) {
-  const { name, birthDate, gender, interests, img } = body;
+  const { name, birthDate, gender, interests } = body;
 
-  if (!name || !birthDate) {
-    throw new AppError({
-      status: 400,
-      code: "VALIDATION_ERROR",
-      message: "name and birthDate are required",
-    });
-  }
+  if (!name || !birthDate) throw new AppError({ status: 400, code: "VALIDATION_ERROR", message: "name and birthDate are required" });
 
   const bd = new Date(birthDate);
-  if (Number.isNaN(bd.getTime())) {
-    throw new AppError({
-      status: 400,
-      code: "VALIDATION_ERROR",
-      message: "birthDate must be a valid date",
-    });
-  }
-
-  const childId = generateChildId();
+  if (Number.isNaN(bd.getTime())) throw new AppError({ status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" });
 
   const childDoc = {
-    childId,
     name,
     birthDate: bd,
     gender: gender || undefined,
     interests: Array.isArray(interests) ? interests : [],
     coins: 0,
-    img: img || undefined,
-    status: "Active",
+    isActive: true,
     achievementIds: [],
-    avatar: {
-      level: 1,
-      img: "default.png",
-      currentXp: 0,
-      nextLevelXp: 100,
-    },
+    avatar: { level: 1, img: "default.png", currentXp: 0, nextLevelXp: 100 },
   };
 
   const updatedParent = await pushChildToParent(parentId, childDoc);
 
-  // נחזיר את הילד שנוסף (נמצא אותו לפי childId)
-  const added = updatedParent.children.find((c) => c.childId === childId);
-
+  const added = updatedParent.children[updatedParent.children.length - 1];
   return { child: added };
 }
 
-export async function getMyChildren(parentId) {
+
+export async function getMyChildren(parentId, options = {}) {
+  const includeInactive = options.includeInactive === true;
+
   const children = await getChildrenByParentId(parentId);
-  return { children };
+
+  const filtered = includeInactive ? children : children.filter((c) => c.isActive === true);
+
+  return { children: filtered };
+}
+
+export async function setChildActive(parentId, childId, isActive) {
+  const updatedParent = await updateChildActiveByParentId(parentId, childId, isActive);
+
+  if (!updatedParent) {
+    throw new AppError({
+      status: 404,
+      code: "NOT_FOUND",
+      message: "Child not found",
+    });
+  }
+
+  const updatedChild = updatedParent.children.find((c) => String(c._id) === String(childId));
+
+  return { child: updatedChild };
 }
