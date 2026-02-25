@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS, SIZES } from '../../../constants/theme';
+import { APP_COLORS, COLORS, SIZES } from '../../../constants/theme';
 
 const SPACING_XS = 8;
 const SPACING_SM = 12;
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SIZES.padding,
     gap: SPACING_XS,
-    backgroundColor: COLORS.light.secondary,
+    backgroundColor: APP_COLORS.beige,
   },
   title: {
     fontSize: SIZES.title,

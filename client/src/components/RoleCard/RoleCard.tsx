@@ -1,30 +1,32 @@
-import React, { ReactNode, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Animated,
+  ImageSourcePropType,
   Pressable,
   StyleProp,
   Text,
   View,
   ViewStyle,
 } from 'react-native';
-
-import { COLORS } from '../../../constants/theme';
+import { Image } from 'expo-image';
 import { roleCardStyles as styles } from './rolecard.styles';
 
 type RoleCardProps = {
   title: string;
-  icon: ReactNode;
+  imageSource: ImageSourcePropType;
   onPress: () => void;
   backgroundColor: string;
+  avatarCircleBackground: string;
   containerStyle?: StyleProp<ViewStyle>;
   description: string;
 };
 
 export const RoleCard: React.FC<RoleCardProps> = ({
   title,
-  icon,
+  imageSource,
   onPress,
   backgroundColor,
+  avatarCircleBackground,
   containerStyle,
   description,
 }) => {
@@ -64,13 +66,15 @@ export const RoleCard: React.FC<RoleCardProps> = ({
           styles.card,
           {
             backgroundColor,
-            borderColor: pressed ? COLORS.light.icon : 'transparent',
+            borderWidth: 0,
             transform: [{ scale }],
           },
           containerStyle,
         ]}
       >
-        <View style={styles.iconContainer}>{icon}</View>
+        <View style={[styles.imageContainer, { backgroundColor: avatarCircleBackground }]}>
+          <Image source={imageSource} style={styles.image} />
+        </View>
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </Animated.View>

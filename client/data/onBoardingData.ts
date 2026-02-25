@@ -4,6 +4,7 @@ export interface OnboardingSlide {
   title: string;
   description: string;
   icon: any;
+  image?: any;
 }
 
 export const getOnboardingSlides = (t: any): OnboardingSlide[] => [
@@ -18,6 +19,7 @@ export const getOnboardingSlides = (t: any): OnboardingSlide[] => [
       title: t('onboarding.step2_title'),
       description: t('onboarding.step2_desc'),
       icon: "map",
+      image: require('../assets/images/map.png')
     },
     {
       id: '3',

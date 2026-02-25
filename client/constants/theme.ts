@@ -5,19 +5,22 @@
 
 import { Dimensions, Platform } from 'react-native';
 const { width, height } = Dimensions.get('screen');
-const tintColorLight = '#BDE0FE'; 
 const tintColorDark = '#fff';
+
+export const APP_COLORS = {
+  babyBlue: '#BDE0FE',
+  beige: '#EAD2AC',
+  primaryBlue: '#3B82F6',
+};
 
 export const COLORS = {
   light: {
     text: '#11181C',
     background: '#fff',
-    tint: tintColorLight,
+    tint: APP_COLORS.babyBlue,
     icon: '#687076',
     tabIconDefault: '#687076',
-    secondary: '#EAD2AC', //Beige color
-
-    tabIconSelected: tintColorLight,
+    tabIconSelected: APP_COLORS.babyBlue,
   },
   dark: {
     text: '#ECEDEE',
@@ -59,5 +62,6 @@ export const SIZES = {
   radius: 140, 
   padding: 20,
   title: 26,
-  description: 17,
+  subTitle: 19,
+  description: 16,
 };

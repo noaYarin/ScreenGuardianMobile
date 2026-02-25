@@ -15,11 +15,13 @@
     "step1_desc": "Track screen time and block apps instantly.",
     "step2_title": "Real-time Location",
     "step2_desc": "Get your child's GPS location anytime.",
-    "step3_title": "Smart Reports",
-    "step3_desc": "Receive daily and weekly usage statistics."
+    "step3_title": "AI Analysis",
+    "step3_desc": "AI-based recommendations for other activities."
   },
   "dashboard": {
-    "start": "Start using the app"
+    "start": "Start using the app",
+    "skip": "Skip",
+    "next": "Next"
   },
   "roleSelection": {
     "title": "Who is using the app?",

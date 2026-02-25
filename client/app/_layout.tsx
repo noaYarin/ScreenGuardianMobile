@@ -4,7 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { COLORS } from '@/constants/theme';
 import i18n from '../src/locales/i18n';
-import store from '../src/store';
+import store from '../src/redux/store';
 
 export default function RootLayout() {
   return (
@@ -15,7 +15,8 @@ export default function RootLayout() {
     headerStyle: { backgroundColor: COLORS.light.tint }, 
   }}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+          <Stack.Screen name="onboardingRoute" options={{headerTitle: ""}} />
+          <Stack.Screen name="roleSelectionRoute" options={{headerTitle: ""}} />
         </Stack>
       </I18nextProvider>
     </ReduxProvider>

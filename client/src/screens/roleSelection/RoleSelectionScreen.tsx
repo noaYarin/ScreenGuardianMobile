@@ -1,12 +1,11 @@
-import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { COLORS } from '../../../constants/theme';
 import { RoleCard } from '../../components/RoleCard/RoleCard';
-import { useTranslation } from '../../hooks/use-translation';
+import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './roleselection.styles';
+import { APP_COLORS, COLORS } from '../../../constants/theme';
 
 export const RoleSelectionScreen: React.FC = () => {
   const router = useRouter();
@@ -27,37 +26,23 @@ export const RoleSelectionScreen: React.FC = () => {
       <Text style={styles.title}>{title}</Text>
 
       <View style={styles.cardsContainer}>
-        <View style={styles.cardWrapper}>
           <RoleCard
             title={t('roleSelection.childs')}
-            icon={
-              <Feather
-                name="smile"
-                size={48}
-                color={COLORS.light.icon}
-              />
-            }
+            imageSource={require('../../../assets/images/childrens.webp')}
             description={t('roleSelection.childDescription')}
             onPress={handleChildSelect}
-            backgroundColor={COLORS.light.tint}
+            backgroundColor={APP_COLORS.beige}
+            avatarCircleBackground={COLORS.light.tint}
           />
-        </View>
 
-        <View style={styles.cardWrapper}>
           <RoleCard
             title={t('roleSelection.parents')}
-            icon={
-              <Feather
-                name="user"
-                size={48}
-                color={COLORS.light.icon}
-              />
-            }
+            imageSource={require('../../../assets/images/parents.webp')}
             description={t('roleSelection.parentDescription')}
             onPress={handleParentSelect}
-            backgroundColor={COLORS.light.secondary}
+            backgroundColor={COLORS.light.tint}
+            avatarCircleBackground={APP_COLORS.beige}
           />
-        </View>
       </View>
     </View>
   );

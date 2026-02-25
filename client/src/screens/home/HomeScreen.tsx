@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, Text, TouchableOpacity, View } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
-
+import { Image } from 'expo-image';
 import { LanguageToggle } from '../../components/LanguageToggle';
-import { useTranslation } from '../../hooks/use-translation';
+import { useTranslation } from '../../../hooks/use-translation';
 import type { SupportedLanguage } from '../../locales/i18n';
 import { setLanguage } from '../../redux/slices/language-slice';
 import { styles } from './home.styles';
@@ -27,7 +27,7 @@ export const HomeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../../assets/images/homeImg.png')}
+        source={require('../../../assets/images/homeImg.webp')}
         style={styles.homeImg}
       />
       <Text style={styles.title}>{t('app_name')}</Text>
