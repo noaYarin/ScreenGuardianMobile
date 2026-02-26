@@ -79,6 +79,19 @@
   "days_2_5": "2/5 days",
   "completed_a11y": "Goal completed",
   "not_completed_a11y": "Goal not completed"
+},
+"store": {
+  "title": "Store",
+  "back_a11y": "Go back",
+  "your_balance": "Your Balance",
+  "available_rewards": "Available Rewards:",
+  "reward_time": "30 Minutes Extra",
+  "reward_time_sub": "25 coins",
+  "reward_movie": "Choose a Movie",
+  "reward_icecream": "Ice Cream",
+  "reward_small": "Small Gift",
+  "reward_cost": "25 coins",
+  "coins": "coins"
 }
 }
 

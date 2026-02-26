@@ -3,9 +3,9 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-import { COLORS } from '../../../constants/theme';
-import { RoleCard } from '../../components/RoleCard/RoleCard';
-import { useTranslation } from '../../hooks/use-translation';
+import { COLORS } from '../../../../constants/theme';
+import { RoleCard } from '../../../components/RoleCard/RoleCard';
+import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './roleselection.styles';
 
 export const RoleSelectionScreen: React.FC = () => {

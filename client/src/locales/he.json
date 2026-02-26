@@ -79,6 +79,18 @@
   "days_2_5": "2/5 ימים",
   "completed_a11y": "המטרה הושלמה",
   "not_completed_a11y": "המטרה לא הושלמה"
+},"store": {
+  "title": "חנות",
+  "back_a11y": "חזרה למסך הקודם",
+  "your_balance": "היתרה שלך",
+  "available_rewards": "פרסים זמינים:",
+  "reward_time": "30 דקות זמן מסך",
+  "reward_time_sub": "25 מטבעות",
+  "reward_movie": "בחירת סרט משפחתי",
+  "reward_icecream": "גלידה",
+  "reward_small": "צעצוע קטן",
+  "reward_cost": "25 מטבעות",
+  "coins": "מטבעות"
 }
 }
 

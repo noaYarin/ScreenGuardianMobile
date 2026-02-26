@@ -1,2 +1,2 @@
-import DistressScreen from "../src/screens/DistressScreen/DistressScreen";
+import DistressScreen from "../src/screens/ChildrenScreens/DistressScreen/DistressScreen";
 export default DistressScreen;

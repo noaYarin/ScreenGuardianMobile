@@ -4,8 +4,8 @@ import { router, Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import ScreenLayout from "../../layouts/ScreenLayout/ScreenLayout";
-import AppText from "../../components/AppText/AppText";
+import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
+import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 
 export default function DistressScreen() {

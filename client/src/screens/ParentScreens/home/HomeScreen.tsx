@@ -3,10 +3,10 @@ import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 
-import { LanguageToggle } from '../../components/LanguageToggle';
-import { useTranslation } from '../../hooks/use-translation';
-import type { SupportedLanguage } from '../../locales/i18n';
-import { setLanguage } from '../../redux/slices/language-slice';
+import { LanguageToggle } from '../../../components/LanguageToggle';
+import { useTranslation } from '../../../hooks/use-translation';
+import type { SupportedLanguage } from '../../../locales/i18n';
+import { setLanguage } from '../../../redux/slices/language-slice';
 import { styles } from './home.styles';
 
 export const HomeScreen: React.FC = () => {

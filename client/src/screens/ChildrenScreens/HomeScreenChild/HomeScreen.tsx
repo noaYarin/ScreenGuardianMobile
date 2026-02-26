@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-import ScreenLayout from "../../layouts/ScreenLayout/ScreenLayout";
-import AppText from "../../components/AppText/AppText";
+import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
+import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 
-import i18n, { changeLanguage } from "../../locales/i18n";
+import i18n, { changeLanguage } from "../../../locales/i18n";
 
 // ✅ אייקונים וקטוריים במקום PNG
 const ICON = {
@@ -160,7 +160,7 @@ export default function HomeScreen() {
           <View style={styles.grid}>
             <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} />
             <Tile iconName={ICON.extend} label={t("home.tile_extend")} onPress={() => {}} />
-            <Tile iconName={ICON.shop} label={t("home.tile_shop")} onPress={() => {}} />
+            <Tile iconName={ICON.shop} label={t("home.tile_shop")} onPress={() => router.push("/store" as Href)} />
             <Tile iconName={ICON.tasks} label={t("home.tile_tasks")} onPress={() => {}} />
             <Tile iconName={ICON.achievements} label={t("home.tile_achievements")} onPress={() => {}} />
             <Tile iconName={ICON.goals} label={t("home.tile_goals")} onPress={() => router.push("/goals" as Href)} />

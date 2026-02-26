@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import { I18nextProvider } from "react-i18next";
 import { Provider as ReduxProvider } from "react-redux";
-import { Platform } from "react-native";
 
 import { COLORS } from "@/constants/theme";
 import i18n from "../src/locales/i18n";
@@ -28,7 +27,7 @@ export default function RootLayout() {
 
             // עיצוב טקסט הכותרת
             headerTitleStyle: {
-              color: "#1E3A8A", // תשני לצבע שאת רוצה
+              color: "#1E3A8A",
               fontFamily: "Heebo_700Bold",
               fontSize: 20,
             },
@@ -36,12 +35,11 @@ export default function RootLayout() {
             // צבע חץ ואייקונים ב-header
             headerTintColor: "#1E3A8A",
 
-            // אם את רוצה שהחץ יהיה תמיד משמאל גם ב-RTL
-            headerBackTitleVisible: false,
-          
+            // ✅ מסתיר את הטקסט של ה-Back (במקום headerBackTitleVisible שלא קיים)
+            headerBackTitle: "",
           }}
         >
-          <Stack.Screen name="index" options={{ headerShown: false }} />  
+          <Stack.Screen name="index" options={{ headerShown: false }} />
         </Stack>
       </I18nextProvider>
     </ReduxProvider>

@@ -3,9 +3,9 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, NativeScrollEvent, NativeSyntheticEvent, Text, TouchableOpacity, View } from 'react-native';
 
-import { SIZES } from '../../../constants/theme';
-import { getOnboardingSlides, OnboardingSlide } from '../../../data/onBoardingData';
-import { useTranslation } from '../../hooks/use-translation';
+import { SIZES } from '../../../../constants/theme';
+import { getOnboardingSlides, OnboardingSlide } from '../../../../data/onBoardingData';
+import { useTranslation } from '../../../hooks/use-translation';
 import { styles } from './onboarding.styles';
 
 export const OnboardingScreen: React.FC = () => {

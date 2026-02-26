@@ -1,6 +1,6 @@
 import { I18nManager, StyleSheet } from 'react-native';
 
-import { COLORS, Fonts, SIZES } from '../../../constants/theme';
+import { COLORS, Fonts, SIZES } from '../../../../constants/theme';
 
 export const styles = StyleSheet.create({
   container: {

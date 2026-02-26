@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS, SIZES } from '../../../constants/theme';
+import { COLORS, SIZES } from '../../../../constants/theme';
 
 const SPACING_XS = 8;
 const SPACING_SM = 12;
