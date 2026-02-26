@@ -1,46 +1,30 @@
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
+  // ✅ אין רקע! ScreenLayout אחראי לרקע הקבוע
   container: {
     flex: 1,
-    backgroundColor: "#AFC6D9",
-  },
-
-  header: {
-    backgroundColor: "#4F7FF7",
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-    flexDirection: "row-reverse",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-
-  headerTitle: {
-    color: "#fff",
-    fontSize: 22,
   },
 
   balanceSection: {
     alignItems: "center",
-    marginTop: 25,
+    marginTop: 22,
   },
 
   balanceLabel: {
     fontSize: 20,
     color: "#333",
-    marginBottom: 15,
+    marginBottom: 14,
+    textAlign: "center",
   },
 
   balanceCard: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFC107",
-    paddingHorizontal: 40,
-    paddingVertical: 15,
-    borderRadius: 20,
+    paddingHorizontal: 38,
+    paddingVertical: 14,
+    borderRadius: 18,
     elevation: 4,
   },
 
@@ -51,29 +35,40 @@ export const styles = StyleSheet.create({
   },
 
   rewardsContainer: {
-    marginTop: 30,
-    paddingHorizontal: 20,
+    marginTop: 26,
+    paddingHorizontal: 18,
   },
 
+  // ✅ טקסט מיושר לימין (RTL) כמו בתמונה
   sectionTitle: {
     fontSize: 18,
-    marginBottom: 15,
+    marginBottom: 12,
     textAlign: "right",
+    color: "#333",
   },
 
   rewardCard: {
-    backgroundColor: "#EDEDED",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 18,
-    flexDirection: "row-reverse",
-    justifyContent: "space-between",
-    alignItems: "center",
+    backgroundColor: "#ffffff",
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    marginBottom: 16,
     elevation: 3,
+      shadowColor: "#000",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.12,
+  shadowRadius: 6,
+
+    // ✅ מבנה: מחיר בימין, תוכן+אייקון בשמאל
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
 
-  rewardLeft: {
-    alignItems: "center",
+  // ✅ צד ימין: מחיר
+  priceBox: {
+    minWidth: 70,
+    alignItems: "flex-end",
   },
 
   rewardPrice: {
@@ -85,20 +80,35 @@ export const styles = StyleSheet.create({
     color: "#A86A00",
   },
 
-  rewardRight: {
-    flexDirection: "row-reverse",
+  // ✅ צד שמאל: טקסט (RTL) + אייקון בצד שמאל
+  contentBox: {
+    flex: 1,
+    marginRight: 14,
+    flexDirection: "row",
     alignItems: "center",
-    gap: 15,
+    justifyContent: "space-between",
+  },
+
+  textBox: {
+    flex: 1,
+    paddingLeft: 14,
+    alignItems: "flex-end",
   },
 
   rewardTitle: {
     fontSize: 16,
     textAlign: "right",
+    color: "#111",
   },
 
   rewardSub: {
     fontSize: 14,
     color: "#A86A00",
     textAlign: "right",
+    marginTop: 2,
   },
+  icon: {
+  marginLeft: 10, 
+  marginRight: 10,
+}
 });

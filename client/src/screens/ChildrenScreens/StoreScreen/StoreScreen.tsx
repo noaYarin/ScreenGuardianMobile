@@ -6,14 +6,15 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const ICON = {
-  back: "chevron-right",
-  coin: "cash",
+  coin: "coins",
   clock: "clock-outline",
   movie: "movie-open-outline",
   icecream: "ice-cream",
   gift: "gift-outline",
+  back: "chevron-right",
 } as const;
 
 export default function StoreScreen() {
@@ -23,7 +24,7 @@ export default function StoreScreen() {
     {
       id: 1,
       title: t("store.reward_time"),
-      subtitle: t("store.reward_time_sub"),
+      subtitle: t("store.reward_cost"),
       icon: ICON.clock,
       color: "#2F6BFF",
     },
@@ -52,30 +53,28 @@ export default function StoreScreen() {
 
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        options={{
+          title: t("store.title"),
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
 
-      <ScreenLayout>
-        <View style={styles.container}>
-          
-          {/* Header */}
-          <View style={styles.header}>
+          // ✅ חץ בצד ימין (RTL) בלי Header מותאם אישית
+          headerRight: () => (
             <Pressable
               onPress={() => router.back()}
               accessibilityRole="button"
               accessibilityLabel={t("store.back_a11y")}
+              style={{ paddingHorizontal: 8, paddingVertical: 6 }}
             >
-              <MaterialCommunityIcons
-                name={ICON.back}
-                size={30}
-                color="#fff"
-              />
+              <MaterialCommunityIcons name={ICON.back} size={28} color="#fff" />
             </Pressable>
+          ),
+        }}
+      />
 
-            <AppText weight="extraBold" style={styles.headerTitle}>
-              {t("store.title")}
-            </AppText>
-          </View>
-
+      <ScreenLayout>
+        <View style={styles.container}>
           {/* Balance */}
           <View style={styles.balanceSection}>
             <AppText weight="bold" style={styles.balanceLabel}>
@@ -86,10 +85,11 @@ export default function StoreScreen() {
               <AppText weight="extraBold" style={styles.balanceAmount}>
                 250
               </AppText>
-              <MaterialCommunityIcons
+
+              <FontAwesome5
                 name={ICON.coin}
-                size={36}
-                color="#F4C430"
+                size={34}
+                color="#ffffff"
               />
             </View>
           </View>
@@ -105,33 +105,30 @@ export default function StoreScreen() {
                 key={item.id}
                 style={styles.rewardCard}
                 accessibilityRole="button"
-                accessibilityLabel={`${item.title} ${t(
-                  "store.reward_cost"
-                )}`}
+                accessibilityLabel={`${item.title}, ${t("store.reward_cost")}`}
               >
-                <View style={styles.rewardLeft}>
+                {/* ✅ ימין: מחיר */}
+                <View style={styles.priceBox}>
                   <AppText weight="extraBold" style={styles.rewardPrice}>
                     25
                   </AppText>
-                  <AppText style={styles.rewardCoins}>
-                    {t("store.coins")}
-                  </AppText>
+                  <AppText style={styles.rewardCoins}>{t("store.coins")}</AppText>
                 </View>
 
-                <View style={styles.rewardRight}>
-                  <View>
+                {/* ✅ שמאל: טקסט (מימין לשמאל) + אייקון בשמאל */}
+                <View style={styles.contentBox}>
+                  <View style={styles.textBox}>
                     <AppText weight="bold" style={styles.rewardTitle}>
                       {item.title}
                     </AppText>
-                    <AppText style={styles.rewardSub}>
-                      {item.subtitle}
-                    </AppText>
+                    <AppText style={styles.rewardSub}>{item.subtitle}</AppText>
                   </View>
 
                   <MaterialCommunityIcons
                     name={item.icon}
                     size={28}
                     color={item.color}
+                    style={styles.icon}
                   />
                 </View>
               </Pressable>
