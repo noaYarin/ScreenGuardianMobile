@@ -1,12 +1,13 @@
 import React from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, I18nManager } from "react-native";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 const ICON = {
   coin: "coins",
@@ -14,11 +15,14 @@ const ICON = {
   movie: "movie-open-outline",
   icecream: "ice-cream",
   gift: "gift-outline",
-  back: "chevron-right",
 } as const;
 
 export default function StoreScreen() {
   const { t } = useTranslation();
+
+  // ✅ חץ "חזור" שמתאים את עצמו ל-RTL/LTR כמו ב-Distress
+  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
+    I18nManager.isRTL ? "arrow-left" : "arrow-right";
 
   const rewards = [
     {
@@ -56,20 +60,27 @@ export default function StoreScreen() {
       <Stack.Screen
         options={{
           title: t("store.title"),
+
+          // בדיוק כמו אצלך ב-Distress
+          headerRight: () => (
+            <HeaderIconButton
+              name={backIconName}
+              onPress={() => router.back()}
+              accessibilityLabel={t("store.back_a11y")}
+            />
+          ),
+
+          headerLeft: () => (
+            <HeaderIconButton
+              name="menu"
+              onPress={() => {}}
+              accessibilityLabel={t("store.menu_a11y")}
+            />
+          ),
+
+          // (אופציונלי אבל מומלץ לשמור עקביות, אם זה מה שיש לך בשאר מסכים)
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          // ✅ חץ בצד ימין (RTL) בלי Header מותאם אישית
-          headerRight: () => (
-            <Pressable
-              onPress={() => router.back()}
-              accessibilityRole="button"
-              accessibilityLabel={t("store.back_a11y")}
-              style={{ paddingHorizontal: 8, paddingVertical: 6 }}
-            >
-              <MaterialCommunityIcons name={ICON.back} size={28} color="#fff" />
-            </Pressable>
-          ),
         }}
       />
 
@@ -86,11 +97,7 @@ export default function StoreScreen() {
                 250
               </AppText>
 
-              <FontAwesome5
-                name={ICON.coin}
-                size={34}
-                color="#ffffff"
-              />
+              <FontAwesome5 name={ICON.coin} size={34} color="#ffffff" />
             </View>
           </View>
 
@@ -115,7 +122,7 @@ export default function StoreScreen() {
                   <AppText style={styles.rewardCoins}>{t("store.coins")}</AppText>
                 </View>
 
-                {/* ✅ שמאל: טקסט (מימין לשמאל) + אייקון בשמאל */}
+                {/* ✅ שמאל: טקסט + אייקון */}
                 <View style={styles.contentBox}>
                   <View style={styles.textBox}>
                     <AppText weight="bold" style={styles.rewardTitle}>
@@ -137,5 +144,27 @@ export default function StoreScreen() {
         </View>
       </ScreenLayout>
     </>
+  );
+}
+
+function HeaderIconButton({
+  name,
+  onPress,
+  accessibilityLabel,
+}: {
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  onPress: () => void;
+  accessibilityLabel: string;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={10}
+      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
+    >
+      <MaterialCommunityIcons name={name} size={22} color="#000" />
+    </Pressable>
   );
 }

@@ -91,6 +91,44 @@
   "reward_small": "צעצוע קטן",
   "reward_cost": "25 מטבעות",
   "coins": "מטבעות"
+},"tasks": {
+  "title": "מטלות",
+  "done": "מטלות שנעשו",
+  "todo": "מטלות שלא נעשו",
+  "done_a11y": "הצג מטלות שבוצעו",
+  "todo_a11y": "הצג מטלות שלא בוצעו",
+  "completed": "תמונה הועלתה",
+  "not_uploaded": "לא הועלתה תמונה",
+  "upload": "העלאת תמונה",
+  "upload_a11y": "העלה תמונה כהוכחה לביצוע המשימה",
+  "week_total": "מטבעות שנצברו השבוע: {{total}}",
+  "clean_room": "שיעורי בית",
+  "read_book": "קריאת ספר",
+  "tidy_room": "סידור חדר",
+  "walk_dog": "הליכה עם הכלב",
+  "help_table": "עזרה במטבח"
+},
+  "extendTime": {
+    "title": "בקשת הארכה",
+    "subTitle": "בקשת הארכת זמן",
+    "question": "כמה זמן לבקש?",
+    "minutes": "דקות",
+    "customTitle": "אחר:",
+    "requestedLabel": "מבוקש:",
+    "plusMinutes": "+{{minutes}} דקות",
+    "messageLabel": "הודעה להורה (אופציונלי):",
+    "messagePlaceholder": "אני רוצה לסיים לראות את הסרט...",
+    "send": "שליחת בקשה להורה",
+
+    "back_a11y": "חזרה למסך הקודם",
+    "menu_a11y": "פתיחת תפריט",
+    "option_a11y": "בחירה של תוספת {{minutes}} דקות",
+    "custom_a11y": "בחירת כמות דקות אחרת",
+    "customPlus_a11y": "הגדלת מספר הדקות",
+    "customMinus_a11y": "הקטנת מספר הדקות",
+    "message_a11y": "שדה הודעה להורה",
+    "send_a11y": "שליחת בקשת הארכה"
+  }
 }
-}
+
 

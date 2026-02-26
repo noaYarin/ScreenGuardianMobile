@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Pressable } from "react-native";
+import { View, Pressable, I18nManager } from "react-native";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,14 +12,16 @@ const ICON = {
   target: "target",
   check: "check-circle-outline",
   circle: "checkbox-blank-circle-outline",
-  backRtl: "chevron-right",
-  backLtr: "chevron-left",
 } as const;
 
 export default function GoalsScreen() {
   const { t } = useTranslation();
 
-  // RTL מקומי למסך הזה (כדי שייראה נכון גם אם כל האפליקציה עדיין LTR)
+  // ✅ כמו ב-Distress: היפוך אוטומטי לפי RTL/LTR של האפליקציה
+  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
+    I18nManager.isRTL ? "arrow-left" : "arrow-right";
+
+  // אם את עדיין רוצה RTL "מקומי" לגוף המסך בלבד:
   const isRTL = true;
 
   // בעתיד יבוא מהשרת
@@ -31,20 +33,22 @@ export default function GoalsScreen() {
         options={{
           title: t("goals.title"),
           headerTitleAlign: "center",
-          headerLeft: () => null,
+          headerShadowVisible: false,
+
           headerRight: () => (
-            <Pressable
+            <HeaderIconButton
+              name={backIconName}
               onPress={() => router.back()}
-              accessibilityRole="button"
               accessibilityLabel={t("common.back_a11y")}
-              style={styles.headerBackBtn}
-            >
-              <MaterialCommunityIcons
-                name={isRTL ? ICON.backRtl : ICON.backLtr}
-                size={26}
-                color="#2E3A45"
-              />
-            </Pressable>
+            />
+          ),
+
+          headerLeft: () => (
+            <HeaderIconButton
+              name="menu"
+              onPress={() => {}}
+              accessibilityLabel={t("common.menu_a11y")}
+            />
           ),
         }}
       />
@@ -53,29 +57,18 @@ export default function GoalsScreen() {
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <MaterialCommunityIcons
-              name={ICON.target}
-              size={26}
-              color="#8B5E3C"
-            />
+            <MaterialCommunityIcons name={ICON.target} size={26} color="#8B5E3C" />
 
             <AppText weight="extraBold" style={styles.headerTitle}>
               {t("goals.weekly_title")}
             </AppText>
 
-            <AppText style={styles.headerSubtitle}>
-              {t("goals.subtitle")}
-            </AppText>
+            <AppText style={styles.headerSubtitle}>{t("goals.subtitle")}</AppText>
           </View>
 
           {/* Progress Card */}
           <View style={styles.progressCard}>
-            <View
-              style={[
-                styles.progressTopRow,
-                isRTL && styles.rowReverse,
-              ]}
-            >
+            <View style={[styles.progressTopRow, isRTL && styles.rowReverse]}>
               <AppText weight="bold" style={styles.progressLabel}>
                 {t("goals.total_progress")}
               </AppText>
@@ -85,14 +78,9 @@ export default function GoalsScreen() {
               </AppText>
             </View>
 
-            {/* RTL Progress bar: fill from right */}
+            {/* Progress bar */}
             <View style={styles.progressBarBackground}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  { width: `${progress}%` },
-                ]}
-              />
+              <View style={[styles.progressBarFill, { width: `${progress}%` }]} />
             </View>
           </View>
 
@@ -155,5 +143,27 @@ export default function GoalsScreen() {
         </View>
       </ScreenLayout>
     </>
+  );
+}
+
+function HeaderIconButton({
+  name,
+  onPress,
+  accessibilityLabel,
+}: {
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  onPress: () => void;
+  accessibilityLabel: string;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={10}
+      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
+    >
+      <MaterialCommunityIcons name={name} size={22} color="#000" />
+    </Pressable>
   );
 }

@@ -159,11 +159,11 @@ export default function HomeScreen() {
           {/* grid */}
           <View style={styles.grid}>
             <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} />
-            <Tile iconName={ICON.extend} label={t("home.tile_extend")} onPress={() => {}} />
-            <Tile iconName={ICON.shop} label={t("home.tile_shop")} onPress={() => router.push("/store" as Href)} />
-            <Tile iconName={ICON.tasks} label={t("home.tile_tasks")} onPress={() => {}} />
+            <Tile iconName={ICON.extend} label={t("home.tile_extend")} onPress={() => router.push("/Child/extendTime" as Href)} />
+            <Tile iconName={ICON.shop} label={t("home.tile_shop")} onPress={() => router.push("/Child/store" as Href)} />
+            <Tile iconName={ICON.tasks} label={t("home.tile_tasks")} onPress={() =>router.push("/Child/tasks" as Href)} />
             <Tile iconName={ICON.achievements} label={t("home.tile_achievements")} onPress={() => {}} />
-            <Tile iconName={ICON.goals} label={t("home.tile_goals")} onPress={() => router.push("/goals" as Href)} />
+            <Tile iconName={ICON.goals} label={t("home.tile_goals")} onPress={() => router.push("/Child/goals" as Href)} />
             <Tile iconName={ICON.heart} label={t("home.tile_encouragement")} onPress={() => {}} />
             <Tile iconName={ICON.bulb} label={t("home.tile_ideas")} onPress={() => {}} />
             <Tile iconName={ICON.help} label={t("home.tile_help")} onPress={() => {}} />
@@ -172,7 +172,7 @@ export default function HomeScreen() {
           {/* panic */}
           <Pressable
             style={({ pressed }) => [styles.panicBtn, pressed && styles.panicPressed]}
-            onPress={() => router.push("/distress" as Href)}
+            onPress={() => router.push("/Child/distress" as Href)}
             accessibilityRole="button"
             accessibilityLabel={t("home.panic_a11y")}
           >

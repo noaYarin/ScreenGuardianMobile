@@ -92,6 +92,43 @@
   "reward_small": "Small Gift",
   "reward_cost": "25 coins",
   "coins": "coins"
-}
+},"tasks": {
+  "title": "Tasks",
+  "done": "Completed Tasks",
+  "todo": "Pending Tasks",
+  "done_a11y": "Show completed tasks",
+  "todo_a11y": "Show pending tasks",
+  "completed": "Photo Uploaded",
+  "not_uploaded": "No photo uploaded",
+  "upload": "Upload Photo",
+  "upload_a11y": "Upload photo as proof of task completion",
+  "week_total": "Coins earned this week: {{total}}",
+  "clean_room": "Homework",
+  "read_book": "Read a Book",
+  "tidy_room": "Clean the Room",
+  "walk_dog": "Walk the Dog",
+  "help_table": "Help in the Kitchen"
+},
+  "extendTime": {
+    "title": "Extension Request",
+    "subTitle": "Request More Time",
+    "question": "How much time to request?",
+    "minutes": "minutes",
+    "customTitle": "Other:",
+    "requestedLabel": "Requested:",
+    "plusMinutes": "+{{minutes}} minutes",
+    "messageLabel": "Message to parent (optional):",
+    "messagePlaceholder": "I want to finish watching the movie...",
+    "send": "Send request to parent",
+
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+    "option_a11y": "Select {{minutes}} extra minutes",
+    "custom_a11y": "Select a custom amount",
+    "customPlus_a11y": "Increase minutes",
+    "customMinus_a11y": "Decrease minutes",
+    "message_a11y": "Message field",
+    "send_a11y": "Send extension request"
+  }
 }
 
