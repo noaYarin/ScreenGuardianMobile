@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import ChildSchema from "./child.model";
 
 const ParentSchema = new mongoose.Schema(
   {

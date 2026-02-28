@@ -9,13 +9,7 @@ const ChildSchema = new mongoose.Schema(
       coins: { type: Number, default: 0 },
       img: { type: String },
       isActive: { type: Boolean, default: true },
-      achievementIds: { type: [String], default: [] },
-      avatar: {
-        level: { type: Number, default: 1 },
-        img: { type: String, default: "default.png" },
-        currentXp: { type: Number, default: 0 },
-        nextLevelXp: { type: Number, default: 100 },
-      },
-    },
+      parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
+    }, { timestamps: true }
   );
   export default mongoose.model("Child", ChildSchema);
