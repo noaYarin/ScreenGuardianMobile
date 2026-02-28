@@ -10,6 +10,10 @@ export async function findParentByEmail(email) {
   return ParentModel.findOne({ email });
 }
 
+export async function findParentByGoogleId(googleId) {
+  return ParentModel.findOne({ googleId });
+}
+
 export async function pushChildToParent(parentId, childDoc) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
     throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
