@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import ChildSchema from "./child.model";
 
 const ParentSchema = new mongoose.Schema(
   {
@@ -7,7 +6,7 @@ const ParentSchema = new mongoose.Schema(
     password: { type: String, required: true }, // hash
     name: { type: String, required: true },
     phoneNumber: { type: String },
-    children: { type: [ChildSchema], default: [] },
+    children: { type: [mongoose.Schema.Types.ObjectId], ref: "Child", default: [] },
   },
   { timestamps: true, versionKey: false }
 );

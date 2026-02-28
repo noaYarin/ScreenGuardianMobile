@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ParentModel } from "../models/parent.model.js";
+import ParentModel from "../models/parent.model.js";  
 import { AppError } from "../utils/appError.js";
 
 export async function createParent(parentDoc) {
