@@ -18,6 +18,13 @@ function issueAuthResponse(parent) {
   return { token, parentId };
 }
 
+export function issueChildToken(parentId, childId) {
+  const parentIdStr = parentId != null ? String(parentId) : null;
+  const childIdStr = childId != null ? String(childId) : null;
+  const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: "CHILD" });
+  return { token, parentId: parentIdStr, childId: childIdStr };
+}
+
 async function verifyGoogleIdToken(idToken) {
   if (!googleClient || !env.GOOGLE_CLIENT_ID) {
     throw new AppError({ status: 503, code: "GOOGLE_AUTH_DISABLED", message: "Google sign-in is not configured" });
