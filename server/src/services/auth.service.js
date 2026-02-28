@@ -25,7 +25,6 @@ export async function registerParent({ email, password, name, phoneNumber, gende
     children: [],
   });
 
-  // ObjectId בתוך ה-JWT (בסדר גמור). ללקוח נחזיר string.
   const parentId = created._id.toString();
   const token = signToken({ parentId, role: "PARENT" });
 

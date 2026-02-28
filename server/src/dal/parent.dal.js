@@ -41,7 +41,6 @@ export async function getChildrenByParentId(parentId) {
   return parent.children || [];
 }
 
-// ✅ חדש: soft delete / הפעלה מחדש לילד לפי children._id
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
     throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
@@ -56,7 +55,7 @@ export async function updateChildActiveByParentId(parentId, childId, isActive) {
     { new: true, projection: { children: 1 } }
   ).lean();
 
-  // אם לא נמצא הורה/ילד תואם
+  
   if (!updated) {
     return null;
   }

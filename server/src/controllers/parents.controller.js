@@ -32,7 +32,6 @@ export async function getMyChildrenController(req, res, next) {
       return res.status(403).json({ ok: false, error: { code: "FORBIDDEN", message: "Parents only" } });
     }
 
-    // ברירת מחדל: רק פעילים. אם includeInactive=true => מחזיר גם מוקפאים
     const includeInactive = req.query?.includeInactive === "true";
 
     const data = await getMyChildren(parentId, { includeInactive });

@@ -4,10 +4,10 @@ import { connectMongo } from "./config/mongo.js";
 
 async function bootstrap() {
   await connectMongo();
-  app.listen(env.PORT, () => console.log(`✅ Server running on :${env.PORT}`));
+  app.listen(env.PORT, () => console.log(`Server running on port:${env.PORT}`));
 }
 
 bootstrap().catch((err) => {
-  console.error("❌ Failed to start server:", err);
+  console.error("Failed to start server:", err);
   process.exit(1);
 });
