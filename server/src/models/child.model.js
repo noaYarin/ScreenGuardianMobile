@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Role } from "../constants/role.js";
 
 const ChildSchema = new mongoose.Schema(
     {
@@ -9,6 +10,7 @@ const ChildSchema = new mongoose.Schema(
       coins: { type: Number, default: 0 },
       img: { type: String },
       isActive: { type: Boolean, default: true },
+      role: { type: String, enum: Role, default: Role.CHILD },
       parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
     }, { timestamps: true }
   );

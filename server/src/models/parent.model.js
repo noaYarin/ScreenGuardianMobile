@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { Role } from "../constants/role.js";
 
 const ParentSchema = new mongoose.Schema(
   {
@@ -7,6 +8,7 @@ const ParentSchema = new mongoose.Schema(
     googleId: { type: String, sparse: true, unique: true },
     name: { type: String, required: true },
     phoneNumber: { type: String },
+    role: { type: String, enum: Role, default: Role.PARENT },
     children: { type: [mongoose.Schema.Types.ObjectId], ref: "Child", default: [] },
   },
   { timestamps: true, versionKey: false }
