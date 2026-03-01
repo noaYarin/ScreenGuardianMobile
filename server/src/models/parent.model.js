@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Role } from "../constants/role.js";
+import { ChildSchema } from './child.model.js';
 
 const ParentSchema = new mongoose.Schema(
   {
@@ -9,7 +10,7 @@ const ParentSchema = new mongoose.Schema(
     name: { type: String, required: true },
     phoneNumber: { type: String },
     role: { type: String, enum: Role, default: Role.PARENT },
-    children: { type: [mongoose.Schema.Types.ObjectId], ref: "Child", default: [] },
+    child: { type: [ChildSchema], default: [] },
   },
   { timestamps: true, versionKey: false }
 );

@@ -6,7 +6,6 @@ export const AvatarSchema = new mongoose.Schema(
         img: { type: String, default: "default.png" },
         currentXp: { type: Number, default: 0 },
         nextLevelXp: { type: Number, default: 100 },
-        childId: { type: mongoose.Schema.Types.ObjectId, ref: "Child", required: true },
     }, { timestamps: true }
 );
 

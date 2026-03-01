@@ -6,7 +6,6 @@ export const AchievementSchema = new mongoose.Schema(
         description: { type: String, required: true },
         icon: { type: String, default: "default.png" },
         xpReward: { type: Number, default: 0 },
-        avatarId: { type: mongoose.Schema.Types.ObjectId, ref: "Avatar", required: true },
     }, { timestamps: true }
 );
 
