@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../config/env.js";
 import { AppError } from "../utils/appError.js";
+import { Auth as AuthErrors } from "../constants/errors.js";
 import { createParent, findParentByEmail, findParentByGoogleId } from "../dal/parent.dal.js";
 
 const BCRYPT_ROUNDS = 10;
@@ -27,13 +28,13 @@ export function issueChildToken(parentId, childId) {
 
 async function verifyGoogleIdToken(idToken) {
   if (!googleClient || !env.GOOGLE_CLIENT_ID) {
-    throw new AppError({ status: 503, code: "GOOGLE_AUTH_DISABLED", message: "Google sign-in is not configured" });
+    throw new AppError(AuthErrors.GOOGLE_AUTH_DISABLED);
   }
   try {
     const ticket = await googleClient.verifyIdToken({ idToken, audience: env.GOOGLE_CLIENT_ID });
     return ticket.getPayload();
   } catch {
-    throw new AppError({ status: 401, code: "INVALID_GOOGLE_TOKEN", message: "Invalid or expired Google token" });
+    throw new AppError(AuthErrors.INVALID_GOOGLE_TOKEN);
   }
 }
 
@@ -43,7 +44,7 @@ async function resolveParentFromGooglePayload(payload) {
   const name = payload.name ?? email?.split("@")[0] ?? "User";
 
   if (!email) {
-    throw new AppError({ status: 400, code: "NO_EMAIL", message: "Google account has no email" });
+    throw new AppError(AuthErrors.NO_EMAIL);
   }
 
   let parent = await findParentByGoogleId(googleId);
@@ -56,13 +57,13 @@ async function resolveParentFromGooglePayload(payload) {
     return parent;
   }
 
-  return createParent({ email, googleId, name, children: [] });
+  return createParent({ email, googleId, name, child: [] });
 }
 
 export async function registerParent({ email, password, name, phoneNumber, gender }) {
   const existing = await findParentByEmail(email);
   if (existing) {
-    throw new AppError({ status: 409, code: "EMAIL_EXISTS", message: "Email already registered" });
+    throw new AppError(AuthErrors.EMAIL_EXISTS);
   }
 
   const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
@@ -72,7 +73,7 @@ export async function registerParent({ email, password, name, phoneNumber, gende
     name,
     phoneNumber,
     gender,
-    children: [],
+    child: [],
   });
 
   return issueAuthResponse(created);
@@ -81,15 +82,15 @@ export async function registerParent({ email, password, name, phoneNumber, gende
 export async function loginParent({ email, password }) {
   const parent = await findParentByEmail(email);
   if (!parent) {
-    throw new AppError({ status: 401, code: "INVALID_CREDENTIALS", message: "Invalid email or password" });
+    throw new AppError(AuthErrors.INVALID_CREDENTIALS);
   }
   if (!parent.password) {
-    throw new AppError({ status: 400, code: "USE_GOOGLE", message: "This account uses Google sign-in" });
+    throw new AppError(AuthErrors.USE_GOOGLE);
   }
 
   const valid = await bcrypt.compare(password, parent.password);
   if (!valid) {
-    throw new AppError({ status: 401, code: "INVALID_CREDENTIALS", message: "Invalid email or password" });
+    throw new AppError(AuthErrors.INVALID_CREDENTIALS);
   }
 
   return issueAuthResponse(parent);

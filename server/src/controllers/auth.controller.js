@@ -1,4 +1,5 @@
 import { registerParent, loginParent, loginWithGoogle } from "../services/auth.service.js";
+import { Auth as AuthErrors } from "../constants/errors.js";
 
 export async function registerParentController(req, res, next) {
   try {
@@ -24,7 +25,8 @@ export async function googleAuthController(req, res, next) {
   try {
     const { idToken } = req.body;
     if (!idToken) {
-      return res.status(400).json({ ok: false, error: { code: "MISSING_TOKEN", message: "idToken is required" } });
+      const e = AuthErrors.MISSING_TOKEN;
+      return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
     }
     const data = await loginWithGoogle(idToken);
     res.json({ ok: true, data });

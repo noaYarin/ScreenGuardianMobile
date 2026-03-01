@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import ParentModel from "../models/parent.model.js";  
 import { AppError } from "../utils/appError.js";
+import { Common as CommonErrors } from "../constants/errors.js";
 
 export async function createParent(parentDoc) {
   return ParentModel.create(parentDoc);
@@ -16,47 +17,47 @@ export async function findParentByGoogleId(googleId) {
 
 export async function pushChildToParent(parentId, childDoc) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
-    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
+    throw new AppError(CommonErrors.INVALID_PARENT_ID);
   }
 
   const updated = await ParentModel.findByIdAndUpdate(
     parentId,
-    { $push: { children: childDoc } },
+    { $push: { child: childDoc } },
     { new: true }
   );
 
   if (!updated) {
-    throw new AppError({ status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" });
+    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
   }
 
   return updated;
 }
 
-export async function getChildrenByParentId(parentId) {
+export async function getChildByParentId(parentId) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
-    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
+    throw new AppError(CommonErrors.INVALID_PARENT_ID);
   }
 
-  const parent = await ParentModel.findById(parentId, { children: 1 }).lean();
+  const parent = await ParentModel.findById(parentId, { child: 1 }).lean();
   if (!parent) {
-    throw new AppError({ status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" });
+    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
   }
 
-  return parent.children || [];
+  return parent.child || [];
 }
 
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
-    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid parentId" });
+    throw new AppError(CommonErrors.INVALID_PARENT_ID);
   }
   if (!mongoose.Types.ObjectId.isValid(childId)) {
-    throw new AppError({ status: 400, code: "INVALID_ID", message: "Invalid childId" });
+    throw new AppError(CommonErrors.INVALID_CHILD_ID);
   }
 
   const updated = await ParentModel.findOneAndUpdate(
-    { _id: parentId, "children._id": childId },
-    { $set: { "children.$.isActive": isActive } },
-    { new: true, projection: { children: 1 } }
+    { _id: parentId, "child._id": childId },
+    { $set: { "child.$.isActive": isActive } },
+    { new: true, projection: { child: 1 } }
   ).lean();
 
   
