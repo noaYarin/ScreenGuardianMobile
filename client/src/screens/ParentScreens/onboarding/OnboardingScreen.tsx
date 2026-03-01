@@ -10,13 +10,13 @@ import {
   Image,
 } from 'react-native';
 
-import { OnboardingButton } from '../../components/OnboardingButton';
-import { COLORS, SIZES } from '../../../constants/theme';
+import { OnboardingButton } from '../../../components/OnboardingButton';
+import { COLORS, SIZES } from '../../../../constants/theme';
 import {
   getOnboardingSlides,
   OnboardingSlide,
-} from '../../../data/onBoardingData';
-import { useTranslation } from '../../../hooks/use-translation';
+} from '../../../../data/onBoardingData';
+import { useTranslation } from '../../../../hooks/use-translation';
 import { styles } from './onboarding.styles';
 
 export const OnboardingScreen: React.FC = () => {

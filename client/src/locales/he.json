@@ -15,13 +15,11 @@
     "step1_desc": "עקבו אחר זמן מסך וחסמו אפליקציות באופן מיידי",
     "step2_title": "מיקום בזמן אמת",
     "step2_desc": "קבלו את מיקום הילד בכל רגע לשקט הנפשי שלכם",
-    "step3_title": "ניתוח AI",
-    "step3_desc": "המלצות לפעילויות אחרות מבוססות בינה מלאכותית"
+    "step3_title": "דוחות חכמים",
+    "step3_desc": "קבלו נתונים סטטיסטיים ותובנות ברמה יומית ושבועית"
     },
   "dashboard": {
-    "start": "התחל להשתמש באפליקציה",
-    "skip": "דלג",
-    "next": "הבא"
+    "start": "התחל להשתמש באפליקציה"
   },
   "roleSelection": {
     "title": "מי משתמש באפליקציה?",
@@ -32,5 +30,105 @@
   },
   "alerts": {
     "time_up": "הזמן נגמר!"
+  },
+  "home": {
+    "title": "בית",
+    "accessibility": "נגישות",
+    "settings": "הגדרות",
+    "hello_user": "היי {{name}}",
+    "points": "נקודות: {{value}}",
+    "level": "רמה {{level}}",
+    "coins": "מטבעות: {{value}}",
+    "time_left_title": "זמן שנותר",
+    "time_left_warning": "את/ה קרוב/ה למגבלה",
+    "tile_apps": "אפליקציות",
+    "tile_extend": "בקשת הארכה",
+    "tile_shop": "חנות",
+    "tile_tasks": "מטלות",
+    "tile_achievements": "הישגים",
+    "tile_goals": "מטרות",
+    "tile_encouragement": "עידוד",
+    "tile_ideas": "רעיונות",
+    "tile_help": "עזרה",
+    "panic": "מצוקה",
+    "panic_a11y": "מעבר למסך מצוקה"
+  },
+  "distress": {
+    "title": "מצוקה",
+    "menu_a11y": "פתיחת תפריט",
+    "back_a11y": "חזרה",
+    "sos_a11y": "שליחת SOS",
+    "need_help": "צריך/ה עזרה?",
+    "tap_to_send": "לחץ/י על הכפתור כדי לשלוח התרעה",
+    "send_to": "נשלח אל",
+    "parents": "הורים",
+    "warning": "השתמש/י ב-SOS רק במקרה חירום אמיתי.",
+    "alert_title": "נשלח SOS",
+    "alert_desc": "נשלחה התרעה להורים."
+  },
+  "goals": {
+  "title": "מטרות",
+  "weekly_title": "מטרות השבוע",
+  "subtitle": "בואו נראה איך הולך!",
+  "total_progress": "התקדמות כללית",
+  "goal_less_than_2h": "השתמש בנייד פחות מ־2 שעות ביום",
+  "goal_no_screen_before_sleep": "בלי מסכים שעה לפני השינה",
+  "goal_learning_apps": "השתמש באפליקציות לימודיות",
+  "days_5_7": "5/7 ימים",
+  "days_6_7": "6/7 ימים",
+  "days_2_5": "2/5 ימים",
+  "completed_a11y": "המטרה הושלמה",
+  "not_completed_a11y": "המטרה לא הושלמה"
+},"store": {
+  "title": "חנות",
+  "back_a11y": "חזרה למסך הקודם",
+  "your_balance": "היתרה שלך",
+  "available_rewards": "פרסים זמינים:",
+  "reward_time": "30 דקות זמן מסך",
+  "reward_time_sub": "25 מטבעות",
+  "reward_movie": "בחירת סרט משפחתי",
+  "reward_icecream": "גלידה",
+  "reward_small": "צעצוע קטן",
+  "reward_cost": "25 מטבעות",
+  "coins": "מטבעות"
+},"tasks": {
+  "title": "מטלות",
+  "done": "מטלות שנעשו",
+  "todo": "מטלות שלא נעשו",
+  "done_a11y": "הצג מטלות שבוצעו",
+  "todo_a11y": "הצג מטלות שלא בוצעו",
+  "completed": "תמונה הועלתה",
+  "not_uploaded": "לא הועלתה תמונה",
+  "upload": "העלאת תמונה",
+  "upload_a11y": "העלה תמונה כהוכחה לביצוע המשימה",
+  "week_total": "מטבעות שנצברו השבוע: {{total}}",
+  "clean_room": "שיעורי בית",
+  "read_book": "קריאת ספר",
+  "tidy_room": "סידור חדר",
+  "walk_dog": "הליכה עם הכלב",
+  "help_table": "עזרה במטבח"
+},
+  "extendTime": {
+    "title": "בקשת הארכה",
+    "subTitle": "בקשת הארכת זמן",
+    "question": "כמה זמן לבקש?",
+    "minutes": "דקות",
+    "customTitle": "אחר:",
+    "requestedLabel": "מבוקש:",
+    "plusMinutes": "+{{minutes}} דקות",
+    "messageLabel": "הודעה להורה (אופציונלי):",
+    "messagePlaceholder": "אני רוצה לסיים לראות את הסרט...",
+    "send": "שליחת בקשה להורה",
+
+    "back_a11y": "חזרה למסך הקודם",
+    "menu_a11y": "פתיחת תפריט",
+    "option_a11y": "בחירה של תוספת {{minutes}} דקות",
+    "custom_a11y": "בחירת כמות דקות אחרת",
+    "customPlus_a11y": "הגדלת מספר הדקות",
+    "customMinus_a11y": "הקטנת מספר הדקות",
+    "message_a11y": "שדה הודעה להורה",
+    "send_a11y": "שליחת בקשת הארכה"
   }
 }
+
+
