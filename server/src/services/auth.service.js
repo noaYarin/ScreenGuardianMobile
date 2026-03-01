@@ -57,7 +57,7 @@ async function resolveParentFromGooglePayload(payload) {
     return parent;
   }
 
-  return createParent({ email, googleId, name, child: [] });
+  return createParent({ email, googleId, name, childs: [] });
 }
 
 export async function registerParent({ email, password, name, phoneNumber, gender }) {
@@ -73,7 +73,7 @@ export async function registerParent({ email, password, name, phoneNumber, gende
     name,
     phoneNumber,
     gender,
-    child: [],
+    childs: [],
   });
 
   return issueAuthResponse(created);

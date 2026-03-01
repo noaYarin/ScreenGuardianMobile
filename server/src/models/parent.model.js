@@ -10,7 +10,7 @@ const ParentSchema = new mongoose.Schema(
     name: { type: String, required: true },
     phoneNumber: { type: String },
     role: { type: String, enum: Role, default: Role.PARENT },
-    child: { type: [ChildSchema], default: [] },
+    childs: { type: [ChildSchema], default: [] },
   },
   { timestamps: true, versionKey: false }
 );

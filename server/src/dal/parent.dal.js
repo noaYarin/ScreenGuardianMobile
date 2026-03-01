@@ -22,7 +22,7 @@ export async function pushChildToParent(parentId, childDoc) {
 
   const updated = await ParentModel.findByIdAndUpdate(
     parentId,
-    { $push: { child: childDoc } },
+    { $push: { childs: childDoc } },
     { new: true }
   );
 
@@ -38,12 +38,12 @@ export async function getChildByParentId(parentId) {
     throw new AppError(CommonErrors.INVALID_PARENT_ID);
   }
 
-  const parent = await ParentModel.findById(parentId, { child: 1 }).lean();
+  const parent = await ParentModel.findById(parentId, { childs: 1 }).lean();
   if (!parent) {
     throw new AppError(CommonErrors.PARENT_NOT_FOUND);
   }
 
-  return parent.child || [];
+  return parent.childs || [];
 }
 
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
@@ -55,9 +55,9 @@ export async function updateChildActiveByParentId(parentId, childId, isActive) {
   }
 
   const updated = await ParentModel.findOneAndUpdate(
-    { _id: parentId, "child._id": childId },
-    { $set: { "child.$.isActive": isActive } },
-    { new: true, projection: { child: 1 } }
+    { _id: parentId, "childs._id": childId },
+    { $set: { "childs.$.isActive": isActive } },
+    { new: true, projection: { childs: 1 } }
   ).lean();
 
   

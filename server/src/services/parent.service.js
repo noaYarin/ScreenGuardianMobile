@@ -27,7 +27,7 @@ export async function setChildActive(parentId, childId, isActive) {
     throw new AppError(CommonErrors.NOT_FOUND);
   }
 
-  const list = updatedParent.child || [];
+  const list = updatedParent.childs || [];
   const updatedChild = list.find((c) => String(c._id) === String(childId));
   return { child: updatedChild };
 }
