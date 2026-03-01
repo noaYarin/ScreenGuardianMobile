@@ -1,10 +1,11 @@
-import * as Localization from 'expo-localization';
-import i18n from 'i18next';
-import { initReactI18next } from 'react-i18next';
-import { I18nManager, Platform } from 'react-native';
+import * as Localization from "expo-localization";
+import * as Updates from "expo-updates";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import { I18nManager, Platform } from "react-native";
 
-import en from './en.json';
-import he from './he.json';
+import en from "./en.json";
+import he from "./he.json";
 
 const resources = {
   en: { translation: en },
@@ -13,7 +14,7 @@ const resources = {
 
 export type SupportedLanguage = keyof typeof resources;
 
-const FALLBACK_LANG: SupportedLanguage = 'en';
+const FALLBACK_LANG: SupportedLanguage = "en";
 
 const getDeviceLanguage = (): SupportedLanguage => {
   const locale = Localization.getLocales()[0]?.languageCode?.toLowerCase();
@@ -22,8 +23,9 @@ const getDeviceLanguage = (): SupportedLanguage => {
     return locale as SupportedLanguage;
   }
 
+  // אם המכשיר כבר RTL, נתחיל בעברית
   if (I18nManager.isRTL) {
-    return 'he';
+    return "he";
   }
 
   return FALLBACK_LANG;
@@ -31,45 +33,54 @@ const getDeviceLanguage = (): SupportedLanguage => {
 
 const initialLanguage = getDeviceLanguage();
 
-const isHebrew = initialLanguage === 'he';
-if (I18nManager.isRTL !== isHebrew) {
-  I18nManager.allowRTL(isHebrew);
-  I18nManager.forceRTL(isHebrew);
+/**
+ * מפעיל/מכבה RTL לפי שפה.
+ * מחזיר true אם נעשה שינוי שדורש reload.
+ */
+const applyRTL = (lang: SupportedLanguage): boolean => {
+  const shouldBeRTL = lang === "he";
+  const needsChange = I18nManager.isRTL !== shouldBeRTL;
 
-  if (Platform.OS !== 'web') {
-    console.log(
-      '[i18n] RTL configuration changed. Please reload the app to apply layout direction.',
-    );
-  }
+  if (!needsChange) return false;
+
+  I18nManager.allowRTL(shouldBeRTL);
+  I18nManager.forceRTL(shouldBeRTL);
+
+  return true;
+};
+
+// מיישמים RTL באתחול (אם צריך)
+const rtlChangedOnInit = applyRTL(initialLanguage);
+
+// Init i18n
+i18n.use(initReactI18next).init({
+  resources,
+  lng: initialLanguage,
+  fallbackLng: FALLBACK_LANG,
+  interpolation: {
+    escapeValue: false,
+  },
+});
+
+// אם באתחול היה שינוי RTL — צריך reload בנייטיב
+if (rtlChangedOnInit && Platform.OS !== "web") {
+  void Updates.reloadAsync();
 }
 
-i18n
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: initialLanguage,
-    fallbackLng: FALLBACK_LANG,
-    interpolation: {
-      escapeValue: false, 
-    },
-  });
+/**
+ * שינוי שפה + RTL/LTR (עם reload בנייטיב אם צריך)
+ */
+export const changeLanguage = async (lang: SupportedLanguage) => {
+  // קודם נשנה את השפה של i18n כדי שהטקסטים יתעדכנו
+  await i18n.changeLanguage(lang);
 
-export const changeLanguage = (lang: SupportedLanguage) => {
-  const isHeb = lang === 'he';
+  // עכשיו נטפל בכיוון
+  const rtlChanged = applyRTL(lang);
 
-  if (I18nManager.isRTL !== isHeb) {
-    I18nManager.allowRTL(isHeb);
-    I18nManager.forceRTL(isHeb);
-
-    if (Platform.OS !== 'web') {
-      console.log(
-        '[i18n] Language changed. Please reload the app to fully apply RTL/LTR layout.',
-      );
-    }
+  // אם הכיוון השתנה — חייבים reload בנייטיב
+  if (rtlChanged && Platform.OS !== "web") {
+    await Updates.reloadAsync();
   }
-
-  return i18n.changeLanguage(lang);
 };
 
 export default i18n;
-
