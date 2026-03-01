@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 
 export const TaskSchema = new mongoose.Schema(
     {
-        title: { type: String, required: true, unique: true },
-        childId: { type: mongoose.Schema.Types.ObjectId, ref: "Child", required: true },
+        title: { type: String, required: true},
+        childId: { type: mongoose.Schema.Types.ObjectId, required: true },
         parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
         description: { type: String, default: "" },
         coinsReward: { type: Number, required: true, default: 0 },

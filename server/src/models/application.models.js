@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import {ScreenTimeSchema} from "../models/screenTime.model"
 
 export const ApplicationSchema = new mongoose.Schema(
     {
@@ -6,6 +7,6 @@ export const ApplicationSchema = new mongoose.Schema(
         icon: { type: String, default: "default.png" },
         packageName: { type: String, required: true },
         isBlocked: { type: Boolean, default: true },
-    }, { timestamps: true }
+        screenTime: { type: ScreenTimeSchema, default: {} }
+    }, 
 );
-export default mongoose.model("Application", ApplicationSchema);
