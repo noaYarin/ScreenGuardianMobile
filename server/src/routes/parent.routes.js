@@ -15,4 +15,5 @@ router.post("/add/child", authJwt, requireParent, addChildController);
 router.get("/get/child", authJwt, requireParent, getMyChildController);
 // api/v1/parents/set/child/:childId/active  
 router.patch("/set/child/:childId/active", authJwt, requireParent, setChildActiveController);
+
 export default router;
