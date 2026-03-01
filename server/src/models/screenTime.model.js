@@ -9,16 +9,6 @@ export const ScreenTimeSchema = new mongoose.Schema(
         startDate: { type: Date, default: null },
         maxAllowedTime: { type: Number, default: 0 },
         remainingTime: { type: Number, default: 0 },
-        targetType: {
-            type: String,
-            required: true,
-            enum: Object.values(ScreenTimeTarget) 
-        },
-        targetId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            refPath: 'targetType'
-        }
-    }, { timestamps: true }
+        
+    }, 
 );
-export default mongoose.model("ScreenTime", ScreenTimeSchema);

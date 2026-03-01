@@ -9,4 +9,3 @@ export const AvatarSchema = new mongoose.Schema(
     }, { timestamps: true }
 );
 
-export default mongoose.model("Avatar", AvatarSchema);

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import { DeviceType } from "../constants/deviceType";
+import {ApplicationSchema} from "../models/application.models"
+import {ScreenTimeSchema} from "../models/screenTime.model"
 
 export const DeviceSchema = new mongoose.Schema(
     {
@@ -10,8 +12,10 @@ export const DeviceSchema = new mongoose.Schema(
         location: { type: String, default: "" },
         isActive: { type: Boolean, default: true },
         barcode: { type: String, default: "" },
-        applications: { type: [mongoose.Schema.Types.ObjectId], ref: "Application", default: [] },
-        childId: { type: mongoose.Schema.Types.ObjectId, ref: "Child", required: true },
+        applications: { type: [ApplicationSchema], default: [] },
+        parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
+        childId: { type: mongoose.Schema.Types.ObjectId, required: true },
+        screenTime: { type: ScreenTimeSchema, default: {} },
     }, { timestamps: true }
 );
 export default mongoose.model("Device", DeviceSchema);
