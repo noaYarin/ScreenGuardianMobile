@@ -9,15 +9,16 @@ import { validateAndBuildChildDoc } from "./child.service.js";
 
 export async function addChild(parentId, body) {
   const childDoc = validateAndBuildChildDoc(body);
-  await pushChildToParent(parentId, childDoc);
-  return { child: childDoc };
+  const updated = await pushChildToParent(parentId, childDoc);
+  const addedChild = updated.children[updated.children.length - 1];
+  return { child: addedChild };
 }
 
 export async function getMyChild(parentId, options = {}) {
   const includeInactive = options.includeInactive === true;
   const childList = await getChildByParentId(parentId);
   const filtered = includeInactive ? childList : childList.filter((c) => c.isActive === true);
-  return { child: filtered };
+  return { children: filtered };
 }
 
 export async function setChildActive(parentId, childId, isActive) {

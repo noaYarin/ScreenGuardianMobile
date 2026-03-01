@@ -15,5 +15,3 @@ export const ChildSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
-export default mongoose.model("Child", ChildSchema);
