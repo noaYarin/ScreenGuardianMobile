@@ -35,4 +35,5 @@ export const Common = {
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
   VALIDATION_CHILD_ID: { status: 400, code: "VALIDATION", message: "childId must be a valid ObjectId" },
   VALIDATION_IS_ACTIVE: { status: 400, code: "VALIDATION", message: "isActive must be boolean" },
+  LIMIT_MAX_CHILDREN_REACHED: {status: 409,code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account.",}
 };

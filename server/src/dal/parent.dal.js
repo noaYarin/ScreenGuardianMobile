@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ParentModel from "../models/parent.model.js";  
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { MAX_CHILDREN_PER_PARENT } from "../constants/childNumLimit.js";
 
 export async function createParent(parentDoc) {
   return ParentModel.create(parentDoc);
@@ -20,30 +21,27 @@ export async function pushChildToParent(parentId, childDoc) {
     throw new AppError(CommonErrors.INVALID_PARENT_ID);
   }
 
-  const updated = await ParentModel.findByIdAndUpdate(
-    parentId,
+  const indexKey = `children.${MAX_CHILDREN_PER_PARENT - 1}`;
+
+  const updated = await ParentModel.findOneAndUpdate(
+    { _id: parentId, [indexKey]: { $exists: false } },
     { $push: { children: childDoc } },
     { new: true }
   );
 
-  if (!updated) {
+  if (updated) {
+    return updated;
+  }
+
+  // אם לא עודכן — נבדוק למה
+  const parentExists = await ParentModel.exists({ _id: parentId });
+
+  if (!parentExists) {
     throw new AppError(CommonErrors.PARENT_NOT_FOUND);
   }
 
-  return updated;
-}
-
-export async function getChildByParentId(parentId) {
-  if (!mongoose.Types.ObjectId.isValid(parentId)) {
-    throw new AppError(CommonErrors.INVALID_PARENT_ID);
-  }
-
-  const parent = await ParentModel.findById(parentId, { children: 1 }).lean();
-  if (!parent) {
-    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
-  }
-
-  return parent.children || [];
+  // אם ההורה קיים → זה אומר שהגענו למכסה
+  throw new AppError(CommonErrors.LIMIT_MAX_CHILDREN_REACHED);
 }
 
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
