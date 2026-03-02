@@ -9,6 +9,8 @@ import {
 } from "../dal/pairing.dal.js";
 import { getChildByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
+import { createDevice, findDeviceByBarcode } from "../dal/device.dal.js";
+import { DeviceType } from "../constants/deviceType.js";
 
 const PAIRING_TTL_MINUTES = 5;
 const SHORT_CODE_MAX_ATTEMPTS = 20;
@@ -103,5 +105,44 @@ export async function linkByCodeOrToken(payload) {
   await consumePairingSession(session._id);
 
   const { parentId, childId } = await resolveChildIdForSession(session);
-  return issueChildToken(parentId, childId);
+
+  const { deviceName, deviceType } = normalizeDevicePayload(payload);
+  const device = await createOrGetDeviceForSession(session, parentId, childId, deviceName, deviceType);
+
+  const tokenData = await issueChildToken(parentId, childId);
+
+  return {
+    ...tokenData,
+    deviceId: String(device._id),
+  };
+}
+
+function normalizeDevicePayload(payload) {
+  const deviceName = String(payload.deviceName || "").trim();
+  const deviceType = String(payload.deviceType || "").trim();
+
+  return {
+    deviceName: deviceName || "Child device",
+    deviceType: deviceType || DeviceType.PHONE, 
+  };
+}
+
+
+async function createOrGetDeviceForSession(session, parentId, childId, deviceName, deviceType) {
+  const existing = await findDeviceByBarcode(session.barcodeToken);
+  if (existing) return existing;
+
+  return createDevice({
+    name: deviceName,
+    type: deviceType,
+    isLocked: false,
+    code: Number(session.code) || 0,
+    location: "",
+    isActive: true,
+    barcode: session.barcodeToken,
+    applications: [],
+    parentId,
+    childId,
+    screenTime: {},
+  });
 }
