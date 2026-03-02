@@ -19,10 +19,18 @@ export async function consumePairingSession(sessionId) {
   if (!mongoose.Types.ObjectId.isValid(sessionId)) {
     throw new AppError(CommonErrors.INVALID_SESSION_ID);
   }
-  const updated = await PairingSessionModel.findByIdAndUpdate(
-    sessionId,
-    { $set: { usedAt: new Date() } },
+
+  const now = new Date();
+
+  const updated = await PairingSessionModel.findOneAndUpdate(
+    {
+      _id: sessionId,
+      usedAt: null,            
+      expiresAt: { $gt: now },   
+    },
+    { $set: { usedAt: now } },
     { new: true }
   ).lean();
-  return updated;
+
+  return updated; 
 }
