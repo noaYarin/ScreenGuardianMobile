@@ -9,6 +9,8 @@ import {
 } from "../dal/pairing.dal.js";
 import { getChildByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
+import { createDevice, findDeviceByBarcode } from "../dal/device.dal.js";
+import { DeviceType } from "../constants/deviceType.js";
 
 const PAIRING_TTL_MINUTES = 5;
 const SHORT_CODE_MAX_ATTEMPTS = 20;
@@ -49,11 +51,7 @@ function validateLinkPayload(payload) {
     : { byCode: false, value: String(barcodeToken).trim() };
 }
 
-function validateSession(session) {
-  if (!session) throw new AppError(PairingErrors.SESSION_NOT_FOUND);
-  if (session.usedAt) throw new AppError(PairingErrors.SESSION_ALREADY_USED);
-  if (new Date(session.expiresAt) <= new Date()) throw new AppError(PairingErrors.SESSION_EXPIRED);
-}
+
 
 async function resolveChildIdForSession(session) {
   const parentId = String(session.parentId);
@@ -99,9 +97,58 @@ export async function linkByCodeOrToken(payload) {
   const { byCode, value } = validateLinkPayload(payload);
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
-  validateSession(session);
-  await consumePairingSession(session._id);
+ if (!session) {
+    throw new AppError(PairingErrors.SESSION_NOT_FOUND);
+  }
+  
+  const consumed = await consumePairingSession(session._id);
+  if (!consumed) { 
+    throw new AppError(PairingErrors.SESSION_ALREADY_USED);
+  }
 
   const { parentId, childId } = await resolveChildIdForSession(session);
-  return issueChildToken(parentId, childId);
+
+  const { deviceName, deviceType } = normalizeDevicePayload(payload);
+  const device = await createOrGetDeviceForSession(session, parentId, childId, deviceName, deviceType);
+
+  const tokenData = await issueChildToken(parentId, childId);
+
+  return {
+    ...tokenData,
+    deviceId: String(device._id),
+  };
+}
+
+function normalizeDevicePayload(payload) {
+  const deviceName = String(payload.deviceName || "").trim();
+  const deviceType = String(payload.deviceType || "").trim();
+
+  if (!deviceType) throw new AppError(PairingErrors.DEVICE_TYPE_REQUIRED);
+  if (!Object.values(DeviceType).includes(deviceType)) {
+    throw new AppError(PairingErrors.INVALID_DEVICE_TYPE);
+  }
+
+  return {
+    deviceName: deviceName || "Child device",
+    deviceType,
+  };
+}
+
+async function createOrGetDeviceForSession(session, parentId, childId, deviceName, deviceType) {
+  const existing = await findDeviceByBarcode(session.barcodeToken);
+  if (existing) return existing;
+
+  return createDevice({
+    name: deviceName,
+    type: deviceType,
+    isLocked: false,
+    code: Number(session.code) || 0,
+    location: "",
+    isActive: true,
+    barcode: session.barcodeToken,
+    applications: [],
+    parentId,
+    childId,
+    screenTime: {},
+  });
 }

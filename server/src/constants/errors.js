@@ -8,6 +8,8 @@ export const Pairing = {
   SESSION_EXPIRED: { status: 410, code: "SESSION_EXPIRED", message: "Pairing code has expired" },
   NO_CHILD: { status: 400, code: "NO_CHILD", message: "Parent has no active child" },
   CHILD_SELECTION_REQUIRED: { status: 400, code: "CHILD_SELECTION_REQUIRED", message: "Parent has more than one child; childId must be specified when generating the pairing code" },
+  DEVICE_TYPE_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is required" },
+INVALID_DEVICE_TYPE: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is invalid" },
 };
 
 
@@ -29,6 +31,7 @@ export const Common = {
   INVALID_PARENT_ID: { status: 400, code: "INVALID_ID", message: "Invalid parentId" },
   INVALID_CHILD_ID: { status: 400, code: "INVALID_ID", message: "Invalid childId" },
   INVALID_SESSION_ID: { status: 400, code: "INVALID_ID", message: "Invalid session id" },
+  INVALID_DEVICE_ID: { status: 400, code: "INVALID_ID", message: "Invalid deviceId" },
   PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
   NOT_FOUND: { status: 404, code: "NOT_FOUND", message: "Child not found" },
   VALIDATION_NAME_BIRTHDATE: { status: 400, code: "VALIDATION_ERROR", message: "name and birthDate are required" },
