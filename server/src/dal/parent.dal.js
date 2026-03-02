@@ -44,6 +44,21 @@ export async function pushChildToParent(parentId, childDoc) {
   throw new AppError(CommonErrors.LIMIT_MAX_CHILDREN_REACHED);
 }
 
+
+export async function getChildByParentId(parentId) {
+  if (!mongoose.Types.ObjectId.isValid(parentId)) {
+    throw new AppError(CommonErrors.INVALID_PARENT_ID);
+  }
+
+  const parent = await ParentModel.findById(parentId, { children: 1 }).lean();
+
+  if (!parent) {
+    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+  }
+
+  return parent.children || [];
+}
+
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
   if (!mongoose.Types.ObjectId.isValid(parentId)) {
     throw new AppError(CommonErrors.INVALID_PARENT_ID);

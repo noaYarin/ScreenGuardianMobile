@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { NotificationSeverity } from "../constants/severity";
+import { NotificationSeverity } from "../constants/severity.js";
 
 export const NotificationSchema = new mongoose.Schema(
     {

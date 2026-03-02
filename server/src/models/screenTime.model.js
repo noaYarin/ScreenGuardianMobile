@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { ScreenTimeTarget } from "../constants/ScreenTimeTarget";
 
 export const ScreenTimeSchema = new mongoose.Schema(
     {

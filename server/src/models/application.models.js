@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {ScreenTimeSchema} from "../models/screenTime.model"
+import {ScreenTimeSchema} from "../models/screenTime.model.js"
 
 export const ApplicationSchema = new mongoose.Schema(
     {
