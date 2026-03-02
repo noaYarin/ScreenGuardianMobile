@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ReportLimitFrequency } from "../constants/limitFrequency";
+import { ReportLimitFrequency } from "../constants/limitFrequency.js";
 import { AppBreakdownItemSchema } from "./appBreakDown.js";
 
 export const ReportSchema = new mongoose.Schema(

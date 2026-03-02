@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { DeviceType } from "../constants/deviceType";
-import {ApplicationSchema} from "../models/application.models"
-import {ScreenTimeSchema} from "../models/screenTime.model"
+import { DeviceType } from "../constants/deviceType.js";
+import {ApplicationSchema} from "../models/application.models.js"
+import {ScreenTimeSchema} from "../models/screenTime.model.js"
 
 export const DeviceSchema = new mongoose.Schema(
     {
