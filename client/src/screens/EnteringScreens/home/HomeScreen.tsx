@@ -21,7 +21,7 @@ export const HomeScreen: React.FC = () => {
   };
 
   const handleStartOnboarding = () => {
-    router.replace('/Parent/onboardingRoute');
+    router.replace('/Entering/onboardingRoute');
   };
 
   return (

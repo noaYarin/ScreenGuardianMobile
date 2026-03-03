@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-import { COLORS, Fonts,SIZES } from '../../../constants/theme';
+import { COLORS, Fonts,SIZES } from '../../../../constants/theme';
 
 const AVATAR_SIZE = 220;
 

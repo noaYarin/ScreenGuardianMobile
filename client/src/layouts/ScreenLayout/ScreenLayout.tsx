@@ -1,5 +1,5 @@
 import React from "react";
-import { SafeAreaView, View, ScrollView } from "react-native";
+import { SafeAreaView, View, ScrollView, Platform } from "react-native";
 import { styles } from "./styles";
 
 type Props = {
@@ -13,7 +13,9 @@ export default function ScreenLayout({ children }: Props) {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.inner}>{children}</View>
+        <View style={[styles.inner, Platform.OS === "web" && styles.webFrame]}>
+          {children}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
