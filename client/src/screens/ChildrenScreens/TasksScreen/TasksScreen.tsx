@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { View, Pressable, ScrollView, I18nManager } from "react-native";
-import { Stack, router } from "expo-router";
+import { View, Pressable, ScrollView } from "react-native";
+import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -21,13 +21,33 @@ type Task = {
   done: boolean;
 };
 
-export default function TasksScreen() {
-  const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<"done" | "todo">("done");
+function HeaderIconButton({
+  name,
+  onPress,
+  accessibilityLabel,
+}: {
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  onPress: () => void;
+  accessibilityLabel: string;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={10}
+      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
+    >
+      <MaterialCommunityIcons name={name} size={22} color="#000" />
+    </Pressable>
+  );
+}
 
-  // ✅ חץ "חזור" שמתאים את עצמו ל-RTL/LTR כמו ב-Distress
-  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    I18nManager.isRTL ? "arrow-left" : "arrow-right";
+export default function TasksScreen() {
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
+
+  const [activeTab, setActiveTab] = useState<"done" | "todo">("done");
 
   const tasks: Task[] = [
     { id: "1", title: t("tasks.clean_room"), coins: 15, done: true },
@@ -38,40 +58,24 @@ export default function TasksScreen() {
   ];
 
   const filteredTasks =
-    activeTab === "done"
-      ? tasks.filter((t) => t.done)
-      : tasks.filter((t) => !t.done);
+    activeTab === "done" ? tasks.filter((x) => x.done) : tasks.filter((x) => !x.done);
 
   return (
     <>
       <Stack.Screen
         options={{
           title: t("tasks.title"),
-
-          headerRight: () => (
-            <HeaderIconButton
-              name={backIconName}
-              onPress={() => router.back()}
-              accessibilityLabel={t("tasks.back_a11y")}
-            />
-          ),
-
-          headerLeft: () => (
-            <HeaderIconButton
-              name="menu"
-              onPress={() => {}}
-              accessibilityLabel={t("tasks.menu_a11y")}
-            />
-          ),
-
           headerTitleAlign: "center",
           headerShadowVisible: false,
+
+          // ✅ אין Back כאן בכלל — מגיע מה־RootLayout
+
+          
         }}
       />
 
       <ScreenLayout>
         <View style={styles.container}>
-          {/* Tabs */}
           <View style={styles.tabsWrapper}>
             <Pressable
               style={[styles.tabBtn, activeTab === "todo" && styles.activeTab]}
@@ -132,7 +136,6 @@ export default function TasksScreen() {
               </View>
             ))}
 
-            {/* Weekly summary */}
             <View style={styles.weekBox}>
               <MaterialCommunityIcons name={ICON.coin} size={20} color="#B36B00" />
               <AppText weight="extraBold" style={styles.weekText}>
@@ -143,27 +146,5 @@ export default function TasksScreen() {
         </View>
       </ScreenLayout>
     </>
-  );
-}
-
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#000" />
-    </Pressable>
   );
 }

@@ -21,13 +21,6 @@
   "dashboard": {
     "start": "התחל להשתמש באפליקציה"
   },
-  "roleSelection": {
-    "title": "מי משתמש באפליקציה?",
-    "parents": "הורים",
-    "childs": "ילדים",
-    "childDescription": "שימוש מבוקר לפי כללי ההורה",
-    "parentDescription": "ניהול, מעקב והגדרות שימוש"
-  },
   "alerts": {
     "time_up": "הזמן נגמר!"
   },
@@ -128,7 +121,98 @@
     "customMinus_a11y": "הקטנת מספר הדקות",
     "message_a11y": "שדה הודעה להורה",
     "send_a11y": "שליחת בקשת הארכה"
+  },
+  "selectRole": {
+  "title": "מי משתמש באפליקציה?",
+  "heading": "מי משתמש באפליקציה?",
+  "subHeading": "בחרו פרופיל להמשך",
+  "child": "ילד",
+  "child_desc": "שימוש מבוקר לפי כללי ההורה",
+  "parent": "הורה",
+  "parent_desc": "ניהול, מעקב והגדרות שימוש",
+  "child_a11y": "כניסה כילד",
+  "parent_a11y": "כניסה כהורה",
+  "back_a11y": "חזור",
+  "menu_a11y": "פתח תפריט"
+},
+"roleSelection": {
+  "title": "ברוכים הבאים",
+  "heading": "מי משתמש באפליקציה?",
+  "subHeading": "בחרו פרופיל להמשך",
+  "childs": "ילד",
+  "childDescription": "שימוש במכשיר לפי ההגבלות שההורה הגדיר",
+  "parents": "הורה",
+  "parentDescription": "ניהול מגבלות, מעקב שימוש ואישור בקשות",
+  "child_a11y": "המשך כילד",
+  "parent_a11y": "המשך כהורה",
+  "back_a11y": "חזור",
+  "menu_a11y": "פתח תפריט"
+},
+  "linkChildren": {
+    "title": "חיבור להורה",
+    "back_a11y": "חזרה",
+    "menu_a11y": "פתיחת תפריט",
+
+    "tab_barcode": "ברקוד",
+    "tab_code": "קוד",
+    "tab_barcode_a11y": "מעבר למצב ברקוד",
+    "tab_code_a11y": "מעבר למצב קוד",
+
+    "heading": "חיבור לחשבון הורה",
+    "sub_barcode": "בקש/י מההורה לסרוק את הברקוד במסך שלו.",
+    "sub_code": "הקלד/י את הקוד שקיבלת מההורה.",
+
+    "scan": "סריקת ברקוד",
+    "scan_a11y": "התחלת סריקת ברקוד",
+
+    "code_placeholder": "הקלד/י קוד",
+    "code_input_a11y": "שדה הזנת קוד",
+    "submit": "חיבור",
+    "submit_a11y": "שליחת הקוד וחיבור"
+  },
+  "loginParent": {
+    "title": "מסך התחברות",
+    "heading": "התחברות להורים",
+    "subheading": "נהל את זמן המסך של המשפחה שלך",
+    "email_placeholder": "כתובת אימייל",
+    "password_placeholder": "סיסמה",
+    "forgot": "שכחת סיסמה?",
+    "connect": "התחבר",
+    "or": "או",
+    "google": "המשך עם Google",
+    "no_account": "עדיין אין לך חשבון?",
+    "register": "הירשם עכשיו",
+
+    "invalid_email": "נא להכניס כתובת אימייל תקינה.",
+    "missing_password": "נא להכניס סיסמה.",
+    "generic_error": "משהו השתבש. נסי שוב.",
+    "google_error": "ההתחברות עם Google נכשלה. נסי שוב.",
+
+    "back_a11y": "חזרה",
+    "menu_a11y": "תפריט",
+    "email_a11y": "שדה אימייל",
+    "password_a11y": "שדה סיסמה",
+    "toggle_password_a11y": "הצג או הסתר סיסמה",
+    "forgot_a11y": "שכחתי סיסמה",
+    "connect_a11y": "כפתור התחברות",
+    "google_a11y": "המשך עם גוגל",
+    "register_a11y": "מעבר להרשמה"
+  },"homeParent": {
+    "title": "ברוכים הבאים",
+    "parent_name_fallback": "אמא",
+    "hello": "שלום, {{name}}!",
+    "overview": "סקירה כללית",
+    "my_kids": "הילדים שלי",
+    "day_screen_time": "זמן מסך היום",
+    "out_of": "מתוך {{limit}}",
+    "full_watch": "צפייה מלאה",
+    "add_child": "הוספת ילד",
+    "overview_a11y": "מעבר לסקירה כללית",
+    "full_watch_a11y": "פתיחת צפייה מלאה",
+    "add_child_a11y": "הוספת ילד חדש",
+    "child_card_a11y": "בחירת ילד: {{name}}"
   }
 }
+
 
 

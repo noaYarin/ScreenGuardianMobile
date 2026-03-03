@@ -1,12 +1,5 @@
 import React, { useMemo, useState } from "react";
-import {
-  View,
-  Pressable,
-  I18nManager,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+import { View, Pressable, TextInput, KeyboardAvoidingView, Platform } from "react-native";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -21,13 +14,32 @@ type MinuteOption = {
   borderStyle: "blue" | "purple" | "green";
 };
 
+function HeaderIconButton({
+  name,
+  onPress,
+  accessibilityLabel,
+}: {
+  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  onPress: () => void;
+  accessibilityLabel: string;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      hitSlop={10}
+      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
+    >
+      <MaterialCommunityIcons name={name} size={22} color="#000" />
+    </Pressable>
+  );
+}
+
 export default function ExtendTimeRequestScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
 
-  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    I18nManager.isRTL ? "arrow-left" : "arrow-right";
-
-  // ✅ דינמי: תשני כאן בקלות את האופציות
   const minuteOptions: MinuteOption[] = useMemo(
     () => [
       { minutes: 10, icon: "clock-outline", borderStyle: "blue" },
@@ -37,9 +49,7 @@ export default function ExtendTimeRequestScreen() {
     []
   );
 
-  const [selectedMinutes, setSelectedMinutes] = useState<number>(
-    minuteOptions[0]?.minutes ?? 5
-  );
+  const [selectedMinutes, setSelectedMinutes] = useState<number>(minuteOptions[0]?.minutes ?? 5);
   const [customMinutes, setCustomMinutes] = useState<number>(5);
   const [message, setMessage] = useState<string>("");
 
@@ -54,8 +64,6 @@ export default function ExtendTimeRequestScreen() {
   const decCustom = () => selectCustom(Math.max(1, customMinutes - 1));
 
   const onSend = () => {
-    // TODO: חיבור ל-API שלך
-    // payload: { minutes: selectedMinutes, message }
     router.back();
   };
 
@@ -73,31 +81,15 @@ export default function ExtendTimeRequestScreen() {
           headerTitleAlign: "center",
           headerShadowVisible: false,
 
-          headerRight: () => (
-            <HeaderIconButton
-              name={backIconName}
-              onPress={() => router.back()}
-              accessibilityLabel={t("extendTime.back_a11y")}
-            />
-          ),
+          // ✅ Back מגיע מה־RootLayout
 
-          headerLeft: () => (
-            <HeaderIconButton
-              name="menu"
-              onPress={() => {}}
-              accessibilityLabel={t("extendTime.menu_a11y")}
-            />
-          ),
+        
         }}
       />
 
       <ScreenLayout>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.flex}
-        >
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.flex}>
           <View style={styles.container}>
-            {/* subtitle */}
             <View style={styles.subTitleRow}>
               <MaterialCommunityIcons name="trending-up" size={18} color="#2A6CFF" />
               <AppText weight="bold" style={styles.subTitle}>
@@ -109,9 +101,7 @@ export default function ExtendTimeRequestScreen() {
               {t("extendTime.question")}
             </AppText>
 
-            {/* ✅ GRID 2x2 יציב */}
             <View style={styles.grid}>
-              {/* Row 1 */}
               <View style={styles.row}>
                 <MinuteCard
                   minutes={minuteOptions[0].minutes}
@@ -122,7 +112,6 @@ export default function ExtendTimeRequestScreen() {
                   a11y={t("extendTime.option_a11y", { minutes: minuteOptions[0].minutes })}
                   minutesLabel={t("extendTime.minutes")}
                 />
-
                 <MinuteCard
                   minutes={minuteOptions[1].minutes}
                   iconName={minuteOptions[1].icon}
@@ -134,9 +123,7 @@ export default function ExtendTimeRequestScreen() {
                 />
               </View>
 
-              {/* Row 2 */}
               <View style={styles.row}>
-                {/* ✅ CUSTOM (אין nested Pressable) */}
                 <View
                   style={[
                     styles.cardBase,
@@ -145,7 +132,6 @@ export default function ExtendTimeRequestScreen() {
                   ]}
                   accessible={false}
                 >
-                  {/* overlay pressable to select card */}
                   <Pressable
                     onPress={() => selectCustom(customMinutes)}
                     accessibilityRole="button"
@@ -157,11 +143,7 @@ export default function ExtendTimeRequestScreen() {
                   />
 
                   <View style={styles.customTopRow}>
-                    <MaterialCommunityIcons
-                      name="clock-outline"
-                      size={26}
-                      color="#E4572E"
-                    />
+                    <MaterialCommunityIcons name="clock-outline" size={26} color="#E4572E" />
                   </View>
 
                   <AppText weight="extraBold" style={styles.customLabel}>
@@ -215,15 +197,12 @@ export default function ExtendTimeRequestScreen() {
               </View>
             </View>
 
-            {/* summary */}
             <View style={styles.summaryBar}>
               <AppText weight="extraBold" style={styles.summaryText}>
-                {t("extendTime.requestedLabel")}{" "}
-                {t("extendTime.plusMinutes", { minutes: selectedMinutes })}
+                {t("extendTime.requestedLabel")} {t("extendTime.plusMinutes", { minutes: selectedMinutes })}
               </AppText>
             </View>
 
-            {/* message */}
             <View style={styles.messageBlock}>
               <AppText weight="bold" style={styles.messageLabel}>
                 {t("extendTime.messageLabel")}
@@ -235,12 +214,11 @@ export default function ExtendTimeRequestScreen() {
                 placeholderTextColor="#8A8A8A"
                 style={styles.messageInput}
                 multiline
-                textAlign={I18nManager.isRTL ? "right" : "left"}
+                textAlign={isRTL ? "right" : "left"}
                 accessibilityLabel={t("extendTime.message_a11y")}
               />
             </View>
 
-            {/* send */}
             <Pressable
               onPress={onSend}
               accessibilityRole="button"
@@ -293,28 +271,6 @@ function MinuteCard({
         +{minutes}
       </AppText>
       <AppText style={styles.minutesLabel}>{minutesLabel}</AppText>
-    </Pressable>
-  );
-}
-
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#000" />
     </Pressable>
   );
 }

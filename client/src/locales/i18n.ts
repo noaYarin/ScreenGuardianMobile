@@ -1,5 +1,6 @@
 import * as Localization from "expo-localization";
 import * as Updates from "expo-updates";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import { I18nManager, Platform } from "react-native";
@@ -15,7 +16,9 @@ const resources = {
 export type SupportedLanguage = keyof typeof resources;
 
 const FALLBACK_LANG: SupportedLanguage = "en";
+const STORAGE_KEY = "app_lang";
 
+/** שפת מכשיר כברירת מחדל (רק אם אין שמירה) */
 const getDeviceLanguage = (): SupportedLanguage => {
   const locale = Localization.getLocales()[0]?.languageCode?.toLowerCase();
 
@@ -24,19 +27,12 @@ const getDeviceLanguage = (): SupportedLanguage => {
   }
 
   // אם המכשיר כבר RTL, נתחיל בעברית
-  if (I18nManager.isRTL) {
-    return "he";
-  }
+  if (I18nManager.isRTL) return "he";
 
   return FALLBACK_LANG;
 };
 
-const initialLanguage = getDeviceLanguage();
-
-/**
- * מפעיל/מכבה RTL לפי שפה.
- * מחזיר true אם נעשה שינוי שדורש reload.
- */
+/** מפעיל/מכבה RTL לפי שפה. מחזיר true אם צריך reload בנייטיב */
 const applyRTL = (lang: SupportedLanguage): boolean => {
   const shouldBeRTL = lang === "he";
   const needsChange = I18nManager.isRTL !== shouldBeRTL;
@@ -49,36 +45,56 @@ const applyRTL = (lang: SupportedLanguage): boolean => {
   return true;
 };
 
-// מיישמים RTL באתחול (אם צריך)
-const rtlChangedOnInit = applyRTL(initialLanguage);
+/** קורא שפה שמורה (אם קיימת) */
+export const getStoredLanguage = async (): Promise<SupportedLanguage | null> => {
+  try {
+    const saved = await AsyncStorage.getItem(STORAGE_KEY);
+    if (saved === "he" || saved === "en") return saved;
+    return null;
+  } catch {
+    return null;
+  }
+};
 
-// Init i18n
-i18n.use(initReactI18next).init({
-  resources,
-  lng: initialLanguage,
-  fallbackLng: FALLBACK_LANG,
-  interpolation: {
-    escapeValue: false,
-  },
-});
-
-// אם באתחול היה שינוי RTL — צריך reload בנייטיב
-if (rtlChangedOnInit && Platform.OS !== "web") {
-  void Updates.reloadAsync();
-}
-
-/**
- * שינוי שפה + RTL/LTR (עם reload בנייטיב אם צריך)
- */
+/** שומר + משנה שפה + RTL + reload (אם צריך) */
 export const changeLanguage = async (lang: SupportedLanguage) => {
-  // קודם נשנה את השפה של i18n כדי שהטקסטים יתעדכנו
+  // 1) שמירה
+  try {
+    await AsyncStorage.setItem(STORAGE_KEY, lang);
+  } catch {
+    // ignore
+  }
+
+  // 2) שינוי שפה ל-i18next
   await i18n.changeLanguage(lang);
 
-  // עכשיו נטפל בכיוון
+  // 3) טיפול RTL/LTR
   const rtlChanged = applyRTL(lang);
 
-  // אם הכיוון השתנה — חייבים reload בנייטיב
+  // 4) אם הכיוון השתנה — חייבים reload בנייטיב
   if (rtlChanged && Platform.OS !== "web") {
+    await Updates.reloadAsync();
+  }
+};
+
+/** אתחול בטוח: בוחר שפה שמורה אם יש, אחרת שפת מכשיר */
+export const initLanguage = async () => {
+  const saved = await getStoredLanguage();
+  const lang = saved ?? getDeviceLanguage();
+
+  // RTL באתחול (אם צריך)
+  const rtlChangedOnInit = applyRTL(lang);
+
+  // init i18n
+  await i18n.use(initReactI18next).init({
+    resources,
+    lng: lang,
+    fallbackLng: FALLBACK_LANG,
+    interpolation: { escapeValue: false },
+    react: { useSuspense: false },
+  });
+
+  if (rtlChangedOnInit && Platform.OS !== "web") {
     await Updates.reloadAsync();
   }
 };

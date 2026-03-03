@@ -2,7 +2,8 @@ import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
   home: {
-    alignItems: "center",
+    width: "100%",
+    alignItems: "stretch",
     marginTop: 0,
   },
 
@@ -31,6 +32,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 14,
+    alignSelf: "center",
   },
 
   avatarLetter: {
@@ -53,13 +55,16 @@ export const styles = StyleSheet.create({
 
   chipsRow: {
     flexDirection: "row",
-    alignItems: "center", // ✅ חשוב לשורה
+    alignItems: "center",
     marginBottom: 12,
+    justifyContent: "center",
+    flexWrap: "wrap", // ✅ בטלפון צר זה לא יישבר מכוער
+    gap: 10, // ✅ נתמך בריאקט נייטיב חדש; אם לא נתמך אצלך תגידי ואחליף ל-margin
   },
 
   chip: {
     flexDirection: "row",
-    alignItems: "center",     // ✅ כבר היה נכון
+    alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
     paddingHorizontal: 16,
@@ -68,19 +73,16 @@ export const styles = StyleSheet.create({
 
   chipText: {
     fontSize: 16,
-    lineHeight: 20,           // ✅ תואם יותר לפונט
+    lineHeight: 20,
     marginHorizontal: 6,
     textAlign: "center",
     writingDirection: "rtl",
-
-    // ✅ אנדרואיד: מונע “ישיבה נמוכה” של הטקסט
     includeFontPadding: false,
     textAlignVertical: "center",
   },
 
   chipBlue: {
     backgroundColor: "#dbeafe",
-    marginRight: 12,
   },
 
   chipGold: {
@@ -133,22 +135,26 @@ export const styles = StyleSheet.create({
     textAlignVertical: "center",
   },
 
+  // ✅ 3x3 grid אמיתי
   grid: {
     width: "100%",
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
     marginBottom: 10,
+    rowGap: 12,
   },
 
+  // ✅ כל כפתור אותו גודל (ריבוע)
   tile: {
     width: "31.5%",
+    aspectRatio: 1,
     backgroundColor: "#ffffff",
     borderRadius: 18,
-    paddingVertical: 16,
-    paddingHorizontal: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: "center",
-    marginBottom: 14,
+    justifyContent: "center",
   },
 
   tilePressed: {
@@ -157,7 +163,7 @@ export const styles = StyleSheet.create({
   },
 
   tileIcon: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   tileText: {
@@ -166,6 +172,7 @@ export const styles = StyleSheet.create({
     writingDirection: "rtl",
     includeFontPadding: false,
     textAlignVertical: "center",
+    fontSize: 12,
   },
 
   panicBtn: {
@@ -178,6 +185,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "stretch",
   },
 
   panicPressed: {
@@ -195,7 +203,18 @@ export const styles = StyleSheet.create({
     includeFontPadding: false,
     textAlignVertical: "center",
   },
+
   pressed: {
-  opacity: 0.7,
-},
+    opacity: 0.7,
+  },
+
+  headerIconBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+  },
+
+  headerIconBtnPressed: {
+    opacity: 0.6,
+  },
 });

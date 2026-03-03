@@ -1,43 +1,21 @@
-import { useSelector } from 'react-redux';
-
-import en from '../src/locales/en.json';
-import he from '../src/locales/he.json';
-import type { SupportedLanguage } from '../src/locales/i18n';
-
-const translations: Record<SupportedLanguage, typeof en> = {
-  en,
-  he,
-};
-
-const resolvePath = (obj: any, path: string) => {
-  return path.split('.').reduce((acc, key) => {
-    if (acc && typeof acc === 'object' && key in acc) {
-      return acc[key];
-    }
-    return undefined;
-  }, obj as any);
-};
+import { useCallback } from "react";
+import { useTranslation as useI18NextTranslation } from "react-i18next";
+import i18n, { changeLanguage, type SupportedLanguage } from "../src/locales/i18n";
 
 export const useTranslation = () => {
-  const currentLanguage = useSelector(
-    (state: any) => state.language.currentLanguage as SupportedLanguage,
-  );
+  const { t } = useI18NextTranslation();
 
-  const t = (key: string): string => {
-    const langBundle = translations[currentLanguage] || translations.en;
-    const value = resolvePath(langBundle, key);
-    if (typeof value === 'string') {
-      return value;
-    }
-    return key;
-  };
+  const currentLanguage = (i18n.language as SupportedLanguage) || "en";
+  const isRTL = currentLanguage === "he";
 
-  const isRTL = currentLanguage === 'he';
+  const setLanguage = useCallback(async (lang: SupportedLanguage) => {
+    await changeLanguage(lang);
+  }, []);
 
   return {
     t,
     currentLanguage,
     isRTL,
+    changeLanguage: setLanguage,
   };
 };
-

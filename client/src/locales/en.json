@@ -21,13 +21,6 @@
   "dashboard": {
     "start": "Start using the app"
   },
-  "roleSelection": {
-    "title": "Who is using the app?",
-    "parents": "Parents",
-    "childs": "Childs",
-    "childDescription": "Controlled use according to parent rules",
-    "parentDescription": "Management, Tracking, and Usage Settings"
-  },
   "alerts": {
     "time_up": "Time is up!"
  },
@@ -129,6 +122,100 @@
     "customMinus_a11y": "Decrease minutes",
     "message_a11y": "Message field",
     "send_a11y": "Send extension request"
+  },
+  "selectRole": {
+  "title": "Who uses the app?",
+  "heading": "Who uses the app?",
+  "subHeading": "Choose your profile to continue",
+  "child": "Child",
+  "child_desc": "Usage monitored according to parent settings",
+  "parent": "Parent",
+  "parent_desc": "Manage, monitor and set usage limits",
+  "child_a11y": "Login as child",
+  "parent_a11y": "Login as parent",
+  "back_a11y": "Go back",
+  "menu_a11y": "Open menu"
+},
+"roleSelection": {
+  "title": "Welcome",
+  "heading": "Who uses the app?",
+  "subHeading": "Choose your profile to continue",
+  "childs": "Child",
+  "childDescription": "Use the device with limits set by your parent",
+  "parents": "Parent",
+  "parentDescription": "Manage limits, monitor usage and approve requests",
+  "child_a11y": "Continue as child",
+  "parent_a11y": "Continue as parent",
+  "back_a11y": "Go back",
+  "menu_a11y": "Open menu"
+},
+  "linkChildren": {
+    "title": "Connect to Parent",
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+
+    "tab_barcode": "Barcode",
+    "tab_code": "Code",
+    "tab_barcode_a11y": "Switch to barcode mode",
+    "tab_code_a11y": "Switch to code mode",
+
+    "heading": "Connect to Parent Account",
+    "sub_barcode": "Ask your parent to scan the barcode on their screen.",
+    "sub_code": "Enter the code your parent gave you.",
+
+    "scan": "Scan barcode",
+    "scan_a11y": "Start scanning barcode",
+
+    "code_placeholder": "Enter code",
+    "code_input_a11y": "Code input",
+    "submit": "Connect",
+    "submit_a11y": "Submit code and connect"
+  },
+  "loginParent": {
+    "title": "Login",
+    "heading": "Connect to Parents",
+    "subheading": "Manage your family's screen time",
+    "email_placeholder": "Email address",
+    "password_placeholder": "Password",
+    "forgot": "Forgot password?",
+    "connect": "Connect",
+    "or": "OR",
+    "google": "Continue with Google",
+    "no_account": "Don't have an account?",
+    "register": "Register now",
+
+    "invalid_email": "Please enter a valid email.",
+    "missing_password": "Please enter your password.",
+    "generic_error": "Something went wrong. Please try again.",
+    "google_error": "Google login failed. Please try again.",
+
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+    "email_a11y": "Email input",
+    "password_a11y": "Password input",
+    "toggle_password_a11y": "Show or hide password",
+    "forgot_a11y": "Forgot password",
+    "connect_a11y": "Login button",
+    "google_a11y": "Continue with Google",
+    "register_a11y": "Go to registration"
+  },
+  "homeParent": {
+    "title": "Welcome",
+    "parent_name_fallback": "Mom",
+    "hello": "Hello, {{name}}!",
+    "overview": "Overview",
+    "my_kids": "My Kids",
+    "day_screen_time": "Today's screen time",
+    "out_of": "out of {{limit}}",
+    "full_watch": "Full view",
+    "add_child": "Add child",
+    "overview_a11y": "Go to overview",
+    "full_watch_a11y": "Open full view",
+    "add_child_a11y": "Add a new child",
+    "child_card_a11y": "Select child: {{name}}"
   }
 }
+
+
+
 
