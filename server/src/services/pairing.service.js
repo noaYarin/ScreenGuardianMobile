@@ -87,7 +87,7 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code, barcodeToken, deviceName, deviceType }) {
+export async function linkByCodeOrToken({ code="", barcodeToken="", deviceName="", deviceType="OTHER" }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -104,9 +104,9 @@ export async function linkByCodeOrToken({ code, barcodeToken, deviceName, device
   const consumed = await consumePairingSession(session._id);
   if (!consumed) { 
     throw new AppError(PairingErrors.SESSION_ALREADY_USED);
-  }
+  } 
 
-  const { devicePayload } = validateDevicePayload({ deviceName, deviceType });
+  const devicePayload  = validateDevicePayload( deviceName, deviceType ); 
   const currentDevice = await createOrGetDeviceForSession(session, devicePayload);
 
   // Child token is used to authenticate the child on the device
@@ -118,21 +118,15 @@ export async function linkByCodeOrToken({ code, barcodeToken, deviceName, device
   };
 }
 
-function validateDevicePayload({ name, type }) {
-  const deviceName = String(name || "").trim(); 
-  const deviceType = String(type || DeviceType.OTHER).trim();
-
-  if (!deviceType) throw new AppError(PairingErrors.DEVICE_TYPE_REQUIRED);
+function validateDevicePayload(deviceName, deviceType) {
   if (!Object.values(DeviceType).includes(deviceType)) {
     throw new AppError(PairingErrors.INVALID_DEVICE_TYPE);
   }
 
-  const devicePayload = {
+  return {
     deviceName,
     deviceType,
   };
-
-  return devicePayload;
 }
 
 async function createOrGetDeviceForSession(session, devicePayload) {
@@ -143,10 +137,10 @@ async function createOrGetDeviceForSession(session, devicePayload) {
     name: devicePayload.deviceName,
     type: devicePayload.deviceType,
     isLocked: false,
-    code: Number(session.code) || 0,
+    code: session.code || "",
     location: "",
     isActive: true,
-    barcode: session.barcodeToken,
+    barcodeToken: session.barcodeToken || "",
     applications: [],
     parentId: String(session.parentId),
     childId: String(session.childId),
