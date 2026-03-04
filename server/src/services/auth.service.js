@@ -19,9 +19,10 @@ function issueAuthResponse(parent) {
   return { token, parentId };
 }
 
-export function issueChildToken(parentId, childId) {
+export async function issueChildToken(parentId, childId) {
   const parentIdStr = parentId != null ? String(parentId) : null;
   const childIdStr = childId != null ? String(childId) : null;
+  // JWT with parentId and childId 
   const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: "CHILD" });
   return { token, parentId: parentIdStr, childId: childIdStr };
 }
