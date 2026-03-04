@@ -1,4 +1,5 @@
 export const Pairing = {
+  PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
   CHILD_NOT_FOUND: { status: 400, code: "CHILD_NOT_FOUND", message: "Child does not belong to this parent" },
   SHORT_CODE_COLLISION: { status: 503, code: "SHORT_CODE_COLLISION", message: "Could not generate unique code, try again" },
   LINK_NEED_ONE: { status: 400, code: "VALIDATION_ERROR", message: "Provide either code or barcodeToken" },
@@ -32,7 +33,6 @@ export const Common = {
   INVALID_CHILD_ID: { status: 400, code: "INVALID_ID", message: "Invalid childId" },
   INVALID_SESSION_ID: { status: 400, code: "INVALID_ID", message: "Invalid session id" },
   INVALID_DEVICE_ID: { status: 400, code: "INVALID_ID", message: "Invalid deviceId" },
-  PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
   NOT_FOUND: { status: 404, code: "NOT_FOUND", message: "Child not found" },
   VALIDATION_NAME_BIRTHDATE: { status: 400, code: "VALIDATION_ERROR", message: "name and birthDate are required" },
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
