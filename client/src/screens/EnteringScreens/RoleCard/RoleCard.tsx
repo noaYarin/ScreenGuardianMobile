@@ -1,6 +1,7 @@
-import React, { useRef, useState } from 'react';
+import React, { ReactNode, useRef, useState } from 'react';
 import {
   Animated,
+  Image,
   ImageSourcePropType,
   Pressable,
   StyleProp,
@@ -8,7 +9,7 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import { Image } from 'expo-image';
+
 import { roleCardStyles as styles } from './rolecard.styles';
 
 type RoleCardProps = {
@@ -19,10 +20,6 @@ type RoleCardProps = {
   avatarCircleBackground: string;
   containerStyle?: StyleProp<ViewStyle>;
   description: string;
-
-  // ✅ נגישות (לא חובה – כדי לא לשבור שימושים קיימים)
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
 };
 
 export const RoleCard: React.FC<RoleCardProps> = ({
@@ -33,8 +30,6 @@ export const RoleCard: React.FC<RoleCardProps> = ({
   avatarCircleBackground,
   containerStyle,
   description,
-  accessibilityLabel,
-  accessibilityHint,
 }) => {
   const scale = useRef(new Animated.Value(1)).current;
   const [pressed, setPressed] = useState(false);
@@ -58,17 +53,14 @@ export const RoleCard: React.FC<RoleCardProps> = ({
     setPressed(false);
   };
 
-  const a11yLabel = accessibilityLabel ?? title;
-  const a11yHint = accessibilityHint ?? description;
-
   return (
     <Pressable
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       accessibilityRole="button"
-      accessibilityLabel={a11yLabel}
-      accessibilityHint={a11yHint}
+      accessibilityLabel={title}
+      accessibilityHint={title}
     >
       <Animated.View
         style={[
@@ -77,7 +69,6 @@ export const RoleCard: React.FC<RoleCardProps> = ({
             backgroundColor,
             borderWidth: 0,
             transform: [{ scale }],
-            opacity: pressed ? 0.98 : 1,
           },
           containerStyle,
         ]}
@@ -85,7 +76,6 @@ export const RoleCard: React.FC<RoleCardProps> = ({
         <View style={[styles.imageContainer, { backgroundColor: avatarCircleBackground }]}>
           <Image source={imageSource} style={styles.image} />
         </View>
-
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.description}>{description}</Text>
       </Animated.View>

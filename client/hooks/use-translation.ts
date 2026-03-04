@@ -8,8 +8,8 @@ export const useTranslation = () => {
   const currentLanguage = (i18n.language as SupportedLanguage) || "en";
   const isRTL = currentLanguage === "he";
 
-  const setLanguage = useCallback(async (lang: SupportedLanguage) => {
-    await changeLanguage(lang);
+  const setLanguage = useCallback((lang: SupportedLanguage) => {
+    changeLanguage(lang);
   }, []);
 
   return {
