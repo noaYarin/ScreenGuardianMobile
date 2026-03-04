@@ -22,6 +22,8 @@ export async function consumePairingSession(sessionId) {
 
   const now = new Date();
 
+  /** if usedAt is not null, the session is already used
+   if expiresAt is less than now, the session is expired **/
   const updated = await PairingSessionModel.findOneAndUpdate(
     {
       _id: sessionId,

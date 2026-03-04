@@ -10,7 +10,8 @@ export const Pairing = {
   NO_CHILD: { status: 400, code: "NO_CHILD", message: "Parent has no active child" },
   CHILD_SELECTION_REQUIRED: { status: 400, code: "CHILD_SELECTION_REQUIRED", message: "Parent has more than one child; childId must be specified when generating the pairing code" },
   DEVICE_TYPE_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is required" },
-INVALID_DEVICE_TYPE: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is invalid" },
+  INVALID_DEVICE_TYPE: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is invalid" },
+  CHILD_NOT_ACTIVE: { status: 400, code: "CHILD_NOT_ACTIVE", message: "Child is not active" },
 };
 
 
