@@ -11,7 +11,7 @@ export const DeviceSchema = new mongoose.Schema(
         code: { type: Number, default: 0 },
         location: { type: String, default: "" },
         isActive: { type: Boolean, default: true },
-        barcode: { type: String, default: "" },
+        barcodeToken: { type: String, default: "" },
         applications: { type: [ApplicationSchema], default: [] },
         parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
         childId: { type: mongoose.Schema.Types.ObjectId, required: true },
