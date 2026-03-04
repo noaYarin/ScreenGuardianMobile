@@ -1,35 +1,27 @@
+import { StyleSheet } from 'react-native';
 
-import { StyleSheet } from "react-native";
+import { COLORS, Fonts, SIZES } from '../../../../constants/theme';
+
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: "100%",
-    alignItems: "stretch",
-    paddingTop: 24,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    padding: SIZES.padding,
+    paddingTop: SIZES.padding * 2,
   },
-
-  heading: {
-    fontSize: 26,
-    textAlign: "center",
-    marginBottom: 6,
+  title: {
+    fontSize: SIZES.title,
+    fontWeight: '700',
+    color: COLORS.light.text,
+    fontFamily: Fonts.rounded,
+    textAlign: 'center',
   },
-
-  subHeading: {
-    fontSize: 14,
-    textAlign: "center",
-    opacity: 0.7,
-    marginBottom: 22,
-  },
-
   cardsContainer: {
-    width: "100%",
-    flexDirection: "column",
-    gap: 16,
-  },
-
-  cardsContainerTablet: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    marginTop: 25,
   },
 });

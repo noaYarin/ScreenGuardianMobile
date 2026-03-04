@@ -10,6 +10,13 @@ import store from "../src/redux/store";
 
 import i18n, { initLanguage } from "../src/locales/i18n";
 
+/** מסכים שבהם אין HEADER בכלל */
+const NO_HEADER_ROUTES = new Set([
+  "index",
+  "onboardingRoute",
+  "roleSelectionRoute",
+]);
+
 function BackBtn({ isRTL, canGoBack }: { isRTL: boolean; canGoBack: boolean }) {
   const iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
     isRTL ? "arrow-right" : "arrow-left";
@@ -34,31 +41,42 @@ function BackBtn({ isRTL, canGoBack }: { isRTL: boolean; canGoBack: boolean }) {
 
 function AppStack() {
   const { i18n } = useTranslation();
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
+
+  /** זיהוי RTL לפי השפה */
+  const isRTL = i18n.language?.startsWith("he") ?? false;
 
   return (
     <Stack
       screenOptions={({ navigation, route }) => {
         const canGoBack = navigation.canGoBack();
-        const shouldShowBack = route.name !== "index";
 
-        // ✅ ברירת מחדל: אין כלום
+        /** אם זה מסך בלי HEADER */
+        if (NO_HEADER_ROUTES.has(route.name)) {
+          return {
+            headerShown: false,
+            contentStyle: { backgroundColor: COLORS.light.background },
+          };
+        }
+
+        /** HEADER רגיל */
         let headerLeft: (() => React.ReactNode) | undefined = () => null;
         let headerRight: (() => React.ReactNode) | undefined = () => null;
 
-        // ✅ החץ שלנו בצד הנכון
-        if (shouldShowBack) {
-          if (isRTL) headerRight = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
-          else headerLeft = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
-        }
+        if (isRTL)
+          headerRight = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
+        else headerLeft = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
 
         return {
           contentStyle: { backgroundColor: COLORS.light.background },
-          headerStyle: { backgroundColor: COLORS.light.tint },
+
+          headerStyle: {
+            backgroundColor: COLORS.light.tint,
+          },
+
           headerTitleAlign: "center",
           headerShadowVisible: false,
 
-          // ✅ מבטל את החץ המובנה של react-navigation
+          /** מבטל את החץ המובנה של React Navigation */
           headerBackVisible: false,
 
           headerLeft,
@@ -67,8 +85,6 @@ function AppStack() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="onboardingRoute" options={{ headerTitle: "" }} />
-      <Stack.Screen name="roleSelectionRoute" options={{ headerTitle: "" }} />
     </Stack>
   );
 }
@@ -86,9 +102,9 @@ export default function RootLayout() {
         if (mounted) setReady(true);
       } catch (e: any) {
         console.error("initLanguage failed:", e);
+
         if (mounted) {
           setInitError(e?.message ?? "initLanguage failed");
-          // כדי לא לתקוע את האפליקציה – נמשיך בכל מקרה
           setReady(true);
         }
       }
@@ -99,7 +115,7 @@ export default function RootLayout() {
     };
   }, []);
 
-  // ✅ מסך טעינה קצר במקום "Bundling..." שנתקע
+  /** מסך טעינה קטן במקום שהאפליקציה תיתקע על Bundling */
   if (!ready) {
     return (
       <View
@@ -119,8 +135,6 @@ export default function RootLayout() {
     <ReduxProvider store={store}>
       <I18nextProvider i18n={i18n}>
         <AppStack />
-        {/* אם תרצי לראות שגיאה בדף בעת פיתוח */}
-        {/* {initError ? <Text>{initError}</Text> : null} */}
       </I18nextProvider>
     </ReduxProvider>
   );
