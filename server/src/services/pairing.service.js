@@ -118,9 +118,9 @@ export async function linkByCodeOrToken({ code, barcodeToken, deviceName, device
   };
 }
 
-function validateDevicePayload({ deviceName, deviceType }) {
-  const deviceName = String(deviceName || "").trim(); 
-  const deviceType = String(deviceType || DeviceType.OTHER).trim();
+function validateDevicePayload({ name, type }) {
+  const deviceName = String(name || "").trim(); 
+  const deviceType = String(type || DeviceType.OTHER).trim();
 
   if (!deviceType) throw new AppError(PairingErrors.DEVICE_TYPE_REQUIRED);
   if (!Object.values(DeviceType).includes(deviceType)) {
@@ -128,8 +128,8 @@ function validateDevicePayload({ deviceName, deviceType }) {
   }
 
   const devicePayload = {
-      deviceName: deviceName || "Child device",
-      deviceType,
+    deviceName,
+    deviceType,
   };
 
   return devicePayload;
