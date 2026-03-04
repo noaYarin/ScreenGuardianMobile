@@ -7,9 +7,16 @@ export async function createDevice(doc) {
   return DeviceModel.create(doc);
 }
 
-export async function findDeviceByBarcode(barcode) {
-  return DeviceModel.findOne({ barcode }).lean();
+export async function findDeviceByBarcodeOrCode(session) {
+  const existingDevice = await DeviceModel.findOne({
+    $or: [
+      { barcodeToken: session.barcodeToken },
+      { code: session.code }
+    ]
+  }).lean();
+  return existingDevice;
 }
+
 
 export async function findDeviceById(deviceId) {
   if (!mongoose.Types.ObjectId.isValid(deviceId)) {
