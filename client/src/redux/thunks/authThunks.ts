@@ -1,5 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { api } from "../../api/client";
+import {
+  apiLoginParent,
+  apiRegisterParent,
+  apiGoogleAuthParent,
+} from "../../api/auth";
 import { getMyChild } from "../../api";
 import type {
   LoginParentArgs,
@@ -7,15 +11,24 @@ import type {
   RegisterParentArgs,
   GoogleAuthParentArgs,
 } from "../slices/types";
+import type { ChildrenDataFromServer } from "../../api/auth.types";
 
-type ThunkConfig = { rejectValue: string };
 
+function toLoginParentPayload(auth: { token: string; parentId: string }): LoginParentPayload {
+  const children: ChildrenDataFromServer = {
+    childrenIds: [],
+    activeChildId: "",
+  };
+  return { auth, children };
+}
+
+// Thunk template for auth operations
 function createAuthThunk<Args>(
   typePrefix: string,
   request: (args: Args) => Promise<LoginParentPayload>,
   defaultErrorMessage: string
 ) {
-  return createAsyncThunk<LoginParentPayload, Args, ThunkConfig>(
+  return createAsyncThunk<LoginParentPayload, Args, { rejectValue: string }>(
     typePrefix,
     async (args, thunkAPI) => {
       try {
@@ -33,31 +46,26 @@ function createAuthThunk<Args>(
 
 export const loginParent = createAuthThunk<LoginParentArgs>(
   "auth/loginParent",
-  (credentials) =>
-    api.post<LoginParentPayload>("/api/v1/auth/login-parent", credentials),
+  (credentials) => apiLoginParent(credentials).then(toLoginParentPayload),
   "Failed to login. Please try again."
 );
 
 export const registerParent = createAuthThunk<RegisterParentArgs>(
   "auth/registerParent",
-  (credentials) =>
-    api.post<LoginParentPayload>("/api/v1/auth/register-parent", credentials),
+  (credentials) => apiRegisterParent(credentials).then(toLoginParentPayload),
   "Failed to register. Please try again."
 );
 
 export const googleAuthParent = createAuthThunk<GoogleAuthParentArgs>(
   "auth/googleAuthParent",
-  ({ idToken }) =>
-    api.post<LoginParentPayload>("/api/v1/auth/google-auth-parent", {
-      idToken,
-    }),
+  ({ idToken }) => apiGoogleAuthParent(idToken).then(toLoginParentPayload),
   "Failed to authenticate with Google. Please try again."
 );
 
 export const fetchChildren = createAsyncThunk<
   { childrenIds: string[]; activeChildId: string | null },
   void,
-  ThunkConfig
+  { rejectValue: string }
 >("auth/fetchChildren", async (_, thunkAPI) => {
   try {
     const data = await getMyChild();
