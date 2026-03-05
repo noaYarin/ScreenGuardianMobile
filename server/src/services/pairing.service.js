@@ -35,11 +35,11 @@ async function createUniqueCode() {
 }
 
 function assertChildBelongsToParent(childList, childId) {
-  const child = childList.some((c) => String(c._id) === String(childId));
+  const child = childList.find((c) => String(c._id) === String(childId));
   if (!child) throw new AppError(PairingErrors.CHILD_NOT_FOUND);
 
   if (child.isActive === false) {
-    throw new AppError(PairingErrors.CHILD_NOT_ACTIVE); 
+    throw new AppError(PairingErrors.CHILD_NOT_ACTIVE);
   }
 }
 
