@@ -39,7 +39,7 @@ export async function getPendingRequestsController(req, res, next) {
   try {
     const list = await requestService.getPendingRequests({
       parentId: req.user.parentId,
-      childId: req.query.childId, // אופציונלי לסינון
+      childId: req.query.childId, // optional for filtering
     });
 
     return res.json({ ok: true, data: list });

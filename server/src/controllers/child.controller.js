@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { addChild, getMyChild, setChildActive } from "../services/parent.service.js";
-import { Common as CommonErrors } from "../constants/errors.js";
 
 export async function addChildController(req, res, next) {
   try {
@@ -29,16 +28,8 @@ export async function setChildActiveController(req, res, next) {
     const { childId } = req.params;
     const { isActive } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(childId)) {
-      const e = CommonErrors.VALIDATION_CHILD_ID;
-      return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
-    }
-    if (typeof isActive !== "boolean") {
-      const e = CommonErrors.VALIDATION_IS_ACTIVE;
-      return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
-    }
-
     const data = await setChildActive(parentId, childId, isActive);
+
     res.json({ ok: true, data });
   } catch (err) {
     next(err);

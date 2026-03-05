@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
+import { Common as CommonErrors } from "../constants/errors.js";
+
 import {
   createPairingSession,
   findByCode,
@@ -36,7 +38,7 @@ async function createUniqueCode() {
 
 function assertChildBelongsToParent(childList, childId) {
   const child = childList.find((c) => String(c._id) === String(childId));
-  if (!child) throw new AppError(PairingErrors.CHILD_NOT_FOUND);
+  if (!child) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
 
   if (child.isActive === false) {
     throw new AppError(PairingErrors.CHILD_NOT_ACTIVE);
@@ -105,8 +107,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
 
     const parentId = String(consumed.parentId);
   const childId = String(consumed.childId);
-  if (!childId) throw new AppError(PairingErrors.CHILD_NOT_FOUND);
-  if (!parentId) throw new AppError(PairingErrors.PARENT_NOT_FOUND);
+  if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
 
   const devicePayload = validateDevicePayload(deviceName, deviceType);
   const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);

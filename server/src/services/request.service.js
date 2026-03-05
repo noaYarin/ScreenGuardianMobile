@@ -5,7 +5,7 @@ import { RequestStatus } from "../constants/status.js";
 import DeviceModel from "../models/device.model.js";
 import * as requestDal from "../dal/request.dal.js";
 
-import { assertObjectId } from "../utils/validators.js";
+import { assertValidObjectId } from "../utils/validators.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -31,7 +31,7 @@ async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
     const device = await DeviceModel.findById(deviceId).lean();
 
     if (!device) {
-        throw new AppError(RequestErrors.DEVICE_NOT_FOUND);
+        throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
     }
 
     if (String(device.parentId) !== String(parentId)) {
@@ -47,9 +47,9 @@ async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
 
 export async function createRequest({ parentId, childId, deviceId, requestedMinutes, reason }) {
 
-    assertObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-    assertObjectId(childId, CommonErrors.INVALID_CHILD_ID);
-    assertObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+    assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+    assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+    assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
 
     const minutes = assertMinutes(requestedMinutes);
 
@@ -78,8 +78,8 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
 
 export async function getChildRequests({ parentId, childId, status }) {
 
-    assertObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-    assertObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+    assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+    assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
 
     if (status) {
         const allowed = new Set(Object.values(RequestStatus));
@@ -97,10 +97,10 @@ export async function getChildRequests({ parentId, childId, status }) {
 
 export async function getPendingRequests({ parentId, childId }) {
 
-    assertObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+    assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 
     if (childId) {
-        assertObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+        assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
     }
 
     return requestDal.findPendingRequestsByParent({
@@ -111,8 +111,8 @@ export async function getPendingRequests({ parentId, childId }) {
 
 export async function decideRequest({ parentId, requestId, decision }) {
 
-    assertObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-    assertObjectId(requestId, RequestErrors.INVALID_REQUEST_ID);
+    assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+    assertValidObjectId(requestId, RequestErrors.INVALID_REQUEST_ID);
 
     assertDecision(decision);
 
