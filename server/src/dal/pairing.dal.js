@@ -8,11 +8,11 @@ export async function createPairingSession(doc) {
 }
 
 export async function findByCode(code) {
-  return PairingSessionModel.findOne({ code }).lean();
+  return PairingSessionModel.findOne({ code, usedAt: null }).lean();
 }
 
 export async function findByBarcodeToken(barcodeToken) {
-  return PairingSessionModel.findOne({ barcodeToken }).lean();
+  return PairingSessionModel.findOne({ barcodeToken, usedAt: null }).lean();
 }
 
 export async function consumePairingSession(sessionId) {

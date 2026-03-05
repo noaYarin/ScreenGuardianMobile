@@ -12,6 +12,7 @@ const PairingSessionSchema = new mongoose.Schema(
       // TTL index – document will be removed automatically when expired
       index: { expires: 0 },
     },
+    usedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
