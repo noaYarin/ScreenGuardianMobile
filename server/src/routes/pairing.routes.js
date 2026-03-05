@@ -9,6 +9,6 @@ const router = Router();
 router.post("/generate-code", authJwt, requireParent, generatePairingController);
 
 // Child: link device using code or scanned barcodeToken.
-router.post("/link-device", authJwt, linkPairingController);
+router.post("/link-device", linkPairingController);
 
 export default router;

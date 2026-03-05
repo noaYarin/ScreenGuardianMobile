@@ -9,7 +9,7 @@ const ParentSchema = new mongoose.Schema(
     googleId: { type: String, sparse: true, unique: true },
     name: { type: String},
     phoneNumber: { type: String },
-    role: { type: String, enum: Role, default: Role.PARENT },
+    role: { type: String, enum: Object.values(Role), default: Role.PARENT },
     children: { type: [ChildSchema], default: [] },
   },
   { timestamps: true, versionKey: false }
