@@ -7,7 +7,7 @@ export const RequestSchema = new mongoose.Schema(
         status: { type: String, enum: RequestStatus, required: true },
         requester: { type: mongoose.Schema.Types.ObjectId, required: true },
         recipient: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
-        reuestedMinutes: { type: Number, required: true },
+        requestedMinutes: { type: Number, required: true },
     }, { timestamps: true }
 );
 

@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import ParentModel from "../models/parent.model.js";  
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { Pairing } from "../constants/errors.js";
 import { MAX_CHILDREN_PER_PARENT } from "../constants/childNumLimit.js";
 
 export async function createParent(parentDoc) {
@@ -37,7 +38,7 @@ export async function pushChildToParent(parentId, childDoc) {
   const parentExists = await ParentModel.exists({ _id: parentId });
 
   if (!parentExists) {
-    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+    throw new AppError(Pairing.PARENT_NOT_FOUND);
   }
 
   // אם ההורה קיים → זה אומר שהגענו למכסה
