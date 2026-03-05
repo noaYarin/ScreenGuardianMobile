@@ -5,7 +5,14 @@ import { OnboardingScreen } from "../../src/screens/EnteringScreens/onboarding/O
 export default function OnboardingRoute() {
   return (
     <>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen
+        options={{
+          title: "dashboard",
+          headerBackVisible: false,   
+          headerLeft: () => null,    
+          headerRight: () => null,    
+        }}
+      />
       <OnboardingScreen />
     </>
   );

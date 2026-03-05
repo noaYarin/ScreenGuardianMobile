@@ -1,15 +1,22 @@
+// client/src/screens/ChildrenScreens/HomeScreen/HomeScreen.tsx
 import React from "react";
-import { View, Pressable, useWindowDimensions } from "react-native";
+import {
+  View,
+  Pressable,
+  useWindowDimensions,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import { styles } from "./styles";
+import { styles, TILE_COLORS } from "./styles";
 
-import i18n, { changeLanguage } from "../../../locales/i18n";
+import { useTranslation } from "../../../../hooks/use-translation";
+import type { SupportedLanguage } from "../../../locales/i18n";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -32,31 +39,37 @@ const ICON = {
 } as const;
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, isRTL, currentLanguage, changeLanguage } = useTranslation();
   const { width } = useWindowDimensions();
 
-  // ✅ נקודות שבירה פשוטות
+  const rowDir: ViewStyle = { flexDirection: isRTL ? "row-reverse" : "row" };
+  const textAlignStyle: TextStyle = { textAlign: isRTL ? "right" : "left" };
+
   const isPhone = width < 430;
   const isTablet = width >= 430 && width < 900;
 
-  // ✅ גדלים רספונסיביים
-  const avatarSize = isPhone ? 120 : isTablet ? 140 : 150;
-  const helloSize = isPhone ? 26 : isTablet ? 32 : 36;
-  const timerSize = isPhone ? 44 : isTablet ? 52 : 56;
+  const avatarSize = isPhone ? 92 : isTablet ? 108 : 118;
+  const helloSize = isPhone ? 22 : isTablet ? 26 : 28;
+  const timerSize = isPhone ? 34 : isTablet ? 40 : 44;
 
   const userName = "נועה";
   const pointsValue = "1,250";
   const levelValue = 4;
   const coinsValue = 38;
 
-  const isRTL =
-    (typeof i18n.dir === "function" ? i18n.dir(i18n.language) : "rtl") === "rtl" ||
-    i18n.language === "he";
-
-  const onToggleLanguage = () => {
-    const next = i18n.language === "he" ? "en" : "he";
-    changeLanguage(next);
+  const onToggleLanguage = async () => {
+    const next: SupportedLanguage = currentLanguage === "he" ? "en" : "he";
+    await changeLanguage(next);
   };
+
+  const leftIcon = isRTL ? ICON.accessibility : ICON.settings;
+  const rightIcon = isRTL ? ICON.settings : ICON.accessibility;
+
+  const onLeftPress = () => {};
+  const onRightPress = () => {};
+
+  const leftA11y = isRTL ? t("home.accessibility") : t("home.settings");
+  const rightA11y = isRTL ? t("home.settings") : t("home.accessibility");
 
   return (
     <>
@@ -65,8 +78,6 @@ export default function HomeScreen() {
           title: t("home.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          // ✅ אין חץ חזור בכלל במסך הזה
           headerBackVisible: false,
           headerLeft: () => null,
           headerRight: () => null,
@@ -74,139 +85,155 @@ export default function HomeScreen() {
       />
 
       <ScreenLayout>
-        <View style={styles.home}>
+        <View style={styles.page}>
+          {/* Top bar: fixed 3 columns so the middle button is perfectly centered on iPad */}
           <View style={styles.topRow}>
-            <RoundIconButton
-              name={ICON.accessibility}
-              size={26}
-              onPress={() => {}}
-              accessibilityLabel={t("home.accessibility")}
-            />
-
-            <RoundIconButton
-              name={ICON.language}
-              size={26}
-              onPress={onToggleLanguage}
-              accessibilityLabel={t("common.change_language", "Change language")}
-            />
-
-            <RoundIconButton
-              name={ICON.settings}
-              size={26}
-              onPress={() => {}}
-              accessibilityLabel={t("home.settings")}
-            />
-          </View>
-
-          <LinearGradient
-            colors={["#ff7ac8", "#c084fc"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={[styles.avatar, { width: avatarSize, height: avatarSize }]}
-          >
-            <AppText
-              weight="extraBold"
-              style={[
-                styles.avatarLetter,
-                {
-                  fontSize: avatarSize * 0.42,
-                  lineHeight: avatarSize * 0.42,
-                },
-              ]}
-            >
-              נ
-            </AppText>
-          </LinearGradient>
-
-          <AppText weight="bold" style={[styles.hello, { fontSize: helloSize }]}>
-            {t("home.hello_user", { name: userName })}
-          </AppText>
-
-          <View style={styles.chipsRow}>
-            <View style={[styles.chip, styles.chipBlue]}>
-              <MaterialCommunityIcons name={ICON.points} size={22} color="#000" />
-              <AppText weight="extraBold" style={styles.chipText}>
-                {t("home.points", { value: pointsValue })}
-              </AppText>
+            <View style={[styles.topCol, { alignItems: "flex-start" }]}>
+              <RoundIconButton
+                name={leftIcon}
+                onPress={onLeftPress}
+                accessibilityLabel={leftA11y}
+              />
             </View>
 
-            <View style={[styles.chip, styles.chipGold]}>
-              <AppText weight="extraBold" style={styles.chipText}>
-                {t("home.level", { level: levelValue })}
-              </AppText>
-              <MaterialCommunityIcons name={ICON.level} size={22} color="#000" />
+            <View style={styles.topColCenter}>
+              <RoundIconButton
+                name={ICON.language}
+                onPress={onToggleLanguage}
+                accessibilityLabel={t("common.change_language", "Change language")}
+              />
+            </View>
+
+            <View style={[styles.topCol, { alignItems: "flex-end" }]}>
+              <RoundIconButton
+                name={rightIcon}
+                onPress={onRightPress}
+                accessibilityLabel={rightA11y}
+              />
             </View>
           </View>
 
-          <View style={[styles.chip, styles.chipMint]}>
-            <AppText weight="extraBold" style={styles.chipText}>
-              {t("home.coins", { value: coinsValue })}
-            </AppText>
-            <MaterialCommunityIcons name={ICON.coins} size={20} color="#000" />
+          {/* Header card */}
+          <View style={styles.headerCard}>
+            <View style={[styles.headerRow, rowDir]}>
+              <View style={[styles.avatarWrap, { width: avatarSize, height: avatarSize }]}>
+                <LinearGradient
+                  colors={["#3B82F6", "#BDE0FE"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.avatarGradient}
+                >
+                  <AppText weight="extraBold" style={styles.avatarLetter}>
+                    נ
+                  </AppText>
+                </LinearGradient>
+              </View>
+
+              <View style={styles.helloBlock}>
+                <AppText
+                  weight="extraBold"
+                  style={[styles.hello, { fontSize: helloSize }, textAlignStyle]}
+                  numberOfLines={1}
+                >
+                  {t("home.hello_user", { name: userName })}
+                </AppText>
+              </View>
+            </View>
+
+            {/* Stats row: equal width pills with safe spacing for iPad */}
+            <View style={[styles.statsRow, rowDir]}>
+              <StatPill
+                icon={ICON.points}
+                text={t("home.points", { value: pointsValue })}
+                variant="blue"
+                isRTL={isRTL}
+              />
+              <StatPill
+                icon={ICON.level}
+                text={t("home.level", { level: levelValue })}
+                variant="beige"
+                isRTL={isRTL}
+              />
+              <StatPill
+                icon={ICON.coins}
+                text={t("home.coins", { value: coinsValue })}
+                variant="primary"
+                isRTL={isRTL}
+              />
+            </View>
           </View>
 
-          <LinearGradient
-            colors={["#fde2f3", "#dbeafe"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.timer}
-          >
-            <View style={styles.timerTitle}>
-              <MaterialCommunityIcons name={ICON.time} size={24} color="#000" />
-              <AppText weight="bold" style={styles.timerTitleText}>
-                {t("home.time_left_title")}
-              </AppText>
+          {/* Time card */}
+          <View style={styles.card}>
+            <View style={[styles.cardTitleRow, rowDir]}>
+              <View style={[styles.cardTitleLeft, rowDir]}>
+                <View style={styles.iconBadge}>
+                  <MaterialCommunityIcons name={ICON.time} size={18} color="#0F172A" />
+                </View>
+
+                <AppText weight="extraBold" style={[styles.cardTitle, textAlignStyle]}>
+                  {t("home.time_left_title")}
+                </AppText>
+              </View>
             </View>
 
             <AppText weight="extraBold" style={[styles.timerValue, { fontSize: timerSize }]}>
               00:12:45
             </AppText>
 
+            <View style={styles.progressTrack}>
+              <View style={[styles.progressFill, { width: "72%" }]} />
+            </View>
+
             <AppText weight="bold" style={styles.timerSub}>
               {t("home.time_left_warning")}
             </AppText>
-          </LinearGradient>
+          </View>
 
-          {/* ✅ 3x3 קבוע */}
+          {/* Tiles grid */}
           <View style={styles.grid}>
-            <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} />
+            <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} colorKey="apps" />
             <Tile
               iconName={ICON.extend}
               label={t("home.tile_extend")}
               onPress={() => router.push("/Child/extendTime" as Href)}
+              colorKey="extend"
             />
             <Tile
               iconName={ICON.shop}
               label={t("home.tile_shop")}
               onPress={() => router.push("/Child/store" as Href)}
+              colorKey="shop"
             />
             <Tile
               iconName={ICON.tasks}
               label={t("home.tile_tasks")}
               onPress={() => router.push("/Child/tasks" as Href)}
+              colorKey="tasks"
             />
-            <Tile
-              iconName={ICON.achievements}
-              label={t("home.tile_achievements")}
-              onPress={() => {}}
-            />
+            <Tile iconName={ICON.achievements} label={t("home.tile_achievements")} onPress={() => {}} colorKey="achievements" />
             <Tile
               iconName={ICON.goals}
               label={t("home.tile_goals")}
               onPress={() => router.push("/Child/goals" as Href)}
+              colorKey="goals"
             />
-            <Tile iconName={ICON.heart} label={t("home.tile_encouragement")} onPress={() => {}} />
-            <Tile iconName={ICON.bulb} label={t("home.tile_ideas")} onPress={() => {}} />
-            <Tile iconName={ICON.help} label={t("home.tile_help")} onPress={() => {}} />
+            <Tile iconName={ICON.heart} label={t("home.tile_encouragement")} onPress={() => {}} colorKey="encouragement" />
+            <Tile iconName={ICON.bulb} label={t("home.tile_ideas")} onPress={() => {}} colorKey="ideas" />
+            <Tile iconName={ICON.help} label={t("home.tile_help")} onPress={() => {}} colorKey="help" />
           </View>
 
+          {/* Panic button */}
           <Pressable
-            style={({ pressed }) => [styles.panicBtn, pressed && styles.panicPressed]}
+            style={({ pressed }) => [styles.panicBtn, pressed && styles.panicPressed, rowDir]}
             onPress={() => router.push("/Child/distress" as Href)}
             accessibilityRole="button"
             accessibilityLabel={t("home.panic_a11y")}
           >
-            <MaterialCommunityIcons name={ICON.panic} size={22} color="#000" />
+            <View style={styles.panicIconBadge}>
+              <MaterialCommunityIcons name={ICON.panic} size={18} color="#fff" />
+            </View>
+
             <AppText weight="extraBold" style={styles.panicText}>
               {t("home.panic")}
             </AppText>
@@ -217,46 +244,94 @@ export default function HomeScreen() {
   );
 }
 
-type RoundIconButtonProps = {
+function RoundIconButton({
+  name,
+  size = 22,
+  onPress,
+  accessibilityLabel,
+}: {
   name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   size?: number;
-  onPress?: () => void;
+  onPress?: () => void | Promise<void>;
   accessibilityLabel?: string;
-};
-
-function RoundIconButton({ name, size = 22, onPress, accessibilityLabel }: RoundIconButtonProps) {
+}) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => void onPress?.()}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
-      style={({ pressed }) => [styles.circleBtn, pressed && styles.pressed]}
+      style={({ pressed }) => [styles.circleBtn, pressed && styles.circleBtnPressed]}
     >
-      <MaterialCommunityIcons name={name} size={size} color="#000" />
+      <MaterialCommunityIcons name={name} size={size} color="#0F172A" />
     </Pressable>
   );
 }
 
-type TileProps = {
+function StatPill({
+  icon,
+  text,
+  variant,
+  isRTL,
+}: {
+  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  text: string;
+  variant: "blue" | "beige" | "primary";
+  isRTL: boolean;
+}) {
+  const pillStyle =
+    variant === "blue"
+      ? styles.statPillBlue
+      : variant === "beige"
+      ? styles.statPillBeige
+      : styles.statPillPrimary;
+
+  return (
+    <View style={[styles.statPill, pillStyle, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+      <MaterialCommunityIcons name={icon} size={18} color="#0F172A" />
+      <AppText weight="extraBold" style={styles.statText} numberOfLines={1}>
+        {text}
+      </AppText>
+    </View>
+  );
+}
+
+function Tile({
+  iconName,
+  label,
+  onPress,
+  colorKey,
+}: {
   iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   label: string;
   onPress?: () => void;
-};
+  colorKey: keyof typeof TILE_COLORS;
+}) {
+  const c = TILE_COLORS[colorKey];
 
-function Tile({ iconName, label, onPress }: TileProps) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.tile, pressed && styles.tilePressed]}
+      style={({ pressed }) => [
+        styles.tile,
+        { backgroundColor: c.bg, borderColor: c.border },
+        pressed && styles.tilePressed,
+      ]}
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={label}
     >
-      <View style={styles.tileIcon}>
-        <MaterialCommunityIcons name={iconName} size={26} color="#000" />
+      <View style={styles.tileInner}>
+        <View style={styles.tileIconZone}>
+          <View style={[styles.tileIconWrap, { backgroundColor: c.badge }]}>
+            <MaterialCommunityIcons name={iconName} size={26} color={c.icon} />
+          </View>
+        </View>
+
+        <View style={styles.tileLabelZone}>
+          <AppText weight="bold" style={styles.tileText} numberOfLines={2}>
+            {label}
+          </AppText>
+        </View>
       </View>
-      <AppText weight="bold" style={styles.tileText} numberOfLines={1}>
-        {label}
-      </AppText>
     </Pressable>
   );
 }

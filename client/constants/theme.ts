@@ -6,6 +6,7 @@
 import { Dimensions, Platform } from 'react-native';
 const { width, height } = Dimensions.get('screen');
 const tintColorDark = '#fff';
+const tintColorLight = '#BDE0FE'; 
 
 export const APP_COLORS = {
   babyBlue: '#BDE0FE',
@@ -15,13 +16,14 @@ export const APP_COLORS = {
 
 export const COLORS = {
   light: {
-    text: '#11181C',
+     text: '#11181C',
     background: '#fff',
-    tint: APP_COLORS.babyBlue,
-    secondary: '#BDE0FE',
+    tint: tintColorLight,
     icon: '#687076',
     tabIconDefault: '#687076',
-    tabIconSelected: APP_COLORS.babyBlue,
+    secondary: '#EAD2AC', 
+    primary: '#3B82F6',
+    tabIconSelected: tintColorLight,
   },
   dark: {
     text: '#ECEDEE',
