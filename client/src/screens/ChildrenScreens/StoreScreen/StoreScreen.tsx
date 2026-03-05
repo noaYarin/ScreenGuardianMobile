@@ -1,4 +1,5 @@
-import React from "react";
+// client/src/screens/ChildrenScreens/StoreScreen/StoreScreen.tsx
+import React, { useMemo } from "react";
 import { View, Pressable } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -34,20 +35,85 @@ function HeaderIconButton({
       hitSlop={10}
       style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
     >
-      <MaterialCommunityIcons name={name} size={22} color="#000" />
+      <MaterialCommunityIcons name={name} size={22} color="#111" />
     </Pressable>
   );
 }
+
+type RewardTile = {
+  id: number;
+  title: string;
+  subtitle: string;
+  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
+  price: number;
+  // Pastel tile palette
+  bg: string;
+  badge: string;
+  iconColor: string;
+  border: string;
+};
 
 export default function StoreScreen() {
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
 
-  const rewards = [
-    { id: 1, title: t("store.reward_time"), subtitle: t("store.reward_cost"), icon: ICON.clock, color: "#2F6BFF" },
-    { id: 2, title: t("store.reward_movie"), subtitle: t("store.reward_cost"), icon: ICON.movie, color: "#7B3FF2" },
-    { id: 3, title: t("store.reward_icecream"), subtitle: t("store.reward_cost"), icon: ICON.icecream, color: "#E91E63" },
-    { id: 4, title: t("store.reward_small"), subtitle: t("store.reward_cost"), icon: ICON.gift, color: "#E53935" },
+  // Layout helpers (RTL/LTR)
+  const rowDir = useMemo(
+    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
+    [isRTL]
+  );
+  const textAlign = useMemo(
+    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
+    [isRTL]
+  );
+
+  const coinsBalance = 250;
+
+  const rewards: RewardTile[] = [
+    {
+      id: 1,
+      title: t("store.reward_time"),
+      subtitle: t("store.reward_cost"),
+      icon: ICON.clock,
+      price: 25,
+      bg: "#EAF2FF",
+      badge: "#CFE3FF",
+      iconColor: "#2F6DEB",
+      border: "#D6E6FF",
+    },
+    {
+      id: 2,
+      title: t("store.reward_movie"),
+      subtitle: t("store.reward_cost"),
+      icon: ICON.movie,
+      price: 25,
+      bg: "#F3EDFF",
+      badge: "#E0D2FF",
+      iconColor: "#6D28D9",
+      border: "#E7DBFF",
+    },
+    {
+      id: 3,
+      title: t("store.reward_icecream"),
+      subtitle: t("store.reward_cost"),
+      icon: ICON.icecream,
+      price: 25,
+      bg: "#FFEAF0",
+      badge: "#FFC9D8",
+      iconColor: "#D81B60",
+      border: "#FFD6E2",
+    },
+    {
+      id: 4,
+      title: t("store.reward_small"),
+      subtitle: t("store.reward_cost"),
+      icon: ICON.gift,
+      price: 25,
+      bg: "#FFF3DD",
+      badge: "#FFE1A8",
+      iconColor: "#B46B00",
+      border: "#FFE6BA",
+    },
   ];
 
   return (
@@ -57,65 +123,84 @@ export default function StoreScreen() {
           title: t("store.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          // ✅ אין Back כאן בכלל — מגיע מה־RootLayout
-
-         
+          // Back button comes from RootLayout
         }}
       />
 
       <ScreenLayout>
         <View style={styles.container}>
+          {/* Balance */}
           <View style={styles.balanceSection}>
-            <AppText weight="bold" style={styles.balanceLabel}>
+            <AppText weight="bold" style={[styles.balanceLabel, textAlign]}>
               {t("store.your_balance")}
             </AppText>
 
-            <View style={styles.balanceCard}>
-              <AppText weight="extraBold" style={styles.balanceAmount}>
-                250
-              </AppText>
+            <View style={[styles.balanceCard, rowDir]}>
+              <View style={styles.balanceBadge}>
+                <FontAwesome5 name={ICON.coin} size={18} color="#2F6DEB" />
+              </View>
 
-              <FontAwesome5 name={ICON.coin} size={34} color="#ffffff" />
+              <View style={styles.balanceTextWrap}>
+                <AppText weight="extraBold" style={[styles.balanceAmount, textAlign]}>
+                  {coinsBalance}
+                </AppText>
+                <AppText style={[styles.balanceSub, textAlign]}>{t("store.coins")}</AppText>
+              </View>
             </View>
           </View>
 
+          {/* Rewards */}
           <View style={styles.rewardsContainer}>
-            <AppText weight="bold" style={styles.sectionTitle}>
+            <AppText weight="bold" style={[styles.sectionTitle, textAlign]}>
               {t("store.available_rewards")}
             </AppText>
 
-            {rewards.map((item) => (
-              <Pressable
-                key={item.id}
-                style={styles.rewardCard}
-                accessibilityRole="button"
-                accessibilityLabel={`${item.title}, ${t("store.reward_cost")}`}
-              >
-                <View style={styles.priceBox}>
-                  <AppText weight="extraBold" style={styles.rewardPrice}>
-                    25
-                  </AppText>
-                  <AppText style={styles.rewardCoins}>{t("store.coins")}</AppText>
-                </View>
+            {rewards.map((item) => {
+              // Three columns: Icon | Text | Price (LTR)  /  Price | Text | Icon (RTL)
+              return (
+                <Pressable
+                  key={item.id}
+                  style={({ pressed }) => [
+                    styles.rewardCard,
+                    { backgroundColor: item.bg, borderColor: item.border, opacity: pressed ? 0.92 : 1 },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${item.title}, ${t("store.reward_cost")}`}
+                >
+                  <View style={[styles.rewardRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+                    {/* Icon side */}
+                    <View style={[styles.iconBox, { backgroundColor: item.badge, borderColor: item.border }]}>
+                      <MaterialCommunityIcons name={item.icon} size={24} color={item.iconColor} />
+                    </View>
 
-                <View style={styles.contentBox}>
-                  <View style={styles.textBox}>
-                    <AppText weight="bold" style={styles.rewardTitle}>
-                      {item.title}
-                    </AppText>
-                    <AppText style={styles.rewardSub}>{item.subtitle}</AppText>
+                    {/* Text middle */}
+                    <View style={styles.textBox}>
+                      <AppText weight="bold" style={[styles.rewardTitle, textAlign]}>
+                        {item.title}
+                      </AppText>
+                      <AppText style={[styles.rewardSub, textAlign]}>{item.subtitle}</AppText>
+                    </View>
+
+                    {/* Price opposite side of text */}
+                    <View
+                      style={[
+                        styles.priceBox,
+                        {
+                          alignItems: isRTL ? "flex-start" : "flex-end",
+                        },
+                      ]}
+                    >
+                      <View style={[styles.pricePill, { borderColor: item.border, backgroundColor: "#FFFFFF" }]}>
+                        <AppText weight="extraBold" style={styles.rewardPrice}>
+                          {item.price}
+                        </AppText>
+                        <AppText style={styles.rewardCoins}>{t("store.coins")}</AppText>
+                      </View>
+                    </View>
                   </View>
-
-                  <MaterialCommunityIcons
-                    name={item.icon}
-                    size={28}
-                    color={item.color}
-                    style={styles.icon}
-                  />
-                </View>
-              </Pressable>
-            ))}
+                </Pressable>
+              );
+            })}
           </View>
         </View>
       </ScreenLayout>

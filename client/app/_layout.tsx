@@ -47,6 +47,7 @@ function AppStack() {
 
   return (
     <Stack
+    
       screenOptions={({ navigation, route }) => {
         const canGoBack = navigation.canGoBack();
 
@@ -76,7 +77,6 @@ function AppStack() {
           headerTitleAlign: "center",
           headerShadowVisible: false,
 
-          /** מבטל את החץ המובנה של React Navigation */
           headerBackVisible: false,
 
           headerLeft,
@@ -85,6 +85,7 @@ function AppStack() {
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="Parent" options={{ headerShown: false }} />
     </Stack>
   );
 }

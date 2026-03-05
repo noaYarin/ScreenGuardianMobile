@@ -1,117 +1,229 @@
 import { StyleSheet } from "react-native";
 
+const COLORS = {
+  white: "#FFFFFF",
+  text: "#0F172A",
+  muted: "#475569",
+  border: "#E7EFFA",
+  primaryBlue: "#3B82F6",
+  babyBlueTileBg: "#EAF2FF",
+  babyBlueTileBorder: "#D6E6FF",
+  babyBlueBadge: "#CFE3FF",
+
+  beigeTileBg: "#FFF3DD",
+  beigeTileBorder: "#FFE6BA",
+  beigeBadge: "#FFE1A8",
+
+  greenTileBg: "#E9FFF3",
+  greenTileBorder: "#D7F7E8",
+  greenBadge: "#C9F5DE",
+
+  shadow: "#000000",
+};
+
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
 
+  contentMaxWidth: {
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
+  },
+
   tabsWrapper: {
-    flexDirection: "row",
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     padding: 6,
-    marginBottom: 20,
+    gap: 8,
+    marginBottom: 14,
   },
 
   tabBtn: {
     flex: 1,
     paddingVertical: 10,
+    borderRadius: 18,
     alignItems: "center",
-    borderRadius: 16,
+    justifyContent: "center",
   },
 
   activeTab: {
-    backgroundColor: "#d1e0f2",
+    backgroundColor: COLORS.babyBlueTileBg,
+    borderWidth: 1,
+    borderColor: COLORS.babyBlueTileBorder,
+  },
+
+  inactiveTab: {
+    backgroundColor: COLORS.white,
+  },
+
+  tabText: {
+    fontSize: 15,
+    color: COLORS.text,
+  },
+
+  listContent: {
+    paddingTop: 6,
+    paddingBottom: 22,
   },
 
   card: {
-    backgroundColor: "#ffffff",
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 20,
-    borderWidth: 2,
-    borderColor: "#6ED48C",
-     elevation: 3,
-      shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.12,
-  shadowRadius: 6,
+    backgroundColor: COLORS.white,
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 2,
   },
 
-  coinsBadge: {
-    position: "absolute",
-    left: 14,
-    top: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#F6E6B4",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-    gap: 4,
+coinsBadge: {
+  flexDirection: "row",
+  alignItems: "center",
+  backgroundColor: "#FFF3DD",
+  borderWidth: 1,
+  borderColor: "#FFE6BA",
+  paddingHorizontal: 10,
+  paddingVertical: 6,
+  borderRadius: 999,
+  gap: 6,
+},
+
+  coinsBadgeLTR: {
+    left: 12,
+  },
+
+  coinsBadgeRTL: {
+    right: 12,
   },
 
   coinsText: {
-    fontSize: 16,
-    color: "#C18400",
+    fontSize: 14,
+    color: "#B46B00",
   },
 
-  taskTitle: {
-    fontSize: 22,
-    marginTop: 10,
-    marginBottom: 20,
-  },
+taskTitle: {
+  fontSize: 20,
+  color: "#0F172A",
+  lineHeight: 26,
+  flex: 1,
+},
 
-  doneBox: {
-    backgroundColor: "#BDE7C9",
-    padding: 12,
-    borderRadius: 14,
-    flexDirection: "row",
+  statusBoxDone: {
+    backgroundColor: COLORS.greenTileBg,
+    borderWidth: 1,
+    borderColor: COLORS.greenTileBorder,
+    borderRadius: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     alignItems: "center",
-    gap: 8,
-  },
-
-  doneText: {
-    color: "#0E7A3E",
-  },
-
-  uploadRow: {
     gap: 10,
   },
 
-  notUploaded: {
-    color: "#303030",
+  statusTextDone: {
+    color: "#0F8A5F",
+    fontSize: 15,
+  },
+
+  todoArea: {
+    gap: 10,
+  },
+
+  todoHint: {
+    color: COLORS.muted,
+    fontSize: 14,
+    lineHeight: 20,
   },
 
   uploadBtn: {
-    backgroundColor: "#DCE5FF",
-    borderRadius: 14,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
     alignSelf: "flex-start",
+    backgroundColor: COLORS.babyBlueTileBg,
+    borderWidth: 1,
+    borderColor: COLORS.babyBlueTileBorder,
+    borderRadius: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 1,
+  },
+
+  uploadBtnInner: {
+    alignItems: "center",
+    gap: 10,
   },
 
   uploadText: {
-    color: "#2E5BFF",
+    color: "#2F6DEB",
+    fontSize: 15,
+  },
+
+  statusIconCircle: {
+    width: 28,
+    height: 28,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  statusIconCircleDone: {
+    backgroundColor: COLORS.greenBadge,
+  },
+
+  statusIconCircleUpload: {
+    backgroundColor: COLORS.babyBlueBadge,
   },
 
   weekBox: {
-    backgroundColor: "#F4E7B7",
-    borderRadius: 20,
-    padding: 18,
-    marginTop: 30,
-    marginBottom: 40,
-    flexDirection: "row",
+    marginTop: 8,
+    backgroundColor: COLORS.beigeTileBg,
+    borderWidth: 1,
+    borderColor: COLORS.beigeTileBorder,
+    borderRadius: 22,
+    padding: 14,
+
+    shadowColor: COLORS.shadow,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    elevation: 2,
+  },
+
+  weekInner: {
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
   },
 
-  weekText: {
-    fontSize: 20,
-    color: "#9B5B00",
+  weekIconCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: COLORS.beigeBadge,
   },
+
+  weekText: {
+    fontSize: 16,
+    color: "#9B5B00",
+    lineHeight: 22,
+  },
+  cardHeader: {
+  width: "100%",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 12,
+},
 });

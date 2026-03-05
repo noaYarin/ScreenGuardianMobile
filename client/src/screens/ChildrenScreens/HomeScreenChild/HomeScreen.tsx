@@ -32,7 +32,7 @@ const ICON = {
   tasks: "clipboard-check-outline",
   achievements: "trophy",
   goals: "target",
-  heart: "heart-outline",
+  reports: "information-box",
   bulb: "lightbulb-on-outline",
   help: "help-circle-outline",
   panic: "alert-circle-outline",
@@ -65,9 +65,6 @@ export default function HomeScreen() {
   const leftIcon = isRTL ? ICON.accessibility : ICON.settings;
   const rightIcon = isRTL ? ICON.settings : ICON.accessibility;
 
-  const onLeftPress = () => {};
-  const onRightPress = () => {};
-
   const leftA11y = isRTL ? t("home.accessibility") : t("home.settings");
   const rightA11y = isRTL ? t("home.settings") : t("home.accessibility");
 
@@ -86,12 +83,12 @@ export default function HomeScreen() {
 
       <ScreenLayout>
         <View style={styles.page}>
-          {/* Top bar: fixed 3 columns so the middle button is perfectly centered on iPad */}
+          {/* Top bar: 3 fixed columns so the middle button stays perfectly centered */}
           <View style={styles.topRow}>
             <View style={[styles.topCol, { alignItems: "flex-start" }]}>
               <RoundIconButton
                 name={leftIcon}
-                onPress={onLeftPress}
+                onPress={() => {}}
                 accessibilityLabel={leftA11y}
               />
             </View>
@@ -107,7 +104,7 @@ export default function HomeScreen() {
             <View style={[styles.topCol, { alignItems: "flex-end" }]}>
               <RoundIconButton
                 name={rightIcon}
-                onPress={onRightPress}
+                onPress={() => {}}
                 accessibilityLabel={rightA11y}
               />
             </View>
@@ -140,7 +137,7 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* Stats row: equal width pills with safe spacing for iPad */}
+            {/* Stats row: equal width pills with safe spacing */}
             <View style={[styles.statsRow, rowDir]}>
               <StatPill
                 icon={ICON.points}
@@ -190,7 +187,7 @@ export default function HomeScreen() {
             </AppText>
           </View>
 
-          {/* Tiles grid */}
+          {/* Tiles grid: capped tile size so iPad doesn't blow up */}
           <View style={styles.grid}>
             <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} colorKey="apps" />
             <Tile
@@ -211,14 +208,24 @@ export default function HomeScreen() {
               onPress={() => router.push("/Child/tasks" as Href)}
               colorKey="tasks"
             />
-            <Tile iconName={ICON.achievements} label={t("home.tile_achievements")} onPress={() => {}} colorKey="achievements" />
+            <Tile
+              iconName={ICON.achievements}
+              label={t("home.tile_achievements")}
+              onPress={() => {}}
+              colorKey="achievements"
+            />
             <Tile
               iconName={ICON.goals}
               label={t("home.tile_goals")}
               onPress={() => router.push("/Child/goals" as Href)}
               colorKey="goals"
             />
-            <Tile iconName={ICON.heart} label={t("home.tile_encouragement")} onPress={() => {}} colorKey="encouragement" />
+            <Tile
+              iconName={ICON.reports}
+              label={t("home.tile_reports")}
+              onPress={() => {}}
+              colorKey="help"
+            />
             <Tile iconName={ICON.bulb} label={t("home.tile_ideas")} onPress={() => {}} colorKey="ideas" />
             <Tile iconName={ICON.help} label={t("home.tile_help")} onPress={() => {}} colorKey="help" />
           </View>

@@ -42,7 +42,7 @@
     "tile_tasks": "מטלות",
     "tile_achievements": "הישגים",
     "tile_goals": "מטרות",
-    "tile_encouragement": "עידוד",
+    "tile_reports": "דוחות שימוש",
     "tile_ideas": "רעיונות",
     "tile_help": "עזרה",
     "panic": "מצוקה",
@@ -213,7 +213,14 @@
     "full_watch_a11y": "פתיחת צפייה מלאה",
     "add_child_a11y": "הוספת ילד חדש",
     "child_card_a11y": "בחירת ילד: {{name}}"
-  }
+  },
+  "tabs": {
+  "home": "בית",
+  "kids": "ילדים",
+  "limits": "מגבלות",
+  "reports": "דוחות",
+  "settings": "הגדרות"
+}
 }
 
 

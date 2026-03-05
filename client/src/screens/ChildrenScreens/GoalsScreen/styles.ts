@@ -1,118 +1,228 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 
 export const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-  },
-
-  headerBackBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-
-  rowReverse: {
-    flexDirection: "row-reverse",
-  },
-
-  header: {
+  page: {
+    width: "100%",
     alignItems: "center",
-    marginBottom: 25,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
+
+  inner: {
+    width: "100%",
+  },
+
+  // --- Header card ---
+  headerCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    padding: 16,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+
+    marginBottom: 12,
+  },
+
+  headerTop: {
+    width: "100%",
+    alignItems: "center",
+  },
+
+  headerIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 14,
+
+    backgroundColor: "#CFE3FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
+
+    alignItems: "center",
+    justifyContent: "center",
+    marginEnd: 10,
+  },
+
+  headerTextWrap: {
+    flex: 1,
   },
 
   headerTitle: {
-    fontSize: 22,
-    marginTop: 8,
-    color: "#8B5E3C",
-    textAlign: "center",
+    fontSize: 26,
+    lineHeight: 30,
+    color: "#0F172A",
   },
 
   headerSubtitle: {
-    marginTop: 4,
+    marginTop: 6,
     fontSize: 14,
-    color: "#5E6A73",
-    textAlign: "center",
+    lineHeight: 18,
+    color: "#64748B",
   },
 
+  // --- Progress card ---
   progressCard: {
-    backgroundColor: "#F2F2F2",
-    borderRadius: 20,
-    padding: 18,
-    marginBottom: 25,
+    backgroundColor: "#EAF2FF", // Blue tile bg
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
+    padding: 16,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+
+    marginBottom: 14,
   },
 
   progressTopRow: {
-    flexDirection: "row",
+    width: "100%",
+    alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 12,
-    alignItems: "center",
-  },
-
-  progressPercent: {
-    fontSize: 20,
-    color: "#8B5E3C",
-    textAlign: "right",
   },
 
   progressLabel: {
     fontSize: 16,
-    color: "#2E3A45",
-    textAlign: "right",
+    color: "#0F172A",
   },
 
-  // ✅ RTL progress bar background
+  progressBadge: {
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "#CFE3FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
+  },
+
+  progressPercent: {
+    fontSize: 16,
+    color: "#2F6DEB",
+    lineHeight: 18,
+  },
+
   progressBarBackground: {
     height: 12,
-    backgroundColor: "#D6D6D6",
+    backgroundColor: "#FFFFFF",
     borderRadius: 10,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
     position: "relative",
   },
 
-  // ✅ RTL fill: anchored to the RIGHT
   progressBarFill: {
     position: "absolute",
-    right: 0,
-    height: "100%",
-    backgroundColor: "#8B5E3C",
+    top: 0,
+    bottom: 0,
+    backgroundColor: "#3B82F6", // primaryBlue
     borderRadius: 10,
   },
 
-  goalCard: {
-    backgroundColor: "#EADCD2",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 18,
-    borderWidth: 2,
-    borderColor: "#B07D5B",
+  progressHint: {
+    marginTop: 10,
+    fontSize: 13,
+    color: "#475569",
+    opacity: 0.9,
   },
 
-  disabledCard: {
-    backgroundColor: "#F0F2F4",
-    borderColor: "#D3D7DB",
+  // --- Goals list ---
+  list: {
+    gap: 12,
+  },
+
+  goalCard: {
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    padding: 14,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+
+  goalCardDisabled: {
+    backgroundColor: "#F8FAFC",
   },
 
   goalRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    width: "100%",
     alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
   },
 
   goalTextWrap: {
-    alignItems: "flex-end",
-    flexShrink: 1,
+    flex: 1,
   },
 
-  goalText: {
+  goalTitle: {
     fontSize: 16,
-    color: "#2E3A45",
-    textAlign: "right",
+    lineHeight: 20,
+    color: "#0F172A",
   },
 
-  goalDays: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#5E6A73",
-    textAlign: "right",
+  textMuted: {
+    color: "#334155",
+    opacity: 0.85,
+  },
+
+  daysRow: {
+    marginTop: 10,
+    alignItems: "center",
+  },
+
+  daysPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+
+    backgroundColor: "#FFF3DD", // Beige tile bg
+    borderWidth: 1,
+    borderColor: "#FFE6BA",
+  },
+
+  daysPillDisabled: {
+    backgroundColor: "#EEF2F7",
+    borderColor: "#E2E8F0",
+  },
+
+  daysText: {
+    fontSize: 13,
+    color: "#334155",
+  },
+
+  statusIconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 16,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+  },
+
+  statusDone: {
+    backgroundColor: "#E9FFF3", // Green tile bg
+    borderColor: "#D7F7E8",
+  },
+
+  statusTodo: {
+    backgroundColor: "#F1F5F9",
+    borderColor: "#E2E8F0",
+  },
+
+  bottomSpacer: {
+    height: Platform.OS === "web" ? 24 : 18,
   },
 });

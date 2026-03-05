@@ -1,114 +1,150 @@
+// client/src/screens/ChildrenScreens/StoreScreen/styles.ts
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
-  // ✅ אין רקע! ScreenLayout אחראי לרקע הקבוע
   container: {
     flex: 1,
   },
 
   balanceSection: {
     alignItems: "center",
-    marginTop: 22,
+    marginTop: 18,
+    paddingHorizontal: 18,
   },
 
   balanceLabel: {
-    fontSize: 20,
-    color: "#333",
-    marginBottom: 14,
-    textAlign: "center",
+    fontSize: 18,
+    color: "#111",
+    marginBottom: 12,
   },
 
   balanceCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FFC107",
-    paddingHorizontal: 38,
+    width: "100%",
+    maxWidth: 520,
+    borderRadius: 22,
+    paddingHorizontal: 16,
     paddingVertical: 14,
-    borderRadius: 18,
-    elevation: 4,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+
+    // soft shadow
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
+
+    alignItems: "center",
+    gap: 12,
+  },
+
+  balanceBadge: {
+    width: 42,
+    height: 42,
+    borderRadius: 999,
+    backgroundColor: "#EAF2FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  balanceTextWrap: {
+    flex: 1,
   },
 
   balanceAmount: {
-    fontSize: 42,
-    color: "#fff",
-    marginRight: 10,
+    fontSize: 28,
+    color: "#111",
+    lineHeight: 32,
+  },
+
+  balanceSub: {
+    fontSize: 14,
+    color: "#5A6B7A",
+    marginTop: 2,
   },
 
   rewardsContainer: {
-    marginTop: 26,
+    marginTop: 18,
     paddingHorizontal: 18,
+    paddingBottom: 18,
   },
 
-  // ✅ טקסט מיושר לימין (RTL) כמו בתמונה
   sectionTitle: {
     fontSize: 18,
+    color: "#111",
     marginBottom: 12,
-    textAlign: "right",
-    color: "#333",
   },
 
   rewardCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
-    marginBottom: 16,
-    elevation: 3,
-      shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.12,
-  shadowRadius: 6,
+    borderRadius: 22,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 12,
+    borderWidth: 1,
 
-    // ✅ מבנה: מחיר בימין, תוכן+אייקון בשמאל
-    flexDirection: "row",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+
+  rewardRow: {
+    width: "100%",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 12,
   },
 
-  // ✅ צד ימין: מחיר
-  priceBox: {
-    minWidth: 70,
-    alignItems: "flex-end",
-  },
-
-  rewardPrice: {
-    fontSize: 26,
-    color: "#A86A00",
-  },
-
-  rewardCoins: {
-    color: "#A86A00",
-  },
-
-  // ✅ צד שמאל: טקסט (RTL) + אייקון בצד שמאל
-  contentBox: {
-    flex: 1,
-    marginRight: 14,
-    flexDirection: "row",
+  iconBox: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    borderWidth: 1,
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "center",
   },
 
   textBox: {
     flex: 1,
-    paddingLeft: 14,
-    alignItems: "flex-end",
+    minWidth: 0,
   },
 
   rewardTitle: {
     fontSize: 16,
-    textAlign: "right",
     color: "#111",
   },
 
   rewardSub: {
-    fontSize: 14,
-    color: "#A86A00",
-    textAlign: "right",
+    fontSize: 13,
+    color: "#5A6B7A",
+    marginTop: 3,
+  },
+
+  priceBox: {
+    minWidth: 108,
+  },
+
+  pricePill: {
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  rewardPrice: {
+    fontSize: 16,
+    color: "#111",
+    lineHeight: 18,
+  },
+
+  rewardCoins: {
+    fontSize: 12,
+    color: "#5A6B7A",
     marginTop: 2,
   },
-  icon: {
-  marginLeft: 10, 
-  marginRight: 10,
-}
 });
