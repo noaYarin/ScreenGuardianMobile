@@ -6,7 +6,7 @@ import {ScreenTimeSchema} from "../models/screenTime.model.js"
 export const DeviceSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
-        type: { type: String, enum: DeviceType, required: true },
+        type: { type: String, enum: Object.values(DeviceType), required: true },
         isLocked: { type: Boolean },
         code: { type: String, default: "" },
         location: { type: String, default: "" },

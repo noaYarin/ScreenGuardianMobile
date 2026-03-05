@@ -7,7 +7,7 @@ export const ReportSchema = new mongoose.Schema(
         childId: { type: mongoose.Schema.Types.ObjectId, required: true },
         parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
         ai_insights: { type: String, default: "" },
-        limitFrequency: { type: String, enum: ReportLimitFrequency, required: true },
+        limitFrequency: { type: String, enum: Object.values(ReportLimitFrequency), required: true },
         startDate: { type: Date, default: null },
         endDate: { type: Date, default: null },
         appBreakdown: { type: [AppBreakdownItemSchema], default: [] }

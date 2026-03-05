@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import parentRoutes from "./routes/parent.routes.js";
 import pairingRoutes from "./routes/pairing.routes.js";
 import deviceRouter from "./routes/device.routes.js";
+import requestRoutes from "./routes/request.routes.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/parent", parentRoutes);
 app.use("/api/v1/pairing", pairingRoutes);
 app.use("/api/v1/devices", deviceRouter);
+app.use("/api/v1/requests", requestRoutes);
 
 app.use(errorHandler);
 

@@ -2,20 +2,20 @@ import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { Role } from "../constants/role.js";
 
-export function validateAndBuildChildDoc(body) {
+export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;
 
-  if (!name || !birthDate) {
-    throw new AppError(CommonErrors.VALIDATION_NAME_BIRTHDATE);
-  }
+  let bday;
 
-  const bday = new Date(birthDate);
-  if (Number.isNaN(bday.getTime())) {
-    throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
+  if (birthDate !== undefined) {
+    bday = new Date(birthDate);
+    if (Number.isNaN(bday.getTime())) {
+      throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
+    }
   }
 
   return {
-    name, 
+    name: typeof name === "string" ? name : undefined,
     birthDate: bday,
     gender: gender || undefined,
     interests: Array.isArray(interests) ? interests : [],

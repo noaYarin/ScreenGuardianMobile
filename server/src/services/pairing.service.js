@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
+import { Common as CommonErrors } from "../constants/errors.js";
+
 import {
   createPairingSession,
   findByCode,
@@ -35,11 +37,11 @@ async function createUniqueCode() {
 }
 
 function assertChildBelongsToParent(childList, childId) {
-  const child = childList.some((c) => String(c._id) === String(childId));
-  if (!child) throw new AppError(PairingErrors.CHILD_NOT_FOUND);
+  const child = childList.find((c) => String(c._id) === String(childId));
+  if (!child) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
 
   if (child.isActive === false) {
-    throw new AppError(PairingErrors.CHILD_NOT_ACTIVE); 
+    throw new AppError(PairingErrors.CHILD_NOT_ACTIVE);
   }
 }
 
@@ -87,27 +89,29 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code="", barcodeToken="", deviceName="", deviceType="OTHER" }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER" }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
- if (!session) {
+  if (!session) {
     throw new AppError(PairingErrors.SESSION_NOT_FOUND);
   }
 
-  const parentId = String(session.parentId);
-  const childId = String(session.childId);
-  if (!childId) throw new AppError(PairingErrors.CHILD_NOT_FOUND);
-  if (!parentId) throw new AppError(PairingErrors.PARENT_NOT_FOUND);
+
 
   // Check if session is already used or expired
   const consumed = await consumePairingSession(session._id);
-  if (!consumed) { 
-    throw new AppError(PairingErrors.SESSION_ALREADY_USED);
-  } 
+  if (!consumed) {
+    throw new AppError(PairingErrors.SESSION_INVALID);
+  }
 
-  const devicePayload  = validateDevicePayload( deviceName, deviceType ); 
-  const currentDevice = await createOrGetDeviceForSession(session, devicePayload);
+    const parentId = String(consumed.parentId);
+  const childId = String(consumed.childId);
+  if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+
+  const devicePayload = validateDevicePayload(deviceName, deviceType);
+  const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
 
   // Child token is used to authenticate the child on the device
   const tokenData = await issueChildToken(parentId, childId);

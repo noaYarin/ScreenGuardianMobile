@@ -5,6 +5,7 @@ import { env } from "../config/env.js";
 import { AppError } from "../utils/appError.js";
 import { Auth as AuthErrors } from "../constants/errors.js";
 import { createParent, findParentByEmail, findParentByGoogleId } from "../dal/parent.dal.js";
+import { Role } from "../constants/role.js";
 
 const BCRYPT_ROUNDS = 10;
 const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
@@ -15,7 +16,7 @@ function signToken(payload) {
 
 function issueAuthResponse(parent) {
   const parentId = parent._id.toString();
-  const token = signToken({ parentId, role: "PARENT" });
+  const token = signToken({ parentId, role: Role.PARENT});
   return { token, parentId };
 }
 
@@ -23,7 +24,7 @@ export async function issueChildToken(parentId, childId) {
   const parentIdStr = parentId != null ? String(parentId) : null;
   const childIdStr = childId != null ? String(childId) : null;
   // JWT with parentId and childId 
-  const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: "CHILD" });
+  const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: Role.CHILD });
   return { token, parentId: parentIdStr, childId: childIdStr };
 }
 
@@ -61,7 +62,7 @@ async function resolveParentFromGooglePayload(payload) {
   return createParent({ email, googleId, name, children: [] });
 }
 
-export async function registerParent({ email, password, name, phoneNumber, gender }) {
+export async function registerParent({ email, password, name, phoneNumber }) {
   const existing = await findParentByEmail(email);
   if (existing) {
     throw new AppError(AuthErrors.EMAIL_EXISTS);
@@ -73,7 +74,6 @@ export async function registerParent({ email, password, name, phoneNumber, gende
     password: hash,
     name,
     phoneNumber,
-    gender,
     children: [],
   });
 

@@ -1,6 +1,4 @@
 export const Pairing = {
-  PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
-  CHILD_NOT_FOUND: { status: 400, code: "CHILD_NOT_FOUND", message: "Child does not belong to this parent" },
   SHORT_CODE_COLLISION: { status: 503, code: "SHORT_CODE_COLLISION", message: "Could not generate unique code, try again" },
   LINK_NEED_ONE: { status: 400, code: "VALIDATION_ERROR", message: "Provide either code or barcodeToken" },
   LINK_ONLY_ONE: { status: 400, code: "VALIDATION_ERROR", message: "Provide only one of code or barcodeToken" },
@@ -12,6 +10,8 @@ export const Pairing = {
   DEVICE_TYPE_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is required" },
   INVALID_DEVICE_TYPE: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is invalid" },
   CHILD_NOT_ACTIVE: { status: 400, code: "CHILD_NOT_ACTIVE", message: "Child is not active" },
+  SESSION_INVALID: { status: 410, code: "SESSION_INVALID", message: "Pairing code is invalid, expired, or already used" },
+
 };
 
 
@@ -30,14 +30,27 @@ export const Auth = {
 };
 
 export const Common = {
+  PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
+  CHILD_NOT_FOUND: { status: 400, code: "CHILD_NOT_FOUND", message: "Child does not belong to this parent" },
   INVALID_PARENT_ID: { status: 400, code: "INVALID_ID", message: "Invalid parentId" },
   INVALID_CHILD_ID: { status: 400, code: "INVALID_ID", message: "Invalid childId" },
   INVALID_SESSION_ID: { status: 400, code: "INVALID_ID", message: "Invalid session id" },
   INVALID_DEVICE_ID: { status: 400, code: "INVALID_ID", message: "Invalid deviceId" },
   NOT_FOUND: { status: 404, code: "NOT_FOUND", message: "Child not found" },
+  DEVICE_NOT_FOUND: { status: 404, code: "DEVICE_NOT_FOUND", message: "Device not found" },
   VALIDATION_NAME_BIRTHDATE: { status: 400, code: "VALIDATION_ERROR", message: "name and birthDate are required" },
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
   VALIDATION_CHILD_ID: { status: 400, code: "VALIDATION", message: "childId must be a valid ObjectId" },
   VALIDATION_IS_ACTIVE: { status: 400, code: "VALIDATION", message: "isActive must be boolean" },
-  LIMIT_MAX_CHILDREN_REACHED: {status: 409,code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account.",}
+  LIMIT_MAX_CHILDREN_REACHED: { status: 409, code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account" },
+};
+
+export const Request = {
+  REQUEST_NOT_FOUND: { status: 404, code: "REQUEST_NOT_FOUND", message: "Request not found" },
+  REQUEST_NOT_PENDING: { status: 409, code: "REQUEST_NOT_PENDING", message: "Request is not pending" },
+  INVALID_DECISION: { status: 400, code: "VALIDATION_ERROR", message: "decision must be APPROVED or REJECTED" },
+  INVALID_REQUEST_ID: { status: 400, code: "INVALID_ID", message: "Invalid requestId" },
+  INVALID_MINUTES: { status: 400, code: "VALIDATION_ERROR", message: "requestedMinutes must be between 1 and 60" },
+  DEVICE_NOT_OWNED: { status: 403, code: "FORBIDDEN", message: "Device does not belong to this child/parent" },
+  REQUEST_ALREADY_PENDING: { status: 409, code: "REQUEST_ALREADY_PENDING", message: "There is already a pending request for this device" },
 };

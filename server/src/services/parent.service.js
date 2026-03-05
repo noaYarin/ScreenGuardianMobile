@@ -6,6 +6,8 @@ import {
   updateChildActiveByParentId,
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
+import { assertBoolean } from "../utils/validators.js"; 
+
 
 export async function addChild(parentId, body) {
   const childDoc = validateAndBuildChildDoc(body);
@@ -22,6 +24,8 @@ export async function getMyChild(parentId, options = {}) {
 }
 
 export async function setChildActive(parentId, childId, isActive) {
+  assertBoolean(isActive, CommonErrors.VALIDATION_IS_ACTIVE);
+  
   const updatedParent = await updateChildActiveByParentId(parentId, childId, isActive);
 
   if (!updatedParent) {
@@ -30,5 +34,8 @@ export async function setChildActive(parentId, childId, isActive) {
 
   const list = updatedParent.children || [];
   const updatedChild = list.find((c) => String(c._id) === String(childId));
+    if (!updatedChild) {
+    throw new AppError(CommonErrors.NOT_FOUND);
+  }
   return { child: updatedChild };
 }

@@ -11,7 +11,7 @@ export const ChildSchema = new mongoose.Schema(
     interests: { type: [String], default: [] },
     coins: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
-    role: { type: String, enum: Role, default: Role.CHILD },
+    role: { type: String, enum: Object.values(Role), default: Role.CHILD },
     achievementIds: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "Achievement",

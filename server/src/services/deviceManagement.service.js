@@ -4,11 +4,11 @@ import { findDeviceById, updateDeviceById } from "../dal/device.dal.js";
 
 function ensureDeviceBelongsToParent(device, parentId) {
   if (!device) {
-    throw new AppError(CommonErrors.NOT_FOUND);
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
   }
 
   if (String(device.parentId) !== String(parentId)) {
-    throw new AppError(CommonErrors.NOT_FOUND);
+    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
   }
 }
 
