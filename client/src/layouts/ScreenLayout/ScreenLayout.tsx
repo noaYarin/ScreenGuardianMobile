@@ -1,21 +1,24 @@
 import React from "react";
 import { SafeAreaView, View, ScrollView, Platform } from "react-native";
+import { useTranslation } from "react-i18next";
 import { styles } from "./styles";
 
-type Props = {
-  children: React.ReactNode;
-};
+export default function ScreenLayout({ children }: { children: React.ReactNode }) {
+  // This hook re-renders the component on language change
+  const { i18n } = useTranslation();
 
-export default function ScreenLayout({ children }: Props) {
+  const rtl = i18n.resolvedLanguage === "he";
+
   return (
     <SafeAreaView style={styles.page}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          Platform.OS === "web" ? ({ direction: rtl ? "rtl" : "ltr" } as any) : null,
+        ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.inner, Platform.OS === "web" && styles.webFrame]}>
-          {children}
-        </View>
+        <View style={styles.inner}>{children}</View>
       </ScrollView>
     </SafeAreaView>
   );

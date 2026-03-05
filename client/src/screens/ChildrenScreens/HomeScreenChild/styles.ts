@@ -1,191 +1,322 @@
+// client/src/screens/ChildrenScreens/HomeScreen/styles.ts
 import { StyleSheet } from "react-native";
+import { APP_COLORS } from "../../../../constants/theme";
+
+export const TILE_COLORS = {
+  apps: { bg: "#EAF2FF", badge: "#CFE3FF", icon: "#2F6DEB", border: "#D6E6FF" },
+  extend: { bg: "#EAF2FF", badge: "#CFE3FF", icon: "#2F6DEB", border: "#D6E6FF" },
+  shop: { bg: "#FFF3DD", badge: "#FFE1A8", icon: "#B46B00", border: "#FFE6BA" },
+  tasks: { bg: "#E9FFF3", badge: "#C9F5DE", icon: "#0F8A5F", border: "#D7F7E8" },
+  achievements: { bg: "#F3EDFF", badge: "#E0D2FF", icon: "#6D28D9", border: "#E7DBFF" },
+  goals: { bg: "#FFEAF0", badge: "#FFC9D8", icon: "#D81B60", border: "#FFD6E2" },
+  encouragement: { bg: "#FFEFF0", badge: "#FFD0D4", icon: "#E11D48", border: "#FFD9DC" },
+  ideas: { bg: "#EEFFF4", badge: "#CFF7DD", icon: "#16A34A", border: "#DAF9E6" },
+  help: { bg: "#EAF2FF", badge: "#CFE3FF", icon: "#2563EB", border: "#D6E6FF" },
+} as const;
 
 export const styles = StyleSheet.create({
-  home: {
+  page: {
     width: "100%",
     alignItems: "stretch",
-    marginTop: 0,
+    paddingHorizontal: 14,
+    paddingTop: 8,
+    paddingBottom: 16,
   },
 
   topRow: {
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: 6,
-    marginBottom: 14,
+    marginBottom: 12,
+  },
+
+  topCol: {
+    flex: 1,
+  },
+
+  topColCenter: {
+    flex: 1,
     alignItems: "center",
   },
 
   circleBtn: {
-    width: 54,
-    height: 54,
+    width: 52,
+    height: 52,
     borderRadius: 999,
-    backgroundColor: "#ffffff",
+    backgroundColor: "#EFF6FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
     alignItems: "center",
     justifyContent: "center",
   },
 
-  avatar: {
-    width: 150,
-    height: 150,
+  circleBtnPressed: {
+    opacity: 0.75,
+    transform: [{ scale: 0.98 }],
+  },
+
+  headerCard: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    padding: 14,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
+  },
+
+  headerRow: {
+    width: "100%",
+    alignItems: "center",
+  },
+
+  avatarWrap: {
     borderRadius: 999,
+    overflow: "hidden",
+  },
+
+  avatarGradient: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 14,
-    alignSelf: "center",
   },
 
   avatarLetter: {
-    fontSize: 64,
-    color: "#ffffff",
-    lineHeight: 64,
+    color: "#FFFFFF",
+    fontSize: 42,
+    lineHeight: 46,
     includeFontPadding: false,
-    textAlignVertical: "center",
+    textAlign: "center",
+  },
+
+  helloBlock: {
+    flex: 1,
+    paddingHorizontal: 12,
+    minWidth: 0,
   },
 
   hello: {
-    fontSize: 36,
-    color: "#475569",
-    marginBottom: 14,
-    textAlign: "center",
-    writingDirection: "rtl",
+    color: "#0F172A",
     includeFontPadding: false,
-    textAlignVertical: "center",
   },
 
-  chipsRow: {
-    flexDirection: "row",
+  statsRow: {
+    width: "100%",
+    marginTop: 12,
     alignItems: "center",
-    marginBottom: 12,
-    justifyContent: "center",
-    flexWrap: "wrap", // ✅ בטלפון צר זה לא יישבר מכוער
-    gap: 10, // ✅ נתמך בריאקט נייטיב חדש; אם לא נתמך אצלך תגידי ואחליף ל-margin
+    justifyContent: "space-between",
   },
 
-  chip: {
+  statPill: {
+    flex: 1,
+    minWidth: 0,
+    marginHorizontal: 6,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     borderRadius: 999,
   },
 
-  chipText: {
-    fontSize: 16,
-    lineHeight: 20,
-    marginHorizontal: 6,
+  statText: {
+    marginHorizontal: 8,
+    fontSize: 14,
+    lineHeight: 18,
+    color: "#0F172A",
+    flexShrink: 1,
     textAlign: "center",
-    writingDirection: "rtl",
     includeFontPadding: false,
-    textAlignVertical: "center",
   },
 
-  chipBlue: {
-    backgroundColor: "#dbeafe",
+  statPillBlue: {
+    backgroundColor: "#EAF2FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
   },
 
-  chipGold: {
-    backgroundColor: "#fef3c7",
+  statPillBeige: {
+    backgroundColor: APP_COLORS.beige,
+    borderWidth: 1,
+    borderColor: "#F6E4C7",
   },
 
-  chipMint: {
-    backgroundColor: "#dcfce7",
-    marginBottom: 14,
-    alignSelf: "center",
+  statPillPrimary: {
+    backgroundColor: "#E9FFF3",
+    borderWidth: 1,
+    borderColor: "#D7F7E8",
   },
 
-  timer: {
+  card: {
     width: "100%",
+    backgroundColor: "#FFFFFF",
     borderRadius: 22,
-    padding: 18,
-    alignItems: "center",
-    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 2,
   },
 
-  timerTitle: {
-    flexDirection: "row",
+  cardTitleRow: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+
+  cardTitleLeft: {
+    alignItems: "center",
+  },
+
+  iconBadge: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    backgroundColor: "#EAF2FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginHorizontal: 8,
   },
 
-  timerTitleText: {
-    marginLeft: 8,
-    textAlign: "center",
-    writingDirection: "rtl",
+  cardTitle: {
+    color: "#0F172A",
+    fontSize: 16,
     includeFontPadding: false,
-    textAlignVertical: "center",
   },
 
   timerValue: {
-    fontSize: 56,
-    color: "#f97316",
+    marginTop: 10,
+    color: "#0F172A",
     textAlign: "center",
     includeFontPadding: false,
-    textAlignVertical: "center",
+  },
+
+  progressTrack: {
+    width: "100%",
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: "#E6EEF9",
+    overflow: "hidden",
+    marginTop: 12,
+  },
+
+  progressFill: {
+    height: "100%",
+    borderRadius: 999,
+    backgroundColor: "#3B82F6",
   },
 
   timerSub: {
-    color: "#f97316",
-    marginTop: 6,
+    marginTop: 10,
     textAlign: "center",
-    writingDirection: "rtl",
+    color: "#2563EB",
     includeFontPadding: false,
-    textAlignVertical: "center",
   },
 
-  // ✅ 3x3 grid אמיתי
   grid: {
     width: "100%",
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",
-    marginBottom: 10,
+    justifyContent: "space-evenly",  // instead of space-between
     rowGap: 12,
+    marginBottom: 10,
   },
+tile: {
+  width: "31.5%",
+  maxWidth: 200,  
+  aspectRatio: 1,
+  borderRadius: 22,
+  borderWidth: 2,
+  overflow: "hidden",
+  shadowColor: "#000",
+  shadowOpacity: 0.04,
+  shadowRadius: 10,
+  shadowOffset: { width: 0, height: 6 },
+  elevation: 1,
 
-  // ✅ כל כפתור אותו גודל (ריבוע)
-  tile: {
-    width: "31.5%",
-    aspectRatio: 1,
-    backgroundColor: "#ffffff",
-    borderRadius: 18,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+},
+
+tileInner: {
+  flex: 1,
+  paddingHorizontal: 10,
+  paddingVertical: 12,
+},
+
+// Icon stays centered-ish but not too high/low
+tileIconZone: {
+  flex: 6,                 // more space for icon
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+// Label stays closer to icon (not at the bottom)
+tileLabelZone: {
+  flex: 4,
+  alignItems: "center",
+  justifyContent: "flex-start",
+  paddingTop: 6,
+},
+
+tileIconWrap: {
+  width: 56,
+  height: 56,
+  borderRadius: 18,
+  alignItems: "center",
+  justifyContent: "center",
+  borderWidth: 1,
+  borderColor: "#FFFFFF",
+},
+
+tileText: {
+  color: "#0F172A",
+  textAlign: "center",
+  fontSize: 13,
+  lineHeight: 16,
+  includeFontPadding: false,
+},
+
+tileBody: {
+  flex: 1,
+  alignItems: "center",
+  justifyContent: "center", // Icon is truly centered
+  paddingTop: 8,
+  paddingHorizontal: 10,
+},
+
+tileFooter: {
+  paddingHorizontal: 10,
+  paddingBottom: 10,
+  alignItems: "center",
+  justifyContent: "flex-end",
+},
+
 
   tilePressed: {
-    opacity: 0.7,
+    opacity: 0.75,
     transform: [{ scale: 0.99 }],
-  },
-
-  tileIcon: {
-    marginBottom: 8,
-  },
-
-  tileText: {
-    color: "#475569",
-    textAlign: "center",
-    writingDirection: "rtl",
-    includeFontPadding: false,
-    textAlignVertical: "center",
-    fontSize: 12,
   },
 
   panicBtn: {
     width: "100%",
     marginTop: 10,
-    backgroundColor: "#e85a68",
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
-    flexDirection: "row",
+    backgroundColor: "#E85A68",
+    borderRadius: 20,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
-    alignSelf: "stretch",
   },
 
   panicPressed: {
@@ -193,28 +324,21 @@ export const styles = StyleSheet.create({
     transform: [{ scale: 0.995 }],
   },
 
+  panicIconBadge: {
+    width: 34,
+    height: 34,
+    borderRadius: 12,
+    backgroundColor: "rgba(255,255,255,0.22)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 10,
+  },
+
   panicText: {
-    color: "#ffffff",
-    fontSize: 22,
-    marginLeft: 10,
-    lineHeight: 22,
-    textAlign: "center",
-    writingDirection: "rtl",
+    color: "#FFFFFF",
+    fontSize: 18,
+    lineHeight: 20,
     includeFontPadding: false,
-    textAlignVertical: "center",
-  },
-
-  pressed: {
-    opacity: 0.7,
-  },
-
-  headerIconBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-
-  headerIconBtnPressed: {
-    opacity: 0.6,
+    textAlign: "center",
   },
 });
