@@ -1,16 +1,51 @@
 import { StyleSheet } from "react-native";
 
+const TILE = {
+  blueBg: "#EAF2FF",
+  blueBorder: "#D6E6FF",
+  blueIcon: "#2F6DEB",
+
+  beigeBg: "#FFF3DD",
+  beigeBorder: "#FFE6BA",
+  beigeIcon: "#B46B00",
+
+  ring1: "rgba(59, 130, 246, 0.18)",
+  ring2: "rgba(59, 130, 246, 0.10)",
+
+  danger: "#FF4B55",
+  dangerDeep: "#E11D48",
+};
+
 export const styles = StyleSheet.create({
   page: {
+    width: "100%",
     alignItems: "center",
-    paddingTop: 6,
+    paddingTop: 10,
+    paddingHorizontal: 16,
+    gap: 14,
+  },
+
+  heroCard: {
+    width: "100%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    paddingVertical: 16,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
+    alignItems: "center",
   },
 
   sosArea: {
     position: "relative",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 6,
+    marginTop: 4,
   },
 
   ringOuter: {
@@ -21,132 +56,136 @@ export const styles = StyleSheet.create({
     bottom: 0,
     borderRadius: 9999,
     borderWidth: 10,
-    borderColor: "rgba(187, 190, 205, 0.35)",
+    borderColor: TILE.ring1,
   },
 
   ringInner: {
     position: "absolute",
     borderRadius: 9999,
     borderWidth: 10,
-    borderColor: "rgba(187, 190, 205, 0.25)",
+    borderColor: TILE.ring2,
   },
 
   sosButton: {
-    backgroundColor: "#ff1e1e",
+    backgroundColor: TILE.danger,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
-    shadowOpacity: 0.18,
-    shadowRadius: 30,
-    shadowOffset: { width: 0, height: 18 },
-    elevation: 8,
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.55)",
   },
 
   sosButtonPressed: {
-    transform: [{ scale: 0.98 }],
-    opacity: 0.95,
+    transform: [{ scale: 0.985 }],
+    opacity: 0.96,
   },
 
   exMarkCircle: {
-    width: 86,
-    height: 86,
+    width: 84,
+    height: 84,
     borderRadius: 9999,
     borderWidth: 7,
-    borderColor: "#ffffff",
+    borderColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 14,
+    marginBottom: 12,
   },
 
   exMark: {
-    color: "#ffffff",
+    color: "#FFFFFF",
     fontSize: 44,
     lineHeight: 44,
   },
 
   sosText: {
-    color: "#ffffff",
+    color: "#FFFFFF",
     fontSize: 44,
     lineHeight: 44,
     letterSpacing: 0.5,
   },
 
   textBlock: {
-    marginTop: 18,
+    marginTop: 14,
     alignItems: "center",
+    paddingHorizontal: 6,
   },
 
   titleText: {
-    fontSize: 30,
-    color: "#1f2937",
-    marginBottom: 8,
-    textAlign: "center",
-    writingDirection: "rtl",
+    fontSize: 28,
+    color: "#111827",
+    marginBottom: 6,
   },
 
   subtitle: {
-    fontSize: 18,
-    color: "rgba(31, 41, 55, 0.75)",
-    textAlign: "center",
-    writingDirection: "rtl",
+    fontSize: 16,
+    color: "rgba(17, 24, 39, 0.72)",
   },
 
   sendCard: {
     width: "100%",
-    marginTop: 18,
-    backgroundColor: "rgba(255, 255, 255, 0.62)",
-    borderRadius: 18,
-    padding: 18,
-    flexDirection: "row-reverse",
+    backgroundColor: TILE.blueBg,
+    borderRadius: 22,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: 1,
+    borderColor: TILE.blueBorder,
     alignItems: "center",
     justifyContent: "space-between",
-  },
-
-  sendCardRight: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
-
-  sendToLabel: {
-    fontSize: 18,
-    color: "rgba(31, 41, 55, 0.7)",
-    marginBottom: 6,
-    textAlign: "right",
-    writingDirection: "rtl",
-  },
-
-  sendToValue: {
-    fontSize: 26,
-    color: "#1d4ed8",
-    textAlign: "right",
-    writingDirection: "rtl",
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 1,
+    gap: 12,
   },
 
   peopleIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 46,
+    height: 46,
+    borderRadius: 16,
     alignItems: "center",
     justifyContent: "center",
-    color: "#1d4ed8",
-    marginLeft: 14,
+    backgroundColor: "#CFE3FF",
+    borderWidth: 1,
+    borderColor: "rgba(47,109,235,0.18)",
+  },
+
+  sendCardText: {
+    flex: 1,
+  },
+
+  sendToLabel: {
+    fontSize: 14,
+    color: "rgba(17, 24, 39, 0.72)",
+    marginBottom: 4,
+  },
+
+  sendToValue: {
+    fontSize: 20,
+    color: TILE.blueIcon,
   },
 
   warningBox: {
     width: "100%",
-    marginTop: 18,
-    backgroundColor: "rgba(255, 243, 204, 0.95)",
-    borderWidth: 2,
-    borderColor: "rgba(245, 158, 11, 0.45)",
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    backgroundColor: TILE.beigeBg,
+    borderWidth: 1,
+    borderColor: TILE.beigeBorder,
+    borderRadius: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
   },
 
   warningText: {
-    fontSize: 16,
-    color: "#b45309",
-    textAlign: "center",
-    writingDirection: "rtl",
+    fontSize: 14,
+    color: TILE.beigeIcon,
+    flexShrink: 1,
   },
 });

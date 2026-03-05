@@ -1,147 +1,195 @@
 import { StyleSheet } from "react-native";
+import { APP_COLORS, COLORS } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   container: {
     width: "100%",
-    paddingHorizontal: 18,
-    paddingTop: 8,
+    backgroundColor: COLORS.light.background,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+  },
+
+  // רספונסיבי: Web/iPad לא נמרח על כל המסך
+  content: {
+    width: "100%",
+    maxWidth: 560,
+    alignSelf: "center",
   },
 
   bigHello: {
-    fontSize: 44,
-    lineHeight: 52,
-    textAlign: "center",
-    color: "#3F6F9D",
-    marginTop: 10,
+    fontSize: 28,
+    lineHeight: 34,
+    color: "#0F172A",
+    marginTop: 8,
   },
 
-  overviewLinkWrap: {
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 18,
-  },
   overviewLink: {
-    fontSize: 18,
-    color: "#3F6F9D",
+    marginTop: 10,
+    fontSize: 14,
+    color: APP_COLORS.primaryBlue,
     textDecorationLine: "underline",
+    alignSelf: "flex-start",
   },
 
-  sectionHeader: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 10,
+  summaryCard: {
+    marginTop: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#E7EFFA",
+    backgroundColor: "#F8FAFC",
+    padding: 14,
   },
+
+  summaryRow: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+
+  summaryChip: {
+    minWidth: 44,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: "#DBEAFE",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+  },
+
+  summaryChipText: {
+    fontSize: 16,
+    color: "#1D4ED8",
+  },
+
+  summaryTextWrap: {
+    flex: 1,
+  },
+
   sectionTitle: {
-    fontSize: 18,
-    color: "#1B2B3A",
+    fontSize: 16,
+    color: "#0F172A",
+  },
+
+  sectionSub: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#334155",
+    opacity: 0.75,
   },
 
   cardsWrap: {
     width: "100%",
-    gap: 14,
+    marginTop: 14,
+    gap: 12,
   },
 
   card: {
     width: "100%",
-    borderRadius: 18,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#CFE2FF",
-    flexDirection: "row",
-    alignItems: "center",
+    borderColor: "#E7EFFA",
+    backgroundColor: "#FFFFFF",
+    padding: 14,
+    // shadow עדין
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 1,
   },
 
-  cardSelected: {
-    borderColor: "#8AB6FF",
+  cardInner: {
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+  },
+
+  avatarCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 999,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  avatarGood: { backgroundColor: "#ECFDF5" },
+  avatarWarn: { backgroundColor: "#FFFBEB" },
+  avatarBad: { backgroundColor: "#FEF2F2" },
+
+  cardCenter: {
+    flex: 1,
+  },
+
+  childName: {
+    fontSize: 18,
+    lineHeight: 22,
+    color: "#0F172A",
+  },
+
+  childSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#334155",
+    opacity: 0.75,
   },
 
   cardLeft: {
-    minWidth: 80,
+    minWidth: 88,
     alignItems: "flex-start",
   },
 
   timeMain: {
-    fontSize: 26,
-    lineHeight: 30,
+    fontSize: 18,
+    lineHeight: 22,
   },
+
   timeSub: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#9AA7B3",
+    marginTop: 4,
+    fontSize: 12,
+    color: "#64748B",
   },
 
-  timeGood: { color: "#18A34A" },
-  timeWarn: { color: "#D97706" },
-  timeBad: { color: "#DC2626" },
-
-  cardCenter: {
-    flex: 1,
-    paddingHorizontal: 12,
-    alignItems: "flex-end", // RTL נראה כמו בתמונה
-  },
-
-  childName: {
-    fontSize: 26,
-    lineHeight: 30,
-    color: "#1B2B3A",
-  },
-  childSubtitle: {
-    marginTop: 6,
-    fontSize: 14,
-    color: "#9AA7B3",
-  },
-
-  cardRight: {
-    width: 62,
-    alignItems: "flex-end",
-    justifyContent: "center",
-  },
-
-  avatarCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 999,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarGood: { backgroundColor: "#DFF7E6" },
-  avatarWarn: { backgroundColor: "#FFF2CC" },
-  avatarBad: { backgroundColor: "#FFE1E1" },
+  timeGood: { color: "#047857" },
+  timeWarn: { color: "#B45309" },
+  timeBad: { color: "#B91C1C" },
 
   actionsWrap: {
     width: "100%",
     marginTop: 18,
-    gap: 14,
-    alignItems: "center",
+    gap: 12,
   },
 
-  primaryBtn: {
-    width: "82%",
-    borderRadius: 999,
+  btnPrimary: {
+    width: "100%",
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#5EA7E8",
+    justifyContent: "center",
+    backgroundColor: APP_COLORS.primaryBlue,
   },
-  primaryBtnText: {
-    fontSize: 18,
+
+  btnPrimaryText: {
+    fontSize: 16,
     color: "#FFFFFF",
   },
 
-  secondaryBtn: {
-    width: "82%",
-    borderRadius: 999,
+  btnSecondary: {
+    width: "100%",
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: "center",
-    backgroundColor: "#5EA7E8",
+    justifyContent: "center",
+    backgroundColor: "#EFF6FF",
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
   },
-  secondaryBtnText: {
-    fontSize: 18,
-    color: "#FFFFFF",
+
+  btnSecondaryText: {
+    fontSize: 16,
+    color: "#1D4ED8",
   },
 
   bottomSpacer: {
-    height: 24,
+    height: 18,
   },
 });

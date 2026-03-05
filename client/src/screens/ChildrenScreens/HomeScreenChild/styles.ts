@@ -235,7 +235,7 @@ export const styles = StyleSheet.create({
   },
 tile: {
   width: "31.5%",
-  maxWidth: 200,  
+  maxWidth: 250,  
   aspectRatio: 1,
   borderRadius: 22,
   borderWidth: 2,

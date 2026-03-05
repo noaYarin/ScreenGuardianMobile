@@ -42,7 +42,7 @@
     "tile_tasks": "Tasks",
     "tile_achievements": "Achievements",
     "tile_goals": "Goals",
-    "tile_encouragement": "Encouragement",
+    "tile_reports": "Activity Reports",
     "tile_ideas": "Ideas",
     "tile_help": "Help",
     "panic": "SOS",
@@ -215,7 +215,14 @@
     "full_watch_a11y": "Open full view",
     "add_child_a11y": "Add a new child",
     "child_card_a11y": "Select child: {{name}}"
-  }
+  },
+  "tabs": {
+  "home": "Home",
+  "kids": "Kids",
+  "limits": "Limits",
+  "reports": "Reports",
+  "settings": "Settings"
+}
 }
 
 

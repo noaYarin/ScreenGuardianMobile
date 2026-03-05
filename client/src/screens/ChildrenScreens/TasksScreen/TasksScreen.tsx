@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -21,31 +21,19 @@ type Task = {
   done: boolean;
 };
 
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#000" />
-    </Pressable>
-  );
-}
-
 export default function TasksScreen() {
   const { t, i18n } = useTranslation();
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
+  const currentLanguage = i18n.resolvedLanguage || i18n.language || "en";
+  const isRTL = currentLanguage?.startsWith("he") || i18n.dir() === "rtl";
+
+  const rowDir = useMemo(
+    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
+    [isRTL]
+  );
+  const textAlign = useMemo(
+    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
+    [isRTL]
+  );
 
   const [activeTab, setActiveTab] = useState<"done" | "todo">("done");
 
@@ -58,7 +46,9 @@ export default function TasksScreen() {
   ];
 
   const filteredTasks =
-    activeTab === "done" ? tasks.filter((x) => x.done) : tasks.filter((x) => !x.done);
+    activeTab === "done"
+      ? tasks.filter((x) => x.done)
+      : tasks.filter((x) => !x.done);
 
   return (
     <>
@@ -67,82 +57,144 @@ export default function TasksScreen() {
           title: t("tasks.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          // ✅ אין Back כאן בכלל — מגיע מה־RootLayout
-
-          
         }}
       />
 
       <ScreenLayout>
         <View style={styles.container}>
-          <View style={styles.tabsWrapper}>
-            <Pressable
-              style={[styles.tabBtn, activeTab === "todo" && styles.activeTab]}
-              onPress={() => setActiveTab("todo")}
-              accessibilityRole="button"
-              accessibilityLabel={t("tasks.todo_a11y")}
-            >
-              <AppText weight="bold">{t("tasks.todo")}</AppText>
-            </Pressable>
+          <View style={styles.contentMaxWidth}>
+            <View style={[styles.tabsWrapper, rowDir]}>
+              <Pressable
+                style={[
+                  styles.tabBtn,
+                  activeTab === "todo" ? styles.activeTab : styles.inactiveTab,
+                ]}
+                onPress={() => setActiveTab("todo")}
+                accessibilityRole="button"
+                accessibilityLabel={t("tasks.todo_a11y")}
+              >
+                <AppText weight="extraBold" style={styles.tabText}>
+                  {t("tasks.todo")}
+                </AppText>
+              </Pressable>
 
-            <Pressable
-              style={[styles.tabBtn, activeTab === "done" && styles.activeTab]}
-              onPress={() => setActiveTab("done")}
-              accessibilityRole="button"
-              accessibilityLabel={t("tasks.done_a11y")}
-            >
-              <AppText weight="bold">{t("tasks.done")}</AppText>
-            </Pressable>
-          </View>
+              <Pressable
+                style={[
+                  styles.tabBtn,
+                  activeTab === "done" ? styles.activeTab : styles.inactiveTab,
+                ]}
+                onPress={() => setActiveTab("done")}
+                accessibilityRole="button"
+                accessibilityLabel={t("tasks.done_a11y")}
+              >
+                <AppText weight="extraBold" style={styles.tabText}>
+                  {t("tasks.done")}
+                </AppText>
+              </Pressable>
+            </View>
 
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {filteredTasks.map((task) => (
-              <View key={task.id} style={styles.card}>
-                <View style={styles.coinsBadge}>
-                  <MaterialCommunityIcons name={ICON.coin} size={18} color="#C18400" />
-                  <AppText weight="bold" style={styles.coinsText}>
-                    {task.coins}
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.listContent}
+            >
+              {filteredTasks.map((task) => (
+                <View key={task.id} style={styles.card}>
+                  {/* Title on one side, coins on the opposite side (RTL/LTR aware) */}
+                  <View style={[styles.cardHeader, rowDir]}>
+                    <AppText
+                      weight="extraBold"
+                      style={[styles.taskTitle, textAlign]}
+                      numberOfLines={2}
+                    >
+                      {task.title}
+                    </AppText>
+
+                    <View style={[styles.coinsBadge, rowDir]}>
+                      <MaterialCommunityIcons
+                        name={ICON.coin}
+                        size={18}
+                        color="#B46B00"
+                      />
+                      <AppText weight="extraBold" style={styles.coinsText}>
+                        {task.coins}
+                      </AppText>
+                    </View>
+                  </View>
+
+                  {task.done ? (
+                    <View style={[styles.statusBoxDone, rowDir]}>
+                      <View
+                        style={[
+                          styles.statusIconCircle,
+                          styles.statusIconCircleDone,
+                        ]}
+                      >
+                        <MaterialCommunityIcons
+                          name={ICON.check}
+                          size={18}
+                          color="#0F8A5F"
+                        />
+                      </View>
+
+                      <AppText
+                        weight="bold"
+                        style={[styles.statusTextDone, textAlign]}
+                      >
+                        {t("tasks.completed")}
+                      </AppText>
+                    </View>
+                  ) : (
+                    <View style={styles.todoArea}>
+                      <AppText style={[styles.todoHint, textAlign]}>
+                        {t("tasks.not_uploaded")}
+                      </AppText>
+
+                      <Pressable
+                        style={styles.uploadBtn}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("tasks.upload_a11y")}
+                      >
+                        <View style={[styles.uploadBtnInner, rowDir]}>
+                          <View
+                            style={[
+                              styles.statusIconCircle,
+                              styles.statusIconCircleUpload,
+                            ]}
+                          >
+                            <MaterialCommunityIcons
+                              name={ICON.camera}
+                              size={18}
+                              color="#2F6DEB"
+                            />
+                          </View>
+
+                          <AppText weight="extraBold" style={styles.uploadText}>
+                            {t("tasks.upload")}
+                          </AppText>
+                        </View>
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              ))}
+
+              <View style={styles.weekBox}>
+                <View style={[styles.weekInner, rowDir]}>
+                  <View style={styles.weekIconCircle}>
+                    <MaterialCommunityIcons
+                      name={ICON.coin}
+                      size={18}
+                      color="#B46B00"
+                    />
+                  </View>
+
+                  <AppText weight="extraBold" style={[styles.weekText, textAlign]}>
+                    {t("tasks.week_total", { total: 38 })}
                   </AppText>
                 </View>
-
-                <AppText weight="extraBold" style={styles.taskTitle}>
-                  {task.title}
-                </AppText>
-
-                {task.done ? (
-                  <View style={styles.doneBox}>
-                    <MaterialCommunityIcons name={ICON.check} size={20} color="#0E7A3E" />
-                    <AppText weight="bold" style={styles.doneText}>
-                      {t("tasks.completed")}
-                    </AppText>
-                  </View>
-                ) : (
-                  <View style={styles.uploadRow}>
-                    <AppText style={styles.notUploaded}>{t("tasks.not_uploaded")}</AppText>
-
-                    <Pressable
-                      style={styles.uploadBtn}
-                      accessibilityRole="button"
-                      accessibilityLabel={t("tasks.upload_a11y")}
-                    >
-                      <MaterialCommunityIcons name={ICON.camera} size={20} color="#2E5BFF" />
-                      <AppText weight="bold" style={styles.uploadText}>
-                        {t("tasks.upload")}
-                      </AppText>
-                    </Pressable>
-                  </View>
-                )}
               </View>
-            ))}
-
-            <View style={styles.weekBox}>
-              <MaterialCommunityIcons name={ICON.coin} size={20} color="#B36B00" />
-              <AppText weight="extraBold" style={styles.weekText}>
-                {t("tasks.week_total", { total: 38 })}
-              </AppText>
-            </View>
-          </ScrollView>
+            </ScrollView>
+          </View>
         </View>
       </ScreenLayout>
     </>
