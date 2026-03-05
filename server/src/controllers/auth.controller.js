@@ -3,8 +3,8 @@ import { Auth as AuthErrors } from "../constants/errors.js";
 
 export async function registerParentController(req, res, next) {
   try {
-    const { email, password, name, phoneNumber, gender } = req.body;
-    const data = await registerParent({ email, password, name, phoneNumber, gender });
+    const { email, password, name, phoneNumber } = req.body;
+    const data = await registerParent({ email, password, name, phoneNumber });
     res.status(201).json({ ok: true, data });
   } catch (err) {
     next(err);

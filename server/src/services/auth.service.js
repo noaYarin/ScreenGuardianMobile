@@ -61,7 +61,7 @@ async function resolveParentFromGooglePayload(payload) {
   return createParent({ email, googleId, name, children: [] });
 }
 
-export async function registerParent({ email, password, name, phoneNumber, gender }) {
+export async function registerParent({ email, password, name, phoneNumber }) {
   const existing = await findParentByEmail(email);
   if (existing) {
     throw new AppError(AuthErrors.EMAIL_EXISTS);
@@ -73,7 +73,6 @@ export async function registerParent({ email, password, name, phoneNumber, gende
     password: hash,
     name,
     phoneNumber,
-    gender,
     children: [],
   });
 
