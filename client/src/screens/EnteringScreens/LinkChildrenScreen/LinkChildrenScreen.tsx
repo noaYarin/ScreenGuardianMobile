@@ -38,7 +38,6 @@ export default function LinkChildrenScreen() {
           title: t("linkChildren.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-          // ✅ אין כאן חץ חזור — מגיע מה־RootLayout
         }}
       />
 
