@@ -1,13 +1,17 @@
 import mongoose from "mongoose";
+import { DayScheduleSchema } from "./daySchedule.schema.js";
 
 export const ScreenTimeSchema = new mongoose.Schema(
     {
-        haveLimit: { type: Boolean, default: false },
-        timeUsed: { type: Number, default: 0 },
-        endDate: { type: Date, default: null },
-        startDate: { type: Date, default: null },
-        maxAllowedTime: { type: Number, default: 0 },
-        remainingTime: { type: Number, default: 0 },
-        
-    }, 
+        isLimitEnabled: { type: Boolean, default: false },
+        dailyLimitMinutes: { type: Number, default: 0 },
+        weeklyLimitMinutes: { type: Number, default: 0 },
+        usedTodayMinutes: { type: Number, default: 0 },
+        usedWeekMinutes: { type: Number, default: 0 },
+        weeklySchedule: {
+            type: [DayScheduleSchema],
+            default: []
+        }
+    },
+{ _id: false }
 );

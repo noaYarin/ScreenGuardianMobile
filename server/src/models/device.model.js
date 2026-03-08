@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { DeviceType } from "../constants/deviceType.js";
-import {ApplicationSchema} from "../models/application.models.js"
-import {ScreenTimeSchema} from "../models/screenTime.model.js"
+import { ApplicationSchema } from "../models/application.models.js"
+import { ScreenTimeSchema } from "../models/screenTime.model.js"
 
 export const DeviceSchema = new mongoose.Schema(
     {
@@ -15,7 +15,10 @@ export const DeviceSchema = new mongoose.Schema(
         applications: { type: [ApplicationSchema], default: [] },
         parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
         childId: { type: mongoose.Schema.Types.ObjectId, required: true },
-        screenTime: { type: ScreenTimeSchema, default: {} },
+        screenTime: {
+            type: ScreenTimeSchema,
+            default: () => ({})
+        },
     }, { timestamps: true }
 );
 export default mongoose.model("Device", DeviceSchema);
