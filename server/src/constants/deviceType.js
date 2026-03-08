@@ -1,5 +1,5 @@
 export const DeviceType = {
-  "ANDROID": "ANDROID",
-  "IOS": "IOS",
-  "OTHER": "OTHER",
+  PHONE: "PHONE",
+  TABLET: "TABLET",
+  OTHER: "OTHER",
 };
