@@ -1,5 +1,5 @@
-import { api } from "./client";
-import { setToken } from "../services/authStorage";
+import { api } from "../request";
+import { setToken } from "../../services/authStorage";
 import type {
   AuthDataFromServer,
   RegisterParentParams,

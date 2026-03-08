@@ -31,4 +31,3 @@ export type GetMyChildDataFromServer = {
 export type SetChildActiveDataFromServer = {
   [key: string]: unknown;
 };
-

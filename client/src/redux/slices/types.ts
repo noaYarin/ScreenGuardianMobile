@@ -3,7 +3,7 @@ import type {
   LoginParentParams,
   RegisterParentParams,
 } from "../../api";
-import type { ChildrenDataFromServer } from "../../api/auth.types";
+import type { ChildrenDataFromServer } from "../../api/auth/auth.types";
 
 export interface AuthState {
   parentId: string | null;

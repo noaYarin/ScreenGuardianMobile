@@ -18,4 +18,3 @@ export type LinkDeviceDataFromServer = {
   parentId: string;
   childId: string;
 };
-

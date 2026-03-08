@@ -3,7 +3,7 @@ import {
   apiLoginParent,
   apiRegisterParent,
   apiGoogleAuthParent,
-} from "../../api/auth";
+} from "../../api/auth/auth";
 import { getMyChild } from "../../api";
 import type {
   LoginParentArgs,
@@ -11,7 +11,7 @@ import type {
   RegisterParentArgs,
   GoogleAuthParentArgs,
 } from "../slices/types";
-import type { ChildrenDataFromServer } from "../../api/auth.types";
+import type { ChildrenDataFromServer } from "../../api/auth/auth.types";
 
 
 function toLoginParentPayload(auth: { token: string; parentId: string }): LoginParentPayload {
