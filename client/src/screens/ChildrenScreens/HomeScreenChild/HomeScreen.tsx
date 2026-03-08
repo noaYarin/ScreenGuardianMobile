@@ -211,7 +211,7 @@ export default function HomeScreen() {
             <Tile
               iconName={ICON.achievements}
               label={t("home.tile_achievements")}
-              onPress={() => {}}
+              onPress={() => router.push("/Child/achievements" as Href)}
               colorKey="achievements"
             />
             <Tile

@@ -220,8 +220,35 @@
   "limits": "מגבלות",
   "reports": "דוחות",
   "settings": "הגדרות"
+},
+"achievements": {
+    "title": "הישגים",
+    "heading": "ההישגים שלי",
+    "subtitle": "המשך להשיג יעדים ולפתוח תגמולים חדשים",
+    "back_a11y": "חזרה למסך הקודם",
+    "menu_a11y": "פתח תפריט",
+    "points": "נקודות",
+    "completed": "הושגו",
+    "goals_completed": "יעדים שהושלמו",
+    "saved_time": "זמן שנחסך",
+    "streak_days": "רצף ימים",
+    "hours_short": "ש׳",
+    "done": "הושג",
+    "cards": {
+      "focus_master": {
+        "title": "מתחיל מסור",
+        "subtitle": "השלם 10 משימות",
+        "progress": "10/10",
+        "reward": "100 נק׳"
+      },
+      "king_of_achievements": {
+        "title": "מלך ההישגים",
+        "subtitle": "פתח 20 הישגים",
+        "progress": "15/20",
+        "reward": "1000 נק׳"
+      }
+    }
 }
 }
-
 
 

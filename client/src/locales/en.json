@@ -222,7 +222,34 @@
   "limits": "Limits",
   "reports": "Reports",
   "settings": "Settings"
-}
+},"achievements": {
+    "title": "Achievements",
+    "heading": "My Achievements",
+    "subtitle": "Keep reaching goals and unlock new rewards",
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+    "points": "Points",
+    "completed": "Completed",
+    "goals_completed": "Goals completed",
+    "saved_time": "Time saved",
+    "streak_days": "Streak days",
+    "hours_short": "h",
+    "done": "Done",
+    "cards": {
+      "focus_master": {
+        "title": "Dedicated Beginner",
+        "subtitle": "Complete 10 tasks",
+        "progress": "10/10",
+        "reward": "100 pts"
+      },
+      "king_of_achievements": {
+        "title": "King of Achievements",
+        "subtitle": "Unlock 20 achievements",
+        "progress": "15/20",
+        "reward": "1000 pts"
+      }
+    }
+  }
 }
 
 
