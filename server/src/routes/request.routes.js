@@ -31,7 +31,6 @@ router.use("/parent", authJwt, requireParent);
 // Parent gets all pending requests for their children
 router.get("/parent/get/pending", getPendingRequestsController);
 
-
 // Full route: PATCH /api/v1/requests/parent/set/:requestId/decision
 // Parent approves or rejects a request
 router.patch("/parent/set/:requestId/decision", decideRequestController);

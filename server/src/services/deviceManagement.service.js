@@ -1,6 +1,16 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { findDeviceById, updateDeviceById } from "../dal/device.dal.js";
+import { findDeviceById, updateDeviceById, findDevicesByChildId } from "../dal/device.dal.js";
+import { getChildByParentId } from "../dal/parent.dal.js";
+
+function ensureChildBelongsToParent(childList, childId) {
+  const belongs = childList.some((child) => String(child._id) === String(childId));
+
+  if (!belongs) {
+    throw new AppError(CommonErrors.NOT_FOUND);
+  }
+}
+
 
 function ensureDeviceBelongsToParent(device, parentId) {
   if (!device) {
@@ -22,4 +32,12 @@ export async function unlockDevice(parentId, deviceId) {
   const device = await findDeviceById(deviceId);
   ensureDeviceBelongsToParent(device, parentId);
   return updateDeviceById(deviceId, { isLocked: false });
+}
+
+
+export async function getDevicesByChild(parentId, childId) {
+  const childList = await getChildByParentId(parentId);
+  ensureChildBelongsToParent(childList, childId);
+
+  return findDevicesByChildId(childId);
 }

@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import DeviceModel from "../models/device.model.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { assertValidObjectId } from "../utils/validators.js";
@@ -31,4 +30,9 @@ export async function updateDeviceById(deviceId, patch) {
     { $set: patch },
     { new: true }
   ).lean();
+}
+
+export async function findDevicesByChildId(childId) {
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+  return DeviceModel.find({ childId }).lean();
 }
