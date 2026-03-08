@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Role } from "../constants/role.js";
-import { AvatarSchema } from "./avatar.model.js";
+import { AvatarSchema } from "./avatar.schema.js";
 
 
 export const ChildSchema = new mongoose.Schema(

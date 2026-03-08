@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import { Role } from "../constants/role.js";
-import { ChildSchema } from './child.model.js';
+import { ChildSchema } from './child.schema.js';
 
 const ParentSchema = new mongoose.Schema(
   {
