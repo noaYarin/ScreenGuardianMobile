@@ -8,6 +8,7 @@ import { NotificationSeverity } from "../constants/severity.js";
 import { createNotificationService } from "../services/notification.service.js";
 import { TargetRole } from "../constants/roles.js";
 import { NotificationType } from "../constants/notificationType.js";
+import { notifyParent, notifyChild } from "../services/notification.service.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -77,16 +78,15 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
         status: RequestStatus.PENDING
     });
 
-    await createNotificationService({
+
+    await notifyParent({
         parentId,
         childId,
-        targetRole: TargetRole.PARENT,
         type: NotificationType.EXTENSION_REQUEST_CREATED,
         severity: NotificationSeverity.INFO,
         title: "בקשת הארכה חדשה",
         description: "הילד שלח בקשת הארכת זמן"
     });
-
     return request;
 }
 
@@ -138,10 +138,9 @@ export async function decideRequest({ parentId, requestId, decision }) {
     });
 
     if (updated) {
-        await createNotificationService({
+        await notifyChild({
             parentId: updated.parentId,
             childId: updated.childId,
-            targetRole: TargetRole.CHILD,
             type: decision === RequestStatus.APPROVED
                 ? NotificationType.EXTENSION_REQUEST_APPROVED
                 : NotificationType.EXTENSION_REQUEST_REJECTED,

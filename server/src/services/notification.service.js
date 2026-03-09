@@ -1,18 +1,36 @@
 import { findNotificationsByParentId, markNotificationAsReadById, createNotification } from "../dal/notification.dal.js";
 
-export async function createNotificationService({
+export async function notifyParent({
     parentId,
     childId,
-    targetRole,
     type,
     severity,
     title,
     description
 }) {
-    return createNotification({
+    return createNotificationService({
         parentId,
         childId,
-        targetRole,
+        targetRole: TargetRole.PARENT,
+        type,
+        severity,
+        title,
+        description
+    });
+}
+
+export async function notifyChild({
+    parentId,
+    childId,
+    type,
+    severity,
+    title,
+    description
+}) {
+    return createNotificationService({
+        parentId,
+        childId,
+        targetRole: TargetRole.CHILD,
         type,
         severity,
         title,

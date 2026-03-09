@@ -2,7 +2,9 @@ import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { findDeviceById, updateDeviceById, findDevicesByChildId } from "../dal/device.dal.js";
 import { getChildByParentId } from "../dal/parent.dal.js";
-import { createNotificationService } from "../services/notification.service.js";
+import { notifyChild } from "../services/notification.service.js";
+import { NotificationSeverity } from "../constants/severity.js";
+import { NotificationType } from "../constants/notificationType.js";
 
 function ensureChildBelongsToParent(childList, childId) {
   const belongs = childList.some((child) => String(child._id) === String(childId));
@@ -26,13 +28,36 @@ function ensureDeviceBelongsToParent(device, parentId) {
 export async function lockDevice(parentId, deviceId) {
   const device = await findDeviceById(deviceId);
   ensureDeviceBelongsToParent(device, parentId);
-  return updateDeviceById(deviceId, { isLocked: true });
+  const updatedDevice = await updateDeviceById(deviceId, { isLocked: true });
+
+  await notifyChild({
+    parentId,
+    childId: device.childId,
+    type: NotificationType.DEVICE_LOCKED,
+    severity: NotificationSeverity.WARNING,
+    title: "המכשיר ננעל",
+    description: "ההורה נעל את המכשיר"
+  });
+
+  return updatedDevice;
 }
+
 
 export async function unlockDevice(parentId, deviceId) {
   const device = await findDeviceById(deviceId);
   ensureDeviceBelongsToParent(device, parentId);
-  return updateDeviceById(deviceId, { isLocked: false });
+  const updatedDevice = await updateDeviceById(deviceId, { isLocked: false });
+
+  await notifyChild({
+    parentId,
+    childId: device.childId,
+    type: NotificationType.DEVICE_UNLOCKED,
+    severity: NotificationSeverity.INFO,
+    title: "המכשיר שוחרר",
+    description: "ההורה שחרר את המכשיר"
+  });
+
+  return updatedDevice;
 }
 
 
@@ -66,6 +91,16 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
     }
   };
 
-  return updateDeviceById(deviceId, patch);
-}
+  const updatedDevice = await updateDeviceById(deviceId, patch);
 
+  await notifyChild({
+    parentId,
+    childId: device.childId,
+    type: NotificationType.SCREEN_TIME_UPDATED,
+    severity: NotificationSeverity.INFO,
+    title: "מגבלות זמן המסך עודכנו",
+    description: "ההורה עדכן את הגדרות זמן המסך"
+  });
+
+  return updatedDevice;
+}
