@@ -2,6 +2,7 @@ import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { findDeviceById, updateDeviceById, findDevicesByChildId } from "../dal/device.dal.js";
 import { getChildByParentId } from "../dal/parent.dal.js";
+import { createNotificationService } from "../services/notification.service.js";
 
 function ensureChildBelongsToParent(childList, childId) {
   const belongs = childList.some((child) => String(child._id) === String(childId));
@@ -18,7 +19,7 @@ function ensureDeviceBelongsToParent(device, parentId) {
   }
 
   if (String(device.parentId) !== String(parentId)) {
-    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
   }
 }
 

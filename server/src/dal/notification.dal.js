@@ -2,6 +2,11 @@ import NotificationModel from "../models/notification.model.js";
 import { assertValidObjectId } from "../utils/validators.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 
+// Create a new notification
+export async function createNotification(doc) {
+  return NotificationModel.create(doc);
+}
+
 // Return all notifications that belong to a specific parent
 export async function findNotificationsByParentId(parentId) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
