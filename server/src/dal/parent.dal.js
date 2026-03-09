@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import ParentModel from "../models/parent.model.js";
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
@@ -42,7 +41,7 @@ export async function pushChildToParent(parentId, childDoc) {
   throw new AppError(CommonErrors.LIMIT_MAX_CHILDREN_REACHED);
 }
 
-export async function getChildByParentId(parentId) {
+export async function getChildrenByParentId(parentId) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 
 

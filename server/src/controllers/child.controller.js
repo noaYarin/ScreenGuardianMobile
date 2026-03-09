@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { addChild, getMyChild, setChildActive } from "../services/parent.service.js";
+import { addChild, getChildren, setChildActive } from "../services/parent.service.js";
 
 export async function addChildController(req, res, next) {
   try {
@@ -11,11 +11,11 @@ export async function addChildController(req, res, next) {
   }
 }
 
-export async function getMyChildController(req, res, next) {
+export async function getChildenController(req, res, next) {
   try {
     const parentId = req.user.parentId;
     const includeInactive = req.query?.includeInactive === "true";
-    const data = await getMyChild(parentId, { includeInactive });
+    const data = await getChildren(parentId, { includeInactive });
     res.json({ ok: true, data });
   } catch (err) {
     next(err);

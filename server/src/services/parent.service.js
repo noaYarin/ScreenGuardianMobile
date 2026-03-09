@@ -2,7 +2,7 @@ import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import {
   pushChildToParent,
-  getChildByParentId,
+  getChildrenByParentId,
   updateChildActiveByParentId,
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
@@ -16,16 +16,16 @@ export async function addChild(parentId, body) {
   return { child: addedChild };
 }
 
-export async function getMyChild(parentId, options = {}) {
+export async function getChildren(parentId, options = {}) {
   const includeInactive = options.includeInactive === true;
-  const childList = await getChildByParentId(parentId);
+  const childList = await getChildrenByParentId(parentId);
   const filtered = includeInactive ? childList : childList.filter((c) => c.isActive === true);
   return { children: filtered };
 }
 
 export async function setChildActive(parentId, childId, isActive) {
   assertBoolean(isActive, CommonErrors.VALIDATION_IS_ACTIVE);
-  
+
   const updatedParent = await updateChildActiveByParentId(parentId, childId, isActive);
 
   if (!updatedParent) {

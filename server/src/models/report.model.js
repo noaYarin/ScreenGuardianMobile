@@ -10,6 +10,7 @@ export const ReportSchema = new mongoose.Schema(
         limitFrequency: { type: String, enum: Object.values(ReportLimitFrequency), required: true },
         startDate: { type: Date, default: null },
         endDate: { type: Date, default: null },
+        totalUsedMinutes: { type: Number, default: 0 },
         appBreakdown: { type: [AppBreakdownItemSchema], default: [] }
     }, { timestamps: true }
 );
