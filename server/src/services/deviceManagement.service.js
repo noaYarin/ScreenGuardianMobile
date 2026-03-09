@@ -41,3 +41,30 @@ export async function getDevicesByChild(parentId, childId) {
 
   return findDevicesByChildId(childId);
 }
+
+
+// Return current screen-time settings for a specific device
+export async function getDeviceScreenTime(parentId, deviceId) {
+  const device = await findDeviceById(deviceId);
+  ensureDeviceBelongsToParent(device, parentId);
+
+  return device.screenTime || {};
+}
+
+// Update screen-time settings for a specific device
+export async function updateDeviceScreenTime(parentId, deviceId, body) {
+  const device = await findDeviceById(deviceId);
+  ensureDeviceBelongsToParent(device, parentId);
+
+  const currentScreenTime = device.screenTime || {};
+
+  const patch = {
+    screenTime: {
+      ...currentScreenTime, // keep existing values
+      ...body               // override only fields sent by the client
+    }
+  };
+
+  return updateDeviceById(deviceId, patch);
+}
+
