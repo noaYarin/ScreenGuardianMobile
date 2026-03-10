@@ -16,6 +16,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 const ICON = {
   email: "email-outline",
@@ -32,11 +33,10 @@ const isValidEmail = (value: string) => {
 };
 
 export default function LoginParentScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
 
-  // ✅ RTL יציב גם ב-Web
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -54,9 +54,6 @@ export default function LoginParentScreen() {
   }, [email, password, submitting]);
 
   const onSubmit = async () => {
-    // ✅ FLOW ONLY (בינתיים): מעבר למסך הבית בלי בדיקות
-    // השאירי את כל ה־validation כאן בהערות כדי להחזיר אחר כך
-
     // setErrorText(null);
 
     // if (!isValidEmail(email)) {
@@ -82,6 +79,7 @@ export default function LoginParentScreen() {
 
   const onGoogle = async () => {
     setErrorText(null);
+
     try {
       setSubmitting(true);
       await new Promise((r) => setTimeout(r, 600));
@@ -98,10 +96,7 @@ export default function LoginParentScreen() {
   );
 
   const inputTextStyle = useMemo(
-    () => [
-      styles.inputText,
-      isRTL && styles.inputTextRTL, // כולל textAlign + writingDirection בסטייל
-    ],
+    () => [styles.inputText, isRTL && styles.inputTextRTL],
     [isRTL]
   );
 
@@ -148,9 +143,11 @@ export default function LoginParentScreen() {
                 {t("loginParent.heading")}
               </AppText>
 
-              <AppText style={styles.subtitle}>{t("loginParent.subheading")}</AppText>
+              <AppText style={styles.subtitle}>
+                {t("loginParent.subheading")}
+              </AppText>
 
-              {/* ✅ EMAIL: RTL אמיתי (האייקון מימין) */}
+              {/* Email input with RTL-aware layout */}
               <View style={inputRowStyle}>
                 <MaterialCommunityIcons name={ICON.email} size={20} color="#6B7280" />
                 <TextInput
@@ -166,9 +163,10 @@ export default function LoginParentScreen() {
                 />
               </View>
 
-              {/* ✅ PASSWORD: RTL אמיתי (המנעול מימין, העין שמאל) */}
+              {/* Password input with RTL-aware layout */}
               <View style={inputRowStyle}>
                 <MaterialCommunityIcons name={ICON.lock} size={20} color="#6B7280" />
+
                 <TextInput
                   value={password}
                   onChangeText={setPassword}
@@ -202,7 +200,7 @@ export default function LoginParentScreen() {
                 </AppText>
               ) : null}
 
-              {/* ✅ שכחת סיסמה באמצע */}
+              {/* Centered forgot password action */}
               <Pressable
                 onPress={() => {}}
                 accessibilityRole="button"
@@ -217,8 +215,8 @@ export default function LoginParentScreen() {
 
               <Pressable
                 onPress={onSubmit}
-                //disabled={!canSubmit} להחזיר לזה כשעושים את הצד שרת
-                disabled={submitting} 
+                // Restore disabled={!canSubmit} when server validation is connected
+                disabled={submitting}
                 accessibilityRole="button"
                 accessibilityLabel={t("loginParent.connect_a11y")}
                 style={({ pressed }) => [
@@ -266,7 +264,9 @@ export default function LoginParentScreen() {
               </Pressable>
 
               <View style={styles.bottomRow}>
-                <AppText style={styles.bottomText}>{t("loginParent.no_account")}</AppText>
+                <AppText style={styles.bottomText}>
+                  {t("loginParent.no_account")}
+                </AppText>
 
                 <Pressable
                   onPress={() => {}}

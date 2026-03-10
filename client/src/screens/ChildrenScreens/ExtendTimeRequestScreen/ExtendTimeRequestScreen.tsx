@@ -13,6 +13,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { pickRTL } from "../../../locales/rtl";
 
 type MinuteOption = {
   minutes: number;
@@ -21,17 +23,8 @@ type MinuteOption = {
 };
 
 export default function ExtendTimeRequestScreen() {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
-
-  const rowDir = useMemo(
-    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
-    [isRTL]
-  );
-  const textAlign = useMemo(
-    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
-    [isRTL]
-  );
+  const { t } = useTranslation();
+  const { isRTL, row, text } = useLocaleLayout();
 
   const minuteOptions: MinuteOption[] = useMemo(
     () => [
@@ -59,9 +52,32 @@ export default function ExtendTimeRequestScreen() {
   const decCustom = () => selectCustom(Math.max(1, customMinutes - 1));
 
   const onSend = () => {
-    // TODO: פה תעשי קריאת API אמיתית אם צריך
+    // TODO: Add a real API call here if needed
     router.back();
   };
+
+  const firstControlAction = pickRTL(isRTL, incCustom, decCustom);
+  const secondControlAction = pickRTL(isRTL, decCustom, incCustom);
+
+  const firstControlIcon = pickRTL<
+    React.ComponentProps<typeof MaterialCommunityIcons>["name"]
+  >(isRTL, "plus", "minus");
+
+  const secondControlIcon = pickRTL<
+    React.ComponentProps<typeof MaterialCommunityIcons>["name"]
+  >(isRTL, "minus", "plus");
+
+  const firstControlA11y = pickRTL(
+    isRTL,
+    t("extendTime.customPlus_a11y"),
+    t("extendTime.customMinus_a11y")
+  );
+
+  const secondControlA11y = pickRTL(
+    isRTL,
+    t("extendTime.customMinus_a11y"),
+    t("extendTime.customPlus_a11y")
+  );
 
   return (
     <>
@@ -70,7 +86,6 @@ export default function ExtendTimeRequestScreen() {
           title: t("extendTime.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-          // ✅ Back/Menu מגיעים מה־RootLayout לפי הנוהל
         }}
       />
 
@@ -81,8 +96,8 @@ export default function ExtendTimeRequestScreen() {
         >
           <View style={styles.outer}>
             <View style={styles.container}>
-              {/* Header / subtitle */}
-              <View style={[styles.subTitleRow, rowDir]}>
+              {/* Header and subtitle */}
+              <View style={[styles.subTitleRow, row]}>
                 <View style={styles.subTitleIconBadge}>
                   <MaterialCommunityIcons
                     name="trending-up"
@@ -99,7 +114,7 @@ export default function ExtendTimeRequestScreen() {
                 {t("extendTime.question")}
               </AppText>
 
-              {/* ✅ 2x2 grid with max tile width (iPad/web friendly) */}
+              {/* Two-by-two grid with max tile width */}
               <View style={styles.grid}>
                 <View style={styles.row}>
                   <MinuteCard
@@ -137,7 +152,7 @@ export default function ExtendTimeRequestScreen() {
                     ]}
                     accessible={false}
                   >
-                    {/* overlay pressable (web-safe) */}
+                    {/* Overlay pressable for full-tile selection */}
                     <Pressable
                       onPress={() => selectCustom(customMinutes)}
                       accessibilityRole="button"
@@ -162,15 +177,11 @@ export default function ExtendTimeRequestScreen() {
                       {t("extendTime.customTitle")}
                     </AppText>
 
-                    <View style={[styles.customValueRow, rowDir]}>
+                    <View style={[styles.customValueRow, row]}>
                       <Pressable
-                        onPress={isRTL ? incCustom : decCustom}
+                        onPress={firstControlAction}
                         accessibilityRole="button"
-                        accessibilityLabel={
-                          isRTL
-                            ? t("extendTime.customPlus_a11y")
-                            : t("extendTime.customMinus_a11y")
-                        }
+                        accessibilityLabel={firstControlA11y}
                         hitSlop={10}
                         style={({ pressed }) => [
                           styles.customControlBtn,
@@ -178,7 +189,7 @@ export default function ExtendTimeRequestScreen() {
                         ]}
                       >
                         <MaterialCommunityIcons
-                          name={isRTL ? "plus" : "minus"}
+                          name={firstControlIcon}
                           size={18}
                           color="#B46B00"
                         />
@@ -189,13 +200,9 @@ export default function ExtendTimeRequestScreen() {
                       </AppText>
 
                       <Pressable
-                        onPress={isRTL ? decCustom : incCustom}
+                        onPress={secondControlAction}
                         accessibilityRole="button"
-                        accessibilityLabel={
-                          isRTL
-                            ? t("extendTime.customMinus_a11y")
-                            : t("extendTime.customPlus_a11y")
-                        }
+                        accessibilityLabel={secondControlA11y}
                         hitSlop={10}
                         style={({ pressed }) => [
                           styles.customControlBtn,
@@ -203,7 +210,7 @@ export default function ExtendTimeRequestScreen() {
                         ]}
                       >
                         <MaterialCommunityIcons
-                          name={isRTL ? "minus" : "plus"}
+                          name={secondControlIcon}
                           size={18}
                           color="#B46B00"
                         />
@@ -246,7 +253,7 @@ export default function ExtendTimeRequestScreen() {
 
               {/* Message */}
               <View style={styles.messageBlock}>
-                <AppText weight="bold" style={[styles.messageLabel, textAlign]}>
+                <AppText weight="bold" style={[styles.messageLabel, text]}>
                   {t("extendTime.messageLabel")}
                 </AppText>
                 <TextInput
@@ -254,7 +261,7 @@ export default function ExtendTimeRequestScreen() {
                   onChangeText={setMessage}
                   placeholder={t("extendTime.messagePlaceholder")}
                   placeholderTextColor="#8A8A8A"
-                  style={[styles.messageInput, textAlign]}
+                  style={[styles.messageInput, text]}
                   multiline
                   accessibilityLabel={t("extendTime.message_a11y")}
                 />

@@ -1,12 +1,6 @@
 // client/src/screens/ChildrenScreens/HomeScreen/HomeScreen.tsx
 import React from "react";
-import {
-  View,
-  Pressable,
-  useWindowDimensions,
-  type TextStyle,
-  type ViewStyle,
-} from "react-native";
+import { View, Pressable, useWindowDimensions } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -16,6 +10,8 @@ import AppText from "../../../components/AppText/AppText";
 import { styles, TILE_COLORS } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { pickRTL } from "../../../locales/rtl";
 import type { SupportedLanguage } from "../../../locales/i18n";
 
 const ICON = {
@@ -39,11 +35,9 @@ const ICON = {
 } as const;
 
 export default function HomeScreen() {
-  const { t, isRTL, currentLanguage, changeLanguage } = useTranslation();
+  const { t, currentLanguage, changeLanguage } = useTranslation();
+  const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
-
-  const rowDir: ViewStyle = { flexDirection: isRTL ? "row-reverse" : "row" };
-  const textAlignStyle: TextStyle = { textAlign: isRTL ? "right" : "left" };
 
   const isPhone = width < 430;
   const isTablet = width >= 430 && width < 900;
@@ -62,11 +56,11 @@ export default function HomeScreen() {
     await changeLanguage(next);
   };
 
-  const leftIcon = isRTL ? ICON.accessibility : ICON.settings;
-  const rightIcon = isRTL ? ICON.settings : ICON.accessibility;
+  const leftIcon = pickRTL(isRTL, ICON.accessibility, ICON.settings);
+  const rightIcon = pickRTL(isRTL, ICON.settings, ICON.accessibility);
 
-  const leftA11y = isRTL ? t("home.accessibility") : t("home.settings");
-  const rightA11y = isRTL ? t("home.settings") : t("home.accessibility");
+  const leftA11y = pickRTL(isRTL, t("home.accessibility"), t("home.settings"));
+  const rightA11y = pickRTL(isRTL, t("home.settings"), t("home.accessibility"));
 
   return (
     <>
@@ -83,7 +77,6 @@ export default function HomeScreen() {
 
       <ScreenLayout>
         <View style={styles.page}>
-          {/* Top bar: 3 fixed columns so the middle button stays perfectly centered */}
           <View style={styles.topRow}>
             <View style={[styles.topCol, { alignItems: "flex-start" }]}>
               <RoundIconButton
@@ -110,9 +103,8 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Header card */}
           <View style={styles.headerCard}>
-            <View style={[styles.headerRow, rowDir]}>
+            <View style={[styles.headerRow, row]}>
               <View style={[styles.avatarWrap, { width: avatarSize, height: avatarSize }]}>
                 <LinearGradient
                   colors={["#3B82F6", "#BDE0FE"]}
@@ -129,7 +121,7 @@ export default function HomeScreen() {
               <View style={styles.helloBlock}>
                 <AppText
                   weight="extraBold"
-                  style={[styles.hello, { fontSize: helloSize }, textAlignStyle]}
+                  style={[styles.hello, { fontSize: helloSize }, text]}
                   numberOfLines={1}
                 >
                   {t("home.hello_user", { name: userName })}
@@ -137,8 +129,7 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            {/* Stats row: equal width pills with safe spacing */}
-            <View style={[styles.statsRow, rowDir]}>
+            <View style={[styles.statsRow, row]}>
               <StatPill
                 icon={ICON.points}
                 text={t("home.points", { value: pointsValue })}
@@ -160,15 +151,14 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          {/* Time card */}
           <View style={styles.card}>
-            <View style={[styles.cardTitleRow, rowDir]}>
-              <View style={[styles.cardTitleLeft, rowDir]}>
+            <View style={[styles.cardTitleRow, row]}>
+              <View style={[styles.cardTitleLeft, row]}>
                 <View style={styles.iconBadge}>
                   <MaterialCommunityIcons name={ICON.time} size={18} color="#0F172A" />
                 </View>
 
-                <AppText weight="extraBold" style={[styles.cardTitle, textAlignStyle]}>
+                <AppText weight="extraBold" style={[styles.cardTitle, text]}>
                   {t("home.time_left_title")}
                 </AppText>
               </View>
@@ -187,52 +177,73 @@ export default function HomeScreen() {
             </AppText>
           </View>
 
-          {/* Tiles grid: capped tile size so iPad doesn't blow up */}
           <View style={styles.grid}>
-            <Tile iconName={ICON.apps} label={t("home.tile_apps")} onPress={() => {}} colorKey="apps" />
+            <Tile
+              iconName={ICON.apps}
+              label={t("home.tile_apps")}
+              onPress={() => {}}
+              colorKey="apps"
+            />
+
             <Tile
               iconName={ICON.extend}
               label={t("home.tile_extend")}
               onPress={() => router.push("/Child/extendTime" as Href)}
               colorKey="extend"
             />
+
             <Tile
               iconName={ICON.shop}
               label={t("home.tile_shop")}
               onPress={() => router.push("/Child/store" as Href)}
               colorKey="shop"
             />
+
             <Tile
               iconName={ICON.tasks}
               label={t("home.tile_tasks")}
               onPress={() => router.push("/Child/tasks" as Href)}
               colorKey="tasks"
             />
+
             <Tile
               iconName={ICON.achievements}
               label={t("home.tile_achievements")}
               onPress={() => router.push("/Child/achievements" as Href)}
               colorKey="achievements"
             />
+
             <Tile
               iconName={ICON.goals}
               label={t("home.tile_goals")}
               onPress={() => router.push("/Child/goals" as Href)}
               colorKey="goals"
             />
+
             <Tile
               iconName={ICON.reports}
               label={t("home.tile_reports")}
               onPress={() => {}}
               colorKey="help"
             />
-            <Tile iconName={ICON.bulb} label={t("home.tile_ideas")} onPress={() => {}} colorKey="ideas" />
-            <Tile iconName={ICON.help} label={t("home.tile_help")} onPress={() => {}} colorKey="help" />
+
+            <Tile
+              iconName={ICON.bulb}
+              label={t("home.tile_ideas")}
+              onPress={() => {}}
+              colorKey="ideas"
+            />
+
+            <Tile
+              iconName={ICON.help}
+              label={t("home.tile_help")}
+              onPress={() => {}}
+              colorKey="help"
+            />
           </View>
 
-          {/* Panic button */}
           <Pressable
-            style={({ pressed }) => [styles.panicBtn, pressed && styles.panicPressed, rowDir]}
+            style={({ pressed }) => [styles.panicBtn, pressed && styles.panicPressed, row]}
             onPress={() => router.push("/Child/distress" as Href)}
             accessibilityRole="button"
             accessibilityLabel={t("home.panic_a11y")}
@@ -293,7 +304,13 @@ function StatPill({
       : styles.statPillPrimary;
 
   return (
-    <View style={[styles.statPill, pillStyle, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+    <View
+      style={[
+        styles.statPill,
+        pillStyle,
+        { flexDirection: isRTL ? "row-reverse" : "row" },
+      ]}
+    >
       <MaterialCommunityIcons name={icon} size={18} color="#0F172A" />
       <AppText weight="extraBold" style={styles.statText} numberOfLines={1}>
         {text}

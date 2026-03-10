@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import { Stack, router, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 type ChildCard = {
   id: string;
@@ -21,13 +22,9 @@ const ICON = {
 } as const;
 
 export default function HomeParentScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const { row, text } = useLocaleLayout();
 
-  const isRTL = i18n.dir() === "rtl";
-  const rowDir = { flexDirection: isRTL ? ("row-reverse" as const) : ("row" as const) };
-  const textAlign = { textAlign: isRTL ? ("right" as const) : ("left" as const) };
-
- 
   const parentName = t("homeParent.parent_name_fallback");
 
   const children: ChildCard[] = useMemo(
@@ -45,7 +42,7 @@ export default function HomeParentScreen() {
 
   return (
     <>
-      {/* Home screen: */}
+      {/* Home screen */}
       <Stack.Screen
         options={{
           title: t("homeParent.title"),
@@ -59,47 +56,48 @@ export default function HomeParentScreen() {
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>
-            {/* */}
-            <AppText weight="extraBold" style={[styles.bigHello, textAlign]}>
+            {/* Greeting */}
+            <AppText weight="extraBold" style={[styles.bigHello, text]}>
               {t("homeParent.hello", { name: parentName })}
             </AppText>
 
-            {/* */}
+            {/* Overview link */}
             <AppText
               onPress={onPressOverview}
               weight="bold"
-              style={[styles.overviewLink, textAlign]}
+              style={[styles.overviewLink, text]}
               accessibilityRole="button"
               accessibilityLabel={t("homeParent.overview_a11y")}
             >
               {t("homeParent.overview")}
             </AppText>
 
-            {/* */}
+            {/* Summary card */}
             <View style={styles.summaryCard}>
-              <View style={[styles.summaryRow, rowDir]}>
+              <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>
                   <AppText weight="extraBold" style={styles.summaryChipText}>
                     {children.length}
                   </AppText>
                 </View>
+
                 <View style={styles.summaryTextWrap}>
-                  <AppText weight="bold" style={[styles.sectionTitle, textAlign]}>
+                  <AppText weight="bold" style={[styles.sectionTitle, text]}>
                     {t("homeParent.my_kids")}
                   </AppText>
-                  <AppText style={[styles.sectionSub, textAlign]}>
+                  <AppText style={[styles.sectionSub, text]}>
                     {t("homeParent.day_screen_time")}
                   </AppText>
                 </View>
               </View>
             </View>
 
-            {/* */}
+            {/* Children cards */}
             <View style={styles.cardsWrap}>
               {children.map((c) => (
                 <View key={c.id} style={styles.card} accessibilityRole="summary">
-                  <View style={[styles.cardInner, rowDir]}>
-                    {/* avatar */}
+                  <View style={[styles.cardInner, row]}>
+                    {/* Avatar */}
                     <View
                       style={[
                         styles.avatarCircle,
@@ -111,17 +109,24 @@ export default function HomeParentScreen() {
                       <MaterialCommunityIcons name={ICON.user} size={22} color="#0F172A" />
                     </View>
 
-                    {/* name*/}
+                    {/* Child info */}
                     <View style={styles.cardCenter}>
-                      <AppText weight="extraBold" style={[styles.childName, textAlign]} numberOfLines={1}>
+                      <AppText
+                        weight="extraBold"
+                        style={[styles.childName, text]}
+                        numberOfLines={1}
+                      >
                         {c.name}
                       </AppText>
-                      <AppText style={[styles.childSubtitle, textAlign]} numberOfLines={1}>
+                      <AppText
+                        style={[styles.childSubtitle, text]}
+                        numberOfLines={1}
+                      >
                         {t("homeParent.day_screen_time")}
                       </AppText>
                     </View>
 
-                    {/* time */}
+                    {/* Time info */}
                     <View style={styles.cardLeft}>
                       <AppText
                         weight="extraBold"
@@ -143,23 +148,29 @@ export default function HomeParentScreen() {
               ))}
             </View>
 
-            {/* buttons */}
+            {/* Action buttons */}
             <View style={styles.actionsWrap}>
-              <View style={styles.btnPrimary} accessibilityRole="button" accessibilityLabel={t("homeParent.full_watch_a11y")}>
-                <AppText onPress={onPressFullWatch} weight="extraBold" style={styles.btnPrimaryText}>
+              <Pressable
+                style={styles.btnPrimary}
+                onPress={onPressFullWatch}
+                accessibilityRole="button"
+                accessibilityLabel={t("homeParent.full_watch_a11y")}
+              >
+                <AppText weight="extraBold" style={styles.btnPrimaryText}>
                   {t("homeParent.full_watch")}
                 </AppText>
-              </View>
+              </Pressable>
 
-              <View
+              <Pressable
                 style={styles.btnSecondary}
+                onPress={onPressAddChild}
                 accessibilityRole="button"
                 accessibilityLabel={t("homeParent.add_child_a11y")}
               >
-                <AppText onPress={onPressAddChild} weight="extraBold" style={styles.btnSecondaryText}>
+                <AppText weight="extraBold" style={styles.btnSecondaryText}>
                   {t("homeParent.add_child")}
                 </AppText>
-              </View>
+              </Pressable>
             </View>
 
             <View style={styles.bottomSpacer} />

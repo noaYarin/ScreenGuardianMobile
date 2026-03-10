@@ -1,5 +1,4 @@
-// client/src/screens/ChildrenScreens/StoreScreen/StoreScreen.tsx
-import React, { useMemo } from "react";
+import React from "react";
 import { View, Pressable } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -9,6 +8,7 @@ import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 const ICON = {
   coin: "coins",
@@ -18,35 +18,12 @@ const ICON = {
   gift: "gift-outline",
 } as const;
 
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#111" />
-    </Pressable>
-  );
-}
-
 type RewardTile = {
   id: number;
   title: string;
   subtitle: string;
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   price: number;
-  // Pastel tile palette
   bg: string;
   badge: string;
   iconColor: string;
@@ -54,18 +31,8 @@ type RewardTile = {
 };
 
 export default function StoreScreen() {
-  const { t, i18n } = useTranslation();
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
-
-  // Layout helpers (RTL/LTR)
-  const rowDir = useMemo(
-    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
-    [isRTL]
-  );
-  const textAlign = useMemo(
-    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
-    [isRTL]
-  );
+  const { t } = useTranslation();
+  const { isRTL, row, text } = useLocaleLayout();
 
   const coinsBalance = 250;
 
@@ -123,7 +90,6 @@ export default function StoreScreen() {
           title: t("store.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-          // Back button comes from RootLayout
         }}
       />
 
@@ -131,57 +97,69 @@ export default function StoreScreen() {
         <View style={styles.container}>
           {/* Balance */}
           <View style={styles.balanceSection}>
-            <AppText weight="bold" style={[styles.balanceLabel, textAlign]}>
+            <AppText weight="bold" style={[styles.balanceLabel, text]}>
               {t("store.your_balance")}
             </AppText>
 
-            <View style={[styles.balanceCard, rowDir]}>
+            <View style={[styles.balanceCard, row]}>
               <View style={styles.balanceBadge}>
                 <FontAwesome5 name={ICON.coin} size={18} color="#2F6DEB" />
               </View>
 
               <View style={styles.balanceTextWrap}>
-                <AppText weight="extraBold" style={[styles.balanceAmount, textAlign]}>
+                <AppText weight="extraBold" style={[styles.balanceAmount, text]}>
                   {coinsBalance}
                 </AppText>
-                <AppText style={[styles.balanceSub, textAlign]}>{t("store.coins")}</AppText>
+                <AppText style={[styles.balanceSub, text]}>{t("store.coins")}</AppText>
               </View>
             </View>
           </View>
 
           {/* Rewards */}
           <View style={styles.rewardsContainer}>
-            <AppText weight="bold" style={[styles.sectionTitle, textAlign]}>
+            <AppText weight="bold" style={[styles.sectionTitle, text]}>
               {t("store.available_rewards")}
             </AppText>
 
             {rewards.map((item) => {
-              // Three columns: Icon | Text | Price (LTR)  /  Price | Text | Icon (RTL)
               return (
                 <Pressable
                   key={item.id}
                   style={({ pressed }) => [
                     styles.rewardCard,
-                    { backgroundColor: item.bg, borderColor: item.border, opacity: pressed ? 0.92 : 1 },
+                    {
+                      backgroundColor: item.bg,
+                      borderColor: item.border,
+                      opacity: pressed ? 0.92 : 1,
+                    },
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel={`${item.title}, ${t("store.reward_cost")}`}
                 >
-                  <View style={[styles.rewardRow, { flexDirection: isRTL ? "row-reverse" : "row" }]}>
+                  <View style={[styles.rewardRow, row]}>
                     {/* Icon side */}
-                    <View style={[styles.iconBox, { backgroundColor: item.badge, borderColor: item.border }]}>
-                      <MaterialCommunityIcons name={item.icon} size={24} color={item.iconColor} />
+                    <View
+                      style={[
+                        styles.iconBox,
+                        { backgroundColor: item.badge, borderColor: item.border },
+                      ]}
+                    >
+                      <MaterialCommunityIcons
+                        name={item.icon}
+                        size={24}
+                        color={item.iconColor}
+                      />
                     </View>
 
                     {/* Text middle */}
                     <View style={styles.textBox}>
-                      <AppText weight="bold" style={[styles.rewardTitle, textAlign]}>
+                      <AppText weight="bold" style={[styles.rewardTitle, text]}>
                         {item.title}
                       </AppText>
-                      <AppText style={[styles.rewardSub, textAlign]}>{item.subtitle}</AppText>
+                      <AppText style={[styles.rewardSub, text]}>{item.subtitle}</AppText>
                     </View>
 
-                    {/* Price opposite side of text */}
+                    {/* Price side */}
                     <View
                       style={[
                         styles.priceBox,
@@ -190,7 +168,12 @@ export default function StoreScreen() {
                         },
                       ]}
                     >
-                      <View style={[styles.pricePill, { borderColor: item.border, backgroundColor: "#FFFFFF" }]}>
+                      <View
+                        style={[
+                          styles.pricePill,
+                          { borderColor: item.border, backgroundColor: "#FFFFFF" },
+                        ]}
+                      >
                         <AppText weight="extraBold" style={styles.rewardPrice}>
                           {item.price}
                         </AppText>

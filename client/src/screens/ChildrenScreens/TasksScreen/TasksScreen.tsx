@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { View, Pressable, ScrollView } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 const ICON = {
   coin: "cash-multiple",
@@ -22,18 +23,8 @@ type Task = {
 };
 
 export default function TasksScreen() {
-  const { t, i18n } = useTranslation();
-  const currentLanguage = i18n.resolvedLanguage || i18n.language || "en";
-  const isRTL = currentLanguage?.startsWith("he") || i18n.dir() === "rtl";
-
-  const rowDir = useMemo(
-    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
-    [isRTL]
-  );
-  const textAlign = useMemo(
-    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
-    [isRTL]
-  );
+  const { t } = useTranslation();
+  const { row, text } = useLocaleLayout();
 
   const [activeTab, setActiveTab] = useState<"done" | "todo">("done");
 
@@ -63,7 +54,7 @@ export default function TasksScreen() {
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.contentMaxWidth}>
-            <View style={[styles.tabsWrapper, rowDir]}>
+            <View style={[styles.tabsWrapper, row]}>
               <Pressable
                 style={[
                   styles.tabBtn,
@@ -99,17 +90,17 @@ export default function TasksScreen() {
             >
               {filteredTasks.map((task) => (
                 <View key={task.id} style={styles.card}>
-                  {/* Title on one side, coins on the opposite side (RTL/LTR aware) */}
-                  <View style={[styles.cardHeader, rowDir]}>
+                  {/* Title on one side and coins on the opposite side */}
+                  <View style={[styles.cardHeader, row]}>
                     <AppText
                       weight="extraBold"
-                      style={[styles.taskTitle, textAlign]}
+                      style={[styles.taskTitle, text]}
                       numberOfLines={2}
                     >
                       {task.title}
                     </AppText>
 
-                    <View style={[styles.coinsBadge, rowDir]}>
+                    <View style={[styles.coinsBadge, row]}>
                       <MaterialCommunityIcons
                         name={ICON.coin}
                         size={18}
@@ -122,7 +113,7 @@ export default function TasksScreen() {
                   </View>
 
                   {task.done ? (
-                    <View style={[styles.statusBoxDone, rowDir]}>
+                    <View style={[styles.statusBoxDone, row]}>
                       <View
                         style={[
                           styles.statusIconCircle,
@@ -138,14 +129,14 @@ export default function TasksScreen() {
 
                       <AppText
                         weight="bold"
-                        style={[styles.statusTextDone, textAlign]}
+                        style={[styles.statusTextDone, text]}
                       >
                         {t("tasks.completed")}
                       </AppText>
                     </View>
                   ) : (
                     <View style={styles.todoArea}>
-                      <AppText style={[styles.todoHint, textAlign]}>
+                      <AppText style={[styles.todoHint, text]}>
                         {t("tasks.not_uploaded")}
                       </AppText>
 
@@ -154,7 +145,7 @@ export default function TasksScreen() {
                         accessibilityRole="button"
                         accessibilityLabel={t("tasks.upload_a11y")}
                       >
-                        <View style={[styles.uploadBtnInner, rowDir]}>
+                        <View style={[styles.uploadBtnInner, row]}>
                           <View
                             style={[
                               styles.statusIconCircle,
@@ -179,7 +170,7 @@ export default function TasksScreen() {
               ))}
 
               <View style={styles.weekBox}>
-                <View style={[styles.weekInner, rowDir]}>
+                <View style={[styles.weekInner, row]}>
                   <View style={styles.weekIconCircle}>
                     <MaterialCommunityIcons
                       name={ICON.coin}
@@ -188,7 +179,7 @@ export default function TasksScreen() {
                     />
                   </View>
 
-                  <AppText weight="extraBold" style={[styles.weekText, textAlign]}>
+                  <AppText weight="extraBold" style={[styles.weekText, text]}>
                     {t("tasks.week_total", { total: 38 })}
                   </AppText>
                 </View>
