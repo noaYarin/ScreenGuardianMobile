@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
- //GET /api/v1/notifications//parent
+ //GET /api/v1/notifications/parent
 // Get notifications for parent
 router.get("/parent", authJwt, requireParent, getParentNotificationsController);
 

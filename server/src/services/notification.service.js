@@ -44,6 +44,6 @@ export async function getParentNotifications(parentId) {
 }
 
 // Mark a notification as read
-export async function markNotificationAsRead(notificationId) {
-    return markNotificationAsReadById(notificationId);
+export async function markNotificationAsRead(parentId, notificationId) {
+  return markNotificationAsReadById(parentId, notificationId);
 }
