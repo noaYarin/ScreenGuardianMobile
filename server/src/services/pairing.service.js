@@ -9,7 +9,7 @@ import {
   findByBarcodeToken,
   consumePairingSession,
 } from "../dal/pairing.dal.js";
-import { getChildByParentId } from "../dal/parent.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
 import { createDevice, findDeviceByBarcodeOrCode } from "../dal/device.dal.js";
 import { DeviceType } from "../constants/deviceType.js";
@@ -53,7 +53,7 @@ export async function generatePairing(parentId, childIdFromBody) {
   }
 
   // Check if the child belongs to the parent and is active
-  const childList = await getChildByParentId(parentIdStr);
+  const childList = await getChildrenByParentId(parentIdStr);
   assertChildBelongsToParent(childList, childIdFromBody);
 
   const code = await createUniqueCode();
