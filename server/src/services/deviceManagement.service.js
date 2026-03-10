@@ -1,7 +1,7 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { findDeviceById, updateDeviceById, findDevicesByChildId } from "../dal/device.dal.js";
-import { getChildByParentId } from "../dal/parent.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "../services/notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
@@ -62,7 +62,7 @@ export async function unlockDevice(parentId, deviceId) {
 
 
 export async function getDevicesByChild(parentId, childId) {
-  const childList = await getChildByParentId(parentId);
+  const childList = await getChildrenByParentId(parentId);
   ensureChildBelongsToParent(childList, childId);
 
   return findDevicesByChildId(childId);

@@ -5,8 +5,7 @@ import DeviceModel from "../models/device.model.js";
 import * as requestDal from "../dal/request.dal.js";
 import { assertValidObjectId } from "../utils/validators.js";
 import { NotificationSeverity } from "../constants/severity.js";
-import { createNotificationService } from "../services/notification.service.js";
-import { TargetRole } from "../constants/roles.js";
+import { TargetRole } from "../constants/role.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { notifyParent, notifyChild } from "../services/notification.service.js";
 

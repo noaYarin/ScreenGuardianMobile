@@ -11,7 +11,7 @@ export async function addChildController(req, res, next) {
   }
 }
 
-export async function getChildenController(req, res, next) {
+export async function getChildrenController(req, res, next) {
   try {
     const parentId = req.user.parentId;
     const includeInactive = req.query?.includeInactive === "true";

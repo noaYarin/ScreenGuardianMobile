@@ -4,7 +4,7 @@ import { requireParent } from "../middlewares/requireParent.js";
 import {
   lockDeviceController,
   unlockDeviceController,
-  getDevicesByChildController
+  getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController 
 } from "../controllers/device.controller.js";
 
 const router = Router();

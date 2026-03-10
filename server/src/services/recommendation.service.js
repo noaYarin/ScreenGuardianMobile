@@ -1,6 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { getChildByParentId } from "../dal/parent.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { findDevicesByChildId } from "../dal/device.dal.js";
 import { findRequestsByChild } from "../dal/request.dal.js";
 import { RequestStatus } from "../constants/status.js";
@@ -128,7 +128,7 @@ function buildRecommendations({ child, devices, requests }) {
 }
 
 export async function getParentRecommendations(parentId, childId) {
-    const childList = await getChildByParentId(parentId);
+    const childList = await getChildrenByParentId(parentId);
     const child = ensureChildBelongsToParent(childList, childId);
 
     const devices = await findDevicesByChildId(childId);
