@@ -8,6 +8,7 @@ import pairingRoutes from "./routes/pairing.routes.js";
 import deviceRouter from "./routes/device.routes.js";
 import requestRoutes from "./routes/request.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
+import recommendationRoutes from "./routes/recommendation.routes.js";
 
 const app = express();
 
@@ -21,7 +22,7 @@ app.use("/api/v1/pairing", pairingRoutes);
 app.use("/api/v1/devices", deviceRouter);
 app.use("/api/v1/requests", requestRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
-
+app.use("/api/v1/recommendations", recommendationRoutes);
 
 app.use(errorHandler);
 
