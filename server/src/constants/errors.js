@@ -43,7 +43,9 @@ export const Common = {
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
   VALIDATION_CHILD_ID: { status: 400, code: "VALIDATION", message: "childId must be a valid ObjectId" },
   VALIDATION_IS_ACTIVE: { status: 400, code: "VALIDATION", message: "isActive must be boolean" },
+  VALIDATION_INTERESTS: { status: 400, code: "VALIDATION_ERROR",message: "interests must be an array of strings"},
   LIMIT_MAX_CHILDREN_REACHED: { status: 409, code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account" },
+
 };
 
 export const Request = {
@@ -55,3 +57,4 @@ export const Request = {
   DEVICE_NOT_OWNED: { status: 403, code: "FORBIDDEN", message: "Device does not belong to this child/parent" },
   REQUEST_ALREADY_PENDING: { status: 409, code: "REQUEST_ALREADY_PENDING", message: "There is already a pending request for this device" },
 };
+

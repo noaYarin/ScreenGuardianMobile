@@ -1,9 +1,10 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import {
-  pushChildToParent,
   getChildrenByParentId,
   updateChildActiveByParentId,
+  pushChildToParent,
+  updateChildInterestsByParentId
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
 import { assertBoolean } from "../utils/validators.js"; 
@@ -38,4 +39,39 @@ export async function setChildActive(parentId, childId, isActive) {
     throw new AppError(CommonErrors.NOT_FOUND);
   }
   return { child: updatedChild };
+}
+
+
+export async function updateChildInterests(parentId, childId, interests) {
+  if (!Array.isArray(interests)) {
+    throw new AppError(CommonErrors.VALIDATION_INTERESTS);
+  }
+
+  const cleanedInterests = interests
+    .filter((item) => typeof item === "string")
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+
+  const updated = await updateChildInterestsByParentId(
+    parentId,
+    childId,
+    cleanedInterests
+  );
+
+  if (!updated) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const child = (updated.children || []).find(
+    (c) => String(c._id) === String(childId)
+  );
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  return {
+    childId: child._id,
+    interests: child.interests || []
+  };
 }

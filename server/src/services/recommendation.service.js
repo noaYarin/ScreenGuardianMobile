@@ -8,6 +8,7 @@ import {
     RecommendationCode,
     RecommendationPriority
 } from "../constants/recommendation.js";
+import { ActivityIdeas } from "../constants/activityIdeas.js";
 
 function ensureChildBelongsToParent(childList, childId) {
     const child = childList.find((c) => String(c._id) === String(childId));
@@ -19,7 +20,40 @@ function ensureChildBelongsToParent(childList, childId) {
     return child;
 }
 
-function buildRecommendations({ child, devices, requests }) {
+
+function buildChildInterestRecommendations(child) {
+    const interests = Array.isArray(child?.interests) ? child.interests : [];
+
+    if (interests.length === 0) {
+        return ActivityIdeas.slice(0, 4);
+    }
+
+    const matched = ActivityIdeas.filter((activity) =>
+        activity.tags.some((tag) => interests.includes(tag))
+    );
+
+    if (matched.length === 0) {
+        return ActivityIdeas.slice(0, 4);
+    }
+
+    return matched.slice(0, 4);
+}
+
+export async function getChildInterestRecommendations(parentId, childId) {
+    const childList = await getChildrenByParentId(parentId);
+    const child = ensureChildBelongsToParent(childList, childId);
+
+    const recommendations = buildChildInterestRecommendations(child);
+
+    return {
+        childId,
+        interests: child.interests || [],
+        recommendations
+    };
+}
+
+
+function buildParentsRecommendations({ child, devices, requests }) {
     const recommendations = [];
 
     const activeDevice = devices[0];
@@ -138,7 +172,7 @@ export async function getParentRecommendations(parentId, childId) {
         childId
     });
 
-    const recommendations = buildRecommendations({
+    const recommendations = buildParentsRecommendations({
         child,
         devices,
         requests
@@ -149,3 +183,5 @@ export async function getParentRecommendations(parentId, childId) {
         recommendations
     };
 }
+
+

@@ -1,5 +1,9 @@
-import mongoose from "mongoose";
-import { addChild, getChildren, setChildActive } from "../services/parent.service.js";
+import {
+  addChild,
+  getChildren,
+  setChildActive,
+  updateChildInterests
+} from "../services/parent.service.js";
 
 export async function addChildController(req, res, next) {
   try {
@@ -29,6 +33,21 @@ export async function setChildActiveController(req, res, next) {
     const { isActive } = req.body;
 
     const data = await setChildActive(parentId, childId, isActive);
+
+    res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export async function updateChildInterestsController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+    const { interests } = req.body;
+
+    const data = await updateChildInterests(parentId, childId, interests);
 
     res.json({ ok: true, data });
   } catch (err) {

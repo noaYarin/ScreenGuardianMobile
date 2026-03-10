@@ -72,3 +72,21 @@ export async function updateChildActiveByParentId(parentId, childId, isActive) {
 
   return updated;
 }
+
+
+export async function updateChildInterestsByParentId(parentId, childId, interests) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+  const updated = await ParentModel.findOneAndUpdate(
+    { _id: parentId, "children._id": childId },
+    { $set: { "children.$.interests": interests } },
+    { new: true, projection: { children: 1 } }
+  ).lean();
+
+  if (!updated) {
+    return null;
+  }
+
+  return updated;
+}
