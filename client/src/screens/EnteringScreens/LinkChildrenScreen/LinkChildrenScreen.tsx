@@ -132,9 +132,10 @@ export default function LinkChildrenScreen() {
                     value={code}
                     onChangeText={setCode}
                     placeholder={t("linkChildren.code_placeholder")}
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    keyboardType="default"
+                    autoComplete="off"
+                    autoFocus={true}
+                    keyboardType="numeric"
+                    maxLength={6}
                     style={styles.input}
                     accessibilityLabel={t("linkChildren.code_input_a11y")}
                     returnKeyType="done"
@@ -143,18 +144,18 @@ export default function LinkChildrenScreen() {
                 </View>
 
                 <Pressable
-                  onPress={() => router.push("/Child/home")} //לשנות כשיהיה קוד נכון
-                  disabled={!code.trim()}
+                  onPress={pairingBtn}
+                  disabled={!code.trim() || isSubmitting}
                   accessibilityRole="button"
                   accessibilityLabel={t("linkChildren.submit_a11y")}
                   style={({ pressed }) => [
                     styles.primaryBtn,
                     !code.trim() ? styles.primaryBtnDisabled : null,
-                    { opacity: pressed ? 0.75 : 1 },
+                    { opacity: pressed || isSubmitting ? 0.75 : 1 },
                   ]}
                 >
                   <AppText weight="extraBold" style={styles.primaryBtnText}>
-                    {t("linkChildren.submit")}
+                    {t("linkChildren.connect")}
                   </AppText>
                 </Pressable>
               </View>
