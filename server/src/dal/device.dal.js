@@ -36,3 +36,33 @@ export async function findDevicesByChildId(childId) {
   assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
   return DeviceModel.find({ childId }).lean();
 }
+
+
+export async function addExtraMinutesToDevice(deviceId, minutes) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findByIdAndUpdate(
+    deviceId,
+    {
+      $inc: { "screenTime.extraMinutesToday": minutes }
+    },
+    { new: true }
+  ).lean();
+}
+
+
+export async function resetDailyScreenTime(deviceId, now) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findByIdAndUpdate(
+    deviceId,
+    {
+      $set: {
+        "screenTime.usedTodayMinutes": 0,
+        "screenTime.extraMinutesToday": 0,
+        "screenTime.lastDailyResetAt": now
+      }
+    },
+    { new: true }
+  ).lean();
+}

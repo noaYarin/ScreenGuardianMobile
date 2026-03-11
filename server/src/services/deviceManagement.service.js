@@ -71,10 +71,21 @@ export async function getDevicesByChild(parentId, childId) {
 
 // Return current screen-time settings for a specific device
 export async function getDeviceScreenTime(parentId, deviceId) {
-  const device = await findDeviceById(deviceId);
+
+  let device = await findDeviceById(deviceId);
   ensureDeviceBelongsToParent(device, parentId);
 
-  return device.screenTime || {};
+  const now = new Date();
+
+  const lastReset = device.screenTime?.lastDailyResetAt
+    ? new Date(device.screenTime.lastDailyResetAt)
+    : null;
+
+  if (!lastReset || !isSameDay(lastReset, now)) {
+    device = await resetDailyScreenTime(deviceId, now);
+  }
+
+  return device.screenTime;
 }
 
 // Update screen-time settings for a specific device
@@ -104,3 +115,16 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
 
   return updatedDevice;
 }
+
+
+
+function isSameDay(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
+
+
