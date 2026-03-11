@@ -1,13 +1,12 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors, Request as RequestErrors } from "../constants/errors.js";
 import { RequestStatus } from "../constants/status.js";
-import DeviceModel from "../models/device.model.js";
 import * as requestDal from "../dal/request.dal.js";
 import { assertValidObjectId } from "../utils/validators.js";
 import { NotificationSeverity } from "../constants/severity.js";
-import { TargetRole } from "../constants/role.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { notifyParent, notifyChild } from "../services/notification.service.js";
+import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -30,7 +29,7 @@ function assertDecision(decision) {
 }
 
 async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
-    const device = await DeviceModel.findById(deviceId).lean();
+    const device = await findDeviceById(deviceId);
 
     if (!device) {
         throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
@@ -137,6 +136,12 @@ export async function decideRequest({ parentId, requestId, decision }) {
     });
 
     if (updated) {
+        if (decision === RequestStatus.APPROVED) {
+            await addExtraMinutesToDevice(
+                updated.deviceId,
+                Number(updated.requestedMinutes || 0)
+            );
+        }
         await notifyChild({
             parentId: updated.parentId,
             childId: updated.childId,
