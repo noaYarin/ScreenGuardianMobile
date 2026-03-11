@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from "react";
-import { View, Pressable, TextInput, useWindowDimensions } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, Pressable, TextInput, useWindowDimensions, Alert } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
+import { CameraView, useCameraPermissions } from "expo-camera";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
+import { linkDevice } from "../../../api";
 import { styles } from "./styles";
 
 type Mode = "barcode" | "code";
@@ -14,8 +15,12 @@ export default function LinkChildrenScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
 
+  // Barcode or Code
   const [mode, setMode] = useState<Mode>("barcode");
   const [code, setCode] = useState("");
+  const [permission, requestPermission] = useCameraPermissions();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const isBarcode = mode === "barcode";
 
   const cardMaxWidth = useMemo(() => {
     if (width >= 900) return 520;
@@ -23,12 +28,49 @@ export default function LinkChildrenScreen() {
     return 420;
   }, [width]);
 
-  const isBarcode = mode === "barcode";
 
-  const onSubmitCode = () => {
-    const trimmed = code.trim();
-    if (!trimmed) return;
-    router.back();
+  // Request camera permission automatically on mount
+  useEffect(() => {
+    if (!permission) {
+      requestPermission();
+    }
+  }, [permission, requestPermission]);
+
+  // Handle code 
+  const pairingBtn = async () => {
+    try {
+      setIsSubmitting(true);
+      await linkDevice({ code: '', barcodeToken: '' });
+      router.replace("/Child/home");
+    } catch (error) {
+      Alert.alert(
+        t("linkChildren.error_title"),
+        t("linkChildren.error_generic"),
+      );
+    } finally {
+      setIsSubmitting(true);
+    }
+  };
+
+  // Handle barcode scanned
+  const handleBarcodeScanned = async (result: { data?: string }) => {
+    if (isSubmitting) return;
+
+    const token = result?.data?.trim();
+    if (!token) return;
+
+    try {
+      setIsSubmitting(true);
+      await linkDevice({ code: '', barcodeToken: '' });
+      router.replace("/Child/home");
+    } catch (error) {
+      Alert.alert(
+        t("linkChildren.error_title"),
+        t("linkChildren.error_generic"),
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -70,52 +112,63 @@ export default function LinkChildrenScreen() {
                 ]}
               >
                 <View style={styles.segmentRow}>
-                  <MaterialCommunityIcons
-                    name="email-outline"
-                    size={18}
-                    color={!isBarcode ? "#0B4DFF" : "#4B5563"}
-                  />
                   <AppText
-                    weight={!isBarcode ? "extraBold" : "bold"}
-                    style={[
-                      styles.segmentText,
-                      !isBarcode ? styles.segmentTextActive : styles.segmentTextInactive,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {t("linkChildren.tab_code")}
-                  </AppText>
+                  weight={!isBarcode ? "extraBold" : "bold"}
+                  style={[
+                    styles.segmentText,
+                    !isBarcode ? styles.segmentTextActive : styles.segmentTextInactive,
+                  ]}
+                  numberOfLines={1}
+                >
+                  {t("linkChildren.tab_code")}
+                </AppText>
                 </View>
               </Pressable>
             </View>
 
-            <View style={styles.iconCircle} accessible accessibilityRole="image">
-              <MaterialCommunityIcons name="link-variant" size={34} color="#1E3A8A" />
-            </View>
-
+            {!isBarcode ? (
+              <View style={styles.iconCircle} accessible accessibilityRole="image">
+                <MaterialCommunityIcons name="link-variant" size={34} color="#1E3A8A" />
+              </View>
+            ) : (
+              <View style={styles.iconCircle} accessible accessibilityRole="image">
+                <MaterialCommunityIcons name="qrcode-scan" size={34} color="#1E3A8A" />
+              </View>
+            )}
+         
             <AppText weight="extraBold" style={styles.title} numberOfLines={2}>
               {t("linkChildren.heading")}
-            </AppText>
-
-            <AppText style={styles.subtitle} numberOfLines={3}>
-              {isBarcode ? t("linkChildren.sub_barcode") : t("linkChildren.sub_code")}
             </AppText>
 
             {isBarcode ? (
               <View style={styles.qrCard}>
                 <View style={styles.qrBox}>
-                  <MaterialCommunityIcons name="qrcode-scan" size={64} color="#1E3A8A" />
+                  {permission?.granted ? (
+                    <CameraView
+                      style={styles.cameraView}
+                      onBarcodeScanned={handleBarcodeScanned}
+                      barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+                    />
+                  ) : (
+                    <View style={styles.cameraFallback}>
+                      <AppText style={styles.subtitle}>
+                        {t(
+                          "linkChildren.camera_denied_message"
+                        )}
+                      </AppText>
+                    </View>
+                  )}
                 </View>
 
                 <Pressable
-                  onPress={() => router.push("/Child/home")} //לשנות כשיהיה קוד נכון
-
+                  onPress={requestPermission}
                   accessibilityRole="button"
                   accessibilityLabel={t("linkChildren.scan_a11y")}
                   style={({ pressed }) => [
                     styles.primaryBtn,
-                    { opacity: pressed ? 0.75 : 1 },
+                    { opacity: pressed || isSubmitting ? 0.75 : 1 },
                   ]}
+                  disabled={isSubmitting}
                 >
                   <AppText weight="extraBold" style={styles.primaryBtnText}>
                     {t("linkChildren.scan")}
@@ -138,8 +191,6 @@ export default function LinkChildrenScreen() {
                     maxLength={6}
                     style={styles.input}
                     accessibilityLabel={t("linkChildren.code_input_a11y")}
-                    returnKeyType="done"
-                    onSubmitEditing={onSubmitCode}
                   />
                 </View>
 

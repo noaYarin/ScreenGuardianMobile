@@ -4,9 +4,9 @@ export const styles = StyleSheet.create({
   page: {
     flex: 1,
     width: "100%",
-    alignItems: "stretch",
     justifyContent: "center",
-    paddingVertical: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
   },
 
   card: {
@@ -15,7 +15,8 @@ export const styles = StyleSheet.create({
     borderRadius: 26,
     padding: 18,
     backgroundColor: "#DCEBFF",
-  },
+    minHeight: 700,
+    },
 
   segmentWrap: {
     width: "100%",
@@ -81,11 +82,10 @@ export const styles = StyleSheet.create({
   },
 
   subtitle: {
-    marginTop: 8,
     textAlign: "center",
     fontSize: 16,
     color: "#334155",
-    lineHeight: 22,
+    marginBottom: 10,
   },
 
   qrCard: {
@@ -110,11 +110,38 @@ export const styles = StyleSheet.create({
     borderColor: "#1E3A8A",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+
+  qrIconOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  cameraView: {
+    flex: 1,
+    width: "100%",
+  },
+
+  cameraFallback: {
+    flex: 1,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   codeArea: {
     marginTop: 18,
+    minHeight: 300,
     width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-start",
     borderRadius: 22,
     backgroundColor: "#FFFFFF",
     padding: 16,
@@ -133,11 +160,14 @@ export const styles = StyleSheet.create({
     backgroundColor: "#F8FAFC",
     paddingHorizontal: 12,
     paddingVertical: 10,
+    marginBottom: 10,
+    marginTop: 20,
   },
 
   input: {
     fontSize: 16,
     color: "#0F172A",
+    textAlign: "center",
   },
 
   primaryBtn: {

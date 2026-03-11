@@ -67,7 +67,7 @@ export default function RootLayout() {
           justifyContent: "center",
         }}
       >
-        <ActivityIndicator />
+          <ActivityIndicator size="large" color={COLORS.light.tint} />
       </View>
     );
   }
