@@ -249,6 +249,33 @@
         "reward": "1000 pts"
       }
     }
+  },
+  "registerParent": {
+    "title": "Parent Sign Up",
+    "heading": "Create Parent Account",
+    "subheading": "Sign up to start managing screen time",
+    "email_placeholder": "Email",
+    "password_placeholder": "Password",
+    "confirm_password_placeholder": "Confirm Password",
+    "invalid_email": "Invalid email address",
+    "missing_password": "Please enter a password",
+    "missing_confirm_password": "Please confirm your password",
+    "passwords_not_match": "Passwords do not match",
+    "generic_error": "Something went wrong. Please try again",
+    "google_error": "Google sign up failed",
+    "register": "Sign Up",
+    "or": "or",
+    "google": "Continue with Google",
+    "have_account": "Already have an account?",
+    "login": "Log In",
+    "email_a11y": "Email field",
+    "password_a11y": "Password field",
+    "confirm_password_a11y": "Confirm password field",
+    "toggle_password_a11y": "Show or hide password",
+    "toggle_confirm_password_a11y": "Show or hide confirm password",
+    "register_a11y": "Sign up button",
+    "google_a11y": "Sign up with Google button",
+    "login_a11y": "Go to login screen"
   }
 }
 
