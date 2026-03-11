@@ -124,7 +124,10 @@ export default function LinkChildrenScreen() {
               </View>
             ) : (
               <View style={styles.codeArea}>
-                <View style={styles.inputWrap}>
+            <AppText style={styles.subtitle} numberOfLines={3}>
+              {isBarcode ? t("linkChildren.sub_barcode") : t("linkChildren.sub_code")}
+            </AppText>
+                <View style={styles.inputWrap}> 
                   <TextInput
                     value={code}
                     onChangeText={setCode}
