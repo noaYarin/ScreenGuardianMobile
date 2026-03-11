@@ -1,15 +1,15 @@
-import React, { useMemo } from "react";
-import { View, Pressable, useWindowDimensions, Platform } from "react-native";
+import React from "react";
+import { View, Pressable, useWindowDimensions } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import Ionicons from '@expo/vector-icons/Ionicons';
+
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 
-
-import i18n, { changeLanguage } from "../../../locales/i18n";
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { pickRTL } from "../../../locales/rtl";
 
 const ICON = {
   target: "target",
@@ -49,28 +49,8 @@ function HeaderIconButton({
 
 export default function GoalsScreen() {
   const { t } = useTranslation();
+  const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
-
-  const currentLanguage = (i18n?.resolvedLanguage ?? i18n?.language ?? "en") as string;
-  const isRTL = currentLanguage.startsWith("he");
-
-
-  const onChangeLanguage = async (lang: "he" | "en") => {
-    try {
-      await changeLanguage(lang);
-    } catch {
-      // silent
-    }
-  };
-
-  const rowDir = useMemo(
-    () => ({ flexDirection: isRTL ? "row-reverse" as const : "row" as const }),
-    [isRTL]
-  );
-  const textAlign = useMemo(
-    () => ({ textAlign: isRTL ? "right" as const : "left" as const }),
-    [isRTL]
-  );
 
   const progress = 50;
 
@@ -98,6 +78,12 @@ export default function GoalsScreen() {
   const maxContentWidth = Math.min(820, Math.max(340, width - 32));
   const cardRadius = 22;
 
+  const progressFillPosition = pickRTL(
+    isRTL,
+    { right: 0 as const, left: undefined },
+    { left: 0 as const, right: undefined }
+  );
+
   return (
     <>
       <Stack.Screen
@@ -105,48 +91,38 @@ export default function GoalsScreen() {
           title: t("goals.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          //headerRight: () => (
-       //     <HeaderIconButton
-        //      name={ICON.spark}
-        //      onPress={() => {
-
-           //   }}
-          //    accessibilityLabel={t("common.language") ?? "Language"}
-        //    />
-       //   ),
         }}
       />
 
       <ScreenLayout>
         <View style={styles.page}>
           <View style={[styles.inner, { maxWidth: maxContentWidth }]}>
-            {/* Header Card */}
+            {/* Header card */}
             <View style={[styles.headerCard, { borderRadius: cardRadius }]}>
-              <View style={[styles.headerTop, rowDir]}>
+              <View style={[styles.headerTop, row]}>
                 <View style={styles.headerIconWrap}>
                   <MaterialCommunityIcons name={ICON.target} size={22} color="#2F6DEB" />
                 </View>
 
                 <View style={styles.headerTextWrap}>
-                  <AppText weight="extraBold" style={[styles.headerTitle, textAlign]}>
+                  <AppText weight="extraBold" style={[styles.headerTitle, text]}>
                     {t("goals.weekly_title")}
                   </AppText>
-                  <AppText style={[styles.headerSubtitle, textAlign]}>
+                  <AppText style={[styles.headerSubtitle, text]}>
                     {t("goals.subtitle")}
                   </AppText>
                 </View>
               </View>
             </View>
 
-            {/* Progress Card */}
+            {/* Progress card */}
             <View style={[styles.progressCard, { borderRadius: cardRadius }]}>
-              <View style={[styles.progressTopRow, rowDir]}>
-                <AppText weight="bold" style={[styles.progressLabel, textAlign]}>
+              <View style={[styles.progressTopRow, row]}>
+                <AppText weight="bold" style={[styles.progressLabel, text]}>
                   {t("goals.total_progress")}
                 </AppText>
 
-                <View style={[styles.progressBadge, rowDir]}>
+                <View style={[styles.progressBadge, row]}>
                   <MaterialCommunityIcons name="star-circle" size={18} color="#2F6DEB" />
                   <AppText weight="extraBold" style={styles.progressPercent}>
                     {progress}%
@@ -158,21 +134,22 @@ export default function GoalsScreen() {
                 <View
                   style={[
                     styles.progressBarFill,
-                    isRTL ? { right: 0, left: undefined } : { left: 0, right: undefined },
+                    progressFillPosition,
                     { width: `${progress}%` },
                   ]}
                 />
               </View>
 
-              <AppText style={[styles.progressHint, textAlign]}>
+              <AppText style={[styles.progressHint, text]}>
                 {t("goals.subtitle")}
               </AppText>
             </View>
 
-            {/* Goals List */}
+            {/* Goals list */}
             <View style={styles.list}>
               {goals.map((g) => {
                 const isDone = g.done;
+
                 return (
                   <View
                     key={g.key}
@@ -182,16 +159,17 @@ export default function GoalsScreen() {
                       !isDone && styles.goalCardDisabled,
                     ]}
                   >
-                    <View style={[styles.goalRow, rowDir]}>
+                    <View style={[styles.goalRow, row]}>
                       <View style={styles.goalTextWrap}>
                         <AppText
                           weight="extraBold"
-                          style={[styles.goalTitle, textAlign, !isDone && styles.textMuted]}
+                          style={[styles.goalTitle, text, !isDone && styles.textMuted]}
                           numberOfLines={2}
                         >
                           {t(g.titleKey)}
                         </AppText>
-                        <View style={[styles.daysRow, rowDir]}>
+
+                        <View style={[styles.daysRow, row]}>
                           <View style={[styles.daysPill, !isDone && styles.daysPillDisabled]}>
                             <AppText style={styles.daysText}>{t(g.daysKey)}</AppText>
                           </View>
@@ -219,7 +197,7 @@ export default function GoalsScreen() {
               })}
             </View>
 
-            {/* Bottom spacing (כדי שלא יהיה צפוף) */}
+            {/* Bottom spacing */}
             <View style={styles.bottomSpacer} />
           </View>
         </View>

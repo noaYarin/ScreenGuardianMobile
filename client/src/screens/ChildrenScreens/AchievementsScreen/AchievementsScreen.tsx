@@ -1,37 +1,14 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { View, Pressable, useWindowDimensions } from "react-native";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
-
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [
-        styles.headerIconButton,
-        pressed && styles.headerIconButtonPressed,
-      ]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#111827" />
-    </Pressable>
-  );
-}
+import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { pickRTL } from "../../../locales/rtl";
 
 type StatCard = {
   id: string;
@@ -53,15 +30,12 @@ type AchievementCard = {
 };
 
 export default function AchievementsScreen() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const { isRTL, row, text } = useLocaleLayout();
 
-  const isRTL = i18n.dir() === "rtl" || i18n.language?.startsWith("he");
   const isTabletLarge = width >= 900;
   const isTablet = width >= 650;
-
-  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    isRTL ? "arrow-left" : "arrow-right";
 
   const heroIconSize = isTabletLarge ? 84 : isTablet ? 74 : 66;
   const sidePadding = isTabletLarge ? 24 : 16;
@@ -74,26 +48,10 @@ export default function AchievementsScreen() {
     220
   );
 
-  const rowDir = useMemo(
-    () => ({ flexDirection: isRTL ? "row-reverse" : "row" } as const),
-    [isRTL]
-  );
-
-  const rowDirTop = useMemo(
-    () =>
-      ({
-        flexDirection: isRTL ? "row-reverse" : "row",
-        alignItems: "flex-start",
-      } as const),
-    [isRTL]
-  );
-
-  const textAlign = useMemo(
-    () => ({ textAlign: isRTL ? "right" : "left" } as const),
-    [isRTL]
-  );
-
-  const centerText = useMemo(() => ({ textAlign: "center" } as const), []);
+  const rowTop = {
+    ...row,
+    alignItems: "flex-start" as const,
+  };
 
   const points = 1200;
   const completedGoals = 5;
@@ -143,12 +101,12 @@ export default function AchievementsScreen() {
   return (
     <>
       <Stack.Screen
-              options={{
-                title: t("goals.title"),
-                headerTitleAlign: "center",
-                headerShadowVisible: false,
-              }}
-            />
+        options={{
+          title: t("achievements.title"),
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+        }}
+      />
 
       <ScreenLayout>
         <View style={[styles.page, { paddingHorizontal: sidePadding }]}>
@@ -171,41 +129,37 @@ export default function AchievementsScreen() {
             </View>
 
             <View style={styles.heroTextBlock}>
-              <AppText weight="extraBold" style={[styles.heroTitle, textAlign]}>
+              <AppText weight="extraBold" style={[styles.heroTitle, text]}>
                 {t("achievements.heading")}
               </AppText>
 
-              <AppText weight="medium" style={[styles.heroSubtitle, textAlign]}>
+              <AppText weight="medium" style={[styles.heroSubtitle, text]}>
                 {t("achievements.subtitle")}
               </AppText>
             </View>
 
-            <View style={[styles.heroSummaryRow, rowDir]}>
+            <View style={[styles.heroSummaryRow, row]}>
               <View style={[styles.heroSummaryCard, styles.heroSummaryCardGreen]}>
-                <View style={[styles.heroSummaryTop, rowDir]}>
+                <View style={[styles.heroSummaryTop, row]}>
                   <View style={styles.heroSummaryIconGreen}>
-                    <MaterialCommunityIcons
-                      name="target"
-                      size={18}
-                      color="#0F8A5F"
-                    />
+                    <MaterialCommunityIcons name="target" size={18} color="#0F8A5F" />
                   </View>
 
                   <AppText
                     weight="extraBold"
-                    style={[styles.heroSummaryValueGreen, textAlign]}
+                    style={[styles.heroSummaryValueGreen, text]}
                   >
                     {completedGoals}/{totalGoals}
                   </AppText>
                 </View>
 
-                <AppText style={[styles.heroSummaryLabel, textAlign]}>
+                <AppText style={[styles.heroSummaryLabel, text]}>
                   {t("achievements.completed")}
                 </AppText>
               </View>
 
               <View style={[styles.heroSummaryCard, styles.heroSummaryCardGold]}>
-                <View style={[styles.heroSummaryTop, rowDir]}>
+                <View style={[styles.heroSummaryTop, row]}>
                   <View style={styles.heroSummaryIconGold}>
                     <MaterialCommunityIcons
                       name="star-circle-outline"
@@ -216,13 +170,13 @@ export default function AchievementsScreen() {
 
                   <AppText
                     weight="extraBold"
-                    style={[styles.heroSummaryValueGold, textAlign]}
+                    style={[styles.heroSummaryValueGold, text]}
                   >
                     {points}
                   </AppText>
                 </View>
 
-                <AppText style={[styles.heroSummaryLabel, textAlign]}>
+                <AppText style={[styles.heroSummaryLabel, text]}>
                   {t("achievements.points")}
                 </AppText>
               </View>
@@ -242,7 +196,7 @@ export default function AchievementsScreen() {
                     { width: statCardWidth },
                   ]}
                 >
-                  <View style={[styles.statHeader, rowDir]}>
+                  <View style={[styles.statHeader, row]}>
                     <View
                       style={[
                         styles.statIconBadge,
@@ -258,7 +212,7 @@ export default function AchievementsScreen() {
 
                     <AppText
                       weight="medium"
-                      style={[styles.statLabel, textAlign]}
+                      style={[styles.statLabel, text]}
                       numberOfLines={1}
                     >
                       {item.label}
@@ -270,7 +224,7 @@ export default function AchievementsScreen() {
                     style={[
                       styles.statValue,
                       isBlue ? styles.statValueBlue : styles.statValuePink,
-                      textAlign,
+                      text,
                     ]}
                     numberOfLines={1}
                   >
@@ -297,7 +251,7 @@ export default function AchievementsScreen() {
                   ]}
                   onPress={() => {}}
                 >
-                  <View style={[styles.achievementInner, rowDirTop]}>
+                  <View style={[styles.achievementInner, rowTop]}>
                     <View
                       style={[
                         styles.achievementIconBox,
@@ -314,13 +268,13 @@ export default function AchievementsScreen() {
                     </View>
 
                     <View style={styles.achievementTextArea}>
-                      <View style={[styles.achievementTitleRow, rowDir]}>
+                      <View style={[styles.achievementTitleRow, row]}>
                         <AppText
                           weight="extraBold"
                           style={[
                             styles.achievementTitle,
                             isGold && styles.achievementTitleGold,
-                            textAlign,
+                            text,
                           ]}
                           numberOfLines={1}
                         >
@@ -328,12 +282,8 @@ export default function AchievementsScreen() {
                         </AppText>
 
                         {item.completed ? (
-                          <View style={[styles.completedBadge, rowDir]}>
-                            <MaterialCommunityIcons
-                              name="check"
-                              size={14}
-                              color="#fff"
-                            />
+                          <View style={[styles.completedBadge, row]}>
+                            <MaterialCommunityIcons name="check" size={14} color="#fff" />
                             <AppText weight="bold" style={styles.completedBadgeText}>
                               {t("achievements.done")}
                             </AppText>
@@ -345,7 +295,7 @@ export default function AchievementsScreen() {
                         style={[
                           styles.achievementSubtitle,
                           isGold && styles.achievementSubtitleGold,
-                          textAlign,
+                          text,
                         ]}
                         numberOfLines={2}
                       >
@@ -354,17 +304,17 @@ export default function AchievementsScreen() {
 
                       <View style={styles.achievementBottomArea}>
                         <View
-                          style={[
-                            styles.rewardPill,
-                            isGold ? styles.rewardPillGold : styles.rewardPillLight,
-                            isRTL ? styles.rewardPillRtl : styles.rewardPillLtr,
-                          ]}
-                        >
+  style={[
+    styles.rewardPill,
+    isGold ? styles.rewardPillGold : styles.rewardPillLight,
+    isRTL ? styles.rewardPillRtl : styles.rewardPillLtr,
+  ]}
+>
                           <AppText
                             style={[
                               styles.rewardText,
                               isGold && styles.rewardTextGold,
-                              centerText,
+                              { textAlign: "center" },
                             ]}
                             numberOfLines={1}
                           >
@@ -373,17 +323,17 @@ export default function AchievementsScreen() {
                         </View>
 
                         <View
-                          style={[
-                            styles.pointsPill,
-                            isGold ? styles.pointsPillGold : styles.pointsPillLight,
-                            isRTL ? styles.pointsPillRtl : styles.pointsPillLtr,
-                          ]}
-                        >
+  style={[
+    styles.pointsPill,
+    isGold ? styles.pointsPillGold : styles.pointsPillLight,
+    isRTL ? styles.pointsPillRtl : styles.pointsPillLtr,
+  ]}
+>
                           <AppText
                             style={[
                               styles.progressText,
                               isGold && styles.progressTextGold,
-                              centerText,
+                              { textAlign: "center" },
                             ]}
                             numberOfLines={1}
                           >

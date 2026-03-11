@@ -248,7 +248,34 @@
         "reward": "1000 נק׳"
       }
     }
-}
+},
+  "registerParent": {
+    "title": "הרשמה להורה",
+    "heading": "יצירת חשבון הורה",
+    "subheading": "הירשמו כדי להתחיל לנהל את זמן המסך",
+    "email_placeholder": "אימייל",
+    "password_placeholder": "סיסמה",
+    "confirm_password_placeholder": "אימות סיסמה",
+    "invalid_email": "כתובת האימייל אינה תקינה",
+    "missing_password": "יש להזין סיסמה",
+    "missing_confirm_password": "יש להזין אימות סיסמה",
+    "passwords_not_match": "הסיסמאות אינן תואמות",
+    "generic_error": "אירעה שגיאה. נסו שוב",
+    "google_error": "ההתחברות עם Google נכשלה",
+    "register": "הירשמו",
+    "or": "או",
+    "google": "המשיכו עם Google",
+    "have_account": "יש לכם כבר חשבון?",
+    "login": "התחברות",
+    "email_a11y": "שדה אימייל",
+    "password_a11y": "שדה סיסמה",
+    "confirm_password_a11y": "שדה אימות סיסמה",
+    "toggle_password_a11y": "הצג או הסתר סיסמה",
+    "toggle_confirm_password_a11y": "הצג או הסתר אימות סיסמה",
+    "register_a11y": "כפתור הרשמה",
+    "google_a11y": "כפתור הרשמה עם גוגל",
+    "login_a11y": "מעבר למסך התחברות"
+  }
 }
 
 
