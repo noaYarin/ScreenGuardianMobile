@@ -1,6 +1,21 @@
 import React from "react";
 import HomeParentScreen from "../../src/screens/ParentScreens/HomeScreen/HomeScreen";
+import { useTranslation } from "react-i18next";
+import { Stack } from "expo-router";
 
-export default function HomeRoute() {
-  return <HomeParentScreen />;
+export default function HomeParentScreenRoute() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <Stack.Screen
+        options={{
+          headerShown: false,
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          title: t("homeParent.title"),
+        }}
+      />
+      <HomeParentScreen />
+    </>
+  );
 }

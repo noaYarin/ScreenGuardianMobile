@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { View, Pressable, TextInput, useWindowDimensions } from "react-native";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -33,14 +33,6 @@ export default function LinkChildrenScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: t("linkChildren.title"),
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-        }}
-      />
-
       <ScreenLayout>
         <View style={styles.page}>
           <View style={[styles.card, { maxWidth: cardMaxWidth }]}>

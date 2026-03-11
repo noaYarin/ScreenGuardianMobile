@@ -45,17 +45,6 @@ export default function HomeParentScreen() {
 
   return (
     <>
-      {/* Home screen: */}
-      <Stack.Screen
-        options={{
-          title: t("homeParent.title"),
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-          headerBackVisible: false,
-          headerLeft: () => null,
-        }}
-      />
-
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>

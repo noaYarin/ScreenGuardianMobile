@@ -10,89 +10,35 @@ import store from "../src/redux/store";
 
 import i18n, { initLanguage } from "../src/locales/i18n";
 
-/** מסכים שבהם אין HEADER בכלל */
-const NO_HEADER_ROUTES = new Set([
-  "index",
-  "onboardingRoute",
-  "roleSelectionRoute",
-]);
-
-function BackBtn({ isRTL, canGoBack }: { isRTL: boolean; canGoBack: boolean }) {
-  const iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    isRTL ? "arrow-right" : "arrow-left";
-
-  const onPress = () => {
-    if (canGoBack) router.back();
-    else router.replace("/roleSelectionRoute" as any);
-  };
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel="Back"
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={iconName} size={22} color="#000" />
-    </Pressable>
-  );
-}
 
 function AppStack() {
   const { i18n } = useTranslation();
 
-  /** זיהוי RTL לפי השפה */
   const isRTL = i18n.language?.startsWith("he") ?? false;
 
   return (
     <Stack
-    
-      screenOptions={({ navigation, route }) => {
-        const canGoBack = navigation.canGoBack();
-
-        /** אם זה מסך בלי HEADER */
-        if (NO_HEADER_ROUTES.has(route.name)) {
-          return {
-            headerShown: false,
-            contentStyle: { backgroundColor: COLORS.light.background },
-          };
-        }
-
-        /** HEADER רגיל */
-        let headerLeft: (() => React.ReactNode) | undefined = () => null;
-        let headerRight: (() => React.ReactNode) | undefined = () => null;
-
-        if (isRTL)
-          headerRight = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
-        else headerLeft = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
+      screenOptions={() => {
 
         return {
           contentStyle: { backgroundColor: COLORS.light.background },
-
           headerStyle: {
             backgroundColor: COLORS.light.tint,
           },
-
           headerTitleAlign: "center",
           headerShadowVisible: false,
-
-          headerBackVisible: false,
-
-          headerLeft,
-          headerRight,
         };
       }}
     >
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="Parent" options={{ headerShown: false }} />
+      <Stack.Screen name="Parent" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
+      <Stack.Screen name="Child" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
     </Stack>
   );
 }
 
 export default function RootLayout() {
   const [ready, setReady] = useState(false);
-  const [initError, setInitError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -103,12 +49,7 @@ export default function RootLayout() {
         if (mounted) setReady(true);
       } catch (e: any) {
         console.error("initLanguage failed:", e);
-
-        if (mounted) {
-          setInitError(e?.message ?? "initLanguage failed");
-          setReady(true);
         }
-      }
     })();
 
     return () => {
@@ -116,7 +57,6 @@ export default function RootLayout() {
     };
   }, []);
 
-  /** מסך טעינה קטן במקום שהאפליקציה תיתקע על Bundling */
   if (!ready) {
     return (
       <View

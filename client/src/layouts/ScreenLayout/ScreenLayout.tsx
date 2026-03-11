@@ -10,16 +10,8 @@ export default function ScreenLayout({ children }: { children: React.ReactNode }
   const rtl = i18n.resolvedLanguage === "he";
 
   return (
-    <SafeAreaView style={styles.page}>
-      <ScrollView
-        contentContainerStyle={[
-          styles.content,
-          Platform.OS === "web" ? ({ direction: rtl ? "rtl" : "ltr" } as any) : null,
-        ]}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView>
         <View style={styles.inner}>{children}</View>
       </ScrollView>
-    </SafeAreaView>
   );
 }

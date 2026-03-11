@@ -1,16 +1,18 @@
 import React from "react";
 import { Stack } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { OnboardingScreen } from "../../src/screens/EnteringScreens/onboarding/OnboardingScreen";
 
 export default function OnboardingRoute() {
+
   return (
     <>
       <Stack.Screen
         options={{
-          title: "dashboard",
-          headerBackVisible: false,   
-          headerLeft: () => null,    
-          headerRight: () => null,    
+            headerShown: true,           
+            title: "",                   
+            headerShadowVisible: false,   
+
         }}
       />
       <OnboardingScreen />

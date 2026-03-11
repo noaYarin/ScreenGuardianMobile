@@ -1,33 +1,11 @@
 import React from "react";
-import { Tabs, router } from "expo-router";
-import { Pressable } from "react-native";
+import { Tabs } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { COLORS } from "@/constants/theme";
 
 const TAB_ROUTES = new Set(["home", "kids", "limits", "reports", "settings"]);
 
-function BackBtn({ isRTL, canGoBack }: { isRTL: boolean; canGoBack: boolean }) {
-  const iconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    isRTL ? "arrow-right" : "arrow-left";
-
-  const onPress = () => {
-    if (canGoBack) router.back();
-    else router.replace("/roleSelectionRoute" as any);
-  };
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel="Back"
-      hitSlop={10}
-      style={({ pressed }) => [{ padding: 8, opacity: pressed ? 0.65 : 1 }]}
-    >
-      <MaterialCommunityIcons name={iconName} size={22} color="#000" />
-    </Pressable>
-  );
-}
 
 export default function ParentLayout() {
   const { t, i18n } = useTranslation();
@@ -35,22 +13,7 @@ export default function ParentLayout() {
 
   return (
     <Tabs
-      screenOptions={({ navigation, route }) => {
-        const canGoBack = navigation.canGoBack();
-
-        // ✅ visible tabs: no back button
-        const isTopTab = TAB_ROUTES.has(route.name);
-
-        let headerLeft: (() => React.ReactNode) | undefined = () => null;
-        let headerRight: (() => React.ReactNode) | undefined = () => null;
-
-        if (!isTopTab) {
-          // ✅ hidden/internal parent screens: show back
-          if (isRTL) headerRight = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
-          else headerLeft = () => <BackBtn isRTL={isRTL} canGoBack={canGoBack} />;
-        }
-
-        // ✅ header title: tabs use translations
+      screenOptions={({ route }) => {
         const title =
           route.name === "home"
             ? t("homeParent.title")
@@ -59,17 +22,7 @@ export default function ParentLayout() {
             : undefined;
 
         return {
-          // Header (like your global one)
-          headerShown: true,
-          headerStyle: { backgroundColor: COLORS.light.tint },
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-          headerBackVisible: false, // we use our own BackBtn
-          headerLeft,
-          headerRight,
           title,
-
-          // Tab bar
           tabBarShowLabel: true,
           tabBarStyle: {
             height: 72,

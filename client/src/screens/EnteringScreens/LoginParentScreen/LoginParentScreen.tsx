@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
-import { Stack, router } from "expo-router";
+import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -80,17 +80,17 @@ export default function LoginParentScreen() {
     router.replace("/Parent/home" as any);
   };
 
-  const onGoogle = async () => {
-    setErrorText(null);
-    try {
-      setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 600));
-    } catch {
-      setErrorText(t("loginParent.google_error"));
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  // const onGoogle = async () => {
+  //   setErrorText(null);
+  //   try {
+  //     setSubmitting(true);
+  //     await new Promise((r) => setTimeout(r, 600));
+  //   } catch {
+  //     setErrorText(t("loginParent.google_error"));
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
 
   const inputRowStyle = useMemo(
     () => [styles.input, isRTL && styles.inputRTL],
@@ -107,31 +107,12 @@ export default function LoginParentScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: t("loginParent.title"),
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-        }}
-      />
-
       <ScreenLayout>
         <KeyboardAvoidingView
           style={styles.flex1}
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View style={styles.container}>
-            <LinearGradient
-              colors={["#1D4ED8", "#7C3AED"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.hero}
-            >
-              <AppText weight="extraBold" style={styles.heroTitle}>
-                {t("loginParent.title")}
-              </AppText>
-            </LinearGradient>
-
             <View style={[styles.card, { width: cardWidth }]}>
               <View style={styles.iconWrap}>
                 <LinearGradient
@@ -250,7 +231,6 @@ export default function LoginParentScreen() {
               </View>
 
               <Pressable
-                onPress={onGoogle}
                 disabled={submitting}
                 accessibilityRole="button"
                 accessibilityLabel={t("loginParent.google_a11y")}
