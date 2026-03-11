@@ -1,6 +1,6 @@
 // client/src/screens/ChildrenScreens/HomeScreen/HomeScreen.tsx
 import React from "react";
-import { View, Pressable, useWindowDimensions } from "react-native";
+import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -39,8 +39,10 @@ export default function HomeScreen() {
   const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
 
+  const isPhoneSmall = width < 390;
   const isPhone = width < 430;
   const isTablet = width >= 430 && width < 900;
+  const isLarge = width >= 900;
 
   const avatarSize = isPhone ? 92 : isTablet ? 108 : 118;
   const helloSize = isPhone ? 22 : isTablet ? 26 : 28;
@@ -62,6 +64,12 @@ export default function HomeScreen() {
   const leftA11y = pickRTL(isRTL, t("home.accessibility"), t("home.settings"));
   const rightA11y = pickRTL(isRTL, t("home.settings"), t("home.accessibility"));
 
+  const statPillResponsiveStyle = isLarge
+    ? styles.statPillDesktop
+    : isTablet
+    ? styles.statPillTablet
+    : styles.statPillMobile;
+
   return (
     <>
       <Stack.Screen
@@ -76,7 +84,12 @@ export default function HomeScreen() {
       />
 
       <ScreenLayout>
-        <View style={styles.page}>
+        <View
+          style={[
+            styles.page,
+            isPhoneSmall && styles.pageSmall,
+          ]}
+        >
           <View style={styles.topRow}>
             <View style={[styles.topCol, { alignItems: "flex-start" }]}>
               <RoundIconButton
@@ -135,18 +148,21 @@ export default function HomeScreen() {
                 text={t("home.points", { value: pointsValue })}
                 variant="blue"
                 isRTL={isRTL}
+                style={statPillResponsiveStyle}
               />
               <StatPill
                 icon={ICON.level}
                 text={t("home.level", { level: levelValue })}
                 variant="beige"
                 isRTL={isRTL}
+                style={statPillResponsiveStyle}
               />
               <StatPill
                 icon={ICON.coins}
                 text={t("home.coins", { value: coinsValue })}
                 variant="primary"
                 isRTL={isRTL}
+                style={statPillResponsiveStyle}
               />
             </View>
           </View>
@@ -290,11 +306,13 @@ function StatPill({
   text,
   variant,
   isRTL,
+  style,
 }: {
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   text: string;
   variant: "blue" | "beige" | "primary";
   isRTL: boolean;
+  style?: StyleProp<ViewStyle>;
 }) {
   const pillStyle =
     variant === "blue"
@@ -308,6 +326,7 @@ function StatPill({
       style={[
         styles.statPill,
         pillStyle,
+        style,
         { flexDirection: isRTL ? "row-reverse" : "row" },
       ]}
     >
