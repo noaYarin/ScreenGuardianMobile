@@ -168,7 +168,13 @@ taskTitle: {
     color: "#2F6DEB",
     fontSize: 15,
   },
+uploadBtnLtr: {
+  alignSelf: "flex-start",
+},
 
+uploadBtnRtl: {
+  alignSelf: "flex-end",
+},
   statusIconCircle: {
     width: 28,
     height: 28,

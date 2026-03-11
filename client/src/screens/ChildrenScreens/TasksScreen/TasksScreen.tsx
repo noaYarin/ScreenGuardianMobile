@@ -24,7 +24,7 @@ type Task = {
 
 export default function TasksScreen() {
   const { t } = useTranslation();
-  const { row, text } = useLocaleLayout();
+  const { row, text, isRTL } = useLocaleLayout();
 
   const [activeTab, setActiveTab] = useState<"done" | "todo">("done");
 
@@ -90,7 +90,6 @@ export default function TasksScreen() {
             >
               {filteredTasks.map((task) => (
                 <View key={task.id} style={styles.card}>
-                  {/* Title on one side and coins on the opposite side */}
                   <View style={[styles.cardHeader, row]}>
                     <AppText
                       weight="extraBold"
@@ -141,7 +140,10 @@ export default function TasksScreen() {
                       </AppText>
 
                       <Pressable
-                        style={styles.uploadBtn}
+                        style={[
+                          styles.uploadBtn,
+                          isRTL ? styles.uploadBtnRtl : styles.uploadBtnLtr,
+                        ]}
                         accessibilityRole="button"
                         accessibilityLabel={t("tasks.upload_a11y")}
                       >
