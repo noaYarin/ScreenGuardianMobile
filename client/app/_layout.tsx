@@ -1,36 +1,52 @@
 import React, { useEffect, useState } from "react";
-import { Stack, router } from "expo-router";
+import { Stack } from "expo-router";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { Provider as ReduxProvider } from "react-redux";
-import { Pressable, View, ActivityIndicator } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { View, ActivityIndicator } from "react-native";
+import { HeaderBackButton } from "@react-navigation/elements";
 
 import { COLORS } from "@/constants/theme";
 import store from "../src/redux/store";
 
 import i18n, { initLanguage } from "../src/locales/i18n";
 
-
 function AppStack() {
   const { i18n } = useTranslation();
-
   const isRTL = i18n.language?.startsWith("he") ?? false;
 
   return (
     <Stack
-      screenOptions={() => {
-
-        return {
+    // header options
+      screenOptions={({ navigation }) =>
+        ({
           contentStyle: { backgroundColor: COLORS.light.background },
           headerStyle: {
             backgroundColor: COLORS.light.tint,
           },
           headerTitleAlign: "center",
-          headerShadowVisible: false,
-        };
-      }}
+          headerDirection: isRTL ? "rtl" : "ltr",
+          ...(isRTL
+            ? {
+                headerBackVisible: false,
+                headerLeft: () => null,
+                headerRight: (props: any) =>
+                  navigation.canGoBack() ? (
+                    <View style={{ transform: [{ scaleX: -1 }] }}>
+                      <HeaderBackButton
+                        {...props}
+                        onPress={navigation.goBack}
+                      />
+                    </View>
+                  ) : null,
+              }
+            : {
+              // default back button
+                headerBackVisible: true,
+              }),
+        } as any)
+      }
     >
-      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ headerShown: false}} />
       <Stack.Screen name="Parent" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
       <Stack.Screen name="Child" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
     </Stack>
