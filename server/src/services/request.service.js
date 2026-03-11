@@ -1,11 +1,12 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors, Request as RequestErrors } from "../constants/errors.js";
 import { RequestStatus } from "../constants/status.js";
-
-import DeviceModel from "../models/device.model.js";
 import * as requestDal from "../dal/request.dal.js";
-
 import { assertValidObjectId } from "../utils/validators.js";
+import { NotificationSeverity } from "../constants/severity.js";
+import { NotificationType } from "../constants/notificationType.js";
+import { notifyParent, notifyChild } from "../services/notification.service.js";
+import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -28,7 +29,7 @@ function assertDecision(decision) {
 }
 
 async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
-    const device = await DeviceModel.findById(deviceId).lean();
+    const device = await findDeviceById(deviceId);
 
     if (!device) {
         throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
@@ -66,7 +67,7 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
         throw new AppError(RequestErrors.REQUEST_ALREADY_PENDING);
     }
 
-    return requestDal.createRequestDoc({
+    const request = await requestDal.createRequestDoc({
         parentId,
         childId,
         deviceId,
@@ -74,6 +75,17 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
         reason: reason ?? "",
         status: RequestStatus.PENDING
     });
+
+
+    await notifyParent({
+        parentId,
+        childId,
+        type: NotificationType.EXTENSION_REQUEST_CREATED,
+        severity: NotificationSeverity.INFO,
+        title: "בקשת הארכה חדשה",
+        description: "הילד שלח בקשת הארכת זמן"
+    });
+    return request;
 }
 
 export async function getChildRequests({ parentId, childId, status }) {
@@ -116,23 +128,45 @@ export async function decideRequest({ parentId, requestId, decision }) {
 
     assertDecision(decision);
 
-  //update only if still pending
-    const updated  = await requestDal.updateRequestDecisionIfPending({
+    //update only if still pending
+    const updated = await requestDal.updateRequestDecisionIfPending({
         requestId,
         parentId,
         decision
     });
 
-   if (updated) return updated;
+    if (updated) {
+        if (decision === RequestStatus.APPROVED) {
+            await addExtraMinutesToDevice(
+                updated.deviceId,
+                Number(updated.requestedMinutes || 0)
+            );
+        }
+        await notifyChild({
+            parentId: updated.parentId,
+            childId: updated.childId,
+            type: decision === RequestStatus.APPROVED
+                ? NotificationType.EXTENSION_REQUEST_APPROVED
+                : NotificationType.EXTENSION_REQUEST_REJECTED,
+            severity: NotificationSeverity.INFO,
+            title: decision === RequestStatus.APPROVED
+                ? "בקשת ההארכה אושרה"
+                : "בקשת ההארכה נדחתה",
+            description: decision === RequestStatus.APPROVED
+                ? "ההורה אישר את בקשת ההארכה"
+                : "ההורה דחה את בקשת ההארכה"
+        });
 
-  // If not updated- then why
-  const existing = await requestDal.findRequestByIdForParent({ requestId, parentId });
+        return updated;
+    }
+    // If not updated- then why
+    const existing = await requestDal.findRequestByIdForParent({ requestId, parentId });
 
-  if (!existing) {
-    throw new AppError(RequestErrors.REQUEST_NOT_FOUND);
-  }
+    if (!existing) {
+        throw new AppError(RequestErrors.REQUEST_NOT_FOUND);
+    }
 
-  // request exist but not pending
-  throw new AppError(RequestErrors.REQUEST_NOT_PENDING);
+    // request exist but not pending
+    throw new AppError(RequestErrors.REQUEST_NOT_PENDING);
 
 }

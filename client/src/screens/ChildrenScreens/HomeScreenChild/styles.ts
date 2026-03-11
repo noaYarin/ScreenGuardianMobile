@@ -23,6 +23,10 @@ export const styles = StyleSheet.create({
     paddingBottom: 16,
   },
 
+  pageSmall: {
+    paddingHorizontal: 10,
+  },
+
   topRow: {
     width: "100%",
     flexDirection: "row",
@@ -106,24 +110,37 @@ export const styles = StyleSheet.create({
     includeFontPadding: false,
   },
 
-  statsRow: {
-    width: "100%",
-    marginTop: 12,
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
+statsRow: {
+  width: "100%",
+  marginTop: 12,
+  flexWrap: "wrap",
+  justifyContent: "center",
+  alignItems: "center",
+},
 
-  statPill: {
-    flex: 1,
-    minWidth: 0,
-    marginHorizontal: 6,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 999,
-  },
+statPill: {
+  minWidth: 0,
+  alignItems: "center",
+  justifyContent: "center",
+  paddingVertical: 10,
+  paddingHorizontal: 12,
+  borderRadius: 999,
+  marginBottom: 8,
+},
+
+statPillDesktop: {
+  width: "31.5%",
+},
+
+statPillTablet: {
+  width: "31.5%",
+},
+
+statPillMobile: {
+  width: "100%",
+  maxWidth: 280,
+  alignSelf: "center",
+},
 
   statText: {
     marginHorizontal: 8,
@@ -229,79 +246,76 @@ export const styles = StyleSheet.create({
     width: "100%",
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-evenly",  // instead of space-between
+    justifyContent: "space-evenly",
     rowGap: 12,
     marginBottom: 10,
   },
-tile: {
-  width: "31.5%",
-  maxWidth: 250,  
-  aspectRatio: 1,
-  borderRadius: 22,
-  borderWidth: 2,
-  overflow: "hidden",
-  shadowColor: "#000",
-  shadowOpacity: 0.04,
-  shadowRadius: 10,
-  shadowOffset: { width: 0, height: 6 },
-  elevation: 1,
 
-},
+  tile: {
+    width: "31.5%",
+    maxWidth: 250,
+    aspectRatio: 1,
+    borderRadius: 22,
+    borderWidth: 2,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 1,
+  },
 
-tileInner: {
-  flex: 1,
-  paddingHorizontal: 10,
-  paddingVertical: 12,
-},
+  tileInner: {
+    flex: 1,
+    paddingHorizontal: 10,
+    paddingVertical: 12,
+  },
 
-// Icon stays centered-ish but not too high/low
-tileIconZone: {
-  flex: 6,                 // more space for icon
-  alignItems: "center",
-  justifyContent: "center",
-},
+  tileIconZone: {
+    flex: 6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 
-// Label stays closer to icon (not at the bottom)
-tileLabelZone: {
-  flex: 4,
-  alignItems: "center",
-  justifyContent: "flex-start",
-  paddingTop: 6,
-},
+  tileLabelZone: {
+    flex: 4,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 6,
+  },
 
-tileIconWrap: {
-  width: 56,
-  height: 56,
-  borderRadius: 18,
-  alignItems: "center",
-  justifyContent: "center",
-  borderWidth: 1,
-  borderColor: "#FFFFFF",
-},
+  tileIconWrap: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
+  },
 
-tileText: {
-  color: "#0F172A",
-  textAlign: "center",
-  fontSize: 13,
-  lineHeight: 16,
-  includeFontPadding: false,
-},
+  tileText: {
+    color: "#0F172A",
+    textAlign: "center",
+    fontSize: 13,
+    lineHeight: 16,
+    includeFontPadding: false,
+  },
 
-tileBody: {
-  flex: 1,
-  alignItems: "center",
-  justifyContent: "center", // Icon is truly centered
-  paddingTop: 8,
-  paddingHorizontal: 10,
-},
+  tileBody: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 8,
+    paddingHorizontal: 10,
+  },
 
-tileFooter: {
-  paddingHorizontal: 10,
-  paddingBottom: 10,
-  alignItems: "center",
-  justifyContent: "flex-end",
-},
-
+  tileFooter: {
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+    alignItems: "center",
+    justifyContent: "flex-end",
+  },
 
   tilePressed: {
     opacity: 0.75,

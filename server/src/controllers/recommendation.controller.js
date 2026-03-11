@@ -1,0 +1,30 @@
+import {
+  getParentRecommendations,
+  getChildInterestRecommendations
+} from "../services/recommendation.service.js";
+
+export async function getChildInterestRecommendationsController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+
+    const data = await getChildInterestRecommendations(parentId, childId);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getParentRecommendationsController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId } = req.params;
+
+    const data = await getParentRecommendations(parentId, childId);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}

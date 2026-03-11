@@ -136,7 +136,7 @@ export const styles = StyleSheet.create({
   statsGrid: {
     width: "100%",
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     justifyContent: "center",
     marginBottom: 18,
   },
