@@ -167,11 +167,13 @@
 
     "scan": "Scan barcode",
     "scan_a11y": "Start scanning barcode",
-
+    "camera_denied_message": "Camera permission is required to scan the barcode.",
     "code_placeholder": "Enter code",
     "code_input_a11y": "Code input",
-    "submit": "Connect",
-    "submit_a11y": "Submit code and connect"
+    "error_title": "Something went wrong",
+    "error_generic": "Failed to link device, please try again.",
+    "connect": "Connect",
+    "connect_a11y": "Connect button"
   },
   "loginParent": {
     "title": "Login",
