@@ -274,7 +274,52 @@
     "register_a11y": "כפתור הרשמה",
     "google_a11y": "כפתור הרשמה עם גוגל",
     "login_a11y": "מעבר למסך התחברות"
+  },
+  "addChild": {
+    "title": "הוספת ילד",
+    "back_a11y": "חזרה למסך הקודם",
+    "menu_a11y": "פתיחת תפריט",
+    "heading": "הוספת ילד חדש",
+    "subheading": "מלאי את הפרטים הבסיסיים של הילד",
+    "name_label": "שם",
+    "name_placeholder": "הקלידי שם",
+    "name_a11y": "שדה שם הילד",
+    "birthdate_label": "תאריך לידה",
+    "birthdate_placeholder": "DD/MM/YYYY",
+    "birthdate_a11y": "שדה תאריך לידה",
+    "gender_label": "מגדר",
+    "gender_boy": "בן",
+    "gender_girl": "בת",
+    "gender_other": "אחר",
+    "gender_boy_a11y": "בחירת בן",
+    "gender_girl_a11y": "בחירת בת",
+    "gender_other_a11y": "בחירת אחר",
+    "save": "שמירה",
+    "save_a11y": "שמירת הילד",
+    "validation_title": "שגיאה",
+    "validation_name": "יש למלא שם",
+    "validation_birthdate": "יש להזין תאריך בפורמט DD/MM/YYYY",
+    "success_title": "נשמר",
+    "success_message": "הילד נשמר בהצלחה"
+  },
+  "kidDetails": {
+    "title": "ניהול ילדים",
+    "back_a11y": "חזרה למסך הקודם",
+    "menu_a11y": "פתיחת תפריט",
+    "birthdate_value": "תאריך לידה: {{value}}",
+    "gender_value": "מגדר: {{value}}",
+    "used_today": "שימוש היום",
+    "daily_limit": "מגבלה יומית",
+    "devices_title": "מכשירים",
+    "add_device": "הוספת מכשיר",
+    "add_device_a11y": "הוספת מכשיר",
+    "active_now": "פעל עכשיו",
+    "remaining_time_value": "זמן נותר: {{value}}",
+    "delete_device_a11y": "מחיקת המכשיר {{name}}",
+    "view_limits": "צפייה במגבלות",
+    "view_limits_a11y": "צפייה במגבלות של {{name}}"
   }
 }
+
 
 

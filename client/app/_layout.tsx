@@ -47,7 +47,7 @@ function AppStack() {
       }
     >
       <Stack.Screen name="index" options={{ headerShown: false}} />
-      <Stack.Screen name="Parent" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
+      <Stack.Screen name="Parent" options={{ headerShown: false, title: "", headerShadowVisible: false }} />
       <Stack.Screen name="Child" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
     </Stack>
   );

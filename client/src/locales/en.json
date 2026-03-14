@@ -278,8 +278,54 @@
     "register_a11y": "Sign up button",
     "google_a11y": "Sign up with Google button",
     "login_a11y": "Go to login screen"
+  },
+  "addChild": {
+    "title": "Add Child",
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+    "heading": "Add a new child",
+    "subheading": "Fill in the child's basic details",
+    "name_label": "Name",
+    "name_placeholder": "Enter a name",
+    "name_a11y": "Child name field",
+    "birthdate_label": "Birth date",
+    "birthdate_placeholder": "DD/MM/YYYY",
+    "birthdate_a11y": "Birth date field",
+    "gender_label": "Gender",
+    "gender_boy": "Boy",
+    "gender_girl": "Girl",
+    "gender_other": "Other",
+    "gender_boy_a11y": "Select boy",
+    "gender_girl_a11y": "Select girl",
+    "gender_other_a11y": "Select other",
+    "save": "Save",
+    "save_a11y": "Save child",
+    "validation_title": "Error",
+    "validation_name": "Please enter a name",
+    "validation_birthdate": "Please enter a date in DD/MM/YYYY format",
+    "success_title": "Saved",
+    "success_message": "The child was saved successfully"
+  },
+  "kidDetails": {
+    "title": "Kids Management",
+    "back_a11y": "Go back",
+    "menu_a11y": "Open menu",
+    "birthdate_value": "Birth date: {{value}}",
+    "gender_value": "Gender: {{value}}",
+    "used_today": "Used today",
+    "daily_limit": "Daily limit",
+    "devices_title": "Devices",
+    "add_device": "Add device",
+    "add_device_a11y": "Add device",
+    "active_now": "Active now",
+    "remaining_time_value": "Remaining time: {{value}}",
+    "delete_device_a11y": "Delete device {{name}}",
+    "view_limits": "View limits",
+    "view_limits_a11y": "View limits for {{name}}"
   }
 }
+
+
 
 
 

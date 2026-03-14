@@ -22,6 +22,10 @@ export default function ParentLayout() {
             : undefined;
 
         return {
+
+          headerStyle: {
+            backgroundColor: COLORS.light.tint,
+          },
           title,
           tabBarShowLabel: true,
           tabBarStyle: {
