@@ -37,7 +37,7 @@ export default function HomeParentScreen() {
   );
 
   const onPressOverview = () => router.push("/Parent/reports" as Href);
-  const onPressFullWatch = () => router.push("/Parent/kids" as Href);
+  const onPressFullWatch = () => router.push("/Parent/kidDetails" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
 
   return (

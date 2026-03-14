@@ -9,7 +9,7 @@ export default function HomeParentScreenRoute() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           headerTitleAlign: "center",
           headerShadowVisible: false,
           title: t("homeParent.title"),
