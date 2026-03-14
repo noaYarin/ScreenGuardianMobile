@@ -7,6 +7,8 @@ import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { notifyParent, notifyChild } from "../services/notification.service.js";
 import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
+import { sendAuditLog } from "./audit.service.js";
+import { AuditActionType } from "../constants/auditActionType.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -156,6 +158,19 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 ? "ההורה אישר את בקשת ההארכה"
                 : "ההורה דחה את בקשת ההארכה"
         });
+
+        await sendAuditLog({
+            parentId: updated.parentId,
+            childId: updated.childId,
+            actionType: decision === RequestStatus.APPROVED
+                ? AuditActionType.APPROVE_REQUEST
+                : AuditActionType.REJECT_REQUEST,
+            description: decision === RequestStatus.APPROVED
+                ? "ההורה אישר בקשת הארכה"
+                : "ההורה דחה בקשת הארכה"
+        });
+
+
 
         return updated;
     }

@@ -5,6 +5,8 @@ import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "../services/notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
+import { sendAuditLog } from "./audit.service.js";
+import { AuditActionType } from "../constants/auditActionType.js";
 
 function ensureChildBelongsToParent(childList, childId) {
   const belongs = childList.some((child) => String(child._id) === String(childId));
@@ -39,6 +41,13 @@ export async function lockDevice(parentId, deviceId) {
     description: "ההורה נעל את המכשיר"
   });
 
+    await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.LOCK_DEVICE,
+    description: "נעילת מכשיר"
+  });
+
   return updatedDevice;
 }
 
@@ -56,6 +65,14 @@ export async function unlockDevice(parentId, deviceId) {
     title: "המכשיר שוחרר",
     description: "ההורה שחרר את המכשיר"
   });
+
+    await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.UNLOCK_DEVICE,
+    description: "שחרור מכשיר"
+  });
+
 
   return updatedDevice;
 }
@@ -111,6 +128,14 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
     severity: NotificationSeverity.INFO,
     title: "מגבלות זמן המסך עודכנו",
     description: "ההורה עדכן את הגדרות זמן המסך"
+  });
+
+
+    await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.UPDATE_SCREEN_TIME,
+    description: "עדכון מגבלות זמן המסך"
   });
 
   return updatedDevice;
