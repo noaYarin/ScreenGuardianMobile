@@ -47,19 +47,13 @@ function createAuthThunk<Args>(
 export const loginParent = createAuthThunk<LoginParentArgs>(
   "auth/loginParent",
   (credentials) => apiLoginParent(credentials).then(toLoginParentPayload),
-  "Failed to login. Please try again."
+  "loginParent.generic_error"
 );
 
 export const registerParent = createAuthThunk<RegisterParentArgs>(
   "auth/registerParent",
   (credentials) => apiRegisterParent(credentials).then(toLoginParentPayload),
-  "Failed to register. Please try again."
-);
-
-export const googleAuthParent = createAuthThunk<GoogleAuthParentArgs>(
-  "auth/googleAuthParent",
-  ({ idToken }) => apiGoogleAuthParent(idToken).then(toLoginParentPayload),
-  "Failed to authenticate with Google. Please try again."
+  "registerParent.generic_error"
 );
 
 export const fetchChildren = createAsyncThunk<
