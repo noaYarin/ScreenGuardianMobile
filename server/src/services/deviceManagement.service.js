@@ -5,6 +5,8 @@ import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "../services/notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
+import { sendAuditLog } from "./audit.service.js";
+import { AuditActionType } from "../constants/auditActionType.js";
 
 function ensureChildBelongsToParent(childList, childId) {
   const belongs = childList.some((child) => String(child._id) === String(childId));
@@ -35,8 +37,15 @@ export async function lockDevice(parentId, deviceId) {
     childId: device.childId,
     type: NotificationType.DEVICE_LOCKED,
     severity: NotificationSeverity.WARNING,
-    title: "המכשיר ננעל",
-    description: "ההורה נעל את המכשיר"
+    title: "Device Locked",
+    description: "The parent locked the device"
+  });
+
+  await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.LOCK_DEVICE,
+    description: "Device locked"
   });
 
   return updatedDevice;
@@ -53,9 +62,17 @@ export async function unlockDevice(parentId, deviceId) {
     childId: device.childId,
     type: NotificationType.DEVICE_UNLOCKED,
     severity: NotificationSeverity.INFO,
-    title: "המכשיר שוחרר",
-    description: "ההורה שחרר את המכשיר"
+    title: "Device Unlocked",
+    description: "The parent unlocked the device"
   });
+
+  await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.UNLOCK_DEVICE,
+    description: "Device Unlocked"
+  });
+
 
   return updatedDevice;
 }
@@ -109,8 +126,16 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
     childId: device.childId,
     type: NotificationType.SCREEN_TIME_UPDATED,
     severity: NotificationSeverity.INFO,
-    title: "מגבלות זמן המסך עודכנו",
-    description: "ההורה עדכן את הגדרות זמן המסך"
+    title: "Screen Time Limits Updated",
+    description: "The parent updated the screen time settings"
+  });
+
+
+  await sendAuditLog({
+    parentId,
+    childId: device.childId,
+    actionType: AuditActionType.UPDATE_SCREEN_TIME,
+    description: "Screen time limits updated"
   });
 
   return updatedDevice;

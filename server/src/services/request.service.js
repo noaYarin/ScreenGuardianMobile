@@ -7,6 +7,8 @@ import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { notifyParent, notifyChild } from "../services/notification.service.js";
 import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
+import { sendAuditLog } from "./audit.service.js";
+import { AuditActionType } from "../constants/auditActionType.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -82,8 +84,8 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
         childId,
         type: NotificationType.EXTENSION_REQUEST_CREATED,
         severity: NotificationSeverity.INFO,
-        title: "בקשת הארכה חדשה",
-        description: "הילד שלח בקשת הארכת זמן"
+        title: "New Extension Request",
+        description: "Your child requested more screen time"
     });
     return request;
 }
@@ -150,12 +152,24 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 : NotificationType.EXTENSION_REQUEST_REJECTED,
             severity: NotificationSeverity.INFO,
             title: decision === RequestStatus.APPROVED
-                ? "בקשת ההארכה אושרה"
-                : "בקשת ההארכה נדחתה",
+                ? "Extension Request Approved"
+                : "Extension Request Rejected",
             description: decision === RequestStatus.APPROVED
-                ? "ההורה אישר את בקשת ההארכה"
-                : "ההורה דחה את בקשת ההארכה"
+                ? "Your parent approved your extension request"
+                : "Your parent rejected your extension request"
         });
+
+        await sendAuditLog({
+            parentId: updated.parentId,
+            childId: updated.childId,
+            actionType: decision === RequestStatus.APPROVED
+                ? AuditActionType.APPROVE_REQUEST
+                : AuditActionType.REJECT_REQUEST,
+            description: decision === RequestStatus.APPROVED
+                ? "Parent approved extension request"
+                : "Parent rejected extension request"
+        });
+
 
         return updated;
     }

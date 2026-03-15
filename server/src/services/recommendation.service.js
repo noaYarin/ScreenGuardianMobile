@@ -76,8 +76,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (approvedRequests.length >= 3) {
         recommendations.push({
             code: RecommendationCode.REVIEW_DAILY_LIMIT,
-            title: "מומלץ לבדוק את המגבלה היומית",
-            description: "הילד ביקש ואושר לו זמן נוסף מספר פעמים. ייתכן שהמגבלה היומית לא מותאמת לשגרה.",
+            title: "Consider Reviewing the Daily Limit",
+            description: "The child has requested and received additional screen time several times. The daily limit may not match their routine.",
             priority: RecommendationPriority.HIGH
         });
     }
@@ -85,8 +85,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (pendingRequests.length > 0) {
         recommendations.push({
             code: RecommendationCode.PENDING_REQUESTS,
-            title: "יש בקשות הארכה שממתינות לטיפול",
-            description: `כרגע יש ${pendingRequests.length} בקשות שממתינות לאישור או דחייה.`,
+            title: "Pending Extension Requests",
+            description: "You have ${pendingRequests.length} requests waiting for approval or rejection.",
             priority: RecommendationPriority.MEDIUM
         });
     }
@@ -94,8 +94,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (screenTime.isLimitEnabled !== true) {
         recommendations.push({
             code: RecommendationCode.ENABLE_LIMIT,
-            title: "מומלץ להפעיל מגבלת זמן מסך",
-            description: "כרגע מגבלת זמן המסך אינה פעילה. הגדרה כזאת תעזור ביצירת שגרה קבועה.",
+            title: "Consider Enabling a Screen Time Limit",
+            description: "Screen time limits are currently not active. Setting one can help create a consistent routine.",
             priority: RecommendationPriority.HIGH
         });
     }
@@ -103,8 +103,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (isHighDailyUsage) {
         recommendations.push({
             code: RecommendationCode.HIGH_DAILY_USAGE,
-            title: "השימוש היום קרוב למגבלה היומית",
-            description: "הילד כבר ניצל חלק גדול מזמן המסך היומי. ייתכן שכדאי לבדוק אם המגבלה מתאימה לשגרה.",
+            title: "Today's usage is close to the daily limit",
+            description: "The child has already used a large portion of the daily screen time. You may want to check if the limit fits their routine.",
             priority: RecommendationPriority.MEDIUM
         });
     }
@@ -112,8 +112,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (isHighDailyUsage || approvedRequests.length >= 3) {
         recommendations.push({
             code: RecommendationCode.SUGGEST_ACTIVITY,
-            title: "מומלץ להציע פעילות חלופית",
-            description: "זוהה שימוש גבוה במסך או צורך חוזר בזמן נוסף. אפשר להציע פעילות ספורטיבית, יצירתית או משפחתית במקום זמן מסך נוסף.",
+            title: "Consider suggesting an alternative activity",
+            description: "High screen usage or repeated requests for extra time were detected. You may want to suggest a sports, creative, or family activity instead of additional screen time.",
             priority: RecommendationPriority.MEDIUM
         });
     }
@@ -121,8 +121,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (!screenTime.dailyLimitMinutes || Number(screenTime.dailyLimitMinutes) <= 0) {
         recommendations.push({
             code: RecommendationCode.SET_DAILY_LIMIT,
-            title: "מומלץ להגדיר מגבלה יומית",
-            description: "כרגע לא מוגדרת מגבלה יומית ברורה. הגדרה כזאת תעזור ביצירת שגרה קבועה.",
+            title: "Consider setting a daily limit",
+            description: "There is currently no clear daily screen time limit. Setting one can help create a consistent routine.",
             priority: RecommendationPriority.HIGH
         });
     }
@@ -130,8 +130,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (!screenTime.weeklySchedule || screenTime.weeklySchedule.length === 0) {
         recommendations.push({
             code: RecommendationCode.SET_WEEKLY_SCHEDULE,
-            title: "מומלץ להגדיר שגרה שבועית",
-            description: "שגרה שבועית קבועה יכולה לעזור ביצירת גבולות ברורים לאורך השבוע.",
+            title: "Consider setting a weekly routine",
+            description: "A consistent weekly schedule can help create clear boundaries throughout the week.",
             priority: RecommendationPriority.LOW
         });
     }
@@ -139,8 +139,8 @@ function buildParentsRecommendations({ child, devices, requests }) {
     if (activeDevice?.isLocked === true) {
         recommendations.push({
             code: RecommendationCode.CHECK_LOCK_REASON,
-            title: "בדקו אם הנעילה עדיין נחוצה",
-            description: "המכשיר נעול כרגע. מומלץ לבדוק אם הנעילה זמנית או אם צריך לעדכן את ההגדרות.",
+            title: "Check if the device still needs to be locked",
+            description: "The device is currently locked. You may want to check whether the lock is temporary or if the settings should be updated.",
             priority: RecommendationPriority.LOW
         });
     }
@@ -151,13 +151,12 @@ function buildParentsRecommendations({ child, devices, requests }) {
         if (age >= 6 && age <= 10) {
             recommendations.push({
                 code: RecommendationCode.YOUNG_CHILD_GUIDANCE,
-                title: "לילדים צעירים מומלץ לנסח גבולות פשוטים וברורים",
-                description: "בגילאים צעירים כדאי להגדיר מגבלות קבועות ופשוטות שקל להבין ולעקוב אחריהן.",
+                title: "For younger children, simple and clear boundaries are recommended",
+                description: "At younger ages, it is helpful to set simple and consistent limits that are easy to understand and follow.",
                 priority: RecommendationPriority.LOW
             });
         }
     }
-
     return recommendations;
 }
 
