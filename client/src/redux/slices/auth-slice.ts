@@ -6,7 +6,6 @@ import type {
 } from "./types";
 import {
   fetchChildren,
-  googleAuthParent,
   loginParent,
   registerParent,
 } from "../thunks/authThunks";
@@ -23,17 +22,14 @@ const initialState: AuthState = {
 const authPending = isAnyOf(
   loginParent.pending,
   registerParent.pending,
-  googleAuthParent.pending
 );
 const authFulfilled = isAnyOf(
   loginParent.fulfilled,
   registerParent.fulfilled,
-  googleAuthParent.fulfilled
 );
 const authRejected = isAnyOf(
   loginParent.rejected,
   registerParent.rejected,
-  googleAuthParent.rejected
 );
 
 function applyAuthFromServer(
@@ -113,7 +109,6 @@ export const {
 export {
   loginParent,
   registerParent,
-  googleAuthParent,
   fetchChildren,
 } from "../thunks/authThunks";
 export default authSlice.reducer;
