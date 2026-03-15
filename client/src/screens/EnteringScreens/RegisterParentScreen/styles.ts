@@ -102,8 +102,8 @@ export const styles = StyleSheet.create({
 
   errorText: {
     color: "#DC2626",
-    marginTop: -4,
-    marginBottom: 8,
+    marginVertical: 20,
+    marginHorizontal: 20,
     textAlign: "center",
   },
 
