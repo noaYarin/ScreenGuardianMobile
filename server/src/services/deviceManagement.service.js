@@ -37,15 +37,15 @@ export async function lockDevice(parentId, deviceId) {
     childId: device.childId,
     type: NotificationType.DEVICE_LOCKED,
     severity: NotificationSeverity.WARNING,
-    title: "המכשיר ננעל",
-    description: "ההורה נעל את המכשיר"
+    title: "Device Locked",
+    description: "The parent locked the device"
   });
 
-    await sendAuditLog({
+  await sendAuditLog({
     parentId,
     childId: device.childId,
     actionType: AuditActionType.LOCK_DEVICE,
-    description: "נעילת מכשיר"
+    description: "Device locked"
   });
 
   return updatedDevice;
@@ -62,15 +62,15 @@ export async function unlockDevice(parentId, deviceId) {
     childId: device.childId,
     type: NotificationType.DEVICE_UNLOCKED,
     severity: NotificationSeverity.INFO,
-    title: "המכשיר שוחרר",
-    description: "ההורה שחרר את המכשיר"
+    title: "Device Unlocked",
+    description: "The parent unlocked the device"
   });
 
-    await sendAuditLog({
+  await sendAuditLog({
     parentId,
     childId: device.childId,
     actionType: AuditActionType.UNLOCK_DEVICE,
-    description: "שחרור מכשיר"
+    description: "Device Unlocked"
   });
 
 
@@ -126,16 +126,16 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
     childId: device.childId,
     type: NotificationType.SCREEN_TIME_UPDATED,
     severity: NotificationSeverity.INFO,
-    title: "מגבלות זמן המסך עודכנו",
-    description: "ההורה עדכן את הגדרות זמן המסך"
+    title: "Screen Time Limits Updated",
+    description: "The parent updated the screen time settings"
   });
 
 
-    await sendAuditLog({
+  await sendAuditLog({
     parentId,
     childId: device.childId,
     actionType: AuditActionType.UPDATE_SCREEN_TIME,
-    description: "עדכון מגבלות זמן המסך"
+    description: "Screen time limits updated"
   });
 
   return updatedDevice;

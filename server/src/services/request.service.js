@@ -84,8 +84,8 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
         childId,
         type: NotificationType.EXTENSION_REQUEST_CREATED,
         severity: NotificationSeverity.INFO,
-        title: "בקשת הארכה חדשה",
-        description: "הילד שלח בקשת הארכת זמן"
+        title: "New Extension Request",
+        description: "Your child requested more screen time"
     });
     return request;
 }
@@ -152,11 +152,11 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 : NotificationType.EXTENSION_REQUEST_REJECTED,
             severity: NotificationSeverity.INFO,
             title: decision === RequestStatus.APPROVED
-                ? "בקשת ההארכה אושרה"
-                : "בקשת ההארכה נדחתה",
+                ? "Extension Request Approved"
+                : "Extension Request Rejected",
             description: decision === RequestStatus.APPROVED
-                ? "ההורה אישר את בקשת ההארכה"
-                : "ההורה דחה את בקשת ההארכה"
+                ? "Your parent approved your extension request"
+                : "Your parent rejected your extension request"
         });
 
         await sendAuditLog({
@@ -166,10 +166,9 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 ? AuditActionType.APPROVE_REQUEST
                 : AuditActionType.REJECT_REQUEST,
             description: decision === RequestStatus.APPROVED
-                ? "ההורה אישר בקשת הארכה"
-                : "ההורה דחה בקשת הארכה"
+                ? "Parent approved extension request"
+                : "Parent rejected extension request"
         });
-
 
 
         return updated;
