@@ -7,6 +7,7 @@ export const styles = StyleSheet.create({
     width: "100%",
     alignItems: "stretch",
     flex: 1,
+    paddingTop: 100,
   },
 
   hero: {
@@ -149,31 +150,11 @@ export const styles = StyleSheet.create({
     fontSize: 12,
   },
 
-  googleBtn: {
-    width: "100%",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 16,
-
-    paddingVertical: 12,
-  },
-
-  googleText: {
-    color: "#111827",
-    fontSize: 14,
-  },
-
   bottomRow: {
     width: "100%",
+    gap: 6,
     flexDirection: "row",
     justifyContent: "center",
-    gap: 6,
     marginTop: 14,
     flexWrap: "wrap",
   },

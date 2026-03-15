@@ -12,11 +12,13 @@ import { Stack, router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-
-import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
-import AppText from "../../../components/AppText/AppText";
+import { useDispatch, useSelector } from "react-redux";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
+import AppText from "../../../components/AppText/AppText";
+import { AppDispatch } from "@/src/redux/store/types";
+import { registerParent } from "@/src/redux/slices/auth-slice";
 
 const ICON = {
   email: "email-outline",
@@ -24,7 +26,6 @@ const ICON = {
   eye: "eye-outline",
   eyeOff: "eye-off-outline",
   users: "account-plus-outline",
-  google: "google",
 } as const;
 
 const isValidEmail = (value: string) => {
@@ -36,16 +37,19 @@ export default function RegisterParentScreen() {
   const { t } = useTranslation();
   const { isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
-
+  const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  // Redux state
+  const { isLoading, error } = useSelector((state: { auth: { isLoading: boolean; error: string | null } }) => state.auth);
+  // Local state
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const displayError = errorMessage || error;
 
-  const [submitting, setSubmitting] = useState(false);
-  const [errorText, setErrorText] = useState<string | null>(null);
 
   const cardWidth = useMemo(() => {
     const sidePadding = 16;
@@ -53,65 +57,44 @@ export default function RegisterParentScreen() {
     return Math.min(width - sidePadding * 2, maxCard);
   }, [width]);
 
-  const canSubmit = useMemo(() => {
-    return (
-      isValidEmail(email) &&
-      password.trim().length >= 1 &&
-      confirmPassword.trim().length >= 1 &&
-      password === confirmPassword &&
-      !submitting
-    );
-  }, [email, password, confirmPassword, submitting]);
 
   const onSubmit = async () => {
-    setErrorText(null);
-
-    if (!isValidEmail(email)) {
-      setErrorText(t("registerParent.invalid_email"));
-      return;
-    }
-
-    if (!password.trim()) {
-      setErrorText(t("registerParent.missing_password"));
-      return;
-    }
-
-    if (!confirmPassword.trim()) {
-      setErrorText(t("registerParent.missing_confirm_password"));
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setErrorText(t("registerParent.passwords_not_match"));
-      return;
-    }
-
     try {
-      setSubmitting(true);
-
-      //add to server
-      await new Promise((r) => setTimeout(r, 600));
-
-      router.replace("/Parent/home" as any);
-    } catch {
-      setErrorText(t("registerParent.generic_error"));
-    } finally {
-      setSubmitting(false);
+      if (!validateForm()) return;
+      // Using .unwrap() to handle the Thunk result as a standard Promise.
+      await (dispatch as AppDispatch)(registerParent({ email, password })).unwrap();
+      router.replace("/Entering/loginParent" as any);
+    } catch (err: any) {
+      console.error(err);
     }
   };
 
-  const onGoogle = async () => {
-    setErrorText(null);
+const validateForm = () => {
 
-    try {
-      setSubmitting(true);
-      await new Promise((r) => setTimeout(r, 600));
-    } catch {
-      setErrorText(t("registerParent.google_error"));
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  if (!email.trim()&& !password.trim()&& !confirmPassword.trim()) {
+    setErrorMessage(t("registerParent.missing_fields"));
+    return false;
+  }
+
+  if (!isValidEmail(email)) {
+    setErrorMessage(t("registerParent.invalid_email"));
+    return false;
+  }
+  if (password !== confirmPassword) {
+    setErrorMessage(t("registerParent.passwords_not_match"));
+    return false;
+  }
+  if (password.length < 8) {
+    setErrorMessage(t("registerParent.invalid_password"));
+    return false;
+  }
+  if (confirmPassword.length < 8) {
+    setErrorMessage(t("registerParent.invalid_confirm_password"));
+    return false;
+  }
+
+  return true;
+}
 
   const inputRowStyle = useMemo(
     () => [styles.input, isRTL && styles.inputRTL],
@@ -127,8 +110,7 @@ export default function RegisterParentScreen() {
     <>
       <Stack.Screen
         options={{
-          title: t("registerParent.title"),
-          headerTitleAlign: "center",
+          title: "",
           headerShadowVisible: false,
         }}
       />
@@ -139,17 +121,6 @@ export default function RegisterParentScreen() {
           behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
           <View style={styles.container}>
-            <LinearGradient
-              colors={["#1D4ED8", "#7C3AED"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.hero}
-            >
-              <AppText weight="extraBold" style={styles.heroTitle}>
-                {t("registerParent.title")}
-              </AppText>
-            </LinearGradient>
-
             <View style={[styles.card, { width: cardWidth }]}>
               <View style={styles.iconWrap}>
                 <LinearGradient
@@ -245,20 +216,20 @@ export default function RegisterParentScreen() {
                 </Pressable>
               </View>
 
-              {errorText ? (
+              {displayError ? (
                 <AppText style={styles.errorText} numberOfLines={2}>
-                  {errorText}
+                  {t(displayError as string)}
                 </AppText>
               ) : null}
 
               <Pressable
                 onPress={onSubmit}
-                disabled={submitting}
+                disabled={isLoading}
                 accessibilityRole="button"
                 accessibilityLabel={t("registerParent.register_a11y")}
                 style={({ pressed }) => [
                   styles.primaryBtn,
-                  (!canSubmit || submitting) && styles.primaryBtnDisabled,
+                  (isLoading) && styles.primaryBtnDisabled,
                   { opacity: pressed ? 0.9 : 1 },
                 ]}
               >
@@ -268,7 +239,7 @@ export default function RegisterParentScreen() {
                   end={{ x: 1, y: 0 }}
                   style={styles.primaryBtnGradient}
                 >
-                  {submitting ? (
+                  {isLoading ? (
                     <ActivityIndicator />
                   ) : (
                     <AppText weight="extraBold" style={styles.primaryBtnText}>
@@ -284,28 +255,8 @@ export default function RegisterParentScreen() {
                 <View style={styles.dividerLine} />
               </View>
 
-              <Pressable
-                onPress={onGoogle}
-                disabled={submitting}
-                accessibilityRole="button"
-                accessibilityLabel={t("registerParent.google_a11y")}
-                style={({ pressed }) => [
-                  styles.googleBtn,
-                  { opacity: pressed ? 0.9 : 1 },
-                ]}
-              >
-                <MaterialCommunityIcons name={ICON.google} size={20} color="#111827" />
-                <AppText weight="bold" style={styles.googleText} numberOfLines={1}>
-                  {t("registerParent.google")}
-                </AppText>
-              </Pressable>
-
               <View style={styles.bottomRow}>
-                <AppText style={styles.bottomText}>
-                  {t("registerParent.have_account")}
-                </AppText>
-
-                <Pressable
+                  <Pressable
                   onPress={() => router.replace("/Entering/loginParent" as any)}
                   accessibilityRole="button"
                   accessibilityLabel={t("registerParent.login_a11y")}
@@ -315,6 +266,9 @@ export default function RegisterParentScreen() {
                     {t("registerParent.login")}
                   </AppText>
                 </Pressable>
+                <AppText style={styles.bottomText}>
+                  {t("registerParent.have_account")}
+                </AppText>
               </View>
             </View>
           </View>
