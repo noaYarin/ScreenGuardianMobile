@@ -19,16 +19,15 @@ export const Auth = {
   EMAIL_NOT_FOUND: { status: 404, code: "EMAIL_NOT_FOUND", message: "Email not found" },
   EMAIL_SEND_FAILED: { status: 500, code: "EMAIL_SEND_FAILED", message: "Failed to send email" },
   MISSING_TOKEN: { status: 400, code: "MISSING_TOKEN", message: "idToken is required" },
-  GOOGLE_AUTH_DISABLED: { status: 503, code: "GOOGLE_AUTH_DISABLED", message: "Google sign-in is not configured" },
-  INVALID_GOOGLE_TOKEN: { status: 401, code: "INVALID_GOOGLE_TOKEN", message: "Invalid or expired Google token" },
-  NO_EMAIL: { status: 400, code: "NO_EMAIL", message: "Google account has no email" },
   EMAIL_EXISTS: { status: 409, code: "EMAIL_EXISTS", message: "Email already registered" },
   INVALID_CREDENTIALS: { status: 401, code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
-  USE_GOOGLE: { status: 400, code: "USE_GOOGLE", message: "This account uses Google sign-in" },
   NO_AUTH: { status: 401, code: "NO_AUTH", message: "Not authenticated" },
   FORBIDDEN: { status: 403, code: "FORBIDDEN", message: "Parents only" },
   NO_TOKEN: { status: 401, code: "NO_TOKEN", message: "Missing token" },
   INVALID_TOKEN: { status: 401, code: "INVALID_TOKEN", message: "Invalid token" },
+  MISSING_EMAIL: { status: 400, code: "MISSING_EMAIL", message: "email is required" },
+  RESET_TOKEN_INVALID: { status: 400, code: "RESET_TOKEN_INVALID", message: "Invalid or expired reset token" },
+  MISSING_TOKEN_OR_NEW_PASSWORD: { status: 400, code: "MISSING_TOKEN_OR_NEW_PASSWORD", message: "token and newPassword are required" },
 };
 
 export const Common = {
