@@ -12,7 +12,7 @@ import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { loginParent } from "../../../redux/slices/auth-slice";
+import { loginParent } from "@/src/redux/thunks/authThunks";
 import { useDispatch, useSelector } from "react-redux";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -37,7 +37,7 @@ export default function LoginParentScreen() {
   const { t } = useTranslation();
   const { isRTL} = useLocaleLayout();
   const { width } = useWindowDimensions();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   // Redux state
   const { isLoading, error } = useSelector((state: { auth: { isLoading: boolean; error: string | null } }) => state.auth);
   const [email, setEmail] = useState("");
@@ -46,7 +46,6 @@ export default function LoginParentScreen() {
  // Local state
  const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const displayError = errorMessage || error;
-
 
   const cardWidth = useMemo(() => {
     const sidePadding = 16;
@@ -58,7 +57,7 @@ export default function LoginParentScreen() {
     try {
       if (!validateForm()) return;
       // Using .unwrap() to handle the Thunk result as a standard Promise.
-      await (dispatch as AppDispatch)(loginParent({ email, password })).unwrap();
+      await dispatch(loginParent({ email, password })).unwrap();
       router.replace("/Parent/home" as any);
     } catch (error: any) {
       setErrorMessage(error as string);
@@ -177,8 +176,9 @@ const validateForm = () => {
               ) : null}
 
               {/* Centered forgot password action */}
+
               <Pressable
-                onPress={() => {}}
+                onPress={() => router.push('/Entering/forgotPassword' as any)}  
                 accessibilityRole="button"
                 accessibilityLabel={t("loginParent.forgot_a11y")}
                 style={({ pressed }) => [
