@@ -2,29 +2,10 @@ export { api } from "./request";
 export type { ApiError, ApiResponse } from "./request";
 
 // Auth
-export { apiRegisterParent, apiLoginParent } from "./auth/auth";
-export type {
-  AuthDataFromServer,
-  RegisterParentParams,
-  LoginParentParams,
-  ChildrenDataFromServer,
-} from "./auth/auth.types";
+export { apiRegisterParent, apiLoginParent } from "./auth";
 
 // Parent
-export { addChild, getMyChild, setChildActive } from "./parent/parent";
-export type {
-  Child,
-  AddChildParams,
-  AddChildDataFromServer,
-  GetMyChildDataFromServer,
-  SetChildActiveDataFromServer,
-} from "./parent/parent.types";
+export { addChild, getMyChild, setChildActive } from "./parent";
 
 // Pairing
-export { generateCode, linkDevice } from "./pairing/pairing";
-export type {
-  GenerateCodeParams,
-  GenerateCodeDataFromServer,
-  LinkDeviceParams,
-  LinkDeviceDataFromServer,
-} from "./pairing/pairing.types";
+export { generateCode, linkDevice } from "./pairing";
