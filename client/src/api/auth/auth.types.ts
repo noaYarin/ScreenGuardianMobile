@@ -17,3 +17,9 @@ export type LoginParentParams = {
   email: string;
   password: string;
 };
+
+export type ResetPasswordParams = {
+  email: string;
+  otpCode: string;
+  password: string;
+};

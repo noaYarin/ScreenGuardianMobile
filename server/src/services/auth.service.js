@@ -1,14 +1,20 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { OAuth2Client } from "google-auth-library";
 import { env } from "../config/env.js";
 import { AppError } from "../utils/appError.js";
 import { Auth as AuthErrors } from "../constants/errors.js";
-import { createParent, findParentByEmail, findParentByGoogleId } from "../dal/parent.dal.js";
+import {
+  createParent,
+  findParentByEmail,
+  setPasswordResetCodeByEmail,
+  findParentByEmailAndValidResetCode,
+  updateParentPasswordAndClearReset,
+} from "../dal/parent.dal.js";
 import { Role } from "../constants/role.js";
+import { sendEmail } from "./emailService.js";
+import { passwordResetTemplate } from "../templates/passwordResetTemplate.js";
 
 const BCRYPT_ROUNDS = 10;
-const googleClient = env.GOOGLE_CLIENT_ID ? new OAuth2Client(env.GOOGLE_CLIENT_ID) : null;
 
 function signToken(payload) {
   return jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRES_IN });
@@ -26,40 +32,6 @@ export async function issueChildToken(parentId, childId) {
   // JWT with parentId and childId 
   const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: Role.CHILD });
   return { token, parentId: parentIdStr, childId: childIdStr };
-}
-
-async function verifyGoogleIdToken(idToken) {
-  if (!googleClient || !env.GOOGLE_CLIENT_ID) {
-    throw new AppError(AuthErrors.GOOGLE_AUTH_DISABLED);
-  }
-  try {
-    const ticket = await googleClient.verifyIdToken({ idToken, audience: env.GOOGLE_CLIENT_ID });
-    return ticket.getPayload();
-  } catch {
-    throw new AppError(AuthErrors.INVALID_GOOGLE_TOKEN);
-  }
-}
-
-async function resolveParentFromGooglePayload(payload) {
-  const googleId = payload.sub;
-  const email = payload.email;
-  const name = payload.name ?? email?.split("@")[0] ?? "User";
-
-  if (!email) {
-    throw new AppError(AuthErrors.NO_EMAIL);
-  }
-
-  let parent = await findParentByGoogleId(googleId);
-  if (parent) return parent;
-
-  parent = await findParentByEmail(email);
-  if (parent) {
-    parent.googleId = googleId;
-    await parent.save();
-    return parent;
-  }
-
-  return createParent({ email, googleId, name, children: [] });
 }
 
 export async function registerParent({ email, password, name, phoneNumber }) {
@@ -85,9 +57,6 @@ export async function loginParent({ email, password }) {
   if (!parent) {
     throw new AppError(AuthErrors.INVALID_CREDENTIALS);
   }
-  if (!parent.password) {
-    throw new AppError(AuthErrors.USE_GOOGLE);
-  }
 
   const valid = await bcrypt.compare(password, parent.password);
   if (!valid) {
@@ -97,8 +66,42 @@ export async function loginParent({ email, password }) {
   return issueAuthResponse(parent);
 }
 
-export async function loginWithGoogle(idToken) {
-  const payload = await verifyGoogleIdToken(idToken);
-  const parent = await resolveParentFromGooglePayload(payload);
+export async function forgotPassword({ email }) {
+  const parent = await findParentByEmail(email);
+  if (!parent) {
+    throw new AppError(AuthErrors.EMAIL_NOT_FOUND);
+  }
+
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+  await setPasswordResetCodeByEmail(email, otpCode, expiresAt);
+  
+  //Template for reset password email
+  const html = passwordResetTemplate({ otpCode });
+
+  try {
+    await sendEmail({
+      to: email,
+      subject: "Reset your password for ScreenGuardian app",
+      html,
+    });
+    return true;
+  } catch (error) {
+    console.error("Failed to send reset password email:", error);
+    return false;
+  }
+}
+
+export async function resetPassword({ email, otpCode, password }) {
+  const now = new Date();
+  const parent = await findParentByEmailAndValidResetCode(email, otpCode, now);
+
+  if (!parent) {
+    throw new AppError(AuthErrors.RESET_TOKEN_INVALID);
+  }
+
+  const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  await updateParentPasswordAndClearReset(parent._id, hash);
   return issueAuthResponse(parent);
 }

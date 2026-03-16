@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { registerParentController, loginParentController, googleAuthController } from "../controllers/auth.controller.js";
+import {
+  registerParentController,
+  loginParentController,
+  forgotPasswordController,
+  resetPasswordController,
+} from "../controllers/auth.controller.js";
 
 const router = Router();
 
@@ -13,8 +18,12 @@ router.post("/register-parent", registerParentController);
 router.post("/login-parent", loginParentController);
 
 
-// POST /api/v1/auth/google-auth-parent
-// Authenticate parent using Google OAuth
-router.post("/google-auth-parent", googleAuthController);
+// POST /api/v1/auth/forgot-password
+// Trigger forgot password email flow
+router.post("/forgot-password", forgotPasswordController);
+
+// POST /api/v1/auth/reset-password-confirm
+// Confirm reset token and set new password
+router.post("/reset-password-confirm", resetPasswordController);
 
 export default router;

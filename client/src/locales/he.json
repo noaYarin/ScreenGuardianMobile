@@ -3,7 +3,8 @@
   "common": {
     "save": "שמור",
     "cancel": "בטל",
-    "back": "חזרה"
+    "back": "חזרה",
+    "ok": "אישור"
   },
   "language": {
     "he": "עברית",
@@ -180,7 +181,6 @@
     "forgot": "שכחת סיסמה?",
     "connect": "התחבר",
     "or": "או",
-    "google": "המשך עם Google",
     "no_account": "עדיין אין לך חשבון?",
     "register": "הירשם עכשיו",
 
@@ -189,7 +189,6 @@
     "missing_fields": "יש למלא את כל השדות",
     "missing_password": "נא להכניס סיסמה.",
     "generic_error": "משהו השתבש, נסה שוב.",
-    "google_error": "ההתחברות עם Google נכשלה. נסי שוב.",
 
     "back_a11y": "חזרה",
     "menu_a11y": "תפריט",
@@ -197,9 +196,29 @@
     "password_a11y": "שדה סיסמה",
     "toggle_password_a11y": "הצג או הסתר סיסמה",
     "forgot_a11y": "שכחתי סיסמה",
+    "forgot_password_message": "נשלח אליך מייל עם הוראות לאיפוס סיסמה",
     "connect_a11y": "כפתור התחברות",
-    "google_a11y": "המשך עם גוגל",
     "register_a11y": "מעבר להרשמה"
+  },
+  "forgotPassword": {
+    "heading": "שכחתי סיסמה",
+    "subheading": "הקלד/י את האימייל כדי לקבל קוד אימות",
+    "send_button": "שליחת קוד"
+  },
+  "resetPassword": {
+    "submit_btn": "שליחת קוד",
+    "heading": "איפוס סיסמה",
+    "subheading": "הקלד/י את הקוד שקיבלת ובחר/י סיסמה חדשה",
+    "code_placeholder": "קוד אימות",
+    "new_password_placeholder": "סיסמה חדשה",
+    "confirm_password_placeholder": "אימות סיסמה חדשה",
+    "missing_email": "חסר אימייל. אנא התחל/י את תהליך האיפוס מחדש.",
+    "invalid_code": "נא להקליד קוד בן 6 ספרות.",
+    "missing_fields": "יש למלא את כל השדות",
+    "invalid_password": "הסיסמה חייבת להכיל לפחות 8 תווים.",
+    "passwords_not_match": "הסיסמאות אינן תואמות.",
+    "success_title": "הסיסמה עודכנה",
+    "success_message": "הסיסמה שלך אופסה בהצלחה."
   },"homeParent": {
     "title": "ברוכים הבאים",
     "parent_name_fallback": "אמא",
@@ -265,10 +284,8 @@
     "invalid_password": "הסיסמה חייבת להכיל לפחות 8 תווים.",
     "invalid_confirm_password": "אימות הסיסמה חייב להכיל לפחות 8 תווים.",
     "generic_error": "משהו השתבש, נסה שוב.",
-    "google_error": "ההתחברות עם Google נכשלה",
     "register": "הרשמה",
     "or": "או",
-    "google": "המשיכו עם Google",
     "have_account": "יש לכם כבר חשבון?",
     "login": "התחברות",
     "email_a11y": "שדה אימייל",
@@ -276,8 +293,7 @@
     "confirm_password_a11y": "שדה אימות סיסמה",
     "toggle_password_a11y": "הצג או הסתר סיסמה",
     "toggle_confirm_password_a11y": "הצג או הסתר אימות סיסמה",
-    "register_a11y": "כפתור הרשמה",
-    "google_a11y": "כפתור הרשמה עם גוגל",
+    "register_a11y": "כפתור הרשמה", 
     "login_a11y": "מעבר למסך התחברות"
   },
   "addChild": {

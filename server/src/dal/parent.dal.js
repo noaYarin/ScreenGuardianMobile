@@ -12,8 +12,40 @@ export async function findParentByEmail(email) {
   return ParentModel.findOne({ email });
 }
 
-export async function findParentByGoogleId(googleId) {
-  return ParentModel.findOne({ googleId });
+
+// Forgot password - search for parent by email and set OTP code
+export async function setPasswordResetCodeByEmail(email, code, expiresAt) {
+  return ParentModel.findOneAndUpdate(
+    { email },
+    {
+      $set: {
+        passwordResetCode: code,
+        passwordResetCodeExpires: expiresAt,
+      },
+    },
+    { new: true }
+  );
+}
+
+// Forgot password - find parent by valid email + OTP code
+export async function findParentByEmailAndValidResetCode(email, code, now = new Date()) {
+  return ParentModel.findOne({
+    email,
+    passwordResetCode: code,
+    passwordResetCodeExpires: { $gt: now },
+  });
+}
+
+// Forgot password - update password and clear reset fields
+export async function updateParentPasswordAndClearReset(parentId, passwordHash) {
+  return ParentModel.findByIdAndUpdate(
+    parentId,
+    {
+      $set: { password: passwordHash },
+      $unset: { passwordResetCode: "", passwordResetCodeExpires: "" },
+    },
+    { new: true }
+  );
 }
 
 export async function pushChildToParent(parentId, childDoc) {

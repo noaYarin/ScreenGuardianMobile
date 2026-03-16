@@ -2,16 +2,30 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   apiLoginParent,
   apiRegisterParent,
-  apiGoogleAuthParent,
+  apiResetPassword,
+  apiForgotPassword,
 } from "../../api/auth/auth";
 import { getMyChild } from "../../api";
 import type {
-  LoginParentArgs,
-  LoginParentPayload,
-  RegisterParentArgs,
-  GoogleAuthParentArgs,
-} from "../slices/types";
-import type { ChildrenDataFromServer } from "../../api/auth/auth.types";
+  AuthDataFromServer,
+  LoginParentParams,
+  RegisterParentParams,
+} from "../../api";
+import type {
+  ChildrenDataFromServer,
+  ResetPasswordParams,
+} from "../../api/auth/auth.types";
+
+type LoginParentPayload = {
+  auth: AuthDataFromServer;
+  children: ChildrenDataFromServer;
+};
+
+type LoginParentArgs = LoginParentParams;
+
+type RegisterParentArgs = RegisterParentParams;
+
+type ResetPasswordArgs = ResetPasswordParams;
 
 
 function toLoginParentPayload(auth: { token: string; parentId: string }): LoginParentPayload {
@@ -55,6 +69,20 @@ export const registerParent = createAuthThunk<RegisterParentArgs>(
   (credentials) => apiRegisterParent(credentials).then(toLoginParentPayload),
   "registerParent.generic_error"
 );
+
+
+export const forgotPassword = createAuthThunk<string>(
+  "auth/forgotPassword",
+  (email) => apiForgotPassword(email).then(toLoginParentPayload),
+  "forgotPassword.generic_error"
+);
+
+export const resetPassword = createAuthThunk<ResetPasswordArgs>(
+  "auth/resetPassword",
+  (args) => apiResetPassword(args).then(toLoginParentPayload),
+  "resetPassword.generic_error"
+);
+
 
 export const fetchChildren = createAsyncThunk<
   { childrenIds: string[]; activeChildId: string | null },

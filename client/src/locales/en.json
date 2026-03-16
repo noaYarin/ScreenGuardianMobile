@@ -3,7 +3,8 @@
   "common": {
     "save": "Save",
     "cancel": "Cancel",
-    "back": "Back"
+    "back": "Back",
+    "ok": "OK"
   },
   "language": {
     "he": "עברית",
@@ -184,7 +185,6 @@
     "forgot": "Forgot password?",
     "connect": "Connect",
     "or": "OR",
-    "google": "Continue with Google",
     "no_account": "Don't have an account?",
     "register": "Register now",
 
@@ -193,7 +193,6 @@
     "missing_fields": "Please fill in all fields",
     "missing_password": "Please enter your password.",
     "generic_error": "Something went wrong. Please try again.",
-    "google_error": "Google login failed. Please try again.",
 
     "back_a11y": "Go back",
     "menu_a11y": "Open menu",
@@ -201,9 +200,29 @@
     "password_a11y": "Password input",
     "toggle_password_a11y": "Show or hide password",
     "forgot_a11y": "Forgot password",
+    "forgot_password_message": "An email with instructions to reset your password has been sent to your email address.",
     "connect_a11y": "Login button",
-    "google_a11y": "Continue with Google",
     "register_a11y": "Go to registration"
+  },
+  "forgotPassword": {
+    "heading": "Forgot password",
+    "subheading": "Enter your email to receive a verification code",
+    "send_button": "Send code"
+  },
+  "resetPassword": {
+    "submit_btn": "Submit",
+    "heading": "Reset password",
+    "subheading": "Enter the code you received and choose a new password",
+    "code_placeholder": "Verification code",
+    "new_password_placeholder": "New password",
+    "confirm_password_placeholder": "Confirm new password",
+    "missing_email": "Missing email. Please restart the reset process.",
+    "invalid_code": "Please enter the 6-digit verification code.",
+    "missing_fields": "Please fill in all fields",
+    "invalid_password": "Password must be at least 8 characters long.",
+    "passwords_not_match": "Passwords do not match.",
+    "success_title": "Password updated",
+    "success_message": "Your password has been reset successfully."
   },
   "homeParent": {
     "title": "Welcome",
@@ -269,10 +288,8 @@
     "invalid_password": "Password must be at least 8 characters long.",
     "invalid_confirm_password": "Confirm password must be at least 8 characters long.",
     "generic_error": "Something went wrong. Please try again",
-    "google_error": "Google sign up failed",
     "register": "Sign Up",
     "or": "or",
-    "google": "Continue with Google",
     "have_account": "Already have an account?",
     "login": "Log In",
     "email_a11y": "Email field",
@@ -281,7 +298,6 @@
     "toggle_password_a11y": "Show or hide password",
     "toggle_confirm_password_a11y": "Show or hide confirm password",
     "register_a11y": "Sign up button",
-    "google_a11y": "Sign up with Google button",
     "login_a11y": "Go to login screen"
   },
   "addChild": {
