@@ -66,7 +66,7 @@ const authSlice = createSlice({
     },
     logout: () => ({ ...initialState }),
   },
-  // extraReducers for async operations
+  // extraReducers for async operations - thunks
   extraReducers: (builder) => {
     builder
       .addCase(
