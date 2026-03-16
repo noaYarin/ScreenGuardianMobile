@@ -5,9 +5,8 @@ import { ChildSchema } from './child.schema.js';
 const ParentSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true, index: true },
-    password: { type: String }, 
-    googleId: { type: String, sparse: true, unique: true },
-    name: { type: String},
+    password: { type: String },
+    name: { type: String },
     phoneNumber: { type: String },
     role: { type: String, enum: Object.values(Role), default: Role.PARENT },
     children: { type: [ChildSchema], default: [] },

@@ -28,40 +28,6 @@ export async function issueChildToken(parentId, childId) {
   return { token, parentId: parentIdStr, childId: childIdStr };
 }
 
-async function verifyGoogleIdToken(idToken) {
-  if (!googleClient || !env.GOOGLE_CLIENT_ID) {
-    throw new AppError(AuthErrors.GOOGLE_AUTH_DISABLED);
-  }
-  try {
-    const ticket = await googleClient.verifyIdToken({ idToken, audience: env.GOOGLE_CLIENT_ID });
-    return ticket.getPayload();
-  } catch {
-    throw new AppError(AuthErrors.INVALID_GOOGLE_TOKEN);
-  }
-}
-
-async function resolveParentFromGooglePayload(payload) {
-  const googleId = payload.sub;
-  const email = payload.email;
-  const name = payload.name ?? email?.split("@")[0] ?? "User";
-
-  if (!email) {
-    throw new AppError(AuthErrors.NO_EMAIL);
-  }
-
-  let parent = await findParentByGoogleId(googleId);
-  if (parent) return parent;
-
-  parent = await findParentByEmail(email);
-  if (parent) {
-    parent.googleId = googleId;
-    await parent.save();
-    return parent;
-  }
-
-  return createParent({ email, googleId, name, children: [] });
-}
-
 export async function registerParent({ email, password, name, phoneNumber }) {
   const existing = await findParentByEmail(email);
   if (existing) {

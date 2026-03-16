@@ -16,6 +16,8 @@ export const Pairing = {
 
 
 export const Auth = {
+  EMAIL_NOT_FOUND: { status: 404, code: "EMAIL_NOT_FOUND", message: "Email not found" },
+  EMAIL_SEND_FAILED: { status: 500, code: "EMAIL_SEND_FAILED", message: "Failed to send email" },
   MISSING_TOKEN: { status: 400, code: "MISSING_TOKEN", message: "idToken is required" },
   GOOGLE_AUTH_DISABLED: { status: 503, code: "GOOGLE_AUTH_DISABLED", message: "Google sign-in is not configured" },
   INVALID_GOOGLE_TOKEN: { status: 401, code: "INVALID_GOOGLE_TOKEN", message: "Invalid or expired Google token" },

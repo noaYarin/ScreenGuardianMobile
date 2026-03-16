@@ -23,12 +23,18 @@ export async function loginParentController(req, res, next) {
 
 export async function googleAuthController(req, res, next) {
   try {
-    const { idToken } = req.body;
-    if (!idToken) {
-      const e = AuthErrors.MISSING_TOKEN;
-      return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
+    const { email, otpCode, password } = req.body;
+
+    if (!email || !otpCode || !password) {
+      const error = AuthErrors.MISSING_TOKEN_OR_NEW_PASSWORD;
+      return res.status(error.status).json({
+        ok: false,
+        error: { code: error.code, message: error.message },
+      });
     }
-    const data = await loginWithGoogle(idToken);
+
+    const data = await resetPassword({ email, otpCode, password });
+
     res.json({ ok: true, data });
   } catch (err) {
     next(err);

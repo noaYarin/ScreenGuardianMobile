@@ -2,7 +2,7 @@ export { api } from "./request";
 export type { ApiError, ApiResponse } from "./request";
 
 // Auth
-export { apiRegisterParent, apiLoginParent, apiGoogleAuthParent } from "./auth/auth";
+export { apiRegisterParent, apiLoginParent } from "./auth/auth";
 export type {
   AuthDataFromServer,
   RegisterParentParams,
