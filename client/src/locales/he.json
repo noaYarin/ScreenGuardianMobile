@@ -201,6 +201,7 @@
     "register_a11y": "מעבר להרשמה"
   },
   "forgotPassword": {
+    "generic_error": "משהו השתבש, נסה שוב.",
     "heading": "שכחתי סיסמה",
     "subheading": "הקלד/י את האימייל כדי לקבל קוד אימות",
     "send_button": "שליחת קוד"

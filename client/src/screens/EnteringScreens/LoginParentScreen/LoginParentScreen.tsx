@@ -19,6 +19,7 @@ import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { AppDispatch } from "@/src/redux/store/types";
+import { setError } from "@/src/redux/slices/auth-slice";
 
 const ICON = {
   email: "email-outline",
@@ -43,9 +44,6 @@ export default function LoginParentScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
- // Local state
- const [errorMessage, setErrorMessage] = useState<string | null>(null);
- const displayError = errorMessage || error;
 
   const cardWidth = useMemo(() => {
     const sidePadding = 16;
@@ -55,12 +53,15 @@ export default function LoginParentScreen() {
 
   const onSubmit = async () => {
     try {
+      dispatch(setError(null));
       if (!validateForm()) return;
       // Using .unwrap() to handle the Thunk result as a standard Promise.
       await dispatch(loginParent({ email, password })).unwrap();
       router.replace("/Parent/home" as any);
     } catch (error: any) {
-      setErrorMessage(error as string);
+      if (typeof error === "string") {
+        dispatch(setError(error));
+      }
     }
   };
 
@@ -68,16 +69,16 @@ export default function LoginParentScreen() {
 const validateForm = () => {
 
   if (!email.trim()&& !password.trim()) {
-    setErrorMessage(t("loginParent.missing_fields"));
+    dispatch(setError("loginParent.missing_fields"));
     return false;
   }
 
   if (!isValidEmail(email)) {
-    setErrorMessage(t("loginParent.invalid_email"));
+    dispatch(setError("loginParent.invalid_email"));
     return false;
   }
   if (password.length < 8) {
-    setErrorMessage(t("loginParent.invalid_password"));
+    dispatch(setError("loginParent.invalid_password"));
     return false;
   }
 
@@ -169,16 +170,19 @@ const validateForm = () => {
                 </Pressable>
               </View>
 
-              {displayError ? (
+              {error ? (
                 <AppText style={styles.errorText} numberOfLines={2}>
-                  {t(displayError as string)}
+                  {t(error as string)}
                 </AppText>
               ) : null}
 
               {/* Centered forgot password action */}
 
               <Pressable
-                onPress={() => router.push('/Entering/forgotPassword' as any)}  
+                onPress={() => {
+                  dispatch(setError(null));
+                  router.push('/Entering/forgotPassword' as any);
+                }}  
                 accessibilityRole="button"
                 accessibilityLabel={t("loginParent.forgot_a11y")}
                 style={({ pressed }) => [

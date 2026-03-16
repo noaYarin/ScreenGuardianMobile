@@ -205,6 +205,7 @@
     "register_a11y": "Go to registration"
   },
   "forgotPassword": {
+    "generic_error": "Something went wrong. Please try again.",
     "heading": "Forgot password",
     "subheading": "Enter your email to receive a verification code",
     "send_button": "Send code"

@@ -10,6 +10,7 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { resetPassword } from "@/src/redux/thunks/authThunks";
 import { AppDispatch } from "@/src/redux/store/types";
+import { setError } from "@/src/redux/slices/auth-slice";
 
 const ICON = {
   lock: "lock-reset",
@@ -28,10 +29,7 @@ export default function ResetPasswordScreen() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const { isLoading, error } = useSelector((state: any) => state.auth);
-  const displayError = errorMessage || error;
+  const { isLoading, error } = useSelector((state: { auth: { isLoading: boolean; error: string | null } }) => state.auth);
 
   const cardWidth = useMemo(() => {
     const sidePadding = 16;
@@ -41,25 +39,25 @@ export default function ResetPasswordScreen() {
 
   const validateForm = () => {
     if (!email) {
-      setErrorMessage(t("resetPassword.missing_email") || "Missing email. Please restart the reset process.");
+      dispatch(setError("resetPassword.missing_email"));
       return false;
     }
 
     if (!verificationCode.trim() || verificationCode.trim().length !== 6) {
-      setErrorMessage(t("resetPassword.invalid_code") || "Please enter the 6-digit verification code.");
+      dispatch(setError("resetPassword.invalid_code"));
       return false;
     }
 
     if (!password.trim() || !confirmPassword.trim()) {
-      setErrorMessage(t("resetPassword.missing_fields"));
+      dispatch(setError("resetPassword.missing_fields"));
       return false;
     }
     if (password.length < 8) {
-      setErrorMessage(t("resetPassword.invalid_password"));
+      dispatch(setError("resetPassword.invalid_password"));
       return false;
     }
     if (password !== confirmPassword) {
-      setErrorMessage(t("resetPassword.passwords_not_match"));
+      dispatch(setError("resetPassword.passwords_not_match"));
       return false;
     }
     return true;
@@ -67,7 +65,7 @@ export default function ResetPasswordScreen() {
 
   const onSubmit = async () => {
     try {
-      setErrorMessage(null);
+      dispatch(setError(null));
       if (!validateForm()) return;
 
       await dispatch(
@@ -79,19 +77,19 @@ export default function ResetPasswordScreen() {
       ).unwrap();
 
       Alert.alert(
-        t("resetPassword.success_title") || "Password updated",
-        t("resetPassword.success_message") || "Your password has been reset successfully.",
+        t("resetPassword.success_title"),
+        t("resetPassword.success_message"),
         [
           {
-            text: t("common.ok") || "OK",
+            text: t("common.ok"),
             onPress: () => {
               router.replace("/Entering/loginParent" as any);
             },
           },
         ]
       );
-    } catch (err: any) {
-      console.error(err);
+    } catch {
+      dispatch(setError("resetPassword.generic_error"));
     }
   };
 
@@ -155,8 +153,8 @@ export default function ResetPasswordScreen() {
               />
             </View>
 
-            {displayError ? (
-              <AppText style={styles.errorText}>{displayError}</AppText>
+            {error ? (
+              <AppText style={styles.errorText}>{t(error as string)}</AppText>
             ) : null}
 
             <Pressable onPress={onSubmit} disabled={isLoading} style={styles.primaryBtn}>

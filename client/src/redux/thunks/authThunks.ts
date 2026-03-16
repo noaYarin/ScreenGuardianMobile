@@ -4,85 +4,105 @@ import {
   apiRegisterParent,
   apiResetPassword,
   apiForgotPassword,
-} from "../../api/auth/auth";
+} from "../../api/auth";
 import { getMyChild } from "../../api";
-import type {
-  AuthDataFromServer,
-  LoginParentParams,
-  RegisterParentParams,
-} from "../../api";
-import type {
-  ChildrenDataFromServer,
-  ResetPasswordParams,
-} from "../../api/auth/auth.types";
 
-type LoginParentPayload = {
-  auth: AuthDataFromServer;
-  children: ChildrenDataFromServer;
+// Payload when auth succeeds (login, register, reset password)
+type AuthSuccessPayload = {
+  token: string;
+  parentId: string;
 };
 
-type LoginParentArgs = LoginParentParams;
+// Reset password args are defined inline so it's clear what the thunk expects
+type ResetPasswordArgs = {
+  email: string;
+  otpCode: string;
+  password: string;
+};
 
-type RegisterParentArgs = RegisterParentParams;
+// Forgot password returns only a success message
+type ForgotPasswordSuccessPayload = {
+  message: string;
+};
 
-type ResetPasswordArgs = ResetPasswordParams;
+export const loginParent = createAsyncThunk<
+  AuthSuccessPayload,
+  { email: string; password: string },
+  { rejectValue: string }
+>("auth/loginParent", async (credentials, thunkAPI) => {
+  try {
+    const data = await apiLoginParent(credentials);
+    return {
+      token: data.token,
+      parentId: data.parentId,
+    };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "loginParent.generic_error";
 
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
-function toLoginParentPayload(auth: { token: string; parentId: string }): LoginParentPayload {
-  const children: ChildrenDataFromServer = {
-    childrenIds: [],
-    activeChildId: "",
-  };
-  return { auth, children };
-}
+export const registerParent = createAsyncThunk<
+  AuthSuccessPayload,
+  { email: string; password: string },
+  { rejectValue: string }
+>("auth/registerParent", async (credentials, thunkAPI) => {
+  try {
+    // Go to fulfilled state
+    const data = await apiRegisterParent(credentials);
+    return {
+      token: data.token,
+      parentId: data.parentId,
+    };
+  } catch (error) {
+    // Go to rejected state
+    const message =
+      (error as Error)?.message ?? "registerParent.generic_error";
 
-// Thunk template for auth operations
-function createAuthThunk<Args>(
-  typePrefix: string,
-  request: (args: Args) => Promise<LoginParentPayload>,
-  defaultErrorMessage: string
-) {
-  return createAsyncThunk<LoginParentPayload, Args, { rejectValue: string }>(
-    typePrefix,
-    async (args, thunkAPI) => {
-      try {
-        const data = await request(args);
-        return data;
-      } catch (error) {
-        const message =
-          (error as Error)?.message ?? defaultErrorMessage;
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
-        return thunkAPI.rejectWithValue(message);
-      }
-    }
-  );
-}
+export const forgotPassword = createAsyncThunk<
+  ForgotPasswordSuccessPayload,
+  string,
+  { rejectValue: string }
+>("auth/forgotPassword", async (email, thunkAPI) => {
+  try {
+    // Go to fulfilled state
+    const data = await apiForgotPassword(email); 
+    return data;
+  } catch (error) {
+    // Go to rejected state
+    const message =
+    (error as Error)?.message ?? "forgotPassword.generic_error";
 
-export const loginParent = createAuthThunk<LoginParentArgs>(
-  "auth/loginParent",
-  (credentials) => apiLoginParent(credentials).then(toLoginParentPayload),
-  "loginParent.generic_error"
-);
+  return thunkAPI.rejectWithValue(message);
+  }
+});
 
-export const registerParent = createAuthThunk<RegisterParentArgs>(
-  "auth/registerParent",
-  (credentials) => apiRegisterParent(credentials).then(toLoginParentPayload),
-  "registerParent.generic_error"
-);
+export const resetPassword = createAsyncThunk<
+  AuthSuccessPayload,
+  ResetPasswordArgs,
+  { rejectValue: string }
+>("auth/resetPassword", async (args, thunkAPI) => {
+  try {
+    // Go to fulfilled state
+    const data = await apiResetPassword(args);
+    return {
+      token: data.token,
+      parentId: data.parentId,
+    };
+  } catch (error) {
+    // Go to rejected state
+    const message =
+      (error as Error)?.message ?? "resetPassword.generic_error";
 
-
-export const forgotPassword = createAuthThunk<string>(
-  "auth/forgotPassword",
-  (email) => apiForgotPassword(email).then(toLoginParentPayload),
-  "forgotPassword.generic_error"
-);
-
-export const resetPassword = createAuthThunk<ResetPasswordArgs>(
-  "auth/resetPassword",
-  (args) => apiResetPassword(args).then(toLoginParentPayload),
-  "resetPassword.generic_error"
-);
-
+    return thunkAPI.rejectWithValue(message);
+  }
+});
 
 export const fetchChildren = createAsyncThunk<
   { childrenIds: string[]; activeChildId: string | null },

@@ -18,7 +18,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { AppDispatch } from "@/src/redux/store/types";
-import { registerParent } from "@/src/redux/slices/auth-slice";
+import { registerParent, setError } from "@/src/redux/slices/auth-slice";
 
 const ICON = {
   email: "email-outline",
@@ -37,7 +37,7 @@ export default function RegisterParentScreen() {
   const { t } = useTranslation();
   const { isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -46,9 +46,6 @@ export default function RegisterParentScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   // Redux state
   const { isLoading, error } = useSelector((state: { auth: { isLoading: boolean; error: string | null } }) => state.auth);
-  // Local state
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const displayError = errorMessage || error;
 
 
   const cardWidth = useMemo(() => {
@@ -60,36 +57,39 @@ export default function RegisterParentScreen() {
 
   const onSubmit = async () => {
     try {
+      dispatch(setError(null));
       if (!validateForm()) return;
       // Using .unwrap() to handle the Thunk result as a standard Promise.
-      await (dispatch as AppDispatch)(registerParent({ email, password })).unwrap();
+      await dispatch(registerParent({ email, password })).unwrap();
       router.replace("/Entering/loginParent" as any);
     } catch (err: any) {
-      console.error(err);
+      if (typeof err === "string") {
+        dispatch(setError(err));
+      }
     }
   };
 
 const validateForm = () => {
 
   if (!email.trim()&& !password.trim()&& !confirmPassword.trim()) {
-    setErrorMessage(t("registerParent.missing_fields"));
+    dispatch(setError("registerParent.missing_fields"));
     return false;
   }
 
   if (!isValidEmail(email)) {
-    setErrorMessage(t("registerParent.invalid_email"));
+    dispatch(setError("registerParent.invalid_email"));
     return false;
   }
   if (password !== confirmPassword) {
-    setErrorMessage(t("registerParent.passwords_not_match"));
+    dispatch(setError("registerParent.passwords_not_match"));
     return false;
   }
   if (password.length < 8) {
-    setErrorMessage(t("registerParent.invalid_password"));
+    dispatch(setError("registerParent.invalid_password"));
     return false;
   }
   if (confirmPassword.length < 8) {
-    setErrorMessage(t("registerParent.invalid_confirm_password"));
+    dispatch(setError("registerParent.invalid_confirm_password"));
     return false;
   }
 
@@ -216,9 +216,9 @@ const validateForm = () => {
                 </Pressable>
               </View>
 
-              {displayError ? (
+              {error ? (
                 <AppText style={styles.errorText} numberOfLines={2}>
-                  {t(displayError as string)}
+                  {t(error as string)}
                 </AppText>
               ) : null}
 

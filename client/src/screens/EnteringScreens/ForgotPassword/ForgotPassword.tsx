@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { View, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, useWindowDimensions, Alert } from "react-native";
+import { View, TextInput, Pressable, KeyboardAvoidingView, Platform, ActivityIndicator, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useTranslation } from "react-i18next";
@@ -10,6 +10,7 @@ import { styles } from "./forgotPassword.styles";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { AppDispatch } from "@/src/redux/store/types";
+import { setError } from "@/src/redux/slices/auth-slice";
 
 export default function ForgotPasswordScreen() {
   const { t } = useTranslation();
@@ -17,8 +18,7 @@ export default function ForgotPasswordScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const [email, setEmail] = useState("");
   
-  const { isLoading, error } = useSelector((state: any) => state.auth);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const { isLoading, error } = useSelector((state: { auth: { isLoading: boolean; error: string | null } }) => state.auth);
 
   const cardWidth = useMemo(() => {
     const sidePadding = 16;
@@ -27,11 +27,11 @@ export default function ForgotPasswordScreen() {
   }, [width]);
 
   const handleSendEmail = async () => {
-    setLocalError(null);
+    dispatch(setError(null));
     const trimmedEmail = email.trim();
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
-      setLocalError(t("loginParent.invalid_email"));
+      dispatch(setError("loginParent.invalid_email"));
       return;
     }
 
@@ -43,7 +43,9 @@ export default function ForgotPasswordScreen() {
         params: { email: trimmedEmail },
       } as any);
     } catch (err: any) {
-      setLocalError(err);
+      if (typeof err === "string") {
+        dispatch(setError(err));
+      }
     }
   };
 
@@ -80,9 +82,9 @@ export default function ForgotPasswordScreen() {
               />
             </View>
 
-            {(localError || error) && (
+            {error && (
               <AppText style={styles.errorText}>
-                {localError || error}
+                {t(error as string)}
               </AppText>
             )}
 
@@ -96,7 +98,10 @@ export default function ForgotPasswordScreen() {
               </LinearGradient>
             </Pressable>
 
-            <Pressable onPress={() => router.back()} style={styles.backButtonWrapper}>
+            <Pressable onPress={() => {
+              dispatch(setError(null));
+              router.back();
+            }} style={styles.backButtonWrapper}>
               <AppText style={styles.bottomLink}>{t("common.back")}</AppText>
             </Pressable>
 
