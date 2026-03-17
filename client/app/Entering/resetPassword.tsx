@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import ResetPasswordScreen from "../../src/screens/EnteringScreens/ResetPassword/ResetPassword";
+import ResetPasswordScreen from "../../src/screens/EnteringScreens/ResetPasswordScreen/ResetPasswordScreen";
 
 export default function resetPasswordRoute() {
     

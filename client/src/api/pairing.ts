@@ -3,7 +3,7 @@ import { api } from "./request";
 const URL = "/api/v1/pairing";
 const auth = { requireAuth: true as const };
 
-export async function generateCode(
+export async function apiGenerateCode(
   params?: { childId?: string | null }
 ): Promise<{ code: string; barcodeToken: string; expiresAt: string }> {
   return api.post<{ code: string; barcodeToken: string; expiresAt: string }>(
@@ -13,7 +13,7 @@ export async function generateCode(
   );
 }
 
-export async function linkDevice(
+export async function apiLinkDevice(
   params: { code?: string; barcodeToken?: string }
 ): Promise<{ token: string; parentId: string; childId: string }> {
   return api.post<{ token: string; parentId: string; childId: string }>(

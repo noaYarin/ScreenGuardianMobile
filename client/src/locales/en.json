@@ -337,13 +337,16 @@
     "used_today": "Used today",
     "daily_limit": "Daily limit",
     "devices_title": "Devices",
-    "add_device": "Add device",
-    "add_device_a11y": "Add device",
+    "add_device": "Connect device",
+    "add_device_a11y": "Connect device",
     "active_now": "Active now",
     "remaining_time_value": "Remaining time: {{value}}",
     "delete_device_a11y": "Delete device {{name}}",
     "view_limits": "View limits",
     "view_limits_a11y": "View limits for {{name}}"
+  },
+  "linkDevice": {
+    "title": "Connect Device"
   }
 }
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { Stack } from "expo-router";
-import { RoleSelectionScreen } from "../../src/screens/EnteringScreens/roleSelection/RoleSelectionScreen";
-import { useTranslation } from "react-i18next";
+import { RoleSelectionScreen } from "../../src/screens/EnteringScreens/RoleSelectionScreen/RoleSelectionScreen";
 
 export default function RoleSelectionRoute() {
   return (

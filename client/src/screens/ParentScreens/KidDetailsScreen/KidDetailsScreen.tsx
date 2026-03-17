@@ -5,7 +5,7 @@ import {
   I18nManager,
   useWindowDimensions,
 } from "react-native";
-import { Stack, router, useLocalSearchParams } from "expo-router";
+import { Href, Stack, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -88,17 +88,16 @@ export default function KidDetailsScreen() {
       ? params.name
       : STATIC_CHILD.name;
 
-  const onAddDevice = () => {
-    // TODO: Connect this button to the backend.
-    // TODO: Call the server to create a new device for the selected child.
-  };
+  const handleConnectDevice = () => {
+    router.push("/Parent/linkDevice" as Href);
+  };  
 
-  const onViewLimits = (deviceId: string) => {
+  const handleViewLimits = (deviceId: string) => {
     // TODO: Navigate to the device limits screen or fetch device limits from the backend.
     console.log("View limits for device:", deviceId);
   };
 
-  const onDeleteDevice = (deviceId: string) => {
+  const handleDeleteDevice = (deviceId: string) => {
     // TODO: Connect this delete action to the backend.
     // TODO: Delete the selected device on the server, then refresh the child devices list.
     console.log("Delete device:", deviceId);
@@ -190,7 +189,7 @@ export default function KidDetailsScreen() {
 
               <Pressable
                 style={styles.addDeviceButton}
-                onPress={onAddDevice}
+                onPress={handleConnectDevice}
                 accessibilityRole="button"
                 accessibilityLabel={t("kidDetails.add_device_a11y")}
               >
@@ -270,7 +269,7 @@ export default function KidDetailsScreen() {
                   <View style={[styles.deviceBottomRow, row]}>
                     <Pressable
                       style={styles.deleteButton}
-                      onPress={() => onDeleteDevice(device.id)}
+                      onPress={() => handleDeleteDevice(device.id)}
                       accessibilityRole="button"
                       accessibilityLabel={t("kidDetails.delete_device_a11y", {
                         name: device.name,
@@ -285,7 +284,7 @@ export default function KidDetailsScreen() {
 
                     <Pressable
                       style={styles.viewLimitsButton}
-                      onPress={() => onViewLimits(device.id)}
+                      onPress={() => handleViewLimits(device.id)}
                       accessibilityRole="button"
                       accessibilityLabel={t("kidDetails.view_limits_a11y", {
                         name: device.name,
