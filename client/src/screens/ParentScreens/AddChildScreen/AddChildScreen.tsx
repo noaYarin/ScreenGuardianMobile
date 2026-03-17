@@ -6,6 +6,7 @@ import {
   I18nManager,
   Alert,
   useWindowDimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -15,6 +16,10 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/src/redux/store/types";
+import { addChildThunk, clearChildrenError } from "@/src/redux/slices/children-slice";
 
 function HeaderIconButton({
   name,
@@ -47,17 +52,31 @@ const GENDER_OPTIONS: {
   key: GenderOption;
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 }[] = [
-  { key: "boy", icon: "human-male" },
-  { key: "girl", icon: "human-female" },
-  { key: "other", icon: "human-greeting-variant" },
-];
+    { key: "boy", icon: "human-male" },
+    { key: "girl", icon: "human-female" },
+    { key: "other", icon: "human-greeting-variant" },
+  ];
 
 function isValidDate(value: string) {
   return /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(value.trim());
 }
 
+function toIsoDate(value: string) {
+  const [day, month, year] = value.trim().split("/");
+
+  if (!day || !month || !year) return "";
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function AddChildScreen() {
   const { t } = useTranslation();
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { isLoading, error } = useSelector(
+    (state: { children: { isLoading: boolean; error: string | null } }) => state.children
+  );
+
   const { row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
 
@@ -70,27 +89,41 @@ export default function AddChildScreen() {
   const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
     I18nManager.isRTL ? "arrow-left" : "arrow-right";
 
-  const onSave = () => {
-    if (!childName.trim()) {
-      Alert.alert(t("addChild.validation_title"), t("addChild.validation_name"));
-      return;
-    }
+  const onSave = async () => {
+    try {
+      dispatch(clearChildrenError());
 
-    if (!isValidDate(birthDate)) {
+      if (!childName.trim()) {
+        Alert.alert(t("addChild.validation_title"), t("addChild.validation_name"));
+        return;
+      }
+
+      if (!isValidDate(birthDate)) {
+        Alert.alert(
+          t("addChild.validation_title"),
+          t("addChild.validation_birthdate")
+        );
+        return;
+      }
+
+      await dispatch(
+        addChildThunk({
+          name: childName.trim(),
+          birthDate: toIsoDate(birthDate),
+          gender,
+        })
+      ).unwrap();
+
+      Alert.alert(t("addChild.success_title"), t("addChild.success_message"));
+      router.back();
+    } catch (err: any) {
       Alert.alert(
         t("addChild.validation_title"),
-        t("addChild.validation_birthdate")
+        typeof err === "string" ? t(err) : t("common.generic_error")
       );
-      return;
     }
-
-    // TODO: Connect this action to the backend.
-    // TODO: Send childName, birthDate, and gender to the server.
-    // TODO: After successful save, navigate back to the parent home screen.
-
-    Alert.alert(t("addChild.success_title"), t("addChild.success_message"));
-    router.back();
   };
+
 
   return (
     <>
@@ -109,7 +142,7 @@ export default function AddChildScreen() {
           headerLeft: () => (
             <HeaderIconButton
               name="menu"
-              onPress={() => {}}
+              onPress={() => { }}
               accessibilityLabel={t("addChild.menu_a11y")}
             />
           ),
@@ -141,6 +174,7 @@ export default function AddChildScreen() {
                   placeholder={t("addChild.name_placeholder")}
                   placeholderTextColor="#94A3B8"
                   style={[styles.input, text]}
+                  maxLength={30}
                   accessibilityLabel={t("addChild.name_a11y")}
                 />
               </View>
@@ -156,7 +190,8 @@ export default function AddChildScreen() {
                   placeholder={t("addChild.birthdate_placeholder")}
                   placeholderTextColor="#94A3B8"
                   style={[styles.input, text]}
-                  keyboardType="number-pad"
+                  keyboardType="numbers-and-punctuation"
+                  maxLength={10}
                   accessibilityLabel={t("addChild.birthdate_a11y")}
                 />
               </View>

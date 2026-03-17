@@ -5,7 +5,7 @@ import {
   apiResetPassword,
   apiForgotPassword,
 } from "../../api/auth";
-import { getMyChild } from "../../api";
+import { getMyChildren } from "../../api";
 
 // Payload when auth succeeds (login, register, reset password)
 type AuthSuccessPayload = {
@@ -110,7 +110,7 @@ export const fetchChildren = createAsyncThunk<
   { rejectValue: string }
 >("auth/fetchChildren", async (_, thunkAPI) => {
   try {
-    const data = await getMyChild();
+    const data = await getMyChildren();
     const childrenIds = data.children.map((child) => child._id);
     const activeChild = data.children.find((child) => child.isActive);
 

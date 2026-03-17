@@ -22,17 +22,16 @@ export async function addChild(body: {
   name: string;
   birthDate: string;
   gender?: string;
-  interests?: string[];
 }): Promise<{ child: Child }> {
   return api.post<{ child: Child }>("/api/v1/parent/add/child", body, auth);
 }
 
-export async function getMyChild(options?: {
+export async function getMyChildren(options?: {
   includeInactive?: boolean;
 }): Promise<{ children: Child[] }> {
   const query =
     options?.includeInactive === true ? "?includeInactive=true" : "";
-  return api.get<{ children: Child[] }>(`${URL}/get/child${query}`, auth);
+  return api.get<{ children: Child[] }>(`${URL}/get/children${query}`, auth);
 }
 
 export async function setChildActive(

@@ -5,7 +5,7 @@ export type { ApiError, ApiResponse } from "./request";
 export { apiRegisterParent, apiLoginParent } from "./auth";
 
 // Parent
-export { addChild, getMyChild, setChildActive } from "./parent";
+export { addChild, getMyChildren, setChildActive } from "./parent";
 
 // Pairing
 export { generateCode, linkDevice } from "./pairing";
