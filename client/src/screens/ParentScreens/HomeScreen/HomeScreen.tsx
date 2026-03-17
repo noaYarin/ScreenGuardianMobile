@@ -187,32 +187,34 @@ export default function HomeParentScreen() {
                 ))}
               </View>
             )}
-            
+
             {/* Action buttons */}
-            <View style={styles.actionsWrap}>
-              <Pressable
-                style={styles.btnPrimary}
-                onPress={onPressFullWatch}
-                accessibilityRole="button"
-                accessibilityLabel={t("homeParent.full_watch_a11y")}
-              >
-                <AppText weight="extraBold" style={styles.btnPrimaryText}>
-                  {t("homeParent.full_watch")}
-                </AppText>
-              </Pressable>
+            {childCards.length > 0 && (
+              <View style={styles.actionsWrap}>
+                <Pressable
+                  style={styles.btnPrimary}
+                  onPress={onPressFullWatch}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("homeParent.full_watch_a11y")}
+                >
+                  <AppText weight="extraBold" style={styles.btnPrimaryText}>
+                    {t("homeParent.full_watch")}
+                  </AppText>
+                </Pressable>
 
-              <Pressable
-                style={styles.btnSecondary}
-                onPress={onPressAddChild}
-                accessibilityRole="button"
-                accessibilityLabel={t("homeParent.add_child_a11y")}
-              >
-                <AppText weight="extraBold" style={styles.btnSecondaryText}>
-                  {t("homeParent.add_child")}
-                </AppText>
-              </Pressable>
-            </View>
-
+                <Pressable
+                  style={styles.btnSecondary}
+                  onPress={onPressAddChild}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("homeParent.add_child_a11y")}
+                >
+                  <AppText weight="extraBold" style={styles.btnSecondaryText}>
+                    {t("homeParent.add_child")}
+                  </AppText>
+                </Pressable>
+              </View>
+            )}
+            
             <View style={styles.bottomSpacer} />
           </View>
         </View>
