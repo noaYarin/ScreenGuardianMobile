@@ -7,6 +7,9 @@ import { Gender } from "../constants/gender.js";
 export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;
 
+  if (!name || typeof name !== "string" || !name.trim()) {
+    throw new AppError(CommonErrors.VALIDATION_NAME_REQUIRED);
+  }
   let bday;
 
   if (birthDate !== undefined) {
@@ -17,8 +20,8 @@ export function validateAndBuildChildDoc(body = {}) {
   }
 
   if (gender && !Object.values(Gender).includes(gender)) {
-  throw new AppError(CommonErrors.VALIDATION_GENDER_INVALID);
-}
+    throw new AppError(CommonErrors.VALIDATION_GENDER_INVALID);
+  }
 
   return {
     name: typeof name === "string" ? name : undefined,
