@@ -333,13 +333,16 @@
     "used_today": "שימוש היום",
     "daily_limit": "מגבלה יומית",
     "devices_title": "מכשירים",
-    "add_device": "הוספת מכשיר",
-    "add_device_a11y": "הוספת מכשיר",
+    "add_device": "חיבור מכשיר",
+    "add_device_a11y": "חיבור מכשיר",
     "active_now": "פעל עכשיו",
     "remaining_time_value": "זמן נותר: {{value}}",
     "delete_device_a11y": "מחיקת המכשיר {{name}}",
     "view_limits": "צפייה במגבלות",
     "view_limits_a11y": "צפייה במגבלות של {{name}}"
+  },
+  "linkDevice": {
+    "title": "חיבור מכשיר"
   }
 }
 
