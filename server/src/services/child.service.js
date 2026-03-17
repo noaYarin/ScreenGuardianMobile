@@ -10,6 +10,12 @@ export function validateAndBuildChildDoc(body = {}) {
   if (!name || typeof name !== "string" || !name.trim()) {
     throw new AppError(CommonErrors.VALIDATION_NAME_REQUIRED);
   }
+
+
+  if (name.trim().length > 30) {
+    throw new AppError(CommonErrors.VALIDATION_NAME_TOO_LONG);
+  }
+
   let bday;
 
   if (birthDate !== undefined) {
