@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { Role } from "../constants/role.js";
+import { Gender } from "../constants/gender.js";
 import { AvatarSchema } from "./avatar.schema.js";
 
 
@@ -7,7 +8,7 @@ export const ChildSchema = new mongoose.Schema(
   {
     name: { type: String},
     birthDate: { type: Date},
-    gender: { type: String },
+    gender: { type: String, enum: Object.values(Gender), default: Gender.OTHER },
     interests: { type: [String], default: [] },
     coins: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },

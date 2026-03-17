@@ -42,6 +42,7 @@ export const Common = {
   DEVICE_NOT_OWNED: { status: 403, code: "FORBIDDEN", message: "Device does not belong to this parent/child" },
   VALIDATION_NAME_BIRTHDATE: { status: 400, code: "VALIDATION_ERROR", message: "name and birthDate are required" },
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
+  VALIDATION_GENDER_INVALID: {status: 400,code: "VALIDATION_ERROR",message: "gender must be one of: boy, girl, other"},
   VALIDATION_CHILD_ID: { status: 400, code: "VALIDATION", message: "childId must be a valid ObjectId" },
   VALIDATION_IS_ACTIVE: { status: 400, code: "VALIDATION", message: "isActive must be boolean" },
   VALIDATION_INTERESTS: { status: 400, code: "VALIDATION_ERROR",message: "interests must be an array of strings"},
