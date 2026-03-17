@@ -11,14 +11,14 @@
     "en": "English"
   },
   "onboarding": {
-     "startOnboarding": "התחל",
+    "startOnboarding": "התחל",
     "step1_title": "ניטור והגנה",
     "step1_desc": "עקבו אחר זמן מסך וחסמו אפליקציות באופן מיידי",
     "step2_title": "מיקום בזמן אמת",
     "step2_desc": "קבלו את מיקום הילד בכל רגע לשקט הנפשי שלכם",
     "step3_title": "ניתוח AI",
     "step3_desc": "המלצות לפעילויות אחרות מבוססות בינה מלאכותית"
-    },
+  },
   "dashboard": {
     "start": "התחל להשתמש באפליקציה",
     "skip": "דלג",
@@ -63,47 +63,49 @@
     "alert_desc": "נשלחה התרעה להורים."
   },
   "goals": {
-  "title": "מטרות",
-  "weekly_title": "מטרות השבוע",
-  "subtitle": "בואו נראה איך הולך!",
-  "total_progress": "התקדמות כללית",
-  "goal_less_than_2h": "השתמש בנייד פחות מ־2 שעות ביום",
-  "goal_no_screen_before_sleep": "בלי מסכים שעה לפני השינה",
-  "goal_learning_apps": "השתמש באפליקציות לימודיות",
-  "days_5_7": "5/7 ימים",
-  "days_6_7": "6/7 ימים",
-  "days_2_5": "2/5 ימים",
-  "completed_a11y": "המטרה הושלמה",
-  "not_completed_a11y": "המטרה לא הושלמה"
-},"store": {
-  "title": "חנות",
-  "back_a11y": "חזרה למסך הקודם",
-  "your_balance": "היתרה שלך",
-  "available_rewards": "פרסים זמינים:",
-  "reward_time": "30 דקות זמן מסך",
-  "reward_time_sub": "25 מטבעות",
-  "reward_movie": "בחירת סרט משפחתי",
-  "reward_icecream": "גלידה",
-  "reward_small": "צעצוע קטן",
-  "reward_cost": "25 מטבעות",
-  "coins": "מטבעות"
-},"tasks": {
-  "title": "מטלות",
-  "done": "מטלות שנעשו",
-  "todo": "מטלות שלא נעשו",
-  "done_a11y": "הצג מטלות שבוצעו",
-  "todo_a11y": "הצג מטלות שלא בוצעו",
-  "completed": "תמונה הועלתה",
-  "not_uploaded": "לא הועלתה תמונה",
-  "upload": "העלאת תמונה",
-  "upload_a11y": "העלה תמונה כהוכחה לביצוע המשימה",
-  "week_total": "מטבעות שנצברו השבוע: {{total}}",
-  "clean_room": "שיעורי בית",
-  "read_book": "קריאת ספר",
-  "tidy_room": "סידור חדר",
-  "walk_dog": "הליכה עם הכלב",
-  "help_table": "עזרה במטבח"
-},
+    "title": "מטרות",
+    "weekly_title": "מטרות השבוע",
+    "subtitle": "בואו נראה איך הולך!",
+    "total_progress": "התקדמות כללית",
+    "goal_less_than_2h": "השתמש בנייד פחות מ־2 שעות ביום",
+    "goal_no_screen_before_sleep": "בלי מסכים שעה לפני השינה",
+    "goal_learning_apps": "השתמש באפליקציות לימודיות",
+    "days_5_7": "5/7 ימים",
+    "days_6_7": "6/7 ימים",
+    "days_2_5": "2/5 ימים",
+    "completed_a11y": "המטרה הושלמה",
+    "not_completed_a11y": "המטרה לא הושלמה"
+  },
+  "store": {
+    "title": "חנות",
+    "back_a11y": "חזרה למסך הקודם",
+    "your_balance": "היתרה שלך",
+    "available_rewards": "פרסים זמינים:",
+    "reward_time": "30 דקות זמן מסך",
+    "reward_time_sub": "25 מטבעות",
+    "reward_movie": "בחירת סרט משפחתי",
+    "reward_icecream": "גלידה",
+    "reward_small": "צעצוע קטן",
+    "reward_cost": "25 מטבעות",
+    "coins": "מטבעות"
+  },
+  "tasks": {
+    "title": "מטלות",
+    "done": "מטלות שנעשו",
+    "todo": "מטלות שלא נעשו",
+    "done_a11y": "הצג מטלות שבוצעו",
+    "todo_a11y": "הצג מטלות שלא בוצעו",
+    "completed": "תמונה הועלתה",
+    "not_uploaded": "לא הועלתה תמונה",
+    "upload": "העלאת תמונה",
+    "upload_a11y": "העלה תמונה כהוכחה לביצוע המשימה",
+    "week_total": "מטבעות שנצברו השבוע: {{total}}",
+    "clean_room": "שיעורי בית",
+    "read_book": "קריאת ספר",
+    "tidy_room": "סידור חדר",
+    "walk_dog": "הליכה עם הכלב",
+    "help_table": "עזרה במטבח"
+  },
   "extendTime": {
     "title": "בקשת הארכה",
     "subTitle": "בקשת הארכת זמן",
@@ -115,7 +117,6 @@
     "messageLabel": "הודעה להורה (אופציונלי):",
     "messagePlaceholder": "אני רוצה לסיים לראות את הסרט...",
     "send": "שליחת בקשה להורה",
-
     "back_a11y": "חזרה למסך הקודם",
     "menu_a11y": "פתיחת תפריט",
     "option_a11y": "בחירה של תוספת {{minutes}} דקות",
@@ -126,31 +127,31 @@
     "send_a11y": "שליחת בקשת הארכה"
   },
   "selectRole": {
-  "title": "מי משתמש באפליקציה?",
-  "heading": "מי משתמש באפליקציה?",
-  "subHeading": "בחרו פרופיל להמשך",
-  "child": "ילד",
-  "child_desc": "שימוש מבוקר לפי כללי ההורה",
-  "parent": "הורה",
-  "parent_desc": "ניהול, מעקב והגדרות שימוש",
-  "child_a11y": "כניסה כילד",
-  "parent_a11y": "כניסה כהורה",
-  "back_a11y": "חזור",
-  "menu_a11y": "פתח תפריט"
-},
-"roleSelection": {
-  "title": "ברוכים הבאים",
-  "heading": "מי משתמש באפליקציה?",
-  "subHeading": "בחרו פרופיל להמשך",
-  "childs": "ילד",
-  "childDescription": "שימוש במכשיר לפי ההגבלות שההורה הגדיר",
-  "parents": "הורה",
-  "parentDescription": "ניהול מגבלות, מעקב שימוש ואישור בקשות",
-  "child_a11y": "המשך כילד",
-  "parent_a11y": "המשך כהורה",
-  "back_a11y": "חזור",
-  "menu_a11y": "פתח תפריט"
-},
+    "title": "מי משתמש באפליקציה?",
+    "heading": "מי משתמש באפליקציה?",
+    "subHeading": "בחרו פרופיל להמשך",
+    "child": "ילד",
+    "child_desc": "שימוש מבוקר לפי כללי ההורה",
+    "parent": "הורה",
+    "parent_desc": "ניהול, מעקב והגדרות שימוש",
+    "child_a11y": "כניסה כילד",
+    "parent_a11y": "כניסה כהורה",
+    "back_a11y": "חזור",
+    "menu_a11y": "פתח תפריט"
+  },
+  "roleSelection": {
+    "title": "ברוכים הבאים",
+    "heading": "מי משתמש באפליקציה?",
+    "subHeading": "בחרו פרופיל להמשך",
+    "childs": "ילד",
+    "childDescription": "שימוש במכשיר לפי ההגבלות שההורה הגדיר",
+    "parents": "הורה",
+    "parentDescription": "ניהול מגבלות, מעקב שימוש ואישור בקשות",
+    "child_a11y": "המשך כילד",
+    "parent_a11y": "המשך כהורה",
+    "back_a11y": "חזור",
+    "menu_a11y": "פתח תפריט"
+  },
   "linkChildren": {
     "title": "חיבור להורה",
     "back_a11y": "חזרה",
@@ -165,7 +166,7 @@
     "scan": "סריקת ברקוד",
     "scan_a11y": "התחלת סריקת ברקוד",
     "camera_denied_message": "גישה למצלמה נדרשת כדי לסרוק את הברקוד.",
-    "error_title": "משהו השתבש",  
+    "error_title": "משהו השתבש",
     "error_generic": "חיבור למכשיר נכשל, נסה שוב.",
     "code_placeholder": "הקלד/י קוד",
     "code_input_a11y": "שדה הזנת קוד",
@@ -183,13 +184,11 @@
     "or": "או",
     "no_account": "עדיין אין לך חשבון?",
     "register": "הירשם עכשיו",
-
     "invalid_email": "נא להכניס כתובת אימייל תקינה.",
     "invalid_password": "הסיסמה חייבת להכיל לפחות 8 תווים.",
     "missing_fields": "יש למלא את כל השדות",
     "missing_password": "נא להכניס סיסמה.",
     "generic_error": "משהו השתבש, נסה שוב.",
-
     "back_a11y": "חזרה",
     "menu_a11y": "תפריט",
     "email_a11y": "שדה אימייל",
@@ -220,7 +219,8 @@
     "passwords_not_match": "הסיסמאות אינן תואמות.",
     "success_title": "הסיסמה עודכנה",
     "success_message": "הסיסמה שלך אופסה בהצלחה."
-  },"homeParent": {
+  },
+  "homeParent": {
     "title": "ברוכים הבאים",
     "parent_name_fallback": "אמא",
     "hello": "שלום, {{name}}!",
@@ -233,16 +233,17 @@
     "overview_a11y": "מעבר לסקירה כללית",
     "full_watch_a11y": "פתיחת צפייה מלאה",
     "add_child_a11y": "הוספת ילד חדש",
-    "child_card_a11y": "בחירת ילד: {{name}}"
+    "child_card_a11y": "בחירת ילד: {{name}}",
+    "no_children": "אין ילדים עדיין. הוסף ילד כדי להתחיל"
   },
   "tabs": {
-  "home": "בית",
-  "kids": "ילדים",
-  "limits": "מגבלות",
-  "reports": "דוחות",
-  "settings": "הגדרות"
-},
-"achievements": {
+    "home": "בית",
+    "kids": "ילדים",
+    "limits": "מגבלות",
+    "reports": "דוחות",
+    "settings": "הגדרות"
+  },
+  "achievements": {
     "title": "הישגים",
     "heading": "ההישגים שלי",
     "subtitle": "המשך להשיג יעדים ולפתוח תגמולים חדשים",
@@ -269,7 +270,7 @@
         "reward": "1000 נק׳"
       }
     }
-},
+  },
   "registerParent": {
     "title": "הרשמה להורה",
     "heading": "יצירת חשבון הורה",
@@ -294,7 +295,7 @@
     "confirm_password_a11y": "שדה אימות סיסמה",
     "toggle_password_a11y": "הצג או הסתר סיסמה",
     "toggle_confirm_password_a11y": "הצג או הסתר אימות סיסמה",
-    "register_a11y": "כפתור הרשמה", 
+    "register_a11y": "כפתור הרשמה",
     "login_a11y": "מעבר למסך התחברות"
   },
   "addChild": {
@@ -342,6 +343,3 @@
     "view_limits_a11y": "צפייה במגבלות של {{name}}"
   }
 }
-
-
-

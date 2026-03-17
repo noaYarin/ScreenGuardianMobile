@@ -238,7 +238,8 @@
     "overview_a11y": "Go to overview",
     "full_watch_a11y": "Open full view",
     "add_child_a11y": "Add a new child",
-    "child_card_a11y": "Select child: {{name}}"
+    "child_card_a11y": "Select child: {{name}}",
+    "no_children": "No children yet. Add a child to get started"
   },
   "tabs": {
   "home": "Home",
