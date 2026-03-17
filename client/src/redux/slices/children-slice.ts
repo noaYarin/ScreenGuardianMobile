@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import * as parentApi from "@/src/api/parent";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { addChildThunk, getMyChildrenThunk } from "../thunks/childrenThunks";
 
 export type Child = {
   _id: string;
@@ -27,17 +27,6 @@ const initialState: ChildrenState = {
   error: null,
 };
 
-export const addChildThunk = createAsyncThunk(
-  "children/addChild",
-  async (payload: AddChildPayload, thunkAPI) => {
-    try {
-      const response = await parentApi.addChild(payload);
-      return response.child;
-    } catch (err: any) {
-      return thunkAPI.rejectWithValue(err?.message || "children.add_failed");
-    }
-  }
-);
 
 const childrenSlice = createSlice({
   name: "children",
@@ -63,7 +52,22 @@ const childrenSlice = createSlice({
       .addCase(addChildThunk.rejected, (state, action) => {
         state.isLoading = false;
         state.error = (action.payload as string) || "children.add_failed";
+      })
+
+      .addCase(getMyChildrenThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getMyChildrenThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.children = action.payload;
+      })
+      .addCase(getMyChildrenThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string) || "children.fetch_failed";
       });
+
+
   },
 });
 

@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
-import { View, Pressable } from "react-native";
-import { Stack, router, type Href } from "expo-router";
+import React, { useEffect, useMemo } from "react";
+import { View, Pressable, ActivityIndicator } from "react-native";
+import { router, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -8,6 +8,10 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/src/redux/store/types";
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ChildCard = {
   id: string;
@@ -25,17 +29,41 @@ export default function HomeParentScreen() {
   const { t } = useTranslation();
   const { row, text } = useLocaleLayout();
 
-  const parentName = t("homeParent.parent_name_fallback");
+  const dispatch = useDispatch<AppDispatch>();
 
-  const children: ChildCard[] = useMemo(
-    () => [
-      { id: "noam", name: "נועם", usedText: "2:30", limitText: "4:00", status: "good" },
-      { id: "tomer", name: "תומר", usedText: "4:00", limitText: "4:00", status: "bad" },
-      { id: "yael", name: "יעל", usedText: "3:45", limitText: "4:00", status: "warn" },
-    ],
-    []
+  const { children, isLoading, error } = useSelector(
+    (state: {
+      children: {
+        children: {
+          _id: string;
+          name: string;
+          birthDate?: string;
+          gender?: string;
+          interests?: string[];
+        }[];
+        isLoading: boolean;
+        error: string | null;
+      };
+    }) => state.children
   );
 
+  useEffect(() => {
+    dispatch(getMyChildrenThunk());
+  }, [dispatch]);
+
+  const parentName = t("homeParent.parent_name_fallback");
+
+  const childCards: ChildCard[] = useMemo(
+    () =>
+      children.map((child) => ({
+        id: child._id,
+        name: child.name,
+        usedText: "--:--",
+        limitText: "--:--",
+        status: "good",
+      })),
+    [children]
+  );
   const onPressOverview = () => router.push("/Parent/reports" as Href);
   const onPressFullWatch = () => router.push("/Parent/kidDetails" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
@@ -81,62 +109,85 @@ export default function HomeParentScreen() {
               </View>
             </View>
 
+
             {/* Children cards */}
-            <View style={styles.cardsWrap}>
-              {children.map((c) => (
-                <View key={c.id} style={styles.card} accessibilityRole="summary">
-                  <View style={[styles.cardInner, row]}>
-                    {/* Avatar */}
-                    <View
-                      style={[
-                        styles.avatarCircle,
-                        c.status === "good" && styles.avatarGood,
-                        c.status === "warn" && styles.avatarWarn,
-                        c.status === "bad" && styles.avatarBad,
-                      ]}
-                    >
-                      <MaterialCommunityIcons name={ICON.user} size={22} color="#0F172A" />
-                    </View>
+            {isLoading ? (
+              <View style={{ paddingVertical: 16 }}>
+                <ActivityIndicator />
+              </View>
+            ) : error ? (
+              <AppText style={[styles.sectionSub, text]}>{t(error)}</AppText>
+            ) : childCards.length === 0 ? (
+              <View style={{ alignItems: "center", gap: 12, paddingVertical: 16 }}>
+                <AppText style={[styles.sectionSub, text]}>
+                  {t("homeParent.no_children")}
+                </AppText>
 
-                    {/* Child info */}
-                    <View style={styles.cardCenter}>
-                      <AppText
-                        weight="extraBold"
-                        style={[styles.childName, text]}
-                        numberOfLines={1}
-                      >
-                        {c.name}
-                      </AppText>
-                      <AppText
-                        style={[styles.childSubtitle, text]}
-                        numberOfLines={1}
-                      >
-                        {t("homeParent.day_screen_time")}
-                      </AppText>
-                    </View>
-
-                    {/* Time info */}
-                    <View style={styles.cardLeft}>
-                      <AppText
-                        weight="extraBold"
+                <Pressable
+                  style={styles.btnSecondary}
+                  onPress={onPressAddChild}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("homeParent.add_child_a11y")}
+                >
+                  <AppText weight="extraBold" style={styles.btnSecondaryText}>
+                    {t("homeParent.add_child")}
+                  </AppText>
+                </Pressable>
+              </View>
+            ) : (
+              <View style={styles.cardsWrap}>
+                {childCards.map((c) => (
+                  <View key={c.id} style={styles.card} accessibilityRole="summary">
+                    <View style={[styles.cardInner, row]}>
+                      <View
                         style={[
-                          styles.timeMain,
-                          c.status === "good" && styles.timeGood,
-                          c.status === "warn" && styles.timeWarn,
-                          c.status === "bad" && styles.timeBad,
+                          styles.avatarCircle,
+                          c.status === "good" && styles.avatarGood,
+                          c.status === "warn" && styles.avatarWarn,
+                          c.status === "bad" && styles.avatarBad,
                         ]}
                       >
-                        {c.usedText}
-                      </AppText>
-                      <AppText style={styles.timeSub}>
-                        {t("homeParent.out_of", { limit: c.limitText })}
-                      </AppText>
+                        <MaterialCommunityIcons name={ICON.user} size={22} color="#0F172A" />
+                      </View>
+
+                      <View style={styles.cardCenter}>
+                        <AppText
+                          weight="extraBold"
+                          style={[styles.childName, text]}
+                          numberOfLines={1}
+                        >
+                          {c.name}
+                        </AppText>
+                        <AppText
+                          style={[styles.childSubtitle, text]}
+                          numberOfLines={1}
+                        >
+                          {t("homeParent.day_screen_time")}
+                        </AppText>
+                      </View>
+
+                      <View style={styles.cardLeft}>
+                        <AppText
+                          weight="extraBold"
+                          style={[
+                            styles.timeMain,
+                            c.status === "good" && styles.timeGood,
+                            c.status === "warn" && styles.timeWarn,
+                            c.status === "bad" && styles.timeBad,
+                          ]}
+                        >
+                          {c.usedText}
+                        </AppText>
+                        <AppText style={styles.timeSub}>
+                          {t("homeParent.out_of", { limit: c.limitText })}
+                        </AppText>
+                      </View>
                     </View>
                   </View>
-                </View>
-              ))}
-            </View>
-
+                ))}
+              </View>
+            )}
+            
             {/* Action buttons */}
             <View style={styles.actionsWrap}>
               <Pressable

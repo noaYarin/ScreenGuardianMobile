@@ -19,7 +19,8 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/src/redux/store/types";
-import { addChildThunk, clearChildrenError } from "@/src/redux/slices/children-slice";
+import { addChildThunk } from "@/src/redux/thunks/childrenThunks";
+import { clearChildrenError } from "@/src/redux/slices/children-slice";
 
 function HeaderIconButton({
   name,
@@ -239,14 +240,20 @@ export default function AddChildScreen() {
             </View>
 
             <Pressable
-              style={styles.saveButton}
+              style={[styles.saveButton, isLoading && { opacity: 0.7 }]}
               onPress={onSave}
+              disabled={isLoading}
+
               accessibilityRole="button"
               accessibilityLabel={t("addChild.save_a11y")}
             >
-              <AppText weight="extraBold" style={styles.saveButtonText}>
-                {t("addChild.save")}
-              </AppText>
+              {isLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <AppText weight="extraBold" style={styles.saveButtonText}>
+                  {t("addChild.save")}
+                </AppText>
+              )}
             </Pressable>
 
             <View style={styles.bottomSpacer} />
