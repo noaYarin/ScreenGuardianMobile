@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const enteringFormStyles = StyleSheet.create({
   flex1: { flex: 1 },
 
   container: {
@@ -17,7 +17,6 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 18,
     paddingBottom: 16,
-
     shadowColor: "#000",
     shadowOpacity: 0.12,
     shadowRadius: 16,
@@ -58,12 +57,10 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-
     backgroundColor: "#F9FAFB",
     borderWidth: 1,
     borderColor: "#E5E7EB",
     borderRadius: 16,
-
     paddingHorizontal: 12,
     paddingVertical: 12,
     marginBottom: 12,
@@ -92,6 +89,17 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
+  forgotWrap: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+
+  forgotText: {
+    color: "#2563EB",
+    textDecorationLine: "underline",
+  },
+
   primaryBtn: {
     width: "100%",
     borderRadius: 18,
@@ -115,8 +123,46 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
 
+  dividerRow: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginTop: 14,
+    marginBottom: 12,
+  },
+
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#E5E7EB",
+  },
+
+  dividerText: {
+    color: "#6B7280",
+    fontSize: 12,
+  },
+
+  bottomRow: {
+    width: "100%",
+    gap: 6,
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 14,
+    flexWrap: "wrap",
+  },
+
+  bottomText: {
+    color: "#6B7280",
+  },
+
   bottomLink: {
     color: "#2563EB",
     textDecorationLine: "underline",
+  },
+
+  backButtonWrapper: {
+    marginTop: 20,
+    alignItems: "center",
   },
 });
