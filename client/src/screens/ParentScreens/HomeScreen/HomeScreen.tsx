@@ -117,7 +117,7 @@ export default function HomeParentScreen() {
               </View>
             ) : error ? (
               <AppText style={[styles.sectionSub, text]}>{t(error)}</AppText>
-            ) : childCards.length === 0 ? (
+            ) : children.length === 0 ? (
               <View style={{ alignItems: "center", gap: 12, paddingVertical: 16 }}>
                 <AppText style={[styles.sectionSub, text]}>
                   {t("homeParent.no_children")}
@@ -214,7 +214,7 @@ export default function HomeParentScreen() {
                 </Pressable>
               </View>
             )}
-            
+
             <View style={styles.bottomSpacer} />
           </View>
         </View>
