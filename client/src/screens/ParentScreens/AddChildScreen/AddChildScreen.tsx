@@ -124,7 +124,7 @@ export default function AddChildScreen() {
     }
   };
 
-  
+
   return (
     <>
       <Stack.Screen
@@ -174,6 +174,7 @@ export default function AddChildScreen() {
                   placeholder={t("addChild.name_placeholder")}
                   placeholderTextColor="#94A3B8"
                   style={[styles.input, text]}
+                  maxLength={30}
                   accessibilityLabel={t("addChild.name_a11y")}
                 />
               </View>
@@ -189,7 +190,8 @@ export default function AddChildScreen() {
                   placeholder={t("addChild.birthdate_placeholder")}
                   placeholderTextColor="#94A3B8"
                   style={[styles.input, text]}
-                  keyboardType="number-pad"
+                  keyboardType="numbers-and-punctuation"
+                  maxLength={10}
                   accessibilityLabel={t("addChild.birthdate_a11y")}
                 />
               </View>
