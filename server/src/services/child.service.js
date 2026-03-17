@@ -1,6 +1,8 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { Role } from "../constants/role.js";
+import { Gender } from "../constants/gender.js";
+
 
 export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;
@@ -13,6 +15,10 @@ export function validateAndBuildChildDoc(body = {}) {
       throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
     }
   }
+
+  if (gender && !Object.values(Gender).includes(gender)) {
+  throw new AppError(CommonErrors.VALIDATION_GENDER_INVALID);
+}
 
   return {
     name: typeof name === "string" ? name : undefined,
