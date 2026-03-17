@@ -6,7 +6,6 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CameraView } from "expo-camera";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import { linkDevice } from "../../../api";
 import { styles } from "./linkDeviceScreen.styles";
 
 type Mode = "barcode" | "code";

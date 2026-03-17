@@ -6,10 +6,9 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AuthFormCard from "../../../components/AuthFormCard/AuthFormCard";
-import { resetPassword } from "@/src/redux/thunks/authThunks";
 import { validateResetPassword } from "@/src/validation/authValidation";
 import { AppDispatch } from "@/src/redux/store/types";
-import { setError } from "@/src/redux/slices/auth-slice";
+import { setError, resetPassword } from "@/src/redux/slices/auth-slice";
 import { enteringFormStyles as styles } from "@/src/components/AuthFormCard/AuthFormCard.styles";
 
 const ICON = {

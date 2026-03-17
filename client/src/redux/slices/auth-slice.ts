@@ -7,6 +7,7 @@ import {
   forgotPassword,
 } from "../thunks/authThunks";
 
+
 type AuthState = {
   parentId: string | null;
   token: string | null;
@@ -120,16 +121,15 @@ const authSlice = createSlice({
 
 export const {
   setError,
-  setAuthFromServer,
-  setAuthFromToken,
-  setActiveChild,
-  exitParentMode,
-  logout,
 } = authSlice.actions;
 
+// Export all auth thunks, now the components use it from this slice 
 export {
   loginParent,
   registerParent,
+  resetPassword,
+  forgotPassword,
   fetchChildren,
 } from "../thunks/authThunks";
+
 export default authSlice.reducer;
