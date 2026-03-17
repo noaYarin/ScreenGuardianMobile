@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { View, Pressable } from "react-native";
 import { Stack, router, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -8,6 +8,10 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "@/src/redux/store/types";
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ChildCard = {
   id: string;
