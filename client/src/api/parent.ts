@@ -10,6 +10,7 @@ type Child = {
   isActive: boolean;
   role: string;
   achievementIds?: string[];
+  selectedDeviceId?: string | null;
   avatar?: Record<string, unknown>;
   createdAt?: string;
   updatedAt?: string;
