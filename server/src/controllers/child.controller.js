@@ -2,7 +2,8 @@ import {
   addChild,
   getChildren,
   setChildActive,
-  updateChildInterests
+  updateChildInterests,
+  setSelectedDevice
 } from "../services/parent.service.js";
 
 export async function addChildController(req, res, next) {
@@ -50,6 +51,21 @@ export async function updateChildInterestsController(req, res, next) {
     const data = await updateChildInterests(parentId, childId, interests);
 
     res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export async function setSelectedDeviceController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId } = req.params;
+    const { deviceId } = req.body ?? {};
+
+    const data = await setSelectedDevice(parentId, childId, deviceId);
+
+    res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);
   }

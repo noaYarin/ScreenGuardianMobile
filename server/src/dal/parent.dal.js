@@ -122,3 +122,17 @@ export async function updateChildInterestsByParentId(parentId, childId, interest
 
   return updated;
 }
+
+
+
+export async function updateSelectedDeviceByParentId(parentId, childId, selectedDeviceId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+  assertValidObjectId(selectedDeviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return ParentModel.findOneAndUpdate(
+    { _id: parentId, "children._id": childId },
+    { $set: { "children.$.selectedDeviceId": selectedDeviceId } },
+    { new: true }
+  ).lean();
+}

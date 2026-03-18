@@ -4,10 +4,13 @@ import {
   getChildrenByParentId,
   updateChildActiveByParentId,
   pushChildToParent,
-  updateChildInterestsByParentId
+  updateChildInterestsByParentId,
+  updateSelectedDeviceByParentId
+
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
 import { assertBoolean } from "../utils/validators.js"; 
+import { findDevicesByChildId } from "../dal/device.dal.js";
 
 
 export async function addChild(parentId, body) {
@@ -73,5 +76,29 @@ export async function updateChildInterests(parentId, childId, interests) {
   return {
     childId: child._id,
     interests: child.interests || []
+  };
+}
+
+
+export async function setSelectedDevice(parentId, childId, deviceId) {
+  const childList = await getChildrenByParentId(parentId);
+  const child = childList.find((c) => String(c._id) === String(childId));
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const devices = await findDevicesByChildId(childId);
+  const device = devices.find((d) => String(d._id) === String(deviceId));
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  await updateSelectedDeviceByParentId(parentId, childId, deviceId);
+
+  return {
+    childId,
+    selectedDeviceId: deviceId
   };
 }

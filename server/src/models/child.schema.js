@@ -18,6 +18,11 @@ export const ChildSchema = new mongoose.Schema(
       ref: "Achievement",
       default: []
     },
+    selectedDeviceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Device",
+      default: null
+    },
     avatar: { type: AvatarSchema, default: () => ({}) },
   },
 
