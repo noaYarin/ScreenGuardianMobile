@@ -1,5 +1,5 @@
 import React from "react";
-import HomeParentScreen from "../../src/screens/ParentScreens/HomeScreen/HomeScreen";
+import HomeParentScreen from "../../../src/screens/ParentScreens/HomeScreen/HomeScreen";
 import { useTranslation } from "react-i18next";
 import { Stack } from "expo-router";
 

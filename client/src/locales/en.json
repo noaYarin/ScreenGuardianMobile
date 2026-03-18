@@ -330,7 +330,7 @@
     "success_message": "The child was saved successfully"
   },
   "kidDetails": {
-    "title": "Kids Management",
+    "title": "Kid Details",
     "back_a11y": "Go back",
     "menu_a11y": "Open menu",
     "birthdate_value": "Birth date: {{value}}",
@@ -338,18 +338,262 @@
     "used_today": "Used today",
     "daily_limit": "Daily limit",
     "devices_title": "Devices",
-    "add_device": "Connect device",
-    "add_device_a11y": "Connect device",
+    "toggle_devices_a11y": "Expand or collapse devices list",
+    "add_device": "Add device",
+    "add_device_a11y": "Add a new device for this child",
     "active_now": "Active now",
     "remaining_time_value": "Remaining time: {{value}}",
     "delete_device_a11y": "Delete device {{name}}",
     "view_limits": "View limits",
-    "view_limits_a11y": "View limits for {{name}}"
+    "view_limits_a11y": "View limits for {{name}}",
+    "child_profile": "Child profile",
+    "child_profile_a11y": "Open profile for {{name}}"
   },
   "linkDevice": {
     "title": "Connect Device"
+  },
+  "childProfile": {
+    "title": "Child Profile",
+    "edit": "Edit Details",
+    "edit_a11y": "Edit child details",
+    "age": "Age {{age}}",
+    "actions": {
+      "apps": {
+        "title": "Apps on Device",
+        "subtitle": "View installed apps",
+        "a11y": "Go to apps on device screen"
+      },
+      "limits": {
+        "title": "Screen Time Limits",
+        "subtitle": "View limits",
+        "a11y": "Go to screen time limits screen"
+      },
+      "reports": {
+        "title": "Child Reports",
+        "subtitle": "View statistics",
+        "a11y": "Go to child reports screen"
+      },
+      "location": {
+        "title": "Location",
+        "subtitle": "Track location",
+        "a11y": "Go to child location screen"
+      },
+      "requests": {
+        "title": "Extension Requests",
+        "subtitle": "1 pending request",
+        "a11y": "Go to extension requests screen"
+      }
+    }
+  },
+  "homeMenu": {
+    "title": "Menu",
+
+    "items": {
+      "location": "Location",
+      "alerts": "System Alerts",
+      "requests": "Extension Requests",
+      "activities": "Activity Recommendations",
+      "rewards": "Tasks & Rewards",
+      "chatbot": "Chatbot",
+      "history": "Activity History"
+    }
+  },
+  "limits": {
+    "title": "Limits",
+    "heading": "Manage Limits",
+    "subtitle": "Set screen time, breaks, and other restrictions in a clean and structured way.",
+    "screenTime": {
+      "title": "Screen Time",
+      "dailyWeekly": "Daily & Weekly Limits",
+      "dailyWeeklyDescription": "Set usage duration by day or by week.",
+      "dailyWeeklyA11y": "Go to daily and weekly limits screen",
+      "breaks": "Breaks Between Sessions",
+      "breaksDescription": "Set rest time between usage sessions."
+    },
+    "apps": {
+      "title": "Apps",
+      "blockedApps": "Blocked Apps",
+      "blockedAppsDescription": "Manage apps that should not be allowed."
+    }
+  },
+ "dailyTimeLimits": {
+    "title": "Screen Time Limits",
+
+    "heroTitle": "Manage screen time per child and device",
+    "heroSubtitle": "Select a child and then choose the relevant device to adjust limits accurately.",
+
+    "childrenSectionTitle": "Select Child",
+    "devicesSectionTitle": "Select Device",
+
+    "childRole": "Personal Management",
+
+    "deviceContext": "{{childName}} · {{deviceName}}",
+
+    "usedLabel": "Used so far",
+
+    "edit": "Edit Limit",
+    "editA11y": "Edit limit for {{section}}",
+
+    "childTabA11y": "Select child {{name}}",
+    "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
+
+    "daily": {
+      "title": "Daily Limit",
+      "summary": "Current limit is {{value}} per day"
+    },
+
+    "weekly": {
+      "title": "Weekly Limit",
+      "summary": "Current limit is {{value}} per week"
+    },
+
+    "range": {
+      "startLabel": "Current usage",
+      "endLabel": "Limit"
+    },
+
+    "devices": {
+      "phone": "Phone",
+      "tablet": "Tablet"
+    },
+    "status": {
+  "ok": "OK"
+},
+  "almostReached": "Almost reached limit",
+      "done": "Done",
+    "currentLimit": "Current limit",
+    "editWeekly": "Edit weekly",
+    "a11y": {
+    "editWeeklySchedule": "Edit weekly schedule",
+    "editDailyLimit": "Edit daily limit",
+    "doneEditing": "Finish editing",
+    "decreaseByFiveMinutes": "Decrease by five minutes",
+    "increaseByFiveMinutes": "Increase by five minutes"
+  }
+  },
+  "childDeviceSelector": {
+    "childrenSectionTitle": "Select Child",
+    "devicesSectionTitle": "Select Device",
+    "defaultChildSubtitle": "Personal Management",
+    "childTabA11y": "Select child {{name}}",
+    "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
+    "devices": {
+      "phone": "Phone",
+      "tablet": "Tablet"
+    }
+  },
+  "routineLimits": {
+    "title": "Weekly Routine",
+    "hero": {
+      "title": "Weekly Routine Management",
+      "subtitle": "Plan recurring lock periods by day, hour, and usage habits"
+    },
+    "overview": {
+      "title": "Quick Overview",
+      "subtitle": "{{childName}}'s routine board for {{deviceName}}"
+    },
+    "stats": {
+      "rules": "Active Rules",
+      "lockedHours": "Locked Hours",
+      "activeDays": "Active Days"
+    },
+    "scheduler": {
+      "title": "Weekly Board",
+      "subtitle": "A visual view of device lock periods across the week"
+    },
+    "legend": {
+      "locked": "Locked",
+      "open": "Open"
+    },
+    "presetsSection": {
+      "title": "Quick Presets",
+      "subtitle": "Fast selection of common routine types"
+    },
+    "presets": {
+      "schoolHours": "School Hours",
+      "sleep": "Sleep",
+      "homework": "Homework",
+      "family": "Family Time"
+    },
+    "form": {
+      "title": "Add Routine Rule",
+      "subtitle": "Static form for now until full server integration",
+      "ruleName": "Title",
+      "start": "Starts",
+      "end": "Ends",
+      "repeat": "Repeat",
+      "hint": "Later, this form can support day selection, time ranges, lock types, and device-specific exceptions.",
+      "addButton": "Add Routine"
+    },
+    "formValues": {
+      "sleepRoutine": "Sleep Routine",
+      "startValue": "Every day, 20:00",
+      "endValue": "Every day, 07:00",
+      "weekdays": "Sun–Thu"
+    },
+    "blockTitles": {
+      "schoolMorning": "School",
+      "afternoonLock": "Afternoon",
+      "sleepTime": "Sleep",
+      "studyWindow": "Study",
+      "familyTime": "Family"
+    },
+    "daysShort": {
+      "sunday": "S",
+      "monday": "M",
+      "tuesday": "T",
+      "wednesday": "W",
+      "thursday": "T",
+      "friday": "F",
+      "saturday": "S"
+    },
+    "a11y": {
+      "gridCell": "Grid cell for {{day}} at {{time}}, state: {{state}}",
+      "selectPreset": "Select preset {{name}}",
+      "addRoutine": "Add a new routine rule"
+    }
+  },
+  "weeklySchedule": {
+    "title": "Weekly Schedule",
+    "heading": "Weekly Hour Limits",
+    "subtitle": "Set allowed usage hours for {{childName}} on {{deviceName}}",
+    "dayRailTitle": "Quick jump by day",
+    "dayRailHint": "Tap a day to scroll to its section",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "copyToAll": "Copy to all days",
+    "save": "Save schedule",
+    "totalHours": "Total time: {{hours}} hours",
+    "status": {
+      "enabled": "Enabled",
+      "disabled": "Disabled"
+    },
+    "summary": {
+      "activeDays": "Active days",
+      "totalHours": "Weekly hours"
+    },
+    "days": {
+      "sun": { "short": "S", "full": "Sunday" },
+      "mon": { "short": "M", "full": "Monday" },
+      "tue": { "short": "T", "full": "Tuesday" },
+      "wed": { "short": "W", "full": "Wednesday" },
+      "thu": { "short": "T", "full": "Thursday" },
+      "fri": { "short": "F", "full": "Friday" },
+      "sat": { "short": "S", "full": "Saturday" }
+    },
+    "a11y": {
+      "scrollToDay": "Jump to {{day}}",
+      "toggleDay": "Enable or disable {{day}}",
+      "editStartTime": "Edit start time for {{day}}",
+      "editEndTime": "Edit end time for {{day}}",
+      "copyToAllDays": "Copy current settings to all days",
+      "saveSchedule": "Save weekly schedule"
+    }
   }
 }
+
+
+
 
 
 
