@@ -9,6 +9,8 @@ import { notifyParent, notifyChild } from "../services/notification.service.js";
 import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
+import { validateDeviceAccess } from "../services/deviceManagement.service.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -21,6 +23,17 @@ function assertMinutes(minutes) {
     return n;
 }
 
+
+function ensureChildBelongsToParent(childList, childId) {
+    const child = childList.find((c) => String(c._id) === String(childId));
+
+    if (!child) {
+        throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+    }
+
+    return child;
+}
+
 function assertDecision(decision) {
     if (
         decision !== RequestStatus.APPROVED &&
@@ -30,23 +43,6 @@ function assertDecision(decision) {
     }
 }
 
-async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
-    const device = await findDeviceById(deviceId);
-
-    if (!device) {
-        throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
-    }
-
-    if (String(device.parentId) !== String(parentId)) {
-        throw new AppError(RequestErrors.DEVICE_NOT_OWNED);
-    }
-
-    if (String(device.childId) !== String(childId)) {
-        throw new AppError(RequestErrors.DEVICE_NOT_OWNED);
-    }
-
-    return device;
-}
 
 export async function createRequest({ parentId, childId, deviceId, requestedMinutes, reason }) {
 
@@ -56,7 +52,7 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
 
     const minutes = assertMinutes(requestedMinutes);
 
-    await assertDeviceBelongsToChild({ deviceId, parentId, childId });
+    await validateDeviceAccess({ deviceId, parentId, childId });
 
     // check duplicate pending request
     const existingPending = await requestDal.findPendingRequestForDevice({
@@ -79,14 +75,19 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
     });
 
 
-    await notifyParent({
-        parentId,
-        childId,
-        type: NotificationType.EXTENSION_REQUEST_CREATED,
-        severity: NotificationSeverity.INFO,
-        title: "New Extension Request",
-        description: "Your child requested more screen time"
-    });
+    try {
+        await notifyParent({
+            parentId,
+            childId,
+            type: NotificationType.EXTENSION_REQUEST_CREATED,
+            severity: NotificationSeverity.INFO,
+            title: "New Extension Request",
+            description: "Your child requested more screen time"
+        });
+    } catch (err) {
+        console.error("notifyParent failed in createRequest:", err.message);
+    }
+
     return request;
 }
 
@@ -98,7 +99,7 @@ export async function getChildRequests({ parentId, childId, status }) {
     if (status) {
         const allowed = new Set(Object.values(RequestStatus));
         if (!allowed.has(status)) {
-            throw new AppError(CommonErrors.VALIDATION_ERROR);
+            throw new AppError(RequestErrors.INVALID_REQUEST_STATUS);
         }
     }
 
@@ -110,11 +111,13 @@ export async function getChildRequests({ parentId, childId, status }) {
 }
 
 export async function getPendingRequests({ parentId, childId }) {
-
     assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 
     if (childId) {
         assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+        const childList = await getChildrenByParentId(parentId);
+        ensureChildBelongsToParent(childList, childId);
     }
 
     return requestDal.findPendingRequestsByParent({
@@ -144,32 +147,39 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 Number(updated.requestedMinutes || 0)
             );
         }
-        await notifyChild({
-            parentId: updated.parentId,
-            childId: updated.childId,
-            type: decision === RequestStatus.APPROVED
-                ? NotificationType.EXTENSION_REQUEST_APPROVED
-                : NotificationType.EXTENSION_REQUEST_REJECTED,
-            severity: NotificationSeverity.INFO,
-            title: decision === RequestStatus.APPROVED
-                ? "Extension Request Approved"
-                : "Extension Request Rejected",
-            description: decision === RequestStatus.APPROVED
-                ? "Your parent approved your extension request"
-                : "Your parent rejected your extension request"
-        });
+        try {
+            await notifyChild({
+                parentId: updated.parentId,
+                childId: updated.childId,
+                type: decision === RequestStatus.APPROVED
+                    ? NotificationType.EXTENSION_REQUEST_APPROVED
+                    : NotificationType.EXTENSION_REQUEST_REJECTED,
+                severity: NotificationSeverity.INFO,
+                title: decision === RequestStatus.APPROVED
+                    ? "Extension Request Approved"
+                    : "Extension Request Rejected",
+                description: decision === RequestStatus.APPROVED
+                    ? "Your parent approved your extension request"
+                    : "Your parent rejected your extension request"
+            });
+        } catch (err) {
+            console.error("notifyChild failed in decideRequest:", err.message);
+        }
 
-        await sendAuditLog({
-            parentId: updated.parentId,
-            childId: updated.childId,
-            actionType: decision === RequestStatus.APPROVED
-                ? AuditActionType.APPROVE_REQUEST
-                : AuditActionType.REJECT_REQUEST,
-            description: decision === RequestStatus.APPROVED
-                ? "Parent approved extension request"
-                : "Parent rejected extension request"
-        });
-
+        try {
+            await sendAuditLog({
+                parentId: updated.parentId,
+                childId: updated.childId,
+                actionType: decision === RequestStatus.APPROVED
+                    ? AuditActionType.APPROVE_REQUEST
+                    : AuditActionType.REJECT_REQUEST,
+                description: decision === RequestStatus.APPROVED
+                    ? "Parent approved extension request"
+                    : "Parent rejected extension request"
+            });
+        } catch (err) {
+            console.error("sendAuditLog failed in decideRequest:", err.message);
+        }
 
         return updated;
     }

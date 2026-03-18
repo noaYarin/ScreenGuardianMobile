@@ -1,14 +1,16 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
-import { findDevicesByChildId } from "../dal/device.dal.js";
 import { findRequestsByChild } from "../dal/request.dal.js";
+import { findDeviceById } from "../dal/device.dal.js";
 import { RequestStatus } from "../constants/status.js";
 import {
     RecommendationCode,
     RecommendationPriority
 } from "../constants/recommendation.js";
 import { ActivityIdeas } from "../constants/activityIdeas.js";
+import { validateDeviceAccess } from "../services/deviceManagement.service.js";
+
 
 function ensureChildBelongsToParent(childList, childId) {
     const child = childList.find((c) => String(c._id) === String(childId));
@@ -52,12 +54,10 @@ export async function getChildInterestRecommendations(parentId, childId) {
     };
 }
 
-
-function buildParentsRecommendations({ child, devices, requests }) {
+function buildParentsRecommendations({ child, device, requests }) {
     const recommendations = [];
 
-    const activeDevice = devices[0];
-    const screenTime = activeDevice?.screenTime || {};
+    const screenTime = device?.screenTime || {};
 
     const pendingRequests = requests.filter(
         (r) => r.status === RequestStatus.PENDING
@@ -66,7 +66,6 @@ function buildParentsRecommendations({ child, devices, requests }) {
     const approvedRequests = requests.filter(
         (r) => r.status === RequestStatus.APPROVED
     );
-
 
     const isHighDailyUsage =
         screenTime.isLimitEnabled === true &&
@@ -86,7 +85,7 @@ function buildParentsRecommendations({ child, devices, requests }) {
         recommendations.push({
             code: RecommendationCode.PENDING_REQUESTS,
             title: "Pending Extension Requests",
-            description: "You have ${pendingRequests.length} requests waiting for approval or rejection.",
+            description: `You have ${pendingRequests.length} requests waiting for approval or rejection.`,
             priority: RecommendationPriority.MEDIUM
         });
     }
@@ -136,7 +135,7 @@ function buildParentsRecommendations({ child, devices, requests }) {
         });
     }
 
-    if (activeDevice?.isLocked === true) {
+    if (device?.isLocked === true) {
         recommendations.push({
             code: RecommendationCode.CHECK_LOCK_REASON,
             title: "Check if the device still needs to be locked",
@@ -146,8 +145,16 @@ function buildParentsRecommendations({ child, devices, requests }) {
     }
 
     if (child?.birthDate) {
-        const age = new Date().getFullYear() - new Date(child.birthDate).getFullYear();
+        const birth = new Date(child.birthDate);
+        const today = new Date();
 
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
         if (age >= 6 && age <= 10) {
             recommendations.push({
                 code: RecommendationCode.YOUNG_CHILD_GUIDANCE,
@@ -157,14 +164,15 @@ function buildParentsRecommendations({ child, devices, requests }) {
             });
         }
     }
+
     return recommendations;
 }
 
-export async function getParentRecommendations(parentId, childId) {
+export async function getParentRecommendations(parentId, childId, deviceId) {
     const childList = await getChildrenByParentId(parentId);
     const child = ensureChildBelongsToParent(childList, childId);
 
-    const devices = await findDevicesByChildId(childId);
+    const device = await validateDeviceAccess({ deviceId, parentId, childId });
 
     const requests = await findRequestsByChild({
         parentId,
@@ -173,14 +181,13 @@ export async function getParentRecommendations(parentId, childId) {
 
     const recommendations = buildParentsRecommendations({
         child,
-        devices,
+        device,
         requests
     });
 
     return {
         childId,
+        deviceId,
         recommendations
     };
 }
-
-

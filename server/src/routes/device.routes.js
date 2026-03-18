@@ -4,7 +4,8 @@ import { requireParent } from "../middlewares/requireParent.js";
 import {
   lockDeviceController,
   unlockDeviceController,
-  getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController 
+  getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController,
+  setDeviceActiveController  
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -28,6 +29,10 @@ router.get("/:deviceId/screen-time", authJwt, requireParent, getDeviceScreenTime
  //PATCH /api/v1/devices/:deviceId/screen-time
 // Update screen-time settings for a device
 router.patch("/:deviceId/screen-time", authJwt, requireParent, updateDeviceScreenTimeController);
+
+// PATCH /api/v1/devices/:deviceId/active
+// Parent activates/deactivates a device
+router.patch("/:deviceId/active", authJwt, requireParent, setDeviceActiveController);
 
 
 export default router;

@@ -38,7 +38,6 @@ export async function markNotificationAsReadById(parentId, notificationId) {
   ).lean();
 }
 
-
 export async function markAllNotificationsAsRead(parentId) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 

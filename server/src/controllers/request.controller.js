@@ -1,9 +1,15 @@
+import { AppError } from "../utils/appError.js";
+import { Common as CommonErrors } from "../constants/errors.js";
 import * as requestService from "../services/request.service.js";
 
 // Child: POST /api/v1/requests/add
 export async function createRequestController(req, res, next) {
   try {
     const { deviceId, requestedMinutes, reason } = req.body;
+
+    if (!deviceId) {
+      throw new AppError(CommonErrors.INVALID_DEVICE_ID);
+    }
 
     const created = await requestService.createRequest({
       parentId: req.user.parentId,

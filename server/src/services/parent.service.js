@@ -5,7 +5,6 @@ import {
   updateChildActiveByParentId,
   pushChildToParent,
   updateChildInterestsByParentId,
-  updateSelectedDeviceByParentId,
   getChildByParentId
 
 } from "../dal/parent.dal.js";
@@ -91,26 +90,3 @@ export async function updateChildInterests(parentId, childId, interests) {
   };
 }
 
-
-export async function setSelectedDevice(parentId, childId, deviceId) {
-  const childList = await getChildrenByParentId(parentId);
-  const child = childList.find((c) => String(c._id) === String(childId));
-
-  if (!child) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
-
-  const devices = await findDevicesByChildId(childId);
-  const device = devices.find((d) => String(d._id) === String(deviceId));
-
-  if (!device) {
-    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
-  }
-
-  await updateSelectedDeviceByParentId(parentId, childId, deviceId);
-
-  return {
-    childId,
-    selectedDeviceId: deviceId
-  };
-}
