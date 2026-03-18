@@ -1,17 +1,15 @@
 import React from "react";
-import { SafeAreaView, View, ScrollView, Platform } from "react-native";
-import { useTranslation } from "react-i18next";
+import { ScrollView, View } from "react-native";
 import { styles } from "./styles";
 
-export default function ScreenLayout({ children }: { children: React.ReactNode }) {
-  // This hook re-renders the component on language change
-  const { i18n } = useTranslation();
-
-  const rtl = i18n.resolvedLanguage === "he";
-
+export default function ScreenLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-      <ScrollView>
-        <View style={styles.inner}>{children}</View>
-      </ScrollView>
+    <ScrollView contentContainerStyle={styles.content}>
+      <View style={styles.inner}>{children}</View>
+    </ScrollView>
   );
 }
