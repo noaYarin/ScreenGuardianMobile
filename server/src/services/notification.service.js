@@ -1,4 +1,4 @@
-import { findNotificationsByParentId, markNotificationAsReadById, markAllNotificationsAsRead} from "../dal/notification.dal.js";
+import {  createNotification, findNotificationsByParentId, markNotificationAsReadById, markAllNotificationsAsRead} from "../dal/notification.dal.js";
 import { TargetRole } from "../constants/role.js";
 
 export async function notifyParent({
@@ -9,7 +9,7 @@ export async function notifyParent({
     title,
     description
 }) {
-    return createNotificationService({
+    return createNotification({
         parentId,
         childId,
         targetRole: TargetRole.PARENT,
@@ -28,7 +28,7 @@ export async function notifyChild({
     title,
     description
 }) {
-    return createNotificationService({
+    return createNotification({
         parentId,
         childId,
         targetRole: TargetRole.CHILD,
