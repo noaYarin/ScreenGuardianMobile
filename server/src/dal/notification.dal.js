@@ -37,3 +37,13 @@ export async function markNotificationAsReadById(parentId, notificationId) {
     { new: true }
   ).lean();
 }
+
+
+export async function markAllNotificationsAsRead(parentId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+
+  return NotificationModel.updateMany(
+    { parentId, isRead: false },
+    { $set: { isRead: true } }
+  );
+}
