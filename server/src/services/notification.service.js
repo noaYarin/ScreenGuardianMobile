@@ -1,4 +1,5 @@
-import { findNotificationsByParentId, markNotificationAsReadById, createNotification } from "../dal/notification.dal.js";
+import { findNotificationsByParentId, markNotificationAsReadById } from "../dal/notification.dal.js";
+import { TargetRole } from "../constants/role.js";
 
 export async function notifyParent({
     parentId,

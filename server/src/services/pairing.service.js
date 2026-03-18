@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { DevicePlatform } from "../constants/devicePlatform.js";
 
 import {
   createPairingSession,
@@ -89,7 +90,7 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER" }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER", }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -105,12 +106,12 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
     throw new AppError(PairingErrors.SESSION_INVALID);
   }
 
-    const parentId = String(consumed.parentId);
+  const parentId = String(consumed.parentId);
   const childId = String(consumed.childId);
   if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
 
-  const devicePayload = validateDevicePayload(deviceName, deviceType);
+  const devicePayload = validateDevicePayload(deviceName, deviceType, platform);
   const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
 
   // Child token is used to authenticate the child on the device
@@ -122,14 +123,24 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   };
 }
 
-function validateDevicePayload(deviceName, deviceType) {
+function validateDevicePayload(deviceName, deviceType, platform) {
+  const safeDeviceName =
+    typeof deviceName === "string" && deviceName.trim()
+      ? deviceName.trim()
+      : "Child Device";
+
   if (!Object.values(DeviceType).includes(deviceType)) {
     throw new AppError(PairingErrors.INVALID_DEVICE_TYPE);
   }
 
+  if (!Object.values(DevicePlatform).includes(platform)) {
+    throw new AppError(PairingErrors.INVALID_DEVICE_PLATFORM);
+  }
+
   return {
-    deviceName,
+    deviceName: safeDeviceName,
     deviceType,
+    platform,
   };
 }
 
@@ -140,6 +151,7 @@ async function createOrGetDeviceForSession(session, devicePayload) {
   return createDevice({
     name: devicePayload.deviceName,
     type: devicePayload.deviceType,
+    platform: devicePayload.platform,
     isLocked: false,
     code: session.code || "",
     location: "",

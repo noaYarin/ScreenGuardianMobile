@@ -1,6 +1,8 @@
 import NotificationModel from "../models/notification.model.js";
 import { assertValidObjectId } from "../utils/validators.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { TargetRole } from "../constants/role.js";
+
 
 // Create a new notification
 export async function createNotification(doc) {

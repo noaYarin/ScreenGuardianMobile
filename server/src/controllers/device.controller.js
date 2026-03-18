@@ -9,7 +9,7 @@ export async function getDevicesByChildController(req, res, next) {
 
     const devices = await getDevicesByChild(parentId, childId);
 
-    res.status(200).json(devices);
+    res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);
   }

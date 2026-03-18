@@ -33,6 +33,7 @@ export const Auth = {
 export const Common = {
   PARENT_NOT_FOUND: { status: 404, code: "PARENT_NOT_FOUND", message: "Parent not found" },
   CHILD_NOT_FOUND: { status: 400, code: "CHILD_NOT_FOUND", message: "Child does not belong to this parent" },
+  INVALID_ID: { status: 400, code: "VALIDATION_ERROR", message: "Invalid id" },
   INVALID_PARENT_ID: { status: 400, code: "INVALID_ID", message: "Invalid parentId" },
   INVALID_CHILD_ID: { status: 400, code: "INVALID_ID", message: "Invalid childId" },
   INVALID_SESSION_ID: { status: 400, code: "INVALID_ID", message: "Invalid session id" },
@@ -44,11 +45,13 @@ export const Common = {
   VALIDATION_NAME_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "Name is required" },
   VALIDATION_NAME_TOO_LONG: { status: 400, code: "VALIDATION_ERROR", message: "Name is too long" },
   VALIDATION_BIRTHDATE_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "birthDate must be a valid date" },
-  VALIDATION_GENDER_INVALID: {status: 400,code: "VALIDATION_ERROR",message: "gender must be one of: boy, girl, other"} ,
+  VALIDATION_GENDER_INVALID: { status: 400, code: "VALIDATION_ERROR", message: "gender must be one of: boy, girl, other" },
   VALIDATION_CHILD_ID: { status: 400, code: "VALIDATION", message: "childId must be a valid ObjectId" },
   VALIDATION_IS_ACTIVE: { status: 400, code: "VALIDATION", message: "isActive must be boolean" },
-  VALIDATION_INTERESTS: { status: 400, code: "VALIDATION_ERROR",message: "interests must be an array of strings"},
+  VALIDATION_INTERESTS: { status: 400, code: "VALIDATION_ERROR", message: "interests must be an array of strings" },
   LIMIT_MAX_CHILDREN_REACHED: { status: 409, code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account" },
+  DEVICE_PLATFORM_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "platform is required" },
+  INVALID_DEVICE_PLATFORM: { status: 400, code: "VALIDATION_ERROR", message: "platform is invalid" },
 
 };
 
@@ -57,7 +60,7 @@ export const Request = {
   REQUEST_NOT_PENDING: { status: 409, code: "REQUEST_NOT_PENDING", message: "Request is not pending" },
   INVALID_DECISION: { status: 400, code: "VALIDATION_ERROR", message: "decision must be APPROVED or REJECTED" },
   INVALID_REQUEST_ID: { status: 400, code: "INVALID_ID", message: "Invalid requestId" },
-  INVALID_MINUTES: { status: 400, code: "VALIDATION_ERROR", message: "requestedMinutes must be between 1 and 60" },
+  INVALID_MINUTES: { status: 400, code: "VALIDATION_ERROR", message: "requestedMinutes must be between 1 and 120" },
   DEVICE_NOT_OWNED: { status: 403, code: "FORBIDDEN", message: "Device does not belong to this child/parent" },
   REQUEST_ALREADY_PENDING: { status: 409, code: "REQUEST_ALREADY_PENDING", message: "There is already a pending request for this device" },
 };
