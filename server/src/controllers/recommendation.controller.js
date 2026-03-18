@@ -20,8 +20,13 @@ export async function getParentRecommendationsController(req, res, next) {
   try {
     const parentId = req.user.parentId;
     const { childId } = req.params;
+    const { deviceId } = req.query;
 
-    const data = await getParentRecommendations(parentId, childId);
+    if (!deviceId) {
+      throw new AppError(CommonErrors.INVALID_DEVICE_ID);
+    }
+
+    const data = await getParentRecommendations(parentId, childId, deviceId);
 
     res.status(200).json({ ok: true, data });
   } catch (err) {

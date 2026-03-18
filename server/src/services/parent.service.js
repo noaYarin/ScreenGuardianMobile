@@ -5,7 +5,6 @@ import {
   updateChildActiveByParentId,
   pushChildToParent,
   updateChildInterestsByParentId,
-  updateSelectedDeviceByParentId,
   getChildByParentId
 
 } from "../dal/parent.dal.js";
@@ -91,74 +90,3 @@ export async function updateChildInterests(parentId, childId, interests) {
   };
 }
 
-
-export async function setSelectedDevice(parentId, childId, deviceId) {
-  const childList = await getChildrenByParentId(parentId);
-  const child = childList.find((c) => String(c._id) === String(childId));
-
-  if (!child) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
-
-  const devices = await findDevicesByChildId(childId);
-  const device = devices.find((d) => String(d._id) === String(deviceId));
-
-  if (!device) {
-    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
-  }
-
-  await updateSelectedDeviceByParentId(parentId, childId, deviceId);
-
-  return {
-    childId,
-    selectedDeviceId: deviceId
-  };
-}
-
-
-export async function getSelectedDeviceForChild(parentId, childId) {
-  const child = await getChildByParentId(parentId, childId);
-
-  if (!child) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
-
-  const devices = await findDevicesByChildId(childId);
-  const activeDevices = devices.filter((device) => device.isActive === true);
-
-  if (activeDevices.length === 0) {
-    return null;
-  }
-
-  const selectedDevice = activeDevices.find(
-    (device) => String(device._id) === String(child.selectedDeviceId)
-  );
-
-  return selectedDevice || activeDevices[0];
-}
-
-
-export async function reconcileSelectedDeviceAfterDeviceChange(parentId, childId) {
-  const child = await getChildByParentId(parentId, childId);
-
-  if (!child) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
-
-  const devices = await findDevicesByChildId(childId);
-  const activeDevices = devices.filter((d) => d.isActive === true);
-
-  const selectedStillValid = activeDevices.find(
-    (d) => String(d._id) === String(child.selectedDeviceId)
-  );
-
-  if (selectedStillValid) {
-    return selectedStillValid;
-  }
-
-  const nextSelectedDeviceId = activeDevices[0]?._id ?? null;
-
-  await updateSelectedDeviceByParentId(parentId, childId, nextSelectedDeviceId);
-
-  return activeDevices[0] || null;
-}

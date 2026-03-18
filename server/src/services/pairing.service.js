@@ -10,7 +10,7 @@ import {
   findByBarcodeToken,
   consumePairingSession,
 } from "../dal/pairing.dal.js";
-import { getChildrenByParentId, setSelectedDeviceIfMissing } from "../dal/parent.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
 import { createDevice, findDeviceByBarcodeOrCode } from "../dal/device.dal.js";
 import { DeviceType } from "../constants/deviceType.js";
@@ -163,11 +163,6 @@ async function createOrGetDeviceForSession(session, devicePayload) {
     screenTime: {},
   });
 
-  await setSelectedDeviceIfMissing(
-    String(session.parentId),
-    String(session.childId),
-    String(createdDevice._id)
-  );
 
   return createdDevice;
 }

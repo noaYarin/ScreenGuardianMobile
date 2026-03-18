@@ -138,35 +138,3 @@ export async function updateChildInterestsByParentId(parentId, childId, interest
 }
 
 
-
-export async function updateSelectedDeviceByParentId(parentId, childId, selectedDeviceId) {
-  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
-  assertValidObjectId(selectedDeviceId, CommonErrors.INVALID_DEVICE_ID);
-
-  return ParentModel.findOneAndUpdate(
-    { _id: parentId, "children._id": childId },
-    { $set: { "children.$.selectedDeviceId": selectedDeviceId } },
-    { new: true }
-  ).lean();
-}
-
-
-export async function setSelectedDeviceIfMissing(parentId, childId, selectedDeviceId) {
-  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
-  assertValidObjectId(selectedDeviceId, CommonErrors.INVALID_DEVICE_ID);
-
-  const parent = await ParentModel.findById(parentId);
-  if (!parent) return null;
-
-  const child = parent.children.id(childId);
-  if (!child) return null;
-
-  if (!child.selectedDeviceId) {
-    child.selectedDeviceId = selectedDeviceId;
-    await parent.save();
-  }
-
-  return parent.toObject();
-}

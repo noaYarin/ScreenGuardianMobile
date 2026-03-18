@@ -8,7 +8,8 @@ export const styles = StyleSheet.create({
     paddingBottom: 32,
   },
 
-  container: {
+  container: 
+  {
     width: "100%",
     alignSelf: "center",
     gap: 24,
