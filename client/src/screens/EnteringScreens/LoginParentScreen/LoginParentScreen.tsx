@@ -46,7 +46,7 @@ export default function LoginParentScreen() {
         return;
       }
       await dispatch(loginParent({ email, password })).unwrap();
-      router.replace("/Parent/home" as any);
+      router.replace("/Parent/(tabs)/home" as any);
     } catch (err: any) {
       if (typeof err === "string") {
         dispatch(setError(err));

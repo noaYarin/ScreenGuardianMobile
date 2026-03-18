@@ -17,9 +17,18 @@ export const RoleSelectionScreen: React.FC = () => {
     router.push('/Entering/loginParent' as any);
   };
 
+  //const handleParentSelect = () => { 
+  //  router.push('/Parent/(tabs)/home' as any);
+  //};
+
+
   const handleChildSelect = () => {
     router.push('/Entering/linkChild' as any);
   };
+
+  //const handleChildSelect = () => {
+  //  router.push('/Child/home' as any);
+ // };
 
   return (
     <View style={styles.container}>

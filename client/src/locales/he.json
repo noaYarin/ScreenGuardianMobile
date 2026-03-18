@@ -326,23 +326,253 @@
     "success_message": "הילד נשמר בהצלחה"
   },
   "kidDetails": {
-    "title": "ניהול ילדים",
+    "title": "פרטי ילד",
     "back_a11y": "חזרה למסך הקודם",
     "menu_a11y": "פתיחת תפריט",
     "birthdate_value": "תאריך לידה: {{value}}",
-    "gender_value": "מגדר: {{value}}",
+    "gender_value": "מין: {{value}}",
     "used_today": "שימוש היום",
-    "daily_limit": "מגבלה יומית",
+    "daily_limit": "הגבלה יומית",
     "devices_title": "מכשירים",
-    "add_device": "חיבור מכשיר",
-    "add_device_a11y": "חיבור מכשיר",
-    "active_now": "פעל עכשיו",
+    "toggle_devices_a11y": "פתיחה או סגירה של רשימת המכשירים",
+    "add_device": "הוסף מכשיר",
+    "add_device_a11y": "הוספת מכשיר חדש לילד",
+    "active_now": "פעיל עכשיו",
     "remaining_time_value": "זמן נותר: {{value}}",
     "delete_device_a11y": "מחיקת המכשיר {{name}}",
-    "view_limits": "צפייה במגבלות",
-    "view_limits_a11y": "צפייה במגבלות של {{name}}"
+    "view_limits": "צפייה בהגבלות",
+    "view_limits_a11y": "צפייה בהגבלות של {{name}}",
+    "child_profile": "פרופיל ילד",
+    "child_profile_a11y": "מעבר לפרופיל של {{name}}"
   },
   "linkDevice": {
     "title": "חיבור מכשיר"
+  },
+  "childProfile": {
+    "title": "פרופיל ילד",
+    "edit": "עריכת פרטים",
+    "edit_a11y": "עריכת פרטי הילד",
+    "age": "גיל {{age}}",
+    "actions": {
+      "apps": {
+        "title": "אפליקציות במכשיר",
+        "subtitle": "צפייה באפליקציות",
+        "a11y": "מעבר למסך אפליקציות במכשיר"
+      },
+      "limits": {
+        "title": "מגבלות זמן מסך",
+        "subtitle": "צפייה במגבלות",
+        "a11y": "מעבר למסך מגבלות זמן מסך"
+      },
+      "reports": {
+        "title": "דוחות לילד",
+        "subtitle": "צפייה בסטטיסטיקות",
+        "a11y": "מעבר למסך דוחות לילד"
+      },
+      "location": {
+        "title": "מיקום",
+        "subtitle": "מעקב אחר מיקום",
+        "a11y": "מעבר למסך מיקום הילד"
+      },
+      "requests": {
+        "title": "בקשות הארכה",
+        "subtitle": "בקשה 1 שלא נענתה",
+        "a11y": "מעבר למסך בקשות הארכה"
+      }
+    }
+  },
+  "homeMenu": {
+    "title": "תפריט",
+    "items": {
+      "location": "מיקום",
+      "alerts": "התראות מערכת",
+      "requests": "בקשות הארכה",
+      "activities": "המלצות לפעילויות",
+      "rewards": "מטלות ופרסים",
+      "chatbot": "צ'אט בוט",
+      "history": "היסטוריית פעולות"
+    }
+  },"limits": {
+    "title": "מגבלות",
+    "heading": "ניהול מגבלות",
+    "subtitle": "כאן אפשר להגדיר זמן מסך, הפסקות והגבלות נוספות בצורה מסודרת.",
+    "screenTime": {
+      "title": "זמן מסך",
+      "dailyWeekly": "מגבלות יומיות ושבועיות",
+      "dailyWeeklyDescription": "הגדרת משך שימוש לפי ימים או לפי שבוע.",
+      "dailyWeeklyA11y": "מעבר למסך מגבלות יומיות ושבועיות",
+      "breaks": "הפסקות בין שימושים",
+      "breaksDescription": "הגדרת זמן מנוחה בין סשנים."
+    },
+    "apps": {
+      "title": "אפליקציות",
+      "blockedApps": "אפליקציות חסומות",
+      "blockedAppsDescription": "ניהול אפליקציות שלא יתאפשר להשתמש בהן."
+    }
+  },
+  "dailyTimeLimits": {
+    "title": "הגבלות זמן מסך",
+    "heroTitle": "ניהול זמן מסך לפי ילד ומכשיר",
+    "heroSubtitle": "בחרי ילד ואז בחרי את המכשיר הרלוונטי כדי לעדכן מגבלות בצורה מדויקת.",
+    "childrenSectionTitle": "בחירת ילד",
+    "devicesSectionTitle": "בחירת מכשיר",
+    "childRole": "ניהול אישי",
+    "deviceContext": "{{childName}} · {{deviceName}}",
+    "usedLabel": "נוצל עד עכשיו",
+    "edit": "עריכת מגבלה",
+    "editA11y": "עריכת מגבלה עבור {{section}}",
+    "childTabA11y": "בחירת הילד {{name}}",
+    "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "daily": {
+      "title": "מגבלה יומית",
+      "summary": "המגבלה המוגדרת כרגע היא {{value}} ביום"
+    },
+    "weekly": {
+      "title": "מגבלה שבועית",
+      "summary": "המגבלה המוגדרת כרגע היא {{value}} בשבוע"
+    },
+    "range": {
+      "startLabel": "שימוש נוכחי",
+      "endLabel": "מגבלה"
+    },
+    "devices": {
+      "phone": "טלפון",
+      "tablet": "טאבלט"
+    },"status": {
+  "ok": "תקין"
+ }, "almostReached": "כמעט הגיע למגבלה",
+   "done": "סיום",
+    "currentLimit": "מגבלה נוכחית",
+     "editWeekly": "עריכת שבועי",
+  "a11y": {
+    "editWeeklySchedule": "עריכת לוח זמנים שבועי",
+    "editDailyLimit": "עריכת הגבלה יומית",
+    "doneEditing": "סיום עריכה",
+    "decreaseByFiveMinutes": "הפחתה של חמש דקות",
+    "increaseByFiveMinutes": "הוספה של חמש דקות"
+  }
+  },
+  "childDeviceSelector": {
+    "childrenSectionTitle": "בחירת ילד",
+    "devicesSectionTitle": "בחירת מכשיר",
+    "defaultChildSubtitle": "ניהול אישי",
+    "childTabA11y": "בחירת הילד {{name}}",
+    "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "devices": {
+      "phone": "טלפון",
+      "tablet": "טאבלט"
+    }
+  },
+  "routineLimits": {
+    "title": "שגרה שבועית",
+    "hero": {
+      "title": "ניהול שגרה שבועית",
+      "subtitle": "תכנון נעילה קבועה לפי ימים, שעות והרגלי שימוש"
+    },
+    "overview": {
+      "title": "סקירה מהירה",
+      "subtitle": "לוח השגרה של {{childName}} עבור {{deviceName}}"
+    },
+    "stats": {
+      "rules": "כללים פעילים",
+      "lockedHours": "שעות נעילה",
+      "activeDays": "ימים פעילים"
+    },
+    "scheduler": {
+      "title": "לוח שבועי",
+      "subtitle": "תצוגה חזותית של זמני הנעילה במהלך השבוע"
+    },
+    "legend": {
+      "locked": "חסום",
+      "open": "פתוח"
+    },
+    "presetsSection": {
+      "title": "תבניות מהירות",
+      "subtitle": "בחירה מהירה של סוגי שגרה נפוצים"
+    },
+    "presets": {
+      "schoolHours": "שעות לימודים",
+      "sleep": "שעות שינה",
+      "homework": "זמן שיעורים",
+      "family": "זמן משפחה"
+    },
+    "form": {
+      "title": "הוספת כלל שגרה",
+      "subtitle": "כרגע טופס סטטי עד חיבור מלא לשרת",
+      "ruleName": "כותרת",
+      "start": "מתחיל",
+      "end": "מסתיים",
+      "repeat": "חזרה",
+      "hint": "בהמשך אפשר יהיה לבחור ימים, טווחי זמן, סוג נעילה וחריגים לפי מכשיר.",
+      "addButton": "הוספת שגרה"
+    },
+    "formValues": {
+      "sleepRoutine": "שגרת שינה",
+      "startValue": "כל יום, 20:00",
+      "endValue": "כל יום, 07:00",
+      "weekdays": "א׳–ה׳"
+    },
+    "blockTitles": {
+      "schoolMorning": "בית ספר",
+      "afternoonLock": "אחר הצהריים",
+      "sleepTime": "שינה",
+      "studyWindow": "למידה",
+      "familyTime": "משפחה"
+    },
+    "daysShort": {
+      "sunday": "א",
+      "monday": "ב",
+      "tuesday": "ג",
+      "wednesday": "ד",
+      "thursday": "ה",
+      "friday": "ו",
+      "saturday": "ש"
+    },
+    "a11y": {
+      "gridCell": "תא לוח עבור {{day}} בשעה {{time}}, מצב: {{state}}",
+      "selectPreset": "בחירת תבנית {{name}}",
+      "addRoutine": "הוספת כלל שגרה חדש"
+    }
+  },
+  "weeklySchedule": {
+    "title": "לוח זמנים שבועי",
+    "heading": "הגבלות שעות שבועיות",
+    "subtitle": "הגדרת שעות שימוש עבור {{childName}} במכשיר {{deviceName}}",
+    "dayRailTitle": "קפיצה מהירה ליום",
+    "dayRailHint": "לחיצה תגלול לכרטיס של אותו היום",
+    "startTime": "שעת התחלה",
+    "endTime": "שעת סיום",
+    "copyToAll": "העתקה לכל הימים",
+    "save": "שמירת לוח זמנים",
+    "totalHours": "זמן כולל: {{hours}} שעות",
+    "status": {
+      "enabled": "פעיל",
+      "disabled": "כבוי"
+    },
+    "summary": {
+      "activeDays": "ימים פעילים",
+      "totalHours": "שעות שבועיות"
+    },
+    "days": {
+      "sun": { "short": "א", "full": "ראשון" },
+      "mon": { "short": "ב", "full": "שני" },
+      "tue": { "short": "ג", "full": "שלישי" },
+      "wed": { "short": "ד", "full": "רביעי" },
+      "thu": { "short": "ה", "full": "חמישי" },
+      "fri": { "short": "ו", "full": "שישי" },
+      "sat": { "short": "ש", "full": "שבת" }
+    },
+    "a11y": {
+      "scrollToDay": "מעבר מהיר ליום {{day}}",
+      "toggleDay": "הפעלה או כיבוי של היום {{day}}",
+      "editStartTime": "עריכת שעת התחלה עבור היום {{day}}",
+      "editEndTime": "עריכת שעת סיום עבור היום {{day}}",
+      "copyToAllDays": "העתקת ההגדרות לכל הימים",
+      "saveSchedule": "שמירת לוח הזמנים השבועי"
+    }
   }
 }
+
+
+
+

@@ -9,11 +9,22 @@ export const styles = StyleSheet.create({
     paddingTop: 12,
   },
 
-  // רספונסיבי: Web/iPad לא נמרח על כל המסך
   content: {
     width: "100%",
     maxWidth: 560,
     alignSelf: "center",
+  },
+
+  headerMenuButton: {
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 8,
+  },
+
+  headerMenuButtonPressed: {
+    opacity: 0.72,
   },
 
   bigHello: {
@@ -28,7 +39,14 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: APP_COLORS.primaryBlue,
     textDecorationLine: "underline",
+  },
+
+  overviewLinkLtr: {
     alignSelf: "flex-start",
+  },
+
+  overviewLinkRtl: {
+    alignSelf: "flex-end",
   },
 
   summaryCard: {
@@ -77,6 +95,16 @@ export const styles = StyleSheet.create({
     opacity: 0.75,
   },
 
+  loaderWrap: {
+    paddingVertical: 16,
+  },
+
+  emptyState: {
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 16,
+  },
+
   cardsWrap: {
     width: "100%",
     marginTop: 14,
@@ -90,12 +118,16 @@ export const styles = StyleSheet.create({
     borderColor: "#E7EFFA",
     backgroundColor: "#FFFFFF",
     padding: 14,
-    // shadow עדין
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 1,
+  },
+
+  cardPressed: {
+    opacity: 0.82,
+    transform: [{ scale: 0.995 }],
   },
 
   cardInner: {
@@ -112,9 +144,17 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  avatarGood: { backgroundColor: "#ECFDF5" },
-  avatarWarn: { backgroundColor: "#FFFBEB" },
-  avatarBad: { backgroundColor: "#FEF2F2" },
+  avatarGood: {
+    backgroundColor: "#ECFDF5",
+  },
+
+  avatarWarn: {
+    backgroundColor: "#FFFBEB",
+  },
+
+  avatarBad: {
+    backgroundColor: "#FEF2F2",
+  },
 
   cardCenter: {
     flex: 1,
@@ -133,9 +173,16 @@ export const styles = StyleSheet.create({
     opacity: 0.75,
   },
 
-  cardLeft: {
+  cardEdge: {
     minWidth: 88,
+  },
+
+  cardEdgeLtr: {
     alignItems: "flex-start",
+  },
+
+  cardEdgeRtl: {
+    alignItems: "flex-end",
   },
 
   timeMain: {
@@ -149,9 +196,17 @@ export const styles = StyleSheet.create({
     color: "#64748B",
   },
 
-  timeGood: { color: "#047857" },
-  timeWarn: { color: "#B45309" },
-  timeBad: { color: "#B91C1C" },
+  timeGood: {
+    color: "#047857",
+  },
+
+  timeWarn: {
+    color: "#B45309",
+  },
+
+  timeBad: {
+    color: "#B91C1C",
+  },
 
   actionsWrap: {
     width: "100%",
@@ -187,6 +242,10 @@ export const styles = StyleSheet.create({
   btnSecondaryText: {
     fontSize: 16,
     color: "#1D4ED8",
+  },
+
+  buttonPressed: {
+    opacity: 0.8,
   },
 
   bottomSpacer: {
