@@ -17,7 +17,7 @@ function isSameDay(date1, date2) {
   );
 }
 
-async function validateDeviceAccess({ deviceId, parentId, childId }) {
+export async function validateDeviceAccess({ deviceId, parentId, childId }) {
   const device = await findDeviceById(deviceId);
 
   if (!device) {
@@ -32,9 +32,10 @@ async function validateDeviceAccess({ deviceId, parentId, childId }) {
     throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
   }
 
-  if (device.isActive === false) {
+  if (!allowInactive && device.isActive === false) {
     throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
   }
+
 
   return device;
 }
@@ -45,27 +46,6 @@ function ensureChildBelongsToParent(childList, childId) {
   if (!belongs) {
     throw new AppError(CommonErrors.NOT_FOUND);
   }
-}
-async function validateDeviceAccess({ deviceId, parentId, childId }) {
-  const device = await findDeviceById(deviceId);
-
-  if (!device) {
-    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
-  }
-
-  if (String(device.parentId) !== String(parentId)) {
-    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
-  }
-
-  if (childId && String(device.childId) !== String(childId)) {
-    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
-  }
-
-  if (device.isActive === false) {
-    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
-  }
-
-  return device;
 }
 
 
@@ -151,7 +131,7 @@ export async function getDevicesByChild(parentId, childId) {
 // Return current screen-time settings for a specific device
 export async function getDeviceScreenTime(parentId, deviceId) {
 
-  const device = await validateDeviceAccess({ deviceId, parentId });
+  let device = await validateDeviceAccess({ deviceId, parentId });
 
   const now = new Date();
 
@@ -168,7 +148,7 @@ export async function getDeviceScreenTime(parentId, deviceId) {
 
 // Update screen-time settings for a specific device
 export async function updateDeviceScreenTime(parentId, deviceId, body) {
-  
+
   const device = await validateDeviceAccess({ deviceId, parentId });
 
   const currentScreenTime = device.screenTime || {};
@@ -209,12 +189,13 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
   return updatedDevice;
 }
 
+
 export async function setDeviceActive(parentId, deviceId, isActive) {
   if (typeof isActive !== "boolean") {
     throw new AppError(CommonErrors.VALIDATION_IS_ACTIVE);
   }
 
-  const device = await validateDeviceAccess({ deviceId, parentId });
+  await validateDeviceAccess({ deviceId, parentId, allowInactive: true });
 
   const updatedDevice = await updateDeviceById(deviceId, { isActive });
 
