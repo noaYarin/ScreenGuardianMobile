@@ -7,7 +7,7 @@ export const styles = StyleSheet.create({
   },
 
   content: {
-    flexGrow: 1, // הכי חשוב עם ScrollView
+    flexGrow: 1, 
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 24,
@@ -15,14 +15,13 @@ export const styles = StyleSheet.create({
 
   inner: {
     flex: 1,
-    width: "100%", // שלא “יישב” על רוחב קטן
-    alignItems: "stretch", // ילדים יתפסו רוחב מלא אם הם רוצים
+    width: "100%", 
+    alignItems: "stretch", 
   },
 
-  // ✅ רק במחשב (web): כדי שלא יימתח ענק
-  // זה יופעל מתוך ScreenLayout.tsx עם Platform.OS === "web"
+
   webFrame: {
-    maxWidth: 430, // "מובייל" נוח לפיתוח בדפדפן
+    maxWidth: 430, 
     width: "100%",
     alignSelf: "center",
   },
