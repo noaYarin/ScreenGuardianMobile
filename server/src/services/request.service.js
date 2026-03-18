@@ -9,6 +9,7 @@ import { notifyParent, notifyChild } from "../services/notification.service.js";
 import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
+import { validateDeviceAccess } from "../services/deviceManagement.service.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -30,23 +31,6 @@ function assertDecision(decision) {
     }
 }
 
-async function assertDeviceBelongsToChild({ deviceId, parentId, childId }) {
-    const device = await findDeviceById(deviceId);
-
-    if (!device) {
-        throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
-    }
-
-    if (String(device.parentId) !== String(parentId)) {
-        throw new AppError(RequestErrors.DEVICE_NOT_OWNED);
-    }
-
-    if (String(device.childId) !== String(childId)) {
-        throw new AppError(RequestErrors.DEVICE_NOT_OWNED);
-    }
-
-    return device;
-}
 
 export async function createRequest({ parentId, childId, deviceId, requestedMinutes, reason }) {
 
@@ -56,7 +40,7 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
 
     const minutes = assertMinutes(requestedMinutes);
 
-    await assertDeviceBelongsToChild({ deviceId, parentId, childId });
+    await validateDeviceAccess({ deviceId, parentId, childId });
 
     // check duplicate pending request
     const existingPending = await requestDal.findPendingRequestForDevice({

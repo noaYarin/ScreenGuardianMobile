@@ -7,16 +7,10 @@ import { NotificationType } from "../constants/notificationType.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
 
-function ensureChildBelongsToParent(childList, childId) {
-  const belongs = childList.some((child) => String(child._id) === String(childId));
 
-  if (!belongs) {
-    throw new AppError(CommonErrors.NOT_FOUND);
-  }
-}
+async function validateDeviceAccess({ deviceId, parentId, childId }) {
+  const device = await findDeviceById(deviceId);
 
-
-function ensureDeviceBelongsToParent(device, parentId) {
   if (!device) {
     throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
   }
@@ -24,11 +18,53 @@ function ensureDeviceBelongsToParent(device, parentId) {
   if (String(device.parentId) !== String(parentId)) {
     throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
   }
+
+  if (childId && String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
+
+  return device;
 }
 
-export async function lockDevice(parentId, deviceId) {
+function ensureChildBelongsToParent(childList, childId) {
+  const belongs = childList.some((child) => String(child._id) === String(childId));
+
+  if (!belongs) {
+    throw new AppError(CommonErrors.NOT_FOUND);
+  }
+}
+async function validateDeviceAccess({ deviceId, parentId, childId }) {
   const device = await findDeviceById(deviceId);
-  ensureDeviceBelongsToParent(device, parentId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  if (String(device.parentId) !== String(parentId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (childId && String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
+
+  return device;
+}
+
+
+
+export async function lockDevice(parentId, deviceId) {
+
+  const device = await validateDeviceAccess({ deviceId, parentId });
+
   const updatedDevice = await updateDeviceById(deviceId, { isLocked: true });
 
   try {
@@ -62,8 +98,8 @@ export async function lockDevice(parentId, deviceId) {
 
 
 export async function unlockDevice(parentId, deviceId) {
-  const device = await findDeviceById(deviceId);
-  ensureDeviceBelongsToParent(device, parentId);
+
+  const device = await validateDeviceAccess({ deviceId, parentId });
   const updatedDevice = await updateDeviceById(deviceId, { isLocked: false });
 
   try {
@@ -106,8 +142,7 @@ export async function getDevicesByChild(parentId, childId) {
 // Return current screen-time settings for a specific device
 export async function getDeviceScreenTime(parentId, deviceId) {
 
-  let device = await findDeviceById(deviceId);
-  ensureDeviceBelongsToParent(device, parentId);
+  const device = await validateDeviceAccess({ deviceId, parentId });
 
   const now = new Date();
 
@@ -124,8 +159,8 @@ export async function getDeviceScreenTime(parentId, deviceId) {
 
 // Update screen-time settings for a specific device
 export async function updateDeviceScreenTime(parentId, deviceId, body) {
-  const device = await findDeviceById(deviceId);
-  ensureDeviceBelongsToParent(device, parentId);
+  
+  const device = await validateDeviceAccess({ deviceId, parentId });
 
   const currentScreenTime = device.screenTime || {};
 
@@ -161,7 +196,7 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
   } catch (err) {
     console.error("sendAuditLog failed in updateDeviceScreenTime:", err.message);
   }
-  
+
   return updatedDevice;
 }
 

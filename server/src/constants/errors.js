@@ -51,6 +51,7 @@ export const Common = {
   VALIDATION_INTERESTS: { status: 400, code: "VALIDATION_ERROR", message: "interests must be an array of strings" },
   LIMIT_MAX_CHILDREN_REACHED: { status: 409, code: "LIMIT_MAX_CHILDREN_REACHED", message: "Maximum of 8 children per account" },
   DEVICE_PLATFORM_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "platform is required" },
+  DEVICE_NOT_ACTIVE: { status: 400, code: "DEVICE_NOT_ACTIVE", message: "Device is not active" },
   INVALID_DEVICE_PLATFORM: { status: 400, code: "VALIDATION_ERROR", message: "platform is invalid" },
   VALIDATION_ERROR: { status: 400, code: "VALIDATION_ERROR", message: "Validation error" },
 
