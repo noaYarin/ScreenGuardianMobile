@@ -86,6 +86,20 @@ export async function getChildrenByParentId(parentId) {
   return parent.children || [];
 }
 
+
+export async function getChildByParentId(parentId, childId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+  const parent = await ParentModel.findById(parentId).lean();
+  if (!parent) return null;
+
+  return (parent.children || []).find(
+    (child) => String(child._id) === String(childId)
+  ) || null;
+}
+
+
 export async function updateChildActiveByParentId(parentId, childId, isActive) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
   assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);

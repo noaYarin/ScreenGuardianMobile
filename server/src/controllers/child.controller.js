@@ -3,7 +3,8 @@ import {
   getChildren,
   setChildActive,
   updateChildInterests,
-  setSelectedDevice
+  setSelectedDevice,
+  getChild
 } from "../services/parent.service.js";
 
 export async function addChildController(req, res, next) {
@@ -22,6 +23,20 @@ export async function getChildrenController(req, res, next) {
     const includeInactive = req.query?.includeInactive === "true";
     const data = await getChildren(parentId, { includeInactive });
     res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export async function getChildController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId } = req.params;
+
+    const data = await getChild(parentId, childId);
+
+    res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);
   }
