@@ -42,6 +42,12 @@ export const styles = StyleSheet.create({
     gap: 12,
   },
 
+  avatarColumn: {
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+
   avatarWrap: {
     width: 72,
     height: 72,
@@ -49,6 +55,25 @@ export const styles = StyleSheet.create({
     backgroundColor: "#EFF6FF",
     alignItems: "center",
     justifyContent: "center",
+  },
+
+  childProfileButton: {
+    minHeight: 36,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 12,
+    backgroundColor: "#DBEAFE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  childProfileButtonPressed: {
+    opacity: 0.8,
+  },
+
+  childProfileButtonText: {
+    fontSize: 13,
+    color: "#1D4ED8",
   },
 
   profileTextWrap: {
@@ -99,6 +124,21 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 12,
+  },
+
+  devicesToggleButton: {
+    flex: 1,
+    minHeight: 44,
+    justifyContent: "center",
+  },
+
+  devicesToggleButtonPressed: {
+    opacity: 0.75,
+  },
+
+  devicesToggleInner: {
+    alignItems: "center",
+    gap: 6,
   },
 
   sectionTitle: {

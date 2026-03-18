@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { View, Pressable, ActivityIndicator } from "react-native";
-import { router, type Href } from "expo-router";
+import { router, Stack, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -23,11 +23,12 @@ type ChildCard = {
 
 const ICON = {
   user: "account-outline",
+  menu: "menu",
 } as const;
 
 export default function HomeParentScreen() {
   const { t } = useTranslation();
-  const { row, text } = useLocaleLayout();
+  const { row, text, isRTL } = useLocaleLayout();
 
   const dispatch = useDispatch<AppDispatch>();
 
@@ -64,32 +65,74 @@ export default function HomeParentScreen() {
       })),
     [children]
   );
-  const onPressOverview = () => router.push("/Parent/reports" as Href);
+
+  const onPressOverview = () => router.push("/Parent/(tabs)/reports" as Href);
   const onPressFullWatch = () => router.push("/Parent/kidDetails" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
+  const onPressChildCard = (childId: string, childName: string) =>
+    router.push({
+      pathname: "/Parent/kidDetails" as Href,
+      params: { id: childId, name: childName },
+    } as never);
+
+  const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);
+
+  const menuButton = (
+    <Pressable
+      onPress={onPressOpenMenu}
+      accessibilityRole="button"
+      accessibilityLabel={t("homeParent.open_menu_a11y")}
+      hitSlop={10}
+      style={({ pressed }) => [
+        styles.headerMenuButton,
+        pressed && styles.headerMenuButtonPressed,
+      ]}
+    >
+      <MaterialCommunityIcons name={ICON.menu} size={24} color="#0F172A" />
+    </Pressable>
+  );
 
   return (
     <>
+      <Stack.Screen
+        options={{
+          title: t("homeParent.title"),
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerBackVisible: false,
+          ...(isRTL
+            ? {
+                headerLeft: () => menuButton,
+                headerRight: () => null,
+              }
+            : {
+                headerRight: () => menuButton,
+                headerLeft: () => null,
+              }),
+        }}
+      />
+
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>
-            {/* Greeting */}
             <AppText weight="extraBold" style={[styles.bigHello, text]}>
               {t("homeParent.hello", { name: parentName })}
             </AppText>
 
-            {/* Overview link */}
             <AppText
               onPress={onPressOverview}
               weight="bold"
-              style={[styles.overviewLink, text]}
+              style={[
+                styles.overviewLink,
+                text,
+                isRTL ? styles.overviewLinkRtl : styles.overviewLinkLtr,
+              ]}
               accessibilityRole="button"
               accessibilityLabel={t("homeParent.overview_a11y")}
             >
               {t("homeParent.overview")}
             </AppText>
 
-            {/* Summary card */}
             <View style={styles.summaryCard}>
               <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>
@@ -102,6 +145,7 @@ export default function HomeParentScreen() {
                   <AppText weight="bold" style={[styles.sectionTitle, text]}>
                     {t("homeParent.my_kids")}
                   </AppText>
+
                   <AppText style={[styles.sectionSub, text]}>
                     {t("homeParent.day_screen_time")}
                   </AppText>
@@ -109,22 +153,23 @@ export default function HomeParentScreen() {
               </View>
             </View>
 
-
-            {/* Children cards */}
             {isLoading ? (
-              <View style={{ paddingVertical: 16 }}>
+              <View style={styles.loaderWrap}>
                 <ActivityIndicator />
               </View>
             ) : error ? (
               <AppText style={[styles.sectionSub, text]}>{t(error)}</AppText>
             ) : children.length === 0 ? (
-              <View style={{ alignItems: "center", gap: 12, paddingVertical: 16 }}>
+              <View style={styles.emptyState}>
                 <AppText style={[styles.sectionSub, text]}>
                   {t("homeParent.no_children")}
                 </AppText>
 
                 <Pressable
-                  style={styles.btnSecondary}
+                  style={({ pressed }) => [
+                    styles.btnSecondary,
+                    pressed && styles.buttonPressed,
+                  ]}
                   onPress={onPressAddChild}
                   accessibilityRole="button"
                   accessibilityLabel={t("homeParent.add_child_a11y")}
@@ -137,7 +182,18 @@ export default function HomeParentScreen() {
             ) : (
               <View style={styles.cardsWrap}>
                 {childCards.map((c) => (
-                  <View key={c.id} style={styles.card} accessibilityRole="summary">
+                  <Pressable
+                    key={c.id}
+                    style={({ pressed }) => [
+                      styles.card,
+                      pressed && styles.cardPressed,
+                    ]}
+                    onPress={() => onPressChildCard(c.id, c.name)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("homeParent.child_card_a11y", {
+                      name: c.name,
+                    })}
+                  >
                     <View style={[styles.cardInner, row]}>
                       <View
                         style={[
@@ -147,7 +203,11 @@ export default function HomeParentScreen() {
                           c.status === "bad" && styles.avatarBad,
                         ]}
                       >
-                        <MaterialCommunityIcons name={ICON.user} size={22} color="#0F172A" />
+                        <MaterialCommunityIcons
+                          name={ICON.user}
+                          size={22}
+                          color="#0F172A"
+                        />
                       </View>
 
                       <View style={styles.cardCenter}>
@@ -158,6 +218,7 @@ export default function HomeParentScreen() {
                         >
                           {c.name}
                         </AppText>
+
                         <AppText
                           style={[styles.childSubtitle, text]}
                           numberOfLines={1}
@@ -166,7 +227,12 @@ export default function HomeParentScreen() {
                         </AppText>
                       </View>
 
-                      <View style={styles.cardLeft}>
+                      <View
+                        style={[
+                          styles.cardEdge,
+                          isRTL ? styles.cardEdgeRtl : styles.cardEdgeLtr,
+                        ]}
+                      >
                         <AppText
                           weight="extraBold"
                           style={[
@@ -178,21 +244,24 @@ export default function HomeParentScreen() {
                         >
                           {c.usedText}
                         </AppText>
+
                         <AppText style={styles.timeSub}>
                           {t("homeParent.out_of", { limit: c.limitText })}
                         </AppText>
                       </View>
                     </View>
-                  </View>
+                  </Pressable>
                 ))}
               </View>
             )}
 
-            {/* Action buttons */}
             {childCards.length > 0 && (
               <View style={styles.actionsWrap}>
                 <Pressable
-                  style={styles.btnPrimary}
+                  style={({ pressed }) => [
+                    styles.btnPrimary,
+                    pressed && styles.buttonPressed,
+                  ]}
                   onPress={onPressFullWatch}
                   accessibilityRole="button"
                   accessibilityLabel={t("homeParent.full_watch_a11y")}
@@ -203,7 +272,10 @@ export default function HomeParentScreen() {
                 </Pressable>
 
                 <Pressable
-                  style={styles.btnSecondary}
+                  style={({ pressed }) => [
+                    styles.btnSecondary,
+                    pressed && styles.buttonPressed,
+                  ]}
                   onPress={onPressAddChild}
                   accessibilityRole="button"
                   accessibilityLabel={t("homeParent.add_child_a11y")}

@@ -1,7 +1,7 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { getChildrenByParentId, getSelectedDeviceForChild } from "../dal/parent.dal.js";
-import { findDevicesByChildId } from "../dal/device.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { getSelectedDeviceForChild } from "../services/parent.service.js";
 import { findRequestsByChild } from "../dal/request.dal.js";
 import { RequestStatus } from "../constants/status.js";
 import {
