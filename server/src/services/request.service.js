@@ -10,6 +10,7 @@ import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
 import { validateDeviceAccess } from "../services/deviceManagement.service.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 
 const MIN_MINUTES = 1;
 const MAX_MINUTES = 120;
@@ -20,6 +21,17 @@ function assertMinutes(minutes) {
         throw new AppError(RequestErrors.INVALID_MINUTES);
     }
     return n;
+}
+
+
+function ensureChildBelongsToParent(childList, childId) {
+    const child = childList.find((c) => String(c._id) === String(childId));
+
+    if (!child) {
+        throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+    }
+
+    return child;
 }
 
 function assertDecision(decision) {
@@ -99,11 +111,13 @@ export async function getChildRequests({ parentId, childId, status }) {
 }
 
 export async function getPendingRequests({ parentId, childId }) {
-
     assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 
     if (childId) {
         assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+        const childList = await getChildrenByParentId(parentId);
+        ensureChildBelongsToParent(childList, childId);
     }
 
     return requestDal.findPendingRequestsByParent({

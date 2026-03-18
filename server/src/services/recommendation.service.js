@@ -145,8 +145,16 @@ function buildParentsRecommendations({ child, device, requests }) {
     }
 
     if (child?.birthDate) {
-        const age = new Date().getFullYear() - new Date(child.birthDate).getFullYear();
+        const birth = new Date(child.birthDate);
+        const today = new Date();
 
+        let age = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+            age--;
+        }
+        
         if (age >= 6 && age <= 10) {
             recommendations.push({
                 code: RecommendationCode.YOUNG_CHILD_GUIDANCE,
@@ -165,7 +173,7 @@ export async function getParentRecommendations(parentId, childId, deviceId) {
     const child = ensureChildBelongsToParent(childList, childId);
 
     const device = await validateDeviceAccess({ deviceId, parentId, childId });
-    
+
     const requests = await findRequestsByChild({
         parentId,
         childId
