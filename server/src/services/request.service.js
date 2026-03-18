@@ -79,14 +79,19 @@ export async function createRequest({ parentId, childId, deviceId, requestedMinu
     });
 
 
-    await notifyParent({
-        parentId,
-        childId,
-        type: NotificationType.EXTENSION_REQUEST_CREATED,
-        severity: NotificationSeverity.INFO,
-        title: "New Extension Request",
-        description: "Your child requested more screen time"
-    });
+    try {
+        await notifyParent({
+            parentId,
+            childId,
+            type: NotificationType.EXTENSION_REQUEST_CREATED,
+            severity: NotificationSeverity.INFO,
+            title: "New Extension Request",
+            description: "Your child requested more screen time"
+        });
+    } catch (err) {
+        console.error("notifyParent failed in createRequest:", err.message);
+    }
+
     return request;
 }
 
@@ -98,7 +103,7 @@ export async function getChildRequests({ parentId, childId, status }) {
     if (status) {
         const allowed = new Set(Object.values(RequestStatus));
         if (!allowed.has(status)) {
-            throw new AppError(CommonErrors.VALIDATION_ERROR);
+            throw new AppError(RequestErrors.INVALID_REQUEST_STATUS);
         }
     }
 
@@ -144,32 +149,39 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 Number(updated.requestedMinutes || 0)
             );
         }
-        await notifyChild({
-            parentId: updated.parentId,
-            childId: updated.childId,
-            type: decision === RequestStatus.APPROVED
-                ? NotificationType.EXTENSION_REQUEST_APPROVED
-                : NotificationType.EXTENSION_REQUEST_REJECTED,
-            severity: NotificationSeverity.INFO,
-            title: decision === RequestStatus.APPROVED
-                ? "Extension Request Approved"
-                : "Extension Request Rejected",
-            description: decision === RequestStatus.APPROVED
-                ? "Your parent approved your extension request"
-                : "Your parent rejected your extension request"
-        });
+        try {
+            await notifyChild({
+                parentId: updated.parentId,
+                childId: updated.childId,
+                type: decision === RequestStatus.APPROVED
+                    ? NotificationType.EXTENSION_REQUEST_APPROVED
+                    : NotificationType.EXTENSION_REQUEST_REJECTED,
+                severity: NotificationSeverity.INFO,
+                title: decision === RequestStatus.APPROVED
+                    ? "Extension Request Approved"
+                    : "Extension Request Rejected",
+                description: decision === RequestStatus.APPROVED
+                    ? "Your parent approved your extension request"
+                    : "Your parent rejected your extension request"
+            });
+        } catch (err) {
+            console.error("notifyChild failed in decideRequest:", err.message);
+        }
 
-        await sendAuditLog({
-            parentId: updated.parentId,
-            childId: updated.childId,
-            actionType: decision === RequestStatus.APPROVED
-                ? AuditActionType.APPROVE_REQUEST
-                : AuditActionType.REJECT_REQUEST,
-            description: decision === RequestStatus.APPROVED
-                ? "Parent approved extension request"
-                : "Parent rejected extension request"
-        });
-
+        try {
+            await sendAuditLog({
+                parentId: updated.parentId,
+                childId: updated.childId,
+                actionType: decision === RequestStatus.APPROVED
+                    ? AuditActionType.APPROVE_REQUEST
+                    : AuditActionType.REJECT_REQUEST,
+                description: decision === RequestStatus.APPROVED
+                    ? "Parent approved extension request"
+                    : "Parent rejected extension request"
+            });
+        } catch (err) {
+            console.error("sendAuditLog failed in decideRequest:", err.message);
+        }
 
         return updated;
     }

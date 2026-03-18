@@ -1,6 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { getChildrenByParentId, getSelectedDeviceForChild } from "../dal/parent.dal.js";
 import { findDevicesByChildId } from "../dal/device.dal.js";
 import { findRequestsByChild } from "../dal/request.dal.js";
 import { RequestStatus } from "../constants/status.js";
@@ -9,6 +9,7 @@ import {
     RecommendationPriority
 } from "../constants/recommendation.js";
 import { ActivityIdeas } from "../constants/activityIdeas.js";
+
 
 function ensureChildBelongsToParent(childList, childId) {
     const child = childList.find((c) => String(c._id) === String(childId));
@@ -53,11 +54,12 @@ export async function getChildInterestRecommendations(parentId, childId) {
 }
 
 
-function buildParentsRecommendations({ child, devices, requests }) {
+
+
+function buildParentsRecommendations({ child, selectedDevice, requests }) {
     const recommendations = [];
 
-    const activeDevice = devices[0];
-    const screenTime = activeDevice?.screenTime || {};
+    const screenTime = selectedDevice?.screenTime || {};
 
     const pendingRequests = requests.filter(
         (r) => r.status === RequestStatus.PENDING
@@ -86,7 +88,7 @@ function buildParentsRecommendations({ child, devices, requests }) {
         recommendations.push({
             code: RecommendationCode.PENDING_REQUESTS,
             title: "Pending Extension Requests",
-            description: "You have ${pendingRequests.length} requests waiting for approval or rejection.",
+            description: `You have ${pendingRequests.length} requests waiting for approval or rejection.`,
             priority: RecommendationPriority.MEDIUM
         });
     }
@@ -136,7 +138,7 @@ function buildParentsRecommendations({ child, devices, requests }) {
         });
     }
 
-    if (activeDevice?.isLocked === true) {
+    if (selectedDevice?.isLocked === true) {
         recommendations.push({
             code: RecommendationCode.CHECK_LOCK_REASON,
             title: "Check if the device still needs to be locked",
@@ -164,7 +166,7 @@ export async function getParentRecommendations(parentId, childId) {
     const childList = await getChildrenByParentId(parentId);
     const child = ensureChildBelongsToParent(childList, childId);
 
-    const devices = await findDevicesByChildId(childId);
+    const selectedDevice = await getSelectedDeviceForChild(parentId, childId);
 
     const requests = await findRequestsByChild({
         parentId,
@@ -173,7 +175,7 @@ export async function getParentRecommendations(parentId, childId) {
 
     const recommendations = buildParentsRecommendations({
         child,
-        devices,
+        selectedDevice,
         requests
     });
 

@@ -1,6 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { findDeviceById, updateDeviceById, findDevicesByChildId, resetDailyScreenTime } from "../dal/device.dal.js";import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { findDeviceById, updateDeviceById, findDevicesByChildId, resetDailyScreenTime } from "../dal/device.dal.js"; import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "../services/notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
@@ -31,21 +31,31 @@ export async function lockDevice(parentId, deviceId) {
   ensureDeviceBelongsToParent(device, parentId);
   const updatedDevice = await updateDeviceById(deviceId, { isLocked: true });
 
-  await notifyChild({
-    parentId,
-    childId: device.childId,
-    type: NotificationType.DEVICE_LOCKED,
-    severity: NotificationSeverity.WARNING,
-    title: "Device Locked",
-    description: "The parent locked the device"
-  });
+  try {
+    await notifyChild({
+      parentId,
+      childId: device.childId,
+      type: NotificationType.DEVICE_LOCKED,
+      severity: NotificationSeverity.WARNING,
+      title: "Device Locked",
+      description: "The parent locked the device"
+    });
+  } catch (err) {
+    console.error("notifyChild failed in lockDevice:", err.message);
+  }
 
-  await sendAuditLog({
-    parentId,
-    childId: device.childId,
-    actionType: AuditActionType.LOCK_DEVICE,
-    description: "Device locked"
-  });
+
+  try {
+    await sendAuditLog({
+      parentId,
+      childId: device.childId,
+      actionType: AuditActionType.LOCK_DEVICE,
+      description: "Device locked"
+    });
+  } catch (err) {
+    console.error("sendAuditLog failed in lockDevice:", err.message);
+  }
+
 
   return updatedDevice;
 }
@@ -56,22 +66,30 @@ export async function unlockDevice(parentId, deviceId) {
   ensureDeviceBelongsToParent(device, parentId);
   const updatedDevice = await updateDeviceById(deviceId, { isLocked: false });
 
-  await notifyChild({
-    parentId,
-    childId: device.childId,
-    type: NotificationType.DEVICE_UNLOCKED,
-    severity: NotificationSeverity.INFO,
-    title: "Device Unlocked",
-    description: "The parent unlocked the device"
-  });
+  try {
 
-  await sendAuditLog({
-    parentId,
-    childId: device.childId,
-    actionType: AuditActionType.UNLOCK_DEVICE,
-    description: "Device Unlocked"
-  });
+    await notifyChild({
+      parentId,
+      childId: device.childId,
+      type: NotificationType.DEVICE_UNLOCKED,
+      severity: NotificationSeverity.INFO,
+      title: "Device Unlocked",
+      description: "The parent unlocked the device"
+    });
+  } catch (err) {
+    console.error("notifyChild failed in unlockDevice:", err.message);
+  }
 
+  try {
+    await sendAuditLog({
+      parentId,
+      childId: device.childId,
+      actionType: AuditActionType.UNLOCK_DEVICE,
+      description: "Device Unlocked"
+    });
+  } catch (err) {
+    console.error("sendAuditLog failed in unlockDevice:", err.message);
+  }
 
   return updatedDevice;
 }
@@ -120,23 +138,30 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
 
   const updatedDevice = await updateDeviceById(deviceId, patch);
 
-  await notifyChild({
-    parentId,
-    childId: device.childId,
-    type: NotificationType.SCREEN_TIME_UPDATED,
-    severity: NotificationSeverity.INFO,
-    title: "Screen Time Limits Updated",
-    description: "The parent updated the screen time settings"
-  });
+  try {
+    await notifyChild({
+      parentId,
+      childId: device.childId,
+      type: NotificationType.SCREEN_TIME_UPDATED,
+      severity: NotificationSeverity.INFO,
+      title: "Screen Time Limits Updated",
+      description: "The parent updated the screen time settings"
+    });
+  } catch (err) {
+    console.error("notifyChild failed in updateDeviceScreenTime:", err.message);
+  }
 
-
-  await sendAuditLog({
-    parentId,
-    childId: device.childId,
-    actionType: AuditActionType.UPDATE_SCREEN_TIME,
-    description: "Screen time limits updated"
-  });
-
+  try {
+    await sendAuditLog({
+      parentId,
+      childId: device.childId,
+      actionType: AuditActionType.UPDATE_SCREEN_TIME,
+      description: "Screen time limits updated"
+    });
+  } catch (err) {
+    console.error("sendAuditLog failed in updateDeviceScreenTime:", err.message);
+  }
+  
   return updatedDevice;
 }
 

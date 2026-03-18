@@ -114,3 +114,51 @@ export async function setSelectedDevice(parentId, childId, deviceId) {
     selectedDeviceId: deviceId
   };
 }
+
+
+export async function getSelectedDeviceForChild(parentId, childId) {
+  const child = await getChildByParentId(parentId, childId);
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const devices = await findDevicesByChildId(childId);
+  const activeDevices = devices.filter((device) => device.isActive === true);
+
+  if (activeDevices.length === 0) {
+    return null;
+  }
+
+  const selectedDevice = activeDevices.find(
+    (device) => String(device._id) === String(child.selectedDeviceId)
+  );
+
+  return selectedDevice || activeDevices[0];
+}
+
+
+export async function reconcileSelectedDeviceAfterDeviceChange(parentId, childId) {
+  const child = await getChildByParentId(parentId, childId);
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const devices = await findDevicesByChildId(childId);
+  const activeDevices = devices.filter((d) => d.isActive === true);
+
+  const selectedStillValid = activeDevices.find(
+    (d) => String(d._id) === String(child.selectedDeviceId)
+  );
+
+  if (selectedStillValid) {
+    return selectedStillValid;
+  }
+
+  const nextSelectedDeviceId = activeDevices[0]?._id ?? null;
+
+  await updateSelectedDeviceByParentId(parentId, childId, nextSelectedDeviceId);
+
+  return activeDevices[0] || null;
+}
