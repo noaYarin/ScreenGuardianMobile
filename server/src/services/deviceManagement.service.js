@@ -1,7 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { findDeviceById, updateDeviceById, findDevicesByChildId } from "../dal/device.dal.js";
-import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { findDeviceById, updateDeviceById, findDevicesByChildId, resetDailyScreenTime } from "../dal/device.dal.js";import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "../services/notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";

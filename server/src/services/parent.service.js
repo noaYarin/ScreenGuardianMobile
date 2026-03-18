@@ -4,10 +4,14 @@ import {
   getChildrenByParentId,
   updateChildActiveByParentId,
   pushChildToParent,
-  updateChildInterestsByParentId
+  updateChildInterestsByParentId,
+  updateSelectedDeviceByParentId,
+  getChildByParentId
+
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
-import { assertBoolean } from "../utils/validators.js"; 
+import { assertBoolean } from "../utils/validators.js";
+import { findDevicesByChildId } from "../dal/device.dal.js";
 
 
 export async function addChild(parentId, body) {
@@ -24,6 +28,17 @@ export async function getChildren(parentId, options = {}) {
   return { children: filtered };
 }
 
+
+export async function getChild(parentId, childId) {
+  const child = await getChildByParentId(parentId, childId);
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  return { child };
+}
+
 export async function setChildActive(parentId, childId, isActive) {
   assertBoolean(isActive, CommonErrors.VALIDATION_IS_ACTIVE);
 
@@ -35,7 +50,7 @@ export async function setChildActive(parentId, childId, isActive) {
 
   const list = updatedParent.children || [];
   const updatedChild = list.find((c) => String(c._id) === String(childId));
-    if (!updatedChild) {
+  if (!updatedChild) {
     throw new AppError(CommonErrors.NOT_FOUND);
   }
   return { child: updatedChild };
@@ -73,5 +88,29 @@ export async function updateChildInterests(parentId, childId, interests) {
   return {
     childId: child._id,
     interests: child.interests || []
+  };
+}
+
+
+export async function setSelectedDevice(parentId, childId, deviceId) {
+  const childList = await getChildrenByParentId(parentId);
+  const child = childList.find((c) => String(c._id) === String(childId));
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const devices = await findDevicesByChildId(childId);
+  const device = devices.find((d) => String(d._id) === String(deviceId));
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  await updateSelectedDeviceByParentId(parentId, childId, deviceId);
+
+  return {
+    childId,
+    selectedDeviceId: deviceId
   };
 }

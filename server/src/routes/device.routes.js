@@ -11,7 +11,6 @@ const router = Router();
 
 // GET /api/v1/devices/child/:childId
 // Parent gets all devices of specific child
-
 router.get("/child/:childId", authJwt, requireParent, getDevicesByChildController);
 
 // PATCH /api/v1/devices/:deviceId/lock

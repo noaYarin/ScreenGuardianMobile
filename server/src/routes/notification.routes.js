@@ -4,7 +4,8 @@ import { requireParent } from "../middlewares/requireParent.js";
 
 import {
   getParentNotificationsController,
-  markNotificationAsReadController
+  markNotificationAsReadController,
+  readAllNotificationsController
 } from "../controllers/notification.controller.js";
 
 const router = Router();
@@ -16,5 +17,9 @@ router.get("/parent", authJwt, requireParent, getParentNotificationsController);
  //PATCH /api/v1/notifications/parent/:notificationId/read
 // Mark notification as read
 router.patch("/parent/:notificationId/read", authJwt, requireParent, markNotificationAsReadController);
+
+// PATCH /api/v1/notifications/parent/read-all
+// Mark all parent notifications as read
+router.patch("/parent/read-all", authJwt, requireParent, readAllNotificationsController);
 
 export default router;

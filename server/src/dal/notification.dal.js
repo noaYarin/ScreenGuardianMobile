@@ -1,6 +1,8 @@
 import NotificationModel from "../models/notification.model.js";
 import { assertValidObjectId } from "../utils/validators.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { TargetRole } from "../constants/role.js";
+
 
 // Create a new notification
 export async function createNotification(doc) {
@@ -34,4 +36,14 @@ export async function markNotificationAsReadById(parentId, notificationId) {
     { $set: { isRead: true } },
     { new: true }
   ).lean();
+}
+
+
+export async function markAllNotificationsAsRead(parentId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+
+  return NotificationModel.updateMany(
+    { parentId, isRead: false },
+    { $set: { isRead: true } }
+  );
 }
