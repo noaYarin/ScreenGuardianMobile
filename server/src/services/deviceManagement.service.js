@@ -8,6 +8,15 @@ import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
 
 
+
+function isSameDay(date1, date2) {
+  return (
+    date1.getFullYear() === date2.getFullYear() &&
+    date1.getMonth() === date2.getMonth() &&
+    date1.getDate() === date2.getDate()
+  );
+}
+
 async function validateDeviceAccess({ deviceId, parentId, childId }) {
   const device = await findDeviceById(deviceId);
 
@@ -200,15 +209,14 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
   return updatedDevice;
 }
 
+export async function setDeviceActive(parentId, deviceId, isActive) {
+  if (typeof isActive !== "boolean") {
+    throw new AppError(CommonErrors.VALIDATION_IS_ACTIVE);
+  }
 
+  const device = await validateDeviceAccess({ deviceId, parentId });
 
-function isSameDay(date1, date2) {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
+  const updatedDevice = await updateDeviceById(deviceId, { isActive });
+
+  return updatedDevice;
 }
-
-
-
