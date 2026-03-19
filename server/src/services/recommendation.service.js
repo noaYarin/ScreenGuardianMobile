@@ -9,7 +9,7 @@ import {
     RecommendationPriority
 } from "../constants/recommendation.js";
 import { ActivityIdeas } from "../constants/activityIdeas.js";
-import { validateDeviceAccess } from "../services/deviceManagement.service.js";
+import { validateDeviceAccess } from "./device.service.js";
 
 
 function ensureChildBelongsToParent(childList, childId) {
@@ -154,7 +154,7 @@ function buildParentsRecommendations({ child, device, requests }) {
         if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
             age--;
         }
-        
+
         if (age >= 6 && age <= 10) {
             recommendations.push({
                 code: RecommendationCode.YOUNG_CHILD_GUIDANCE,

@@ -1,7 +1,7 @@
 import {
   getDevicesByChild, lockDevice, unlockDevice, getDeviceScreenTime,
-  updateDeviceScreenTime, setDeviceActive
-} from "../services/deviceManagement.service.js";
+  updateDeviceScreenTime, setDeviceActive, getDevicePolicy
+} from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
   try {
@@ -76,6 +76,21 @@ export async function setDeviceActiveController(req, res, next) {
     const data = await setDeviceActive(parentId, deviceId, isActive);
 
     res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export async function getDevicePolicyController(req, res, next) {
+  try {
+    const { deviceId } = req.params;
+    const userId = req.user?.id;
+    const userRole = req.user?.role;
+
+    const policy = await getDevicePolicy({ deviceId, userId, userRole });
+
+    res.status(200).json(policy);
   } catch (err) {
     next(err);
   }
