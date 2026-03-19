@@ -10,9 +10,22 @@ import {
   updateDeviceById,
   findDevicesByChildId,
   resetDailyScreenTime,
-  updateApplicationBlockStatus
+  updateApplicationBlockStatus,
+  findDeviceDailyLimitById,
+  updateDeviceDailyLimit
 } from "../dal/device.dal.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
+
+
+function assertDailyLimitMinutes(value) {
+  const n = Number(value);
+
+  if (!Number.isFinite(n) || n < 0) {
+    throw new AppError(CommonErrors.VALIDATION_ERROR);
+  }
+
+  return n;
+}
 
 
 function isSameDay(date1, date2) {
@@ -298,4 +311,89 @@ export async function unblockApplication(parentId, deviceId, packageName) {
   );
 
   return updatedApp;
+}
+
+
+
+
+
+
+export async function getDeviceDailyLimit(parentId, deviceId) {
+  await validateDeviceAccess({ deviceId, parentId });
+
+  let device = await findDeviceDailyLimitById(deviceId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  const now = new Date();
+
+  const lastReset = device.screenTime?.lastDailyResetAt
+    ? new Date(device.screenTime.lastDailyResetAt)
+    : null;
+
+  if (!lastReset || !isSameDay(lastReset, now)) {
+    device = await resetDailyScreenTime(deviceId, now);
+  }
+
+  return {
+    isLimitEnabled: device.screenTime?.isLimitEnabled ?? false,
+    dailyLimitMinutes: device.screenTime?.dailyLimitMinutes ?? 0,
+    extraMinutesToday: device.screenTime?.extraMinutesToday ?? 0,
+    usedTodayMinutes: device.screenTime?.usedTodayMinutes ?? 0
+  };
+}
+
+
+
+
+export async function updateDeviceDailyLimitService(parentId, deviceId, body) {
+  const device = await validateDeviceAccess({ deviceId, parentId });
+
+  const isLimitEnabled =
+    typeof body.isLimitEnabled === "boolean"
+      ? body.isLimitEnabled
+      : device.screenTime?.isLimitEnabled ?? false;
+
+  const dailyLimitMinutes =
+    body.dailyLimitMinutes !== undefined
+      ? assertDailyLimitMinutes(body.dailyLimitMinutes)
+      : device.screenTime?.dailyLimitMinutes ?? 0;
+
+  const updatedDevice = await updateDeviceDailyLimit(deviceId, {
+    isLimitEnabled,
+    dailyLimitMinutes
+  });
+
+  try {
+    await notifyChild({
+      parentId,
+      childId: device.childId,
+      type: NotificationType.SCREEN_TIME_UPDATED,
+      severity: NotificationSeverity.INFO,
+      title: "Daily Screen Time Updated",
+      description: "The parent updated the daily screen time limit"
+    });
+  } catch (err) {
+    console.error("notifyChild failed in updateDeviceDailyLimitService:", err.message);
+  }
+
+  try {
+    await sendAuditLog({
+      parentId,
+      childId: device.childId,
+      actionType: AuditActionType.UPDATE_SCREEN_TIME,
+      description: "Daily screen time limit updated"
+    });
+  } catch (err) {
+    console.error("sendAuditLog failed in updateDeviceDailyLimitService:", err.message);
+  }
+
+  return {
+    isLimitEnabled: updatedDevice.screenTime?.isLimitEnabled ?? false,
+    dailyLimitMinutes: updatedDevice.screenTime?.dailyLimitMinutes ?? 0,
+    extraMinutesToday: updatedDevice.screenTime?.extraMinutesToday ?? 0,
+    usedTodayMinutes: updatedDevice.screenTime?.usedTodayMinutes ?? 0
+  };
 }
