@@ -16,14 +16,13 @@ type Child = {
 };
 
 const URL = "/api/v1/parent";
-const auth = { requireAuth: true as const };
 
 export async function addChild(body: {
   name: string;
   birthDate: string;
   gender?: string;
 }): Promise<{ child: Child }> {
-  return api.post<{ child: Child }>("/api/v1/parent/add/child", body, auth);
+  return api.post<{ child: Child }>("/api/v1/parent/add/child", body, { requireAuth: true, role: "PARENT" });
 }
 
 export async function getMyChildren(options?: {
@@ -31,7 +30,7 @@ export async function getMyChildren(options?: {
 }): Promise<{ children: Child[] }> {
   const query =
     options?.includeInactive === true ? "?includeInactive=true" : "";
-  return api.get<{ children: Child[] }>(`${URL}/get/children${query}`, auth);
+  return api.get<{ children: Child[] }>(`${URL}/get/children${query}`, { requireAuth: true});
 }
 
 export async function setChildActive(
@@ -41,7 +40,7 @@ export async function setChildActive(
   return api.patch<{ [key: string]: unknown }>(
     `${URL}/set/child/${encodeURIComponent(childId)}/active`,
     { isActive },
-    auth
+    { role: "PARENT" }
   );
 }
 

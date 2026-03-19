@@ -6,7 +6,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import { linkDevice } from "../../../api";
+import { apiLinkDevice } from "../../../api/auth";
 import { styles } from "./styles";
 
 type Mode = "barcode" | "code";
@@ -40,7 +40,7 @@ export default function LinkChildrenScreen() {
   const pairingBtn = async () => {
     try {
       setIsSubmitting(true);
-      await linkDevice({ code: '', barcodeToken: '' });
+      await apiLinkDevice({ code: '', barcodeToken: '' });
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(
@@ -61,7 +61,7 @@ export default function LinkChildrenScreen() {
 
     try {
       setIsSubmitting(true);
-      await linkDevice({ code: '', barcodeToken: '' });
+      await apiLinkDevice({ code: '', barcodeToken: '' });
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(

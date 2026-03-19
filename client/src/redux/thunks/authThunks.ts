@@ -4,8 +4,10 @@ import {
   apiRegisterParent,
   apiResetPassword,
   apiForgotPassword,
+  apiGenerateCodeForPairingChild,
+  apiLinkDevice,
 } from "../../api/auth";
-import { getMyChildren } from "../../api";
+import { getMyChildren } from "../../api/parent";
 
 // Payload when auth succeeds (login, register, reset password)
 type AuthSuccessPayload = {
@@ -103,6 +105,41 @@ export const resetPassword = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
+
+// Auth for children
+export const generateCodeForPairingChild = createAsyncThunk<
+  { code: string; barcodeToken: string; expiresAt: string },  
+  { parentId: string; childId: string },
+  { rejectValue: string }
+>("auth/generateCodeForPairingChild", async (body, thunkAPI) => {
+  try {
+    const data = await apiGenerateCodeForPairingChild(body);
+    return data;
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "pairingChild.generic_error";
+
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+
+export const linkDevice = createAsyncThunk<
+  { token: string; parentId: string; childId: string; deviceId: string },
+  { code: string; barcodeToken: string; deviceName: string; deviceType: string; platform: string },
+  { rejectValue: string }
+>("auth/linkDevice", async (params, thunkAPI) => {
+  try {
+    const data = await apiLinkDevice(params);
+    return data;
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "linkDevice.generic_error";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+
 
 export const fetchChildren = createAsyncThunk<
   { childrenIds: string[]; activeChildId: string | null },
