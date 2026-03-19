@@ -1,12 +1,18 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { findDeviceById, updateDeviceById, findDevicesByChildId, resetDailyScreenTime } from "../dal/device.dal.js"; import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { notifyChild } from "./notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
-
+import {
+  findDeviceById,
+  updateDeviceById,
+  findDevicesByChildId,
+  resetDailyScreenTime,
+  updateApplicationBlockStatus
+} from "../dal/device.dal.js";
+import { getChildrenByParentId } from "../dal/parent.dal.js";
 
 
 function isSameDay(date1, date2) {
@@ -239,4 +245,57 @@ export async function getDevicePolicy(parentId, deviceId) {
     },
     updatedAt: device.updatedAt
   };
+}
+
+
+export async function getDeviceByChild(parentId, childId, deviceId) {
+  const childList = await getChildrenByParentId(parentId);
+  ensureChildBelongsToParent(childList, childId);
+
+  const device = await validateDeviceAccess({ deviceId, parentId, childId });
+
+  return device;
+}
+
+
+
+export async function blockApplication(parentId, deviceId, packageName) {
+  const device = await validateDeviceAccess({ deviceId, parentId });
+
+  const app = device.applications?.find(
+    (application) => application.packageName === packageName
+  );
+
+  if (!app) {
+    throw new AppError(CommonErrors.APP_NOT_FOUND);
+  }
+
+  const updatedDevice = await updateApplicationBlockStatus(deviceId, packageName, true);
+
+  const updatedApp = updatedDevice.applications?.find(
+    (application) => application.packageName === packageName
+  );
+
+  return updatedApp;
+}
+
+
+export async function unblockApplication(parentId, deviceId, packageName) {
+  const device = await validateDeviceAccess({ deviceId, parentId });
+
+  const app = device.applications?.find(
+    (application) => application.packageName === packageName
+  );
+
+  if (!app) {
+    throw new AppError(CommonErrors.APP_NOT_FOUND);
+  }
+
+  const updatedDevice = await updateApplicationBlockStatus(deviceId, packageName, false);
+
+  const updatedApp = updatedDevice.applications?.find(
+    (application) => application.packageName === packageName
+  );
+
+  return updatedApp;
 }
