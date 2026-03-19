@@ -5,7 +5,8 @@ import {
   lockDeviceController,
   unlockDeviceController,
   getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController,
-  setDeviceActiveController  
+  setDeviceActiveController,
+  getDevicePolicyController
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -21,6 +22,10 @@ router.patch("/:deviceId/lock", authJwt, requireParent, lockDeviceController);
  //PATCH /api/v1/devices/:deviceId/unlock
 // Parent unlocks a device
 router.patch("/:deviceId/unlock", authJwt, requireParent, unlockDeviceController);
+
+// GET /api/v1/devices/:deviceId/policy
+// Get device policy for child app
+router.get("/:deviceId/policy", authJwt, getDevicePolicyController);
 
  //GET /api/v1/devices/:deviceId/screen-time
 // Get current screen-time settings for a device

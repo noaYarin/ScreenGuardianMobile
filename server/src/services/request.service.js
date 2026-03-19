@@ -9,7 +9,7 @@ import { notifyParent, notifyChild } from "../services/notification.service.js";
 import { addExtraMinutesToDevice, findDeviceById } from "../dal/device.dal.js";
 import { sendAuditLog } from "./audit.service.js";
 import { AuditActionType } from "../constants/auditActionType.js";
-import { validateDeviceAccess } from "../services/deviceManagement.service.js";
+import { validateDeviceAccess } from "./device.service.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
 
 const MIN_MINUTES = 1;

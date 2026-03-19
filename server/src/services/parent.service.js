@@ -10,7 +10,6 @@ import {
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
 import { assertBoolean } from "../utils/validators.js";
-import { findDevicesByChildId } from "../dal/device.dal.js";
 
 
 export async function addChild(parentId, body) {

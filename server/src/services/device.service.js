@@ -1,7 +1,7 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { findDeviceById, updateDeviceById, findDevicesByChildId, resetDailyScreenTime } from "../dal/device.dal.js"; import { getChildrenByParentId } from "../dal/parent.dal.js";
-import { notifyChild } from "../services/notification.service.js";
+import { notifyChild } from "./notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { sendAuditLog } from "./audit.service.js";
@@ -17,7 +17,7 @@ function isSameDay(date1, date2) {
   );
 }
 
-export async function validateDeviceAccess({ deviceId, parentId, childId }) {
+export async function validateDeviceAccess({ deviceId, parentId, childId, allowInactive = false }) {
   const device = await findDeviceById(deviceId);
 
   if (!device) {
@@ -200,4 +200,43 @@ export async function setDeviceActive(parentId, deviceId, isActive) {
   const updatedDevice = await updateDeviceById(deviceId, { isActive });
 
   return updatedDevice;
+}
+
+
+export async function getDevicePolicy(parentId, deviceId) {
+  let device = await validateDeviceAccess({
+    deviceId,
+    parentId,
+  });
+
+  const now = new Date();
+
+  const lastReset = device.screenTime?.lastDailyResetAt
+    ? new Date(device.screenTime.lastDailyResetAt)
+    : null;
+
+  if (!lastReset || !isSameDay(lastReset, now)) {
+    device = await resetDailyScreenTime(deviceId, now);
+  }
+
+  return {
+    deviceId: String(device._id),
+    childId: String(device.childId),
+    parentId: String(device.parentId),
+    platform: device.platform,
+    isLocked: device.isLocked,
+    isActive: device.isActive,
+    screenTime: {
+      isLimitEnabled: device.screenTime?.isLimitEnabled ?? false,
+      dailyLimitMinutes: device.screenTime?.dailyLimitMinutes ?? 0,
+      extraMinutesToday: device.screenTime?.extraMinutesToday ?? 0,
+      weeklyLimitMinutes: device.screenTime?.weeklyLimitMinutes ?? 0,
+      usedTodayMinutes: device.screenTime?.usedTodayMinutes ?? 0,
+      usedWeekMinutes: device.screenTime?.usedWeekMinutes ?? 0,
+      lastDailyResetAt: device.screenTime?.lastDailyResetAt ?? null,
+      lastWeeklyResetAt: device.screenTime?.lastWeeklyResetAt ?? null,
+      weeklySchedule: device.screenTime?.weeklySchedule ?? []
+    },
+    updatedAt: device.updatedAt
+  };
 }
