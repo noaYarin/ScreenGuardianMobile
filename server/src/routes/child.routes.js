@@ -5,7 +5,8 @@ import { updateChildInterestsController } from "../controllers/child.controller.
 
 const router = Router();
 
-// PATCH /api/v1/child/interests
+// PATCH /api/v1/children/me/interests
+// Update child interests (self)
 router.patch("/me/interests", authJwt, requireChild, updateChildInterestsController);
 
 export default router;

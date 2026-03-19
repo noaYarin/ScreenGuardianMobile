@@ -7,17 +7,29 @@ import {
   getChildController
 } from "../controllers/child.controller.js";
 import { requireParent } from "../middlewares/requireParent.js";
+import { getParentHomeSummaryController } from "../controllers/parent.controller.js";
 
 const router = Router();
 
-//POST api/v1/parent/add/child
-router.post("/add/child", authJwt, requireParent, addChildController);
-//GET api/v1/parent/get/children
-router.get("/get/children", authJwt, requireParent, getChildrenController);
-//GET api/v1/parent/get/child/:childId
-router.get("/get/child/:childId", authJwt, requireParent, getChildController);
-//PATCH api/v1/parent/set/child/:childId/active  
-router.patch("/set/child/:childId/active", authJwt, requireParent, setChildActiveController);
+// POST /api/v1/parent/children
+// Create new child
+router.post("/children", authJwt, requireParent, addChildController);
+
+// GET /api/v1/parent/children
+// Get all children of parent
+router.get("/children", authJwt, requireParent, getChildrenController);
+
+// GET /api/v1/parent/children/:childId
+// Get specific child
+router.get("/children/:childId", authJwt, requireParent, getChildController);
+
+// PATCH /api/v1/parent/children/:childId/active
+// Activate/deactivate child
+router.patch("/children/:childId/active", authJwt, requireParent, setChildActiveController);
+
+// GET /api/v1/parent/home-summary
+// Parent dashboard summary
+router.get("/home-summary", authJwt, requireParent, getParentHomeSummaryController);
 
 
 export default router;
