@@ -113,26 +113,14 @@ export const styles = StyleSheet.create({
     overflow: "hidden",
   },
 
-  qrIconOverlay: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "center",
-    justifyContent: "center",
+  qrImage: {
+    width: 220,
+    height: 220,
   },
 
-  cameraView: {
-    flex: 1,
-    width: "100%",
-  },
-
-  cameraFallback: {
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+  placeholderText: {
+    textAlign: "center",
+    color: "#0F172A",
   },
 
   codeArea: {
@@ -164,28 +152,27 @@ export const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  input: {
-    fontSize: 16,
-    color: "#0F172A",
-    textAlign: "center",
-  },
-
-  primaryBtn: {
-    marginTop: 14,
-    width: "100%",
+  codeDisplayContainer: {
+    minHeight: 72,
     borderRadius: 14,
-    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#D6E6FF",
+    backgroundColor: "#F8FBFF",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#0B4DFF",
+    paddingHorizontal: 16,
   },
 
-  primaryBtnDisabled: {
-    backgroundColor: "#93B4FF",
+  codeDisplayText: {
+    fontSize: 34,
+    letterSpacing: 3,
+    color: "#0F172A",
   },
 
-  primaryBtnText: {
-    fontSize: 16,
-    color: "#FFFFFF",
+  errorText: {
+    textAlign: "center",
+    marginTop: 10,
+    color: "#EF4444",
   },
+
 });

@@ -33,6 +33,15 @@ export async function getMyChildren(options?: {
   return api.get<{ children: Child[] }>(`${URL}/children${query}`, { requireAuth: true, role: "PARENT" });
 }
 
+export async function getChildById(
+  childId: string
+): Promise<{ child: Child }> {
+  return api.get<{ child: Child }>(
+    `${URL}/get/child/${encodeURIComponent(childId)}`,
+    { requireAuth: true, role: "PARENT" }
+  );
+}
+
 export async function setChildActive(
   childId: string,
   isActive: boolean
