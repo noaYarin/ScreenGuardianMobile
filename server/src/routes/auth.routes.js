@@ -5,6 +5,7 @@ import {
   forgotPasswordController,
   resetPasswordController,
 } from "../controllers/auth.controller.js";
+import { requireParent } from "../middlewares/requireParent.js";
 
 const router = Router();
 
@@ -20,10 +21,10 @@ router.post("/login-parent", loginParentController);
 
 // POST /api/v1/auth/forgot-password
 // Trigger forgot password email flow
-router.post("/forgot-password", forgotPasswordController);
+router.post("/forgot-password", requireParent, forgotPasswordController);
 
-// POST /api/v1/auth/reset-password-confirm
+// POST /api/v1/auth/reset-password-confirm 
 // Confirm reset token and set new password
-router.post("/reset-password-confirm", resetPasswordController);
+router.post("/reset-password-confirm", requireParent, resetPasswordController);
 
 export default router;
