@@ -169,6 +169,8 @@
     "scan": "Scan barcode",
     "scan_a11y": "Start scanning barcode",
     "camera_denied_message": "Camera permission is required to scan the barcode.",
+    "invalid_child_selection": "Invalid child selected. Please go back and choose the child again.",
+    "child_mismatch": "Child details do not match. Please return and select the correct child.",
     "code_placeholder": "Enter code",
     "code_input_a11y": "Code input",
     "error_title": "Something went wrong",
@@ -329,8 +331,8 @@
     "success_title": "Saved",
     "success_message": "The child was saved successfully"
   },
-  "kidDetails": {
-    "title": "Kid Details",
+  "childDetails": {
+    "title": "Child Details",
     "back_a11y": "Go back",
     "menu_a11y": "Open menu",
     "birthdate_value": "Birth date: {{value}}",

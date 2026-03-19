@@ -166,6 +166,8 @@
     "scan": "סריקת ברקוד",
     "scan_a11y": "התחלת סריקת ברקוד",
     "camera_denied_message": "גישה למצלמה נדרשת כדי לסרוק את הברקוד.",
+    "invalid_child_selection": "נבחר ילד לא תקין. יש לחזור ולבחור את הילד מחדש.",
+    "child_mismatch": "פרטי הילד אינם תואמים. חזור/י ובחר/י את הילד הנכון.",
     "error_title": "משהו השתבש",
     "error_generic": "חיבור למכשיר נכשל, נסה שוב.",
     "code_placeholder": "הקלד/י קוד",
@@ -325,7 +327,7 @@
     "success_title": "נשמר",
     "success_message": "הילד נשמר בהצלחה"
   },
-  "kidDetails": {
+  "childDetails": {
     "title": "פרטי ילד",
     "back_a11y": "חזרה למסך הקודם",
     "menu_a11y": "פתיחת תפריט",

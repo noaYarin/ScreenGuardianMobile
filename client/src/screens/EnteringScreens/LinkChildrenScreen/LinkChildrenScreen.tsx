@@ -7,6 +7,7 @@ import { CameraView, useCameraPermissions } from "expo-camera";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { apiLinkDevice } from "../../../api/auth";
+import { buildDeviceConnectionPayload } from "../../../lib/deviceConnectionInfo";
 import { styles } from "./styles";
 
 type Mode = "barcode" | "code";
@@ -38,9 +39,16 @@ export default function LinkChildrenScreen() {
 
   // Handle code 
   const pairingBtn = async () => {
+    const trimmedCode = code.trim();
+    if (!trimmedCode) return;
+
     try {
       setIsSubmitting(true);
-      await apiLinkDevice({ code: '', barcodeToken: '' });
+      await apiLinkDevice({
+        code: trimmedCode,
+        barcodeToken: "",
+        ...buildDeviceConnectionPayload(),
+      });
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(
@@ -48,7 +56,7 @@ export default function LinkChildrenScreen() {
         t("linkChildren.error_generic"),
       );
     } finally {
-      setIsSubmitting(true);
+      setIsSubmitting(false);
     }
   };
 
@@ -61,7 +69,11 @@ export default function LinkChildrenScreen() {
 
     try {
       setIsSubmitting(true);
-      await apiLinkDevice({ code: '', barcodeToken: '' });
+      await apiLinkDevice({
+        code: "",
+        barcodeToken: token,
+        ...buildDeviceConnectionPayload(),
+      });
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(
