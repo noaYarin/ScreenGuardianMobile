@@ -66,3 +66,21 @@ export async function resetDailyScreenTime(deviceId, now) {
     { new: true }
   ).lean();
 }
+
+
+export async function updateApplicationBlockStatus(deviceId, packageName, isBlocked) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findOneAndUpdate(
+    {
+      _id: deviceId,
+      "applications.packageName": packageName
+    },
+    {
+      $set: {
+        "applications.$.isBlocked": isBlocked
+      }
+    },
+    { new: true }
+  ).lean();
+}

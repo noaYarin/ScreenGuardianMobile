@@ -54,7 +54,7 @@ export const Common = {
   DEVICE_NOT_ACTIVE: { status: 400, code: "DEVICE_NOT_ACTIVE", message: "Device is not active" },
   INVALID_DEVICE_PLATFORM: { status: 400, code: "VALIDATION_ERROR", message: "platform is invalid" },
   VALIDATION_ERROR: { status: 400, code: "VALIDATION_ERROR", message: "Validation error" },
-
+  APP_NOT_FOUND: { status: 404, code: "APP_NOT_FOUND", message: "Application not found" },
 
 };
 
