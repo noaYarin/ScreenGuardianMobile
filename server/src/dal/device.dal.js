@@ -84,3 +84,33 @@ export async function updateApplicationBlockStatus(deviceId, packageName, isBloc
     { new: true }
   ).lean();
 }
+
+
+export async function findDeviceDailyLimitById(deviceId) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findById(
+    deviceId,
+    {
+      "screenTime.isLimitEnabled": 1,
+      "screenTime.dailyLimitMinutes": 1,
+      "screenTime.extraMinutesToday": 1,
+      "screenTime.usedTodayMinutes": 1
+    }
+  ).lean();
+}
+
+export async function updateDeviceDailyLimit(deviceId, { isLimitEnabled, dailyLimitMinutes }) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findByIdAndUpdate(
+    deviceId,
+    {
+      $set: {
+        "screenTime.isLimitEnabled": isLimitEnabled,
+        "screenTime.dailyLimitMinutes": dailyLimitMinutes
+      }
+    },
+    { new: true }
+  ).lean();
+}

@@ -8,7 +8,8 @@ import {
   getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController,
   setDeviceActiveController,
   getDevicePolicyController, getDeviceByChildController,   blockApplicationController,
-  unblockApplicationController
+  unblockApplicationController, getDeviceDailyLimitController,
+  updateDeviceDailyLimitController
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -31,7 +32,7 @@ router.patch("/:deviceId/unlock", authJwt, requireParent, unlockDeviceController
 
 // GET /api/v1/devices/:deviceId/policy
 // Get device policy for child app
-router.get("/:deviceId/policy", authJwt, requireParent, requireChild, getDevicePolicyController);
+router.get("/:deviceId/policy", authJwt, requireChild, getDevicePolicyController);
 
  //GET /api/v1/devices/:deviceId/screen-time
 // Get current screen-time settings for a device
@@ -40,6 +41,14 @@ router.get("/:deviceId/screen-time", authJwt, requireParent, getDeviceScreenTime
  //PATCH /api/v1/devices/:deviceId/screen-time
 // Update screen-time settings for a device
 router.patch("/:deviceId/screen-time", authJwt, requireParent, updateDeviceScreenTimeController);
+
+// GET /api/v1/devices/:deviceId/daily-limit
+// Get current daily limit settings for a device
+router.get("/:deviceId/daily-limit", authJwt, requireParent, getDeviceDailyLimitController);
+
+// PATCH /api/v1/devices/:deviceId/daily-limit
+// Update daily limit settings for a device
+router.patch("/:deviceId/daily-limit", authJwt, requireParent, updateDeviceDailyLimitController);
 
 // PATCH /api/v1/devices/:deviceId/active
 // Parent activates/deactivates a device

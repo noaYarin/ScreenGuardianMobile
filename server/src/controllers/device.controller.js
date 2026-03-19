@@ -1,6 +1,7 @@
 import {
   getDevicesByChild, lockDevice, unlockDevice, getDeviceScreenTime,
-  updateDeviceScreenTime, setDeviceActive, getDevicePolicy
+  updateDeviceScreenTime, setDeviceActive, getDevicePolicy, getDeviceDailyLimit,
+  updateDeviceDailyLimitService, blockApplication, unblockApplication, getDeviceByChild
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
@@ -56,7 +57,7 @@ export async function getDeviceScreenTimeController(req, res, next) {
 export async function updateDeviceScreenTimeController(req, res, next) {
   try {
     const parentId = req.user.parentId;
-    const { childId, deviceId } = req.params;
+    const { deviceId } = req.params;
     const data = await updateDeviceScreenTime(parentId, deviceId, req.body);
 
     res.status(200).json({ ok: true, data });
@@ -132,6 +133,32 @@ export async function unblockApplicationController(req, res, next) {
     const { deviceId, packageName } = req.params;
 
     const data = await unblockApplication(parentId, deviceId, packageName);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getDeviceDailyLimitController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { deviceId } = req.params;
+
+    const data = await getDeviceDailyLimit(parentId, deviceId);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateDeviceDailyLimitController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { deviceId } = req.params;
+
+    const data = await updateDeviceDailyLimitService(parentId, deviceId, req.body);
 
     res.status(200).json({ ok: true, data });
   } catch (err) {
