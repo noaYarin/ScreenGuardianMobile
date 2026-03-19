@@ -1,5 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
+import { ScreenTimeStatus } from "../constants/status.js";
 import {
   getChildrenByParentId,
   updateChildActiveByParentId,
@@ -10,7 +11,7 @@ import {
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
 import { assertBoolean } from "../utils/validators.js";
-
+import { findDevicesByChildId } from "../dal/device.dal.js";
 
 export async function addChild(parentId, body) {
   const childDoc = validateAndBuildChildDoc(body);
@@ -89,3 +90,60 @@ export async function updateChildInterests(parentId, childId, interests) {
   };
 }
 
+function calculateHomeStatus(used, limit) {
+  if (!limit || limit <= 0) {
+    return ScreenTimeStatus.GOOD;
+  }
+
+  const ratio = used / limit;
+
+  if (ratio >= 1) {
+    return ScreenTimeStatus.BAD;
+  }
+
+  if (ratio >= 0.8) {
+    return ScreenTimeStatus.WARN;
+  }
+
+  return ScreenTimeStatus.GOOD;
+}
+
+
+export async function getParentHomeSummary(parentId) {
+  const childList = await getChildrenByParentId(parentId);
+
+  const summary = [];
+
+  for (const child of childList) {
+    if (child.isActive === false) {
+      continue;
+    }
+
+    const devices = await findDevicesByChildId(child._id);
+
+    let usedTodayMinutes = 0;
+    let dailyLimitMinutes = 0;
+
+    for (const device of devices) {
+      if (device.isActive === false) {
+        continue;
+      }
+
+      const screenTime = device.screenTime || {};
+
+      usedTodayMinutes += Number(screenTime.usedTodayMinutes || 0);
+      dailyLimitMinutes += Number(screenTime.dailyLimitMinutes || 0) +
+        Number(screenTime.extraMinutesToday || 0);
+    }
+
+    summary.push({
+      childId: child._id,
+      name: child.name,
+      usedTodayMinutes,
+      dailyLimitMinutes,
+      status: calculateHomeStatus(usedTodayMinutes, dailyLimitMinutes)
+    });
+  }
+
+  return { children: summary };
+}

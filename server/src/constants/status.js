@@ -5,3 +5,9 @@ export const RequestStatus = {
   CANCELLED: 'CANCELLED',
   COMPLETED: 'COMPLETED',
 };
+
+export const ScreenTimeStatus = {
+  GOOD: "good",
+  WARN: "warn",
+  BAD: "bad"
+};

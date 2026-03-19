@@ -22,7 +22,7 @@ export async function addChild(body: {
   birthDate: string;
   gender?: string;
 }): Promise<{ child: Child }> {
-  return api.post<{ child: Child }>("/api/v1/parent/add/child", body, { requireAuth: true, role: "PARENT" });
+  return api.post<{ child: Child }>("/api/v1/parent/children", body, { requireAuth: true, role: "PARENT" });
 }
 
 export async function getMyChildren(options?: {
@@ -30,7 +30,7 @@ export async function getMyChildren(options?: {
 }): Promise<{ children: Child[] }> {
   const query =
     options?.includeInactive === true ? "?includeInactive=true" : "";
-  return api.get<{ children: Child[] }>(`${URL}/get/children${query}`, { requireAuth: true});
+  return api.get<{ children: Child[] }>(`${URL}/children${query}`, { requireAuth: true, role: "PARENT" });
 }
 
 export async function setChildActive(
@@ -38,9 +38,9 @@ export async function setChildActive(
   isActive: boolean
 ): Promise<{ [key: string]: unknown }> {
   return api.patch<{ [key: string]: unknown }>(
-    `${URL}/set/child/${encodeURIComponent(childId)}/active`,
+    `${URL}/children/${encodeURIComponent(childId)}/active`,
     { isActive },
-    { role: "PARENT" }
+    { requireAuth: true, role: "PARENT" }
   );
 }
 

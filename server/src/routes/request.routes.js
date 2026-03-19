@@ -11,28 +11,26 @@ import {
 
 const router = Router();
 
-// ===== Child routes =====
+// Child routes
 router.use("/child", authJwt, requireChild);
 
-// POST /api/v1/requests/child/add
+// POST /api/v1/requests/child
 // Child creates a new screen-time extension request
-router.post("/child/add", createRequestController);
+router.post("/child", createRequestController);
 
-// GET /api/v1/requests/child/get
+// GET /api/v1/requests/child
 // Child gets their own requests
-router.get("/child/get", getMyRequestsController);
+router.get("/child", getMyRequestsController);
 
-
-// ===== Parent routes =====
+// Parent routes
 router.use("/parent", authJwt, requireParent);
 
-
-// GET /api/v1/requests/parent/get/pending
+// GET /api/v1/requests/parent/pending
 // Parent gets all pending requests for their children
-router.get("/parent/get/pending", getPendingRequestsController);
+router.get("/parent/pending", getPendingRequestsController);
 
-// Full route: PATCH /api/v1/requests/parent/set/:requestId/decision
+// PATCH /api/v1/requests/parent/:requestId/decision
 // Parent approves or rejects a request
-router.patch("/parent/set/:requestId/decision", decideRequestController);
+router.patch("/parent/:requestId/decision", decideRequestController);
 
 export default router;
