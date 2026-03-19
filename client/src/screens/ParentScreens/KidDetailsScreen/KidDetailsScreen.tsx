@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import {
-  View,
-  Pressable,
-  useWindowDimensions,
-} from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { Href, Stack, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { RootState } from "@/src/redux/store/types";
 
 type StaticDevice = {
   id: string;
@@ -22,12 +20,6 @@ type StaticDevice = {
 };
 
 const STATIC_CHILD = {
-  id: "1",
-  name: "יעל",
-  birthDate: "12/03/2017",
-  genderLabel: "בת",
-  usedToday: "2:30",
-  dailyLimit: "4:00",
   devices: [
     {
       id: "device-1",
@@ -52,30 +44,63 @@ export default function KidDetailsScreen() {
   const { width } = useWindowDimensions();
   const params = useLocalSearchParams<{ id?: string; name?: string }>();
 
+  const { children, isLoading, error } = useSelector((state: RootState) => state.children);
+
   const [isDevicesExpanded, setIsDevicesExpanded] = useState(false);
+  const [selectedChildId, setSelectedChildId] = useState<string>(() => {
+    return typeof params.id === "string" && params.id.trim().length > 0 ? params.id : "";
+  });
 
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
-  const childIdFromParams =
-    typeof params.id === "string" && params.id.trim().length > 0
-      ? params.id
-      : STATIC_CHILD.id;
+  useEffect(() => {
+    if (children.length === 0) return;
 
-  const childNameFromParams =
-    typeof params.name === "string" && params.name.trim().length > 0
-      ? params.name
-      : STATIC_CHILD.name;
+    if (!selectedChildId) {
+      setSelectedChildId(children[0]._id);
+      return;
+    }
+
+    if (!children.some((c) => c._id === selectedChildId)) {
+      setSelectedChildId(children[0]._id);
+    }
+  }, [children, selectedChildId]);
+
+  const selectedChild = useMemo(() => {
+    return children.find((c) => c._id === selectedChildId) ?? null;
+  }, [children, selectedChildId]);
+
+  const childName = selectedChild?.name ?? "";
+  const childBirthDate = selectedChild?.birthDate 
+  ? new Date(selectedChild.birthDate).toLocaleDateString("he-IL") 
+  : "";
+
+  const childGenderLabel =
+    selectedChild?.gender === "boy"
+      ? t("addChild.gender_boy")
+      : selectedChild?.gender === "girl"
+      ? t("addChild.gender_girl")
+      : selectedChild?.gender === "other"
+      ? t("addChild.gender_other")
+      : "";
+
+  const devicesForSelectedChild = useMemo(() => {
+    const devices = (selectedChild as any)?.devices;
+    return Array.isArray(devices) ? devices : [];
+  }, [selectedChild]);
 
   const handleConnectDevice = () => {
-    router.push("/Parent/linkDevice" as Href);
-  };
-
-  const handleViewLimits = (deviceId: string) => {
-    console.log("View limits for device:", deviceId);
-  };
-
-  const handleDeleteDevice = (deviceId: string) => {
-    console.log("Delete device:", deviceId);
+    if (selectedChildId) {
+      router.push(
+        {
+          pathname: "/Parent/linkDevice",
+          params: {
+            id: selectedChildId,
+            name: childName,
+          },
+        } as never
+      );
+    }
   };
 
   const handleOpenChildProfile = () => {
@@ -83,8 +108,8 @@ export default function KidDetailsScreen() {
       {
         pathname: "/Parent/childProfile" as Href,
         params: {
-          id: childIdFromParams,
-          name: childNameFromParams,
+          id: selectedChildId,
+          name: childName,
         },
       } as never
     );
@@ -98,7 +123,7 @@ export default function KidDetailsScreen() {
     <>
       <Stack.Screen
         options={{
-          title: t("kidDetails.title"),
+          title: t("childDetails.title"),
           headerTitleAlign: "center",
           headerShadowVisible: false,
         }}
@@ -111,11 +136,11 @@ export default function KidDetailsScreen() {
               <View style={[styles.profileHeader, row]}>
                 <View style={styles.avatarColumn}>
                   <View style={styles.avatarWrap}>
-                    <MaterialCommunityIcons
-                      name="account-child-circle"
-                      size={52}
-                      color="#2563EB"
-                    />
+                  <MaterialCommunityIcons
+                          name="human-child"
+                          size={22}
+                          color="#0F172A"
+                        />
                   </View>
 
                   <Pressable
@@ -125,8 +150,8 @@ export default function KidDetailsScreen() {
                     ]}
                     onPress={handleOpenChildProfile}
                     accessibilityRole="button"
-                    accessibilityLabel={t("kidDetails.child_profile_a11y", {
-                      name: childNameFromParams,
+                    accessibilityLabel={t("childDetails.child_profile_a11y", {
+                      name: childName,
                     })}
                   >
                     <AppText
@@ -134,7 +159,7 @@ export default function KidDetailsScreen() {
                       style={styles.childProfileButtonText}
                       numberOfLines={1}
                     >
-                      {t("kidDetails.child_profile")}
+                      {t("childDetails.child_profile")}
                     </AppText>
                   </Pressable>
                 </View>
@@ -145,18 +170,18 @@ export default function KidDetailsScreen() {
                     style={[styles.childName, text]}
                     numberOfLines={1}
                   >
-                    {childNameFromParams}
+                    {childName}
                   </AppText>
 
                   <AppText style={[styles.childMeta, text]} numberOfLines={1}>
-                    {t("kidDetails.birthdate_value", {
-                      value: STATIC_CHILD.birthDate,
+                    {t("childDetails.birthdate_value", {
+                      value: childBirthDate ?? "",
                     })}
                   </AppText>
 
                   <AppText style={[styles.childMeta, text]} numberOfLines={1}>
-                    {t("kidDetails.gender_value", {
-                      value: STATIC_CHILD.genderLabel,
+                    {t("childDetails.gender_value", {
+                      value: childGenderLabel,
                     })}
                   </AppText>
                 </View>
@@ -165,21 +190,21 @@ export default function KidDetailsScreen() {
               <View style={[styles.statsRow, row]}>
                 <View style={styles.statCard}>
                   <AppText weight="bold" style={[styles.statTitle, text]}>
-                    {t("kidDetails.used_today")}
+                    {t("childDetails.used_today")}
                   </AppText>
 
                   <AppText weight="extraBold" style={[styles.statValue, text]}>
-                    {STATIC_CHILD.usedToday}
+                    {"--:--"}
                   </AppText>
                 </View>
 
                 <View style={styles.statCard}>
                   <AppText weight="bold" style={[styles.statTitle, text]}>
-                    {t("kidDetails.daily_limit")}
+                    {t("childDetails.daily_limit")}
                   </AppText>
 
                   <AppText weight="extraBold" style={[styles.statValue, text]}>
-                    {STATIC_CHILD.dailyLimit}
+                    {"--:--"}
                   </AppText>
                 </View>
               </View>
@@ -189,7 +214,7 @@ export default function KidDetailsScreen() {
               <Pressable
                 onPress={toggleDevicesSection}
                 accessibilityRole="button"
-                accessibilityLabel={t("kidDetails.toggle_devices_a11y")}
+                accessibilityLabel={t("childDetails.toggle_devices_a11y")}
                 style={({ pressed }) => [
                   styles.devicesToggleButton,
                   pressed && styles.devicesToggleButtonPressed,
@@ -197,7 +222,7 @@ export default function KidDetailsScreen() {
               >
                 <View style={[styles.devicesToggleInner, row]}>
                   <AppText weight="extraBold" style={[styles.sectionTitle, text]}>
-                    {t("kidDetails.devices_title")}
+                    {t("childDetails.devices_title")}
                   </AppText>
 
                   <MaterialCommunityIcons
@@ -212,18 +237,18 @@ export default function KidDetailsScreen() {
                 style={styles.addDeviceButton}
                 onPress={handleConnectDevice}
                 accessibilityRole="button"
-                accessibilityLabel={t("kidDetails.add_device_a11y")}
+                accessibilityLabel={t("childDetails.add_device_a11y")}
               >
                 <MaterialCommunityIcons name="plus" size={18} color="#FFFFFF" />
                 <AppText weight="extraBold" style={styles.addDeviceButtonText}>
-                  {t("kidDetails.add_device")}
+                  {t("childDetails.add_device")}
                 </AppText>
               </Pressable>
             </View>
 
             {isDevicesExpanded && (
               <View style={styles.devicesList}>
-                {STATIC_CHILD.devices.map((device) => (
+                {devicesForSelectedChild.map((device) => (
                   <View key={device.id} style={styles.deviceCard}>
                     <View style={[styles.deviceTopRow, row]}>
                       <View style={styles.deviceMainInfo}>
@@ -259,7 +284,7 @@ export default function KidDetailsScreen() {
                     <View style={[styles.deviceInfoStrip, row]}>
                       <View style={styles.infoPillWarn}>
                         <AppText style={styles.infoPillWarnText}>
-                          {t("kidDetails.active_now")}
+                          {t("childDetails.active_now")}
                         </AppText>
                       </View>
 
@@ -281,7 +306,7 @@ export default function KidDetailsScreen() {
                           color="#60A5FA"
                         />
                         <AppText style={[styles.infoMiniText, text]}>
-                          {t("kidDetails.remaining_time_value", {
+                          {t("childDetails.remaining_time_value", {
                             value: device.remainingTimeText,
                           })}
                         </AppText>
@@ -291,9 +316,8 @@ export default function KidDetailsScreen() {
                     <View style={[styles.deviceBottomRow, row]}>
                       <Pressable
                         style={styles.deleteButton}
-                        onPress={() => handleDeleteDevice(device.id)}
                         accessibilityRole="button"
-                        accessibilityLabel={t("kidDetails.delete_device_a11y", {
+                        accessibilityLabel={t("childDetails.delete_device_a11y", {
                           name: device.name,
                         })}
                       >
@@ -306,14 +330,13 @@ export default function KidDetailsScreen() {
 
                       <Pressable
                         style={styles.viewLimitsButton}
-                        onPress={() => handleViewLimits(device.id)}
                         accessibilityRole="button"
-                        accessibilityLabel={t("kidDetails.view_limits_a11y", {
+                        accessibilityLabel={t("childDetails.view_limits_a11y", {
                           name: device.name,
                         })}
                       >
                         <AppText weight="bold" style={styles.viewLimitsButtonText}>
-                          {t("kidDetails.view_limits")}
+                            {t("childDetails.view_limits")}
                         </AppText>
                       </Pressable>
                     </View>
