@@ -589,14 +589,10 @@
       "copyToAllDays": "Copy current settings to all days",
       "saveSchedule": "Save weekly schedule"
     }
+  },
+
+  "api": {
+    "generic_error": "Something went wrong. Please try again.",
+    "unauthorized": "Session expired. Please log in again."
   }
 }
-
-
-
-
-
-
-
-
-
