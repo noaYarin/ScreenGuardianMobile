@@ -9,12 +9,6 @@ export type Child = {
   interests?: string[];
 };
 
-type AddChildPayload = {
-  name: string;
-  birthDate: string;
-  gender?: string;
-};
-
 type ChildrenState = {
   children: Child[];
   isLoading: boolean;

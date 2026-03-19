@@ -20,17 +20,9 @@ type AuthState = {
   childToken: string | null;
   deviceId: string | null;
 
-  // Children data
-  childrenIds: string[];
-
   // Loading and error
   isLoading: boolean;
   error: string | null;
-};
-
-type FetchChildrenFulfilledPayload = {
-  childrenIds: string[];
-  activeChildId: string | null;
 };
 
 type AuthSuccessPayload = {
@@ -44,7 +36,6 @@ const initialState: AuthState = {
   activeChildId: null,
   childToken: null,
   deviceId: null,
-  childrenIds: [],
   isLoading: false,
   error: null,
 };
@@ -85,8 +76,7 @@ const authSlice = createSlice({
     builder
       .addCase(
         fetchChildren.fulfilled,
-        (state, action: PayloadAction<FetchChildrenFulfilledPayload>) => {
-          state.childrenIds = action.payload.childrenIds;
+        (state, action: PayloadAction<{ activeChildId: string | null }>) => {  
           state.activeChildId = action.payload.activeChildId;
         }
       )
@@ -98,10 +88,6 @@ const authSlice = createSlice({
         state.childToken = action.payload.token;
         state.deviceId = action.payload.deviceId;
       
-        // Update children array for the parent
-        if (!state.childrenIds.includes(action.payload.childId)) {
-          state.childrenIds.push(action.payload.childId);
-        }
       })
       .addCase(generateCodeForPairingChild.fulfilled, (state, action) => {
         state.isLoading = false;
