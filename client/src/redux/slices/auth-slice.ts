@@ -5,14 +5,25 @@ import {
   registerParent,
   resetPassword,
   forgotPassword,
+  linkDevice,
+  generateCodeForPairingChild, 
 } from "../thunks/authThunks";
 
-
+// Auth for parent and children
 type AuthState = {
+  // Parent data
   parentId: string | null;
   token: string | null;
-  childrenIds: string[];
+
+  // Child data
   activeChildId: string | null;
+  childToken: string | null;
+  deviceId: string | null;
+
+  // Children data
+  childrenIds: string[];
+
+  // Loading and error
   isLoading: boolean;
   error: string | null;
 };
@@ -30,8 +41,10 @@ type AuthSuccessPayload = {
 const initialState: AuthState = {
   parentId: null,
   token: null,
-  childrenIds: [],
   activeChildId: null,
+  childToken: null,
+  deviceId: null,
+  childrenIds: [],
   isLoading: false,
   error: null,
 };
@@ -41,6 +54,8 @@ const authPending = isAnyOf(
   registerParent.pending,
   resetPassword.pending,
   forgotPassword.pending,
+  generateCodeForPairingChild.pending,
+  linkDevice.pending,
 );
 const authFulfilled = isAnyOf(
   loginParent.fulfilled,
@@ -52,6 +67,8 @@ const authRejected = isAnyOf(
   registerParent.rejected,
   resetPassword.rejected,
   forgotPassword.rejected,
+  generateCodeForPairingChild.rejected,
+  linkDevice.rejected,
 );
 
 const authSlice = createSlice({
@@ -62,22 +79,6 @@ const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
-    setAuthFromServer: (state, action: PayloadAction<AuthSuccessPayload>) => {
-      state.parentId = action.payload.parentId;
-      state.token = action.payload.token;
-      state.childrenIds = initialState.childrenIds;
-      state.activeChildId = initialState.activeChildId;
-    },
-    setActiveChild: (state, action: PayloadAction<string>) => {
-      state.activeChildId = action.payload;
-    },
-    setAuthFromToken: (state, action: PayloadAction<string>) => {
-      state.token = action.payload;
-    },
-    exitParentMode: (state) => {
-      state.parentId = null;
-    },
-    logout: () => ({ ...initialState }),
   },
   // extraReducers for async operations - thunks response
   extraReducers: (builder) => {
@@ -89,11 +90,29 @@ const authSlice = createSlice({
           state.activeChildId = action.payload.activeChildId;
         }
       )
+      .addCase(linkDevice.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.parentId = action.payload.parentId; 
+        state.activeChildId = action.payload.childId;
+        state.childToken = action.payload.token;
+        state.deviceId = action.payload.deviceId;
+      
+        // Update children array for the parent
+        if (!state.childrenIds.includes(action.payload.childId)) {
+          state.childrenIds.push(action.payload.childId);
+        }
+      })
+      .addCase(generateCodeForPairingChild.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+      })
       .addCase(forgotPassword.fulfilled, (state) => {
         // Only clear loading & error; no auth data is set here
         state.isLoading = false;
         state.error = null;
       })
+      // Matchers for pending, rejected, and fulfilled states
       .addMatcher(authPending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -105,8 +124,6 @@ const authSlice = createSlice({
           state.error = null;
           state.parentId = action.payload.parentId;
           state.token = action.payload.token;
-          state.childrenIds = initialState.childrenIds;
-          state.activeChildId = initialState.activeChildId;
         }
       )
       .addMatcher(authRejected, (state, action) => {
@@ -129,6 +146,8 @@ export {
   registerParent,
   resetPassword,
   forgotPassword,
+  generateCodeForPairingChild,
+  linkDevice,
   fetchChildren,
 } from "../thunks/authThunks";
 

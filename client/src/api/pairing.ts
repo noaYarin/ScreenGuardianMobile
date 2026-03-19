@@ -1,7 +1,6 @@
 import { api } from "./request";
 
 const URL = "/api/v1/pairing";
-const auth = { requireAuth: true as const };
 
 export async function apiGenerateCode(
   params?: { childId?: string | null }
@@ -9,7 +8,7 @@ export async function apiGenerateCode(
   return api.post<{ code: string; barcodeToken: string; expiresAt: string }>(
     `${URL}/generate-code`,
     params?.childId != null ? { childId: params.childId } : undefined,
-    auth
+    { requireAuth: true, role: "PARENT" }
   );
 }
 
@@ -19,7 +18,7 @@ export async function apiLinkDevice(
   return api.post<{ token: string; parentId: string; childId: string }>(
     `${URL}/link-device`,
     params,
-    auth
+    { requireAuth: true }
   );
 }
 

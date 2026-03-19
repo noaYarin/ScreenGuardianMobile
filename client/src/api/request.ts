@@ -1,17 +1,14 @@
 import { API_BASE_URL } from "../config/env";
-import { getToken, removeToken } from "../services/authStorage";
+import en from "../locales/en.json";
+import { getParentToken, getChildToken, removeParentToken, removeChildToken } from "../services/authStorage";
+import { useTranslation } from "react-i18next";
 
-export type ApiError = {
-  code: string;
-  message: string;
-};
+const { t } = useTranslation();
 
-export type ApiResponse<T> =
-  | { ok: true; data: T }
-  | { ok: false; error: ApiError };
 
 type RequestOptions = {
   requireAuth?: boolean;
+  role?: "PARENT" | "CHILD";
 };
 
 async function request<T>(
@@ -20,69 +17,53 @@ async function request<T>(
   body?: unknown,
   options: RequestOptions = {}
 ): Promise<T> {
-  const { requireAuth = false } = options;
-  const url = `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
-  const headers: Record<string, string> = {
+  const url = `${API_BASE_URL}${path}`;
+  
+  const headers: any = {
     "Content-Type": "application/json",
   };
 
-  if (requireAuth) {
-    const token = await getToken();
+  if (options.requireAuth) {
+    const parentData = await getParentToken();
+    const childData = await getChildToken();
+    
+    const token = options.role === "CHILD" ? childData?.token : parentData?.token;
+    
     if (token) {
-      headers.Authorization = `Bearer ${token}`;
+      headers["Authorization"] = `Bearer ${token}`;
     }
   }
 
-  const init: RequestInit = {
+  const response = await fetch(url, {
     method,
     headers,
-  };
-  if (body !== undefined && body !== null && method !== "GET") {
-    init.body = JSON.stringify(body);
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  const result = await response.json();
+
+  if (response.status === 401) {
+    await removeParentToken();
+    await removeChildToken();
+    throw new Error(t("api.unauthorized"));
   }
 
-  const res = await fetch(url, init);
-  const json = (await res.json().catch(() => ({}))) as ApiResponse<T>;
-
-  if (!res.ok) {
-    const err = new Error(
-      (json as { ok?: boolean; error?: ApiError }).error?.message ?? `HTTP ${res.status}`
-    ) as Error & { code?: string; status?: number };
-    err.code = (json as { error?: ApiError }).error?.code;
-    err.status = res.status;
-    if (res.status === 401) {
-      removeToken();
-    }
-    throw err;
+  if (!response.ok) {
+    throw new Error(result?.error?.message || result?.message|| t("api.generic_error"));
   }
 
-  const payload = json as { ok: true; data: T };
-  if (payload.ok !== true) {
-    const errPayload = json as { ok: false; error: ApiError };
-    const err = new Error(errPayload.error?.message ?? "Request failed") as Error & {
-      code?: string;
-    };
-    err.code = errPayload.error?.code;
-    throw err;
-  }
-
-  return payload.data;
+  return result?.data as T;
 }
 
 export const api = {
-  get<T>(path: string, options?: RequestOptions) {
-    return request<T>("GET", path, undefined, options);
-  },
-  post<T>(path: string, body?: unknown, options?: RequestOptions) {
-    return request<T>("POST", path, body, options);
-  },
-  patch<T>(path: string, body?: unknown, options?: RequestOptions) {
-    return request<T>("PATCH", path, body, options);
-  },
-  put<T>(path: string, body?: unknown, options?: RequestOptions) {
-    return request<T>("PUT", path, body, options);
-  },
-  delete<T>(path: string, options?: RequestOptions) {
-    return request<T>("DELETE", path, undefined, options);
-  },
+  get: <T>(path: string, options?: RequestOptions) =>
+    request<T>("GET", path, null, options),
+  post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>("POST", path, body, options),
+  put: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>("PUT", path, body, options),
+  patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
+    request<T>("PATCH", path, body, options),
+  delete: <T>(path: string, options?: RequestOptions) =>
+    request<T>("DELETE", path, null, options),
 };

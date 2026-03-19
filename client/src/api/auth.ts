@@ -1,7 +1,8 @@
 import { api } from "./request";
-import { setToken } from "../services/authStorage";
+import { setParentToken, setChildToken } from "../services/authStorage";
 
-const URL = "/api/v1/auth";
+const URL = "/api/v1/auth"; 
+const PAIRING_URL = "/api/v1/pairing";
 
 export async function apiRegisterParent(
   params: { email: string; password: string }
@@ -11,7 +12,7 @@ export async function apiRegisterParent(
     params
   );
   if (data.token) {
-    await setToken(data.token);
+    await setParentToken({ token: data.token, parentId: data.parentId });
   }
   return data;
 }
@@ -24,7 +25,7 @@ export async function apiLoginParent(
     params
   );
   if (data.token) {
-    await setToken(data.token);
+    await setParentToken({ token: data.token, parentId: data.parentId });
   }
   return data;
 }
@@ -34,7 +35,8 @@ export async function apiForgotPassword(
 ): Promise<{ message: string }> {
   const data = await api.post<{ message: string }>(
     `${URL}/forgot-password`,
-    { email }
+    { email },
+    { role: "PARENT" }
   );
   return data;
 }
@@ -44,14 +46,46 @@ export async function apiResetPassword(
 ): Promise<{ token: string; parentId: string }> {
   const data = await api.post<{ token: string; parentId: string }>(
     `${URL}/reset-password-confirm`,
-    params
+    params,
+    { role: "PARENT" }
   );
 
   if (data.token) {
-    await setToken(data.token);
+    await setParentToken({ token: data.token, parentId: data.parentId });
   }
 
   return data;
 }
 
+// Pairing for children with code or barcode token
 
+export async function apiGenerateCodeForPairingChild(
+  params: { parentId: string; childId: string }
+): Promise<{ code: string; barcodeToken: string; expiresAt: string }> {
+  const data = await api.post<{ code: string; barcodeToken: string; expiresAt: string }>(
+    `${PAIRING_URL}/generate-code`,
+    params,
+    { requireAuth: true, role: "PARENT" }
+  );
+  return data;
+}
+
+
+export async function apiLinkDevice(
+  params: {
+    code?: string;
+    barcodeToken?: string;
+    deviceName?: string;
+    deviceType?: string;
+    platform?: string;
+  }
+): Promise<{ token: string; parentId: string; childId: string; deviceId: string }> {
+  const data = await api.post<{ token: string; parentId: string; childId: string; deviceId: string }>(
+    `${PAIRING_URL}/link-device`,
+    params
+  );
+  if (data.token) {
+    await setChildToken({ token: data.token, childId: data.childId, parentId: data.parentId, deviceId: data.deviceId });
+  }
+  return data;
+}
