@@ -1,24 +1,44 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Pressable, TextInput, useWindowDimensions, Alert } from "react-native";
-import { router } from "expo-router";
+import { View, Pressable, useWindowDimensions, Image } from "react-native";
+import { useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { CameraView } from "expo-camera";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./linkDeviceScreen.styles";
+import { generateCodeForPairingChild, setError } from "@/src/redux/slices/auth-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/src/redux/store/types";
 
 type Mode = "barcode" | "code";
+
+const qrImageUrlForToken = (token: string) =>
+  `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(token)}`;
 
 export default function LinkDeviceScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
+  const dispatch = useDispatch<AppDispatch>();
+  const parentId = useSelector((state: RootState) => state.auth.parentId);
+  const authError = useSelector((state: RootState) => state.auth.error);
+  const children = useSelector((state: RootState) => state.children.children);
+  const params = useLocalSearchParams<{ id?: string; name?: string }>();
+  const targetChildId =
+    typeof params.id === "string" && params.id.trim().length > 0 ? params.id : null;
+
+  const matchedChild = targetChildId
+    ? children.find((c) => c._id === targetChildId) ?? null
+    : null;
+  const childSelectionInvalid =
+    !targetChildId || (children.length > 0 && matchedChild === null);
 
   // Barcode or Code
   const [mode, setMode] = useState<Mode>("barcode");
   const [code, setCode] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [barcodeToken, setBarcodeToken] = useState("");
   const isBarcode = mode === "barcode";
+
+  const qrImageUri = barcodeToken ? qrImageUrlForToken(barcodeToken) : "";
 
   const cardMaxWidth = useMemo(() => {
     if (width >= 900) return 520;
@@ -26,13 +46,38 @@ export default function LinkDeviceScreen() {
     return 420;
   }, [width]);
 
-  const pairingBtn = async () => {
-   
-  };
+  //
+  useEffect(() => {
+    if (childSelectionInvalid) {
+      dispatch(setError("linkChildren.invalid_child_selection"));
+      setCode("");
+      setBarcodeToken("");
+      return;
+    }
 
-  const handleBarcodeScanned = async (result: { data?: string }) => {
-   
-  };
+    dispatch(setError(null));
+    if (!parentId || !targetChildId) return;
+
+    // If parent dont want the pairing, we will ignore the result
+    let ignoreResult = false;
+
+    dispatch(generateCodeForPairingChild({ parentId, childId: targetChildId }))
+      .unwrap()
+      .then((result) => {
+        if (ignoreResult) return;
+        setCode(result.code);
+        setBarcodeToken(result.barcodeToken);
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : String(error);
+        console.error(message);
+        if (!ignoreResult) dispatch(setError(message));
+      });
+
+    return () => {
+      ignoreResult = true;
+    };
+  }, [childSelectionInvalid, dispatch, parentId, targetChildId]);
 
   return (
     <>
@@ -104,62 +149,45 @@ export default function LinkDeviceScreen() {
             {isBarcode ? (
               <View style={styles.qrCard}>
                 <View style={styles.qrBox}>
-                    <CameraView
-                      style={styles.cameraView}
-                      onBarcodeScanned={handleBarcodeScanned}
-                      barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
+                  {qrImageUri ? (
+                    <Image
+                      source={{ uri: qrImageUri }}
+                      style={styles.qrImage}
+                      accessibilityLabel={t("linkChildren.tab_barcode_a11y")}
                     />
+                  ) : (
+                    <AppText
+                      weight="extraBold"
+                      style={styles.placeholderText}
+                    >
+                    </AppText>
+                  )}
                   </View>
 
-                <Pressable
-                  onPress={pairingBtn}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("linkChildren.scan_a11y")}
-                  style={({ pressed }) => [
-                    styles.primaryBtn,
-                    { opacity: pressed || isSubmitting ? 0.75 : 1 },
-                  ]}
-                  disabled={isSubmitting}
-                >
-                  <AppText weight="extraBold" style={styles.primaryBtnText}>
-                    {t("linkChildren.scan")}
+                {authError ? (
+                  <AppText style={styles.errorText}>
+                    {t(authError)}
                   </AppText>
-                </Pressable>
+                ) : null}
               </View>
             ) : (
               <View style={styles.codeArea}>
-            <AppText style={styles.subtitle} numberOfLines={3}>
-              {isBarcode ? t("linkChildren.sub_barcode") : t("linkChildren.sub_code")}
-            </AppText>
                 <View style={styles.inputWrap}> 
-                  <TextInput
-                    value={code}
-                    onChangeText={setCode}
-                    placeholder={t("linkChildren.code_placeholder")}
-                    autoComplete="off"
-                    autoFocus={true}
-                    keyboardType="numeric"
-                    maxLength={6}
-                    style={styles.input}
-                    accessibilityLabel={t("linkChildren.code_input_a11y")}
-                  />
+                 <View style={styles.codeDisplayContainer}>
+                    <AppText
+                      weight="extraBold"
+                      style={styles.codeDisplayText}
+                      numberOfLines={1}
+                    >
+                      {code.trim() || "----"}
+                    </AppText>
+                  </View>
                 </View>
-
-                <Pressable
-                  onPress={pairingBtn}
-                  disabled={!code.trim() || isSubmitting}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("linkChildren.submit_a11y")}
-                  style={({ pressed }) => [
-                    styles.primaryBtn,
-                    !code.trim() ? styles.primaryBtnDisabled : null,
-                    { opacity: pressed || isSubmitting ? 0.75 : 1 },
-                  ]}
-                >
-                  <AppText weight="extraBold" style={styles.primaryBtnText}>
-                    {t("linkChildren.connect")}
+                {authError ? (
+                  <AppText style={styles.errorText}>
+                    {t(authError)}
                   </AppText>
-                </Pressable>
+                ) : null}
               </View>
             )}
           </View>
