@@ -465,6 +465,116 @@
       "tablet": "טאבלט"
     }
   },
+  "systemAlerts": {
+    "title": "התראות מערכת",
+    "heading": "התראות מערכת",
+    "subtitle": "עקבו אחרי עדכונים חשובים, חריגות שימוש והודעות מערכת במקום אחד.",
+    "listTitle": "התראות אחרונות",
+    "stats": {
+      "total": "סה״כ",
+      "unread": "לא נקראו",
+      "critical": "קריטיות"
+    },
+    "filters": {
+      "title": "סינון התראות",
+      "items": {
+        "all": "הכול",
+        "unread": "לא נקראו",
+        "critical": "קריטיות"
+      },
+      "a11y": {
+        "all": "הצגת כל ההתראות",
+        "unread": "הצגת התראות שלא נקראו",
+        "critical": "הצגת התראות קריטיות בלבד"
+      }
+    },
+    "severityLabels": {
+      "critical": "קריטית",
+      "warning": "אזהרה",
+      "info": "מידע",
+      "success": "אושר"
+    },
+    "alertCardA11y": "פתיחת התראה {{title}} מזמן {{time}}",
+    "empty": {
+      "title": "אין התראות להצגה",
+      "subtitle": "ברגע שתתקבל התראה חדשה היא תופיע כאן."
+    },
+    "time": {
+      "minutesAgo10": "לפני 10 דקות",
+      "minutesAgo25": "לפני 25 דקות",
+      "hourAgo1": "לפני שעה",
+      "hoursAgo3": "לפני 3 שעות",
+      "hoursAgo5": "לפני 5 שעות"
+    },
+    "alerts": {
+      "securityAttempt": {
+        "title": "ניסיון עקיפה",
+        "description": "זוהה ניסיון לעקוף את מגבלת זמן המסך במכשיר של הילד."
+      },
+      "dailyLimit": {
+        "title": "סיום זמן יומי",
+        "description": "הילד הגיע למכסת זמן המסך היומית שהוגדרה."
+      },
+      "unusualActivity": {
+        "title": "פעילות חריגה",
+        "description": "זוהה שימוש ממושך מהרגיל באפליקציית YouTube."
+      },
+      "newApp": {
+        "title": "התראת מערכת",
+        "description": "אפליקציה חדשה הותקנה במכשיר ומומלץ לבדוק אותה."
+      },
+      "requestApproved": {
+        "title": "בקשת הארכה אושרה",
+        "description": "בקשת הארכת זמן המסך אושרה ונוספו 15 דקות."
+      }
+    }
+  },
+  "extensionRequests": {
+    "title": "בקשות להארכת זמן",
+    "heading": "בקשות זמן פעילות",
+    "subtitle": "כאן אפשר לבדוק מי ביקש עוד זמן, מאיזה מכשיר, עבור איזו אפליקציה, ולאשר או לדחות בלחיצה אחת.",
+    "pendingSectionTitle": "בקשות ממתינות לאישור",
+    "pendingSectionSubtitle": "הבקשות מסוננות לפי הילד והמכשיר שנבחרו כרגע.",
+    "approve": "אשר",
+    "decline": "דחה",
+    "reasonLabel": "סיבה לבקשה",
+    "requestedMinutesLabel": "{{minutes}} דקות נוספות",
+    "childSubtitles": {
+      "personal": "ניהול אישי"
+    },
+    "devices": {
+      "galaxyS23": "Galaxy S23",
+      "ipadAir": "iPad Air",
+      "iphone13": "iPhone 13",
+      "lenovoTab": "Lenovo Tab"
+    },
+    "reasons": {
+      "studyVideo": "סרטון לימודי",
+      "friendsMission": "סיימתי משימה עם חברים",
+      "chatWithFriends": "לשוחח עם חברים",
+      "finishLesson": "לסיים שיעור"
+    },
+    "requestTimes": {
+      "fiveMinutesAgo": "לפני 5 דקות",
+      "tenMinutesAgo": "לפני 10 דקות",
+      "fifteenMinutesAgo": "לפני 15 דקות",
+      "oneHourAgo": "לפני שעה"
+    },
+    "remaining": {
+      "almostFinished": "הזמן כמעט הסתיים",
+      "timeEnded": "הזמן הסתיים",
+      "twoMinutesLeft": "נשארו 2 דקות",
+      "fiveMinutesLeft": "נשארו 5 דקות"
+    },
+    "empty": {
+      "title": "אין כרגע בקשות פעילות",
+      "subtitle": "כאשר הילד ישלח בקשת הארכה עבור המכשיר הזה, היא תופיע כאן."
+    },
+    "a11y": {
+      "approveRequest": "אישור בקשת הארכה של {{childName}} עבור {{appName}}",
+      "declineRequest": "דחיית בקשת הארכה של {{childName}} עבור {{appName}}"
+    }
+  },
   "routineLimits": {
     "title": "שגרה שבועית",
     "hero": {

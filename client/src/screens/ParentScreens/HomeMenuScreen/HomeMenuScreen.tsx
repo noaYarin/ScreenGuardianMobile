@@ -37,6 +37,7 @@ const MENU_ITEMS: MenuItem[] = [
     key: "requests",
     labelKey: "homeMenu.items.requests",
     icon: "message-outline",
+    route: "/Parent/extensionRequests" as Href,
   },
   {
     key: "activities",
@@ -115,7 +116,12 @@ export default function HomeMenuScreen() {
                       isRTL ? styles.menuItemRowRtl : styles.menuItemRowLtr,
                     ]}
                   >
-                    <View style={styles.menuMainSide}>
+                    <View
+                      style={[
+                        styles.menuMainSide,
+                        isRTL ? styles.menuMainSideRtl : styles.menuMainSideLtr,
+                      ]}
+                    >
                       <View style={styles.menuIconWrap}>
                         <MaterialCommunityIcons
                           name={item.icon}
@@ -124,7 +130,12 @@ export default function HomeMenuScreen() {
                         />
                       </View>
 
-                      <View style={styles.menuTextWrap}>
+                      <View
+                        style={[
+                          styles.menuTextWrap,
+                          isRTL ? styles.menuTextWrapRtl : styles.menuTextWrapLtr,
+                        ]}
+                      >
                         <AppText weight="bold" style={[styles.menuText, text]}>
                           {t(item.labelKey)}
                         </AppText>

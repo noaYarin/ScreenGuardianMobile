@@ -24,6 +24,7 @@ type ChildCard = {
 const ICON = {
   user: "account-outline",
   menu: "menu",
+  bell: "bell-outline",
 } as const;
 
 export default function HomeParentScreen() {
@@ -75,6 +76,25 @@ export default function HomeParentScreen() {
       params: { id: childId, name: childName },
     } as never);
 
+
+    const onPressNotifications = () => {
+  router.push("/Parent/systemAlerts" as Href);
+};
+
+const bellButton = (
+  <Pressable
+    onPress={onPressNotifications}
+    accessibilityRole="button"
+    accessibilityLabel={t("homeParent.notifications_a11y")}
+    hitSlop={10}
+    style={({ pressed }) => [
+      styles.headerMenuButton,
+      pressed && styles.headerMenuButtonPressed,
+    ]}
+  >
+    <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
+  </Pressable>
+);
   const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);
 
   const menuButton = (
@@ -103,11 +123,11 @@ export default function HomeParentScreen() {
           ...(isRTL
             ? {
                 headerLeft: () => menuButton,
-                headerRight: () => null,
+                headerRight: () => bellButton,
               }
             : {
                 headerRight: () => menuButton,
-                headerLeft: () => null,
+                headerLeft: () => bellButton,
               }),
         }}
       />

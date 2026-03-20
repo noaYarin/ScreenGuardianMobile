@@ -65,14 +65,31 @@ export const styles = StyleSheet.create({
 
   menuMainSide: {
     flex: 1,
-    flexDirection: "row",
     alignItems: "center",
     gap: 14,
+  },
+
+  menuMainSideRtl: {
+    flexDirection: "row-reverse",
+    justifyContent: "flex-end",
+  },
+
+  menuMainSideLtr: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
   },
 
   menuTextWrap: {
     flex: 1,
     justifyContent: "center",
+  },
+
+  menuTextWrapRtl: {
+    alignItems: "flex-end",
+  },
+
+  menuTextWrapLtr: {
+    alignItems: "flex-start",
   },
 
   menuText: {
