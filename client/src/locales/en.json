@@ -484,6 +484,116 @@
       "tablet": "Tablet"
     }
   },
+  "systemAlerts": {
+    "title": "System Alerts",
+    "heading": "System Alerts",
+    "subtitle": "Track important updates, unusual activity, and system notifications in one place.",
+    "listTitle": "Recent Alerts",
+    "stats": {
+      "total": "Total",
+      "unread": "Unread",
+      "critical": "Critical"
+    },
+    "filters": {
+      "title": "Filter Alerts",
+      "items": {
+        "all": "All",
+        "unread": "Unread",
+        "critical": "Critical"
+      },
+      "a11y": {
+        "all": "Show all alerts",
+        "unread": "Show unread alerts",
+        "critical": "Show only critical alerts"
+      }
+    },
+    "severityLabels": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "info": "Info",
+      "success": "Approved"
+    },
+    "alertCardA11y": "Open alert {{title}} from {{time}}",
+    "empty": {
+      "title": "No alerts to display",
+      "subtitle": "New alerts will appear here as soon as they arrive."
+    },
+    "time": {
+      "minutesAgo10": "10 minutes ago",
+      "minutesAgo25": "25 minutes ago",
+      "hourAgo1": "1 hour ago",
+      "hoursAgo3": "3 hours ago",
+      "hoursAgo5": "5 hours ago"
+    },
+    "alerts": {
+      "securityAttempt": {
+        "title": "Bypass Attempt",
+        "description": "A screen-time limit bypass attempt was detected on the child device."
+      },
+      "dailyLimit": {
+        "title": "Daily Limit Reached",
+        "description": "The child reached the configured daily screen-time limit."
+      },
+      "unusualActivity": {
+        "title": "Unusual Activity",
+        "description": "Longer-than-usual usage was detected in the YouTube app."
+      },
+      "newApp": {
+        "title": "System Alert",
+        "description": "A new app was installed on the device and should be reviewed."
+      },
+      "requestApproved": {
+        "title": "Extension Approved",
+        "description": "A screen-time extension request was approved and 15 minutes were added."
+      }
+    }
+  },
+  "extensionRequests": {
+    "title": "Time Extension Requests",
+    "heading": "Screen Time Requests",
+    "subtitle": "Review pending extension requests, see which device was used, which app needs more time, and approve or decline with one tap.",
+    "pendingSectionTitle": "Pending requests",
+    "pendingSectionSubtitle": "Requests are filtered by the currently selected child and device.",
+    "approve": "Approve",
+    "decline": "Decline",
+    "reasonLabel": "Request reason",
+    "requestedMinutesLabel": "{{minutes}} extra minutes",
+    "childSubtitles": {
+      "personal": "Personal management"
+    },
+    "devices": {
+      "galaxyS23": "Galaxy S23",
+      "ipadAir": "iPad Air",
+      "iphone13": "iPhone 13",
+      "lenovoTab": "Lenovo Tab"
+    },
+    "reasons": {
+      "studyVideo": "Educational video",
+      "friendsMission": "Finishing a mission with friends",
+      "chatWithFriends": "Chatting with friends",
+      "finishLesson": "Finishing a lesson"
+    },
+    "requestTimes": {
+      "fiveMinutesAgo": "5 minutes ago",
+      "tenMinutesAgo": "10 minutes ago",
+      "fifteenMinutesAgo": "15 minutes ago",
+      "oneHourAgo": "1 hour ago"
+    },
+    "remaining": {
+      "almostFinished": "Time is almost over",
+      "timeEnded": "Time has ended",
+      "twoMinutesLeft": "2 minutes left",
+      "fiveMinutesLeft": "5 minutes left"
+    },
+    "empty": {
+      "title": "No active requests right now",
+      "subtitle": "When the child sends a time extension request for this device, it will appear here."
+    },
+    "a11y": {
+      "approveRequest": "Approve extension request of {{childName}} for {{appName}}",
+      "declineRequest": "Decline extension request of {{childName}} for {{appName}}"
+    }
+  },
   "routineLimits": {
     "title": "Weekly Routine",
     "hero": {
