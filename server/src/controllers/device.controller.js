@@ -1,7 +1,18 @@
 import {
-  getDevicesByChild, lockDevice, unlockDevice, getDeviceScreenTime,
-  updateDeviceScreenTime, setDeviceActive, getDevicePolicy, getDeviceDailyLimit,
-  updateDeviceDailyLimitService, blockApplication, unblockApplication, getDeviceByChild
+  getDevicesByChild,
+  lockDevice,
+  unlockDevice,
+  getDeviceScreenTime,
+  updateDeviceScreenTime,
+  setDeviceActive,
+  getDevicePolicy,
+  getDeviceDailyLimit,
+  updateDeviceDailyLimitService,
+  blockApplication,
+  unblockApplication,
+  getDeviceByChild,
+  getDeviceCurrentStatusForChild,
+  updateDeviceUsageByChild
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
@@ -86,12 +97,12 @@ export async function setDeviceActiveController(req, res, next) {
 export async function getDevicePolicyController(req, res, next) {
   try {
     const { deviceId } = req.params;
-    const userId = req.user?.id;
-    const userRole = req.user?.role;
+    const childId = req.user?.childId;
+    const parentId = req.user?.parentId;
 
-    const policy = await getDevicePolicy({ deviceId, userId, userRole });
+    const policy = await getDevicePolicy({ deviceId, childId, parentId });
 
-    res.status(200).json(policy);
+    res.status(200).json({ ok: true, data: policy });
   } catch (err) {
     next(err);
   }
@@ -159,6 +170,44 @@ export async function updateDeviceDailyLimitController(req, res, next) {
     const { deviceId } = req.params;
 
     const data = await updateDeviceDailyLimitService(parentId, deviceId, req.body);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function getDeviceCurrentStatusForChildController(req, res, next) {
+  try {
+    const { deviceId } = req.params;
+    const childId = req.user.childId;
+    const parentId = req.user.parentId;
+
+    const data = await getDeviceCurrentStatusForChild({
+      deviceId,
+      childId,
+      parentId
+    });
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function updateDeviceUsageByChildController(req, res, next) {
+  try {
+    const { deviceId } = req.params;
+    const childId = req.user.childId;
+    const parentId = req.user.parentId;
+    const { usedTodayMinutes } = req.body;
+
+    const data = await updateDeviceUsageByChild({
+      deviceId,
+      childId,
+      parentId,
+      usedTodayMinutes
+    });
 
     res.status(200).json({ ok: true, data });
   } catch (err) {

@@ -12,7 +12,9 @@ import {
   resetDailyScreenTime,
   updateApplicationBlockStatus,
   findDeviceDailyLimitById,
-  updateDeviceDailyLimit
+  updateDeviceDailyLimit,
+  findDeviceStatusById,
+  updateDeviceUsedTodayMinutes
 } from "../dal/device.dal.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
 
@@ -35,6 +37,28 @@ function isSameDay(date1, date2) {
     date1.getDate() === date2.getDate()
   );
 }
+
+
+
+function buildCurrentStatus(device) {
+  const dailyLimitMinutes = Number(device.screenTime?.dailyLimitMinutes ?? 0);
+  const extraMinutesToday = Number(device.screenTime?.extraMinutesToday ?? 0);
+  const usedTodayMinutes = Number(device.screenTime?.usedTodayMinutes ?? 0);
+
+  const totalAllowedMinutes = dailyLimitMinutes + extraMinutesToday;
+  const remainingMinutes = Math.max(totalAllowedMinutes - usedTodayMinutes, 0);
+
+  return {
+    isLimitEnabled: device.screenTime?.isLimitEnabled ?? false,
+    dailyLimitMinutes,
+    extraMinutesToday,
+    usedTodayMinutes,
+    remainingMinutes,
+    isLocked: device.isLocked ?? false,
+    isActive: device.isActive ?? true
+  };
+}
+
 
 export async function validateDeviceAccess({ deviceId, parentId, childId, allowInactive = false }) {
   const device = await findDeviceById(deviceId);
@@ -222,11 +246,24 @@ export async function setDeviceActive(parentId, deviceId, isActive) {
 }
 
 
-export async function getDevicePolicy(parentId, deviceId) {
-  let device = await validateDeviceAccess({
-    deviceId,
-    parentId,
-  });
+export async function getDevicePolicy({ deviceId, childId, parentId }) {
+  let device = await findDeviceById(deviceId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  if (String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (parentId && String(device.parentId) !== String(parentId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
 
   const now = new Date();
 
@@ -259,7 +296,6 @@ export async function getDevicePolicy(parentId, deviceId) {
     updatedAt: device.updatedAt
   };
 }
-
 
 export async function getDeviceByChild(parentId, childId, deviceId) {
   const childList = await getChildrenByParentId(parentId);
@@ -396,4 +432,83 @@ export async function updateDeviceDailyLimitService(parentId, deviceId, body) {
     extraMinutesToday: updatedDevice.screenTime?.extraMinutesToday ?? 0,
     usedTodayMinutes: updatedDevice.screenTime?.usedTodayMinutes ?? 0
   };
+}
+
+
+export async function getDeviceCurrentStatusForChild({ deviceId, childId, parentId }) {
+  let device = await findDeviceStatusById(deviceId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  if (String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (parentId && String(device.parentId) !== String(parentId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
+
+  const now = new Date();
+
+  const lastReset = device.screenTime?.lastDailyResetAt
+    ? new Date(device.screenTime.lastDailyResetAt)
+    : null;
+
+  if (!lastReset || !isSameDay(lastReset, now)) {
+    device = await resetDailyScreenTime(deviceId, now);
+  }
+
+  return buildCurrentStatus(device);
+}
+
+
+export async function updateDeviceUsageByChild({
+  deviceId,
+  childId,
+  parentId,
+  usedTodayMinutes
+}) {
+  const n = Number(usedTodayMinutes);
+
+  if (!Number.isFinite(n) || n < 0) {
+    throw new AppError(CommonErrors.VALIDATION_ERROR);
+  }
+
+  let device = await findDeviceStatusById(deviceId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  if (String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (parentId && String(device.parentId) !== String(parentId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
+
+  const now = new Date();
+
+  const lastReset = device.screenTime?.lastDailyResetAt
+    ? new Date(device.screenTime.lastDailyResetAt)
+    : null;
+
+  if (!lastReset || !isSameDay(lastReset, now)) {
+    device = await resetDailyScreenTime(deviceId, now);
+  }
+
+  const updatedDevice = await updateDeviceUsedTodayMinutes(deviceId, n);
+
+  return buildCurrentStatus(updatedDevice);
 }
