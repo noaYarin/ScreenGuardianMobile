@@ -5,11 +5,17 @@ import { requireChild } from "../middlewares/requireChild.js";
 import {
   lockDeviceController,
   unlockDeviceController,
-  getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController,
+  getDevicesByChildController,
+  getDeviceScreenTimeController,
+  updateDeviceScreenTimeController,
   setDeviceActiveController,
-  getDevicePolicyController, getDeviceByChildController,   blockApplicationController,
-  unblockApplicationController, getDeviceDailyLimitController,
-  updateDeviceDailyLimitController
+  getDevicePolicyController,
+  getDeviceByChildController,
+  deleteDeviceForChildController,
+  blockApplicationController,
+  unblockApplicationController,
+  getDeviceDailyLimitController,
+  updateDeviceDailyLimitController,
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -21,6 +27,14 @@ router.get("/child/:childId", authJwt, requireParent, getDevicesByChildControlle
 // GET /api/v1/devices/child/:childId/:deviceId
 // Parent gets a specific device of a specific child
 router.get("/child/:childId/:deviceId", authJwt, requireParent, getDeviceByChildController);
+
+// DELETE /api/v1/devices/child/:childId/:deviceId
+router.delete(
+  "/child/:childId/:deviceId",
+  authJwt,
+  requireParent,
+  deleteDeviceForChildController
+);
 
 // PATCH /api/v1/devices/:deviceId/lock
 // Parent locks a device (blocks screen usage)

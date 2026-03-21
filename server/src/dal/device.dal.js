@@ -37,6 +37,11 @@ export async function findDevicesByChildId(childId) {
   return DeviceModel.find({ childId }).lean();
 }
 
+export async function deleteDeviceById(deviceId) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+  return DeviceModel.findByIdAndDelete(deviceId).lean();
+}
+
 
 export async function addExtraMinutesToDevice(deviceId, minutes) {
   assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);

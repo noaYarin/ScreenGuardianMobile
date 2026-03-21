@@ -1,7 +1,17 @@
 import {
-  getDevicesByChild, lockDevice, unlockDevice, getDeviceScreenTime,
-  updateDeviceScreenTime, setDeviceActive, getDevicePolicy, getDeviceDailyLimit,
-  updateDeviceDailyLimitService, blockApplication, unblockApplication, getDeviceByChild
+  getDevicesByChild,
+  lockDevice,
+  unlockDevice,
+  getDeviceScreenTime,
+  updateDeviceScreenTime,
+  setDeviceActive,
+  getDevicePolicy,
+  getDeviceDailyLimit,
+  updateDeviceDailyLimitService,
+  blockApplication,
+  unblockApplication,
+  getDeviceByChild,
+  deleteDeviceForParent,
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
@@ -106,6 +116,17 @@ export async function getDeviceByChildController(req, res, next) {
     const device = await getDeviceByChild(parentId, childId, deviceId);
 
     res.status(200).json({ ok: true, data: device });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteDeviceForChildController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId, deviceId } = req.params;
+    await deleteDeviceForParent(parentId, childId, deviceId);
+    res.status(200).json({ ok: true, data: null });
   } catch (err) {
     next(err);
   }
