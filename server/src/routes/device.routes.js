@@ -5,11 +5,18 @@ import { requireChild } from "../middlewares/requireChild.js";
 import {
   lockDeviceController,
   unlockDeviceController,
-  getDevicesByChildController, getDeviceScreenTimeController, updateDeviceScreenTimeController,
+  getDevicesByChildController,
+  getDeviceScreenTimeController,
+  updateDeviceScreenTimeController,
   setDeviceActiveController,
-  getDevicePolicyController, getDeviceByChildController,   blockApplicationController,
-  unblockApplicationController, getDeviceDailyLimitController,
-  updateDeviceDailyLimitController
+  getDevicePolicyController,
+  getDeviceByChildController,
+  blockApplicationController,
+  unblockApplicationController,
+  getDeviceDailyLimitController,
+  updateDeviceDailyLimitController,
+  getDeviceCurrentStatusForChildController,
+  updateDeviceUsageByChildController
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -61,5 +68,23 @@ router.patch("/:deviceId/apps/:packageName/block", authJwt, requireParent, block
 // PATCH /api/v1/devices/:deviceId/apps/:packageName/unblock
 // Parent unblocks an application on a specific device
 router.patch("/:deviceId/apps/:packageName/unblock", authJwt, requireParent, unblockApplicationController);
+
+// GET /api/v1/devices/:deviceId/current-status
+// Child gets current daily screen-time status for home screen
+router.get(
+  "/:deviceId/current-status",
+  authJwt,
+  requireChild,
+  getDeviceCurrentStatusForChildController
+);
+
+// PATCH /api/v1/devices/:deviceId/usage
+// Child app updates used screen-time minutes
+router.patch(
+  "/:deviceId/usage",
+  authJwt,
+  requireChild,
+  updateDeviceUsageByChildController
+);
 
 export default router;
