@@ -47,7 +47,8 @@
     "tile_ideas": "Ideas",
     "tile_help": "Help",
     "panic": "SOS",
-    "panic_a11y": "Open distress screen"
+    "panic_a11y": "Open distress screen",
+    "linked_child_display_name": "Friend"
   },
   "distress": {
     "title": "SOS",
@@ -349,7 +350,10 @@
     "view_limits": "View limits",
     "view_limits_a11y": "View limits for {{name}}",
     "child_profile": "Child profile",
-    "child_profile_a11y": "Open profile for {{name}}"
+    "child_profile_a11y": "Open profile for {{name}}",
+    "status_connected": "Connected",
+    "status_disconnected": "Offline",
+    "location_unknown": "Unknown"
   },
   "linkDevice": {
     "title": "Connect Device"
@@ -706,5 +710,9 @@
   "api": {
     "generic_error": "Something went wrong. Please try again.",
     "unauthorized": "Session expired. Please log in again."
+  },
+  "devices": {
+    "fetch_devices_failed": "Failed to fetch devices",
+    "fetch_device_failed": "Failed to fetch device"
   }
 }
