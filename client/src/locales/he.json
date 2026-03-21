@@ -47,7 +47,8 @@
     "tile_ideas": "רעיונות",
     "tile_help": "עזרה",
     "panic": "מצוקה",
-    "panic_a11y": "מעבר למסך מצוקה"
+    "panic_a11y": "מעבר למסך מצוקה",
+    "linked_child_display_name": "חבר/ה"
   },
   "distress": {
     "title": "מצוקה",
@@ -345,7 +346,10 @@
     "view_limits": "צפייה בהגבלות",
     "view_limits_a11y": "צפייה בהגבלות של {{name}}",
     "child_profile": "פרופיל ילד",
-    "child_profile_a11y": "מעבר לפרופיל של {{name}}"
+    "child_profile_a11y": "מעבר לפרופיל של {{name}}",
+    "status_connected": "מחובר",
+    "status_disconnected": "לא מחובר",
+    "location_unknown": "לא ידוע"
   },
   "linkDevice": {
     "title": "חיבור מכשיר"
@@ -686,7 +690,11 @@
   "api": {
     "generic_error": "משהו השתבש, נסה שוב."
   },
-  "unauthorized": "ההתחברות פגה, נא להתחבר מחדש."
+  "unauthorized": "ההתחברות פגה, נא להתחבר מחדש.",
+  "devices": {
+    "fetch_devices_failed": "בעיה בטעינת המכשירים",
+    "fetch_device_failed": "בעיה בטעינת המכשיר"
+  }
 }
 
 
