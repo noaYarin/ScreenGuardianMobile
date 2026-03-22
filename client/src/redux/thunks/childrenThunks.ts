@@ -1,5 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import * as parentApi from "@/src/api/parent";
+import * as childApi from "@/src/api/child";
+import type { Child } from "@/src/redux/slices/children-slice";
 
 type AddChildPayload = {
   name: string;
@@ -39,6 +41,29 @@ export const getMyChildrenThunk = createAsyncThunk<
     const message =
       (error as Error)?.message ?? "children.fetch_failed";
 
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const fetchCurrentChildProfileThunk = createAsyncThunk<
+  Child,
+  void,
+  { rejectValue: string }
+>("children/fetchCurrentChildProfile", async (_, thunkAPI) => {
+  try {
+    const response = await childApi.fetchCurrentChildProfile();
+    if (response?.child == null) {
+      return thunkAPI.rejectWithValue("children.profile_failed");
+    }
+    const raw = response.child;
+    const child = {
+      ...raw,
+      _id: raw._id != null ? String(raw._id) : raw._id,
+    };
+    return child as Child;
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "children.profile_failed";
     return thunkAPI.rejectWithValue(message);
   }
 });
