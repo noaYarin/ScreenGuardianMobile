@@ -375,6 +375,11 @@
     "device_detail_type": "Device type",
     "device_detail_platform": "Platform",
     "device_detail_location": "Location",
+    "device_lock": "Lock",
+    "device_unlock": "Unlock",
+    "device_lock_a11y": "Lock device {{name}}",
+    "device_unlock_a11y": "Unlock device {{name}}",
+    "device_lock_error": "Could not update lock. Please try again.",
     "device_type": {
       "phone": "Phone",
       "tablet": "Tablet",

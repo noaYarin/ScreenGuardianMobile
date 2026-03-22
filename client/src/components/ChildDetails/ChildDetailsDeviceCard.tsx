@@ -54,7 +54,9 @@ type Props = {
   row: StyleProp<ViewStyle>;
   text: StyleProp<TextStyle>;
   deleteDisabled: boolean;
+  lockDisabled: boolean;
   onDelete: (deviceId: string, displayName: string) => void;
+  onSetDeviceLocked: (deviceId: string, locked: boolean) => void;
 };
 
 export function ChildDetailsDeviceCard({
@@ -62,7 +64,9 @@ export function ChildDetailsDeviceCard({
   row,
   text,
   deleteDisabled,
+  lockDisabled,
   onDelete,
+  onSetDeviceLocked,
 }: Props) {
   const { t } = useTranslation();
 
@@ -127,6 +131,40 @@ export function ChildDetailsDeviceCard({
               text={text}
               valueLines={2}
             />
+            <View style={styles.deviceDetailRowDivider} />
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={
+                device.isLocked
+                  ? t("childDetails.device_unlock_a11y", { name: device.name })
+                  : t("childDetails.device_lock_a11y", { name: device.name })
+              }
+              disabled={lockDisabled}
+              onPress={() =>
+                onSetDeviceLocked(device.id, !device.isLocked)
+              }
+              style={({ pressed }) => [
+                styles.deviceLockActionButton,
+                device.isLocked
+                  ? styles.deviceLockActionButtonGreen
+                  : styles.deviceLockActionButtonRed,
+                lockDisabled && { opacity: 0.45 },
+                pressed && !lockDisabled && { opacity: 0.85 },
+              ]}
+            >
+              <AppText
+                weight="bold"
+                style={
+                  device.isLocked
+                    ? styles.deviceLockActionTextGreen
+                    : styles.deviceLockActionTextRed
+                }
+              >
+                {device.isLocked
+                  ? t("childDetails.device_unlock")
+                  : t("childDetails.device_lock")}
+              </AppText>
+            </Pressable>
           </View>
         </View>
 

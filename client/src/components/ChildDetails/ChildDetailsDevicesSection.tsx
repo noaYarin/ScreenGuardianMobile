@@ -25,6 +25,8 @@ type Props = {
   text: StyleProp<TextStyle>;
   deletingDeviceId: string | null;
   onDeleteDevice: (deviceId: string, displayName: string) => void;
+  /** Local-only lock toggle (no server); wired to Redux `setDeviceLockLocal`. */
+  onSetDeviceLocked: (deviceId: string, locked: boolean) => void;
 };
 
 export function ChildDetailsDevicesSection({
@@ -37,6 +39,7 @@ export function ChildDetailsDevicesSection({
   text,
   deletingDeviceId,
   onDeleteDevice,
+  onSetDeviceLocked,
 }: Props) {
   const { t } = useTranslation();
   const deleteBusy = deletingDeviceId !== null;
@@ -90,7 +93,9 @@ export function ChildDetailsDevicesSection({
                 row={row}
                 text={text}
                 deleteDisabled={deleteBusy}
+                lockDisabled={deleteBusy}
                 onDelete={onDeleteDevice}
+                onSetDeviceLocked={onSetDeviceLocked}
               />
             ))
           )}

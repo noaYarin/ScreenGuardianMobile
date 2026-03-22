@@ -284,6 +284,39 @@ export const childDetailsStyles = StyleSheet.create({
     alignSelf: "stretch",
   },
 
+  deviceLockActionButton: {
+    marginTop: 6,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  deviceLockActionButtonRed: {
+    backgroundColor: "#FEE2E2",
+    borderWidth: 1,
+    borderColor: "#FECACA",
+  },
+
+  deviceLockActionButtonGreen: {
+    backgroundColor: "#DCFCE7",
+    borderWidth: 1,
+    borderColor: "#86EFAC",
+  },
+
+  deviceLockActionTextRed: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#DC2626",
+  },
+
+  deviceLockActionTextGreen: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#16A34A",
+  },
+
   infoMiniRow: {
     alignItems: "center",
     gap: 4,

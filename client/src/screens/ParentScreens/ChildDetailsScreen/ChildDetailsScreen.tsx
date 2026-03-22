@@ -23,6 +23,7 @@ import {
   fetchDevicesByChild,
   deleteDeviceForChild,
 } from "@/src/redux/thunks/deviceThunks";
+import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
 import { ChildrenStrip } from "@/src/components/ChildDetails/ChildrenStrip";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
@@ -206,6 +207,20 @@ export default function ChildDetailsScreen() {
     [dispatch, effectiveChildId, deletingDeviceId, childName, t]
   );
 
+  const handleSetDeviceLocked = useCallback(
+    (deviceId: string, locked: boolean) => {
+      if (!effectiveChildId || deletingDeviceId) return;
+      dispatch(
+        setDeviceLockLocal({
+          childId: effectiveChildId,
+          deviceId,
+          isLocked: locked,
+        })
+      );
+    },
+    [dispatch, effectiveChildId, deletingDeviceId]
+  );
+
   const showFullScreenLoader =
     isLoading &&
     children.length === 0 &&
@@ -324,6 +339,7 @@ export default function ChildDetailsScreen() {
             text={text}
             deletingDeviceId={deletingDeviceId}
             onDeleteDevice={handleDeleteDevice}
+            onSetDeviceLocked={handleSetDeviceLocked}
           />
           <View style={styles.bottomSpacer} />
         </View>

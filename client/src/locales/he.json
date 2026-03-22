@@ -370,6 +370,11 @@
     "device_detail_type": "סוג מכשיר",
     "device_detail_platform": "פלטפורמה",
     "device_detail_location": "מיקום",
+    "device_lock": "נעילה",
+    "device_unlock": "שחרור",
+    "device_lock_a11y": "נעילת המכשיר {{name}}",
+    "device_unlock_a11y": "שחרור נעילת המכשיר {{name}}",
+    "device_lock_error": "לא ניתן לעדכן את מצב הנעילה. נסו שוב.",
     "device_type": {
       "phone": "טלפון",
       "tablet": "טאבלט",
