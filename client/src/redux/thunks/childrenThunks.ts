@@ -14,6 +14,9 @@ export const addChildThunk = createAsyncThunk<
 >("children/addChild", async (payload, thunkAPI) => {
   try {
     const response = await parentApi.addChild(payload);
+    if (response?.child == null) {
+      return thunkAPI.rejectWithValue("children.add_failed");
+    }
     return response.child;
   } catch (error) {
     const message =
@@ -30,7 +33,8 @@ export const getMyChildrenThunk = createAsyncThunk<
 >("children/getMyChildren", async (_, thunkAPI) => {
   try {
     const response = await parentApi.getMyChildren();
-    return response.children;
+    const list = response?.children;
+    return Array.isArray(list) ? list : [];
   } catch (error) {
     const message =
       (error as Error)?.message ?? "children.fetch_failed";

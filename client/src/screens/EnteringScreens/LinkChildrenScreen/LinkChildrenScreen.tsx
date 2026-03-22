@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, Pressable, TextInput, useWindowDimensions, Alert } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,9 @@ import AppText from "../../../components/AppText/AppText";
 import { apiLinkDevice } from "../../../api/auth";
 import { buildDeviceConnectionPayload } from "../../../lib/deviceConnectionInfo";
 import { styles } from "./styles";
+
+/** After a failed link, wait before re-enabling scan so the camera does not instantly re-read the same QR. */
+const ERROR_RELEASE_DELAY = 750;
 
 type Mode = "barcode" | "code";
 
@@ -21,7 +24,36 @@ export default function LinkChildrenScreen() {
   const [code, setCode] = useState("");
   const [permission, requestPermission] = useCameraPermissions();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Blocks duplicate link-device calls synchronously state updates are async 
+  const linkInFlightRef = useRef(false);
+  const finishLinkErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isBarcode = mode === "barcode";
+
+  const tryBeginLink = (): boolean => {
+    if (linkInFlightRef.current) return false;
+    linkInFlightRef.current = true;
+    setIsSubmitting(true);
+    return true;
+  };
+
+  //Resets the linking state and releases the lock
+    const finishLink = () => {
+    linkInFlightRef.current = false;
+    setIsSubmitting(false);
+  };
+
+  // Prevents the camera from immediately re-scanning the same QR code
+  const scheduleFinishLinkAfterError = () => {
+    if (finishLinkErrorTimeoutRef.current) {
+      clearTimeout(finishLinkErrorTimeoutRef.current);
+    }
+    // Set a grace period before allowing the next scan attempt
+    finishLinkErrorTimeoutRef.current = setTimeout(() => {
+      finishLinkErrorTimeoutRef.current = null;
+      finishLink();
+    }, ERROR_RELEASE_DELAY);
+  };
 
   const cardMaxWidth = useMemo(() => {
     if (width >= 900) return 520;
@@ -37,51 +69,59 @@ export default function LinkChildrenScreen() {
     }
   }, [permission, requestPermission]);
 
+  useEffect(() => {
+    return () => {
+      if (finishLinkErrorTimeoutRef.current) {
+        clearTimeout(finishLinkErrorTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Handle code 
   const pairingBtn = async () => {
     const trimmedCode = code.trim();
     if (!trimmedCode) return;
+    if (!tryBeginLink()) return;
 
     try {
-      setIsSubmitting(true);
       await apiLinkDevice({
         code: trimmedCode,
         barcodeToken: "",
         ...buildDeviceConnectionPayload(),
       });
+      finishLink();
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(
         t("linkChildren.error_title"),
         t("linkChildren.error_generic"),
       );
-    } finally {
-      setIsSubmitting(false);
+      scheduleFinishLinkAfterError();
+      router.replace('Entering/roleSelectionRoute' as any);
     }
   };
 
   // Handle barcode scanned
   const handleBarcodeScanned = async (result: { data?: string }) => {
-    if (isSubmitting) return;
-
     const token = result?.data?.trim();
     if (!token) return;
+    if (!tryBeginLink()) return;
 
     try {
-      setIsSubmitting(true);
       await apiLinkDevice({
         code: "",
         barcodeToken: token,
         ...buildDeviceConnectionPayload(),
       });
+      finishLink();
       router.replace("/Child/home");
     } catch (error) {
       Alert.alert(
         t("linkChildren.error_title"),
         t("linkChildren.error_generic"),
       );
-    } finally {
-      setIsSubmitting(false);
+      scheduleFinishLinkAfterError();
+      router.replace('Entering/roleSelectionRoute' as any);
     }
   };
 
@@ -158,7 +198,9 @@ export default function LinkChildrenScreen() {
                   {permission?.granted ? (
                     <CameraView
                       style={styles.cameraView}
-                      onBarcodeScanned={handleBarcodeScanned}
+                      onBarcodeScanned={
+                        isSubmitting ? undefined : handleBarcodeScanned
+                      }
                       barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
                     />
                   ) : (
