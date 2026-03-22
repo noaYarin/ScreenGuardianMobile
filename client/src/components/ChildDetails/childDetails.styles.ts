@@ -1,7 +1,12 @@
 import { StyleSheet } from "react-native";
 import { APP_COLORS, COLORS } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export const childDetailsIconColors = {
+  deleteTrash: "#DC2626",
+  detailAccent: APP_COLORS.primaryBlue,
+} as const;
+
+export const childDetailsStyles = StyleSheet.create({
   container: {
     width: "100%",
     paddingHorizontal: 16,
@@ -10,9 +15,63 @@ export const styles = StyleSheet.create({
     alignItems: "stretch",
   },
 
+  scrollRoot: {
+    flex: 1,
+    width: "100%",
+    backgroundColor: COLORS.light.background,
+  },
+
+  scrollContent: {
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 24,
+    alignItems: "stretch",
+    backgroundColor: COLORS.light.background,
+  },
+
   content: {
     width: "100%",
     alignSelf: "center",
+  },
+
+  childrenStrip: {
+    marginBottom: 14,
+    maxHeight: 44,
+  },
+
+  childrenStripContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 4,
+  },
+
+  childChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: "#F1F5F9",
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+
+  childChipSelected: {
+    backgroundColor: "#DBEAFE",
+    borderColor: "#2563EB",
+  },
+
+  childChipPressed: {
+    opacity: 0.85,
+  },
+
+  childChipText: {
+    fontSize: 14,
+    color: "#475569",
+  },
+
+  childChipTextSelected: {
+    color: "#1D4ED8",
   },
 
   headerIconButton: {
@@ -92,33 +151,6 @@ export const styles = StyleSheet.create({
     color: "#475569",
   },
 
-  statsRow: {
-    marginTop: 16,
-    gap: 12,
-    flexWrap: "wrap",
-  },
-
-  statCard: {
-    flex: 1,
-    minWidth: 140,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#D6E6FF",
-    backgroundColor: "#F8FBFF",
-    padding: 14,
-  },
-
-  statTitle: {
-    fontSize: 13,
-    color: "#475569",
-  },
-
-  statValue: {
-    marginTop: 8,
-    fontSize: 22,
-    color: "#1D4ED8",
-  },
-
   sectionHeader: {
     marginTop: 20,
     alignItems: "center",
@@ -176,14 +208,16 @@ export const styles = StyleSheet.create({
     padding: 14,
   },
 
-  deviceTopRow: {
-    alignItems: "center",
+  deviceHeaderRow: {
+    width: "100%",
+    alignItems: "flex-start",
     justifyContent: "space-between",
-    gap: 12,
+    gap: 10,
   },
 
   deviceMainInfo: {
     flex: 1,
+    minWidth: 0,
   },
 
   deviceName: {
@@ -202,37 +236,52 @@ export const styles = StyleSheet.create({
     color: "#475569",
   },
 
-  deviceAvatar: {
-    width: 62,
-    height: 62,
-    borderRadius: 16,
-    backgroundColor: "#FFFFFF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
   deviceInfoStrip: {
     marginTop: 12,
     borderRadius: 14,
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 14,
+    alignItems: "stretch",
+  },
+
+  deviceDetailRow: {
+    width: "100%",
+    alignItems: "flex-start",
+    gap: 14,
+    paddingVertical: 12,
+  },
+
+  deviceDetailIconColumn: {
+    width: 28,
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    flexWrap: "wrap",
+    paddingTop: 4,
   },
 
-  infoPillWarn: {
-    borderRadius: 10,
-    backgroundColor: "#FAD4D4",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+  deviceDetailTextColumn: {
+    flex: 1,
+    minWidth: 0,
   },
 
-  infoPillWarnText: {
-    fontSize: 13,
-    color: "#C2410C",
+  deviceDetailLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    color: "#64748B",
+    letterSpacing: 0.15,
+    marginBottom: 8,
+  },
+
+  deviceDetailValue: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#111827",
+  },
+
+  deviceDetailRowDivider: {
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: "#E2E8F0",
+    marginHorizontal: 2,
+    alignSelf: "stretch",
   },
 
   infoMiniRow: {
@@ -245,37 +294,53 @@ export const styles = StyleSheet.create({
     color: "#374151",
   },
 
-  deviceBottomRow: {
-    marginTop: 14,
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-
   deleteButton: {
     width: 42,
     height: 42,
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-  },
-
-  viewLimitsButton: {
-    flex: 1,
-    borderRadius: 14,
-    backgroundColor: "#60A5FA",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 10,
-  },
-
-  viewLimitsButtonText: {
-    fontSize: 15,
-    color: "#FFFFFF",
+    backgroundColor: "#FEE2E2",
+    borderWidth: 1,
+    borderColor: "#FECACA",
   },
 
   bottomSpacer: {
     height: 20,
+  },
+
+  reduxSyncRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 12,
+    paddingVertical: 4,
+  },
+
+  reduxErrorBox: {
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 12,
+    backgroundColor: "#FEF2F2",
+  },
+
+  reduxRetryPressable: {
+    marginTop: 10,
+    alignSelf: "flex-start",
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+
+  reduxRetryText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: APP_COLORS.primaryBlue,
+  },
+
+  loadingHint: {
+    marginTop: 14,
+    textAlign: "center",
+    fontSize: 15,
+    color: "#6B7280",
   },
 });

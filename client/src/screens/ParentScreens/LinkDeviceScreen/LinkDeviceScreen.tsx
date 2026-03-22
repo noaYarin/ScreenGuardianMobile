@@ -21,7 +21,8 @@ export default function LinkDeviceScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const parentId = useSelector((state: RootState) => state.auth.parentId);
   const authError = useSelector((state: RootState) => state.auth.error);
-  const children = useSelector((state: RootState) => state.children.children);
+  const childrenList = useSelector((state: RootState) => state.children.childrenList);
+  const children = Array.isArray(childrenList) ? childrenList : [];
   const params = useLocalSearchParams<{ id?: string; name?: string }>();
   const targetChildId =
     typeof params.id === "string" && params.id.trim().length > 0 ? params.id : null;
@@ -46,7 +47,6 @@ export default function LinkDeviceScreen() {
     return 420;
   }, [width]);
 
-  //
   useEffect(() => {
     if (childSelectionInvalid) {
       dispatch(setError("linkChildren.invalid_child_selection"));

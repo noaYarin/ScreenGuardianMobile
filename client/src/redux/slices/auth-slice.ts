@@ -1,6 +1,5 @@
 import { createSlice, isAnyOf, PayloadAction } from "@reduxjs/toolkit";
 import {
-  fetchChildren,
   loginParent,
   registerParent,
   resetPassword,
@@ -70,16 +69,37 @@ const authSlice = createSlice({
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
     },
+    hydrateParentSession: (
+      state,
+      action: PayloadAction<{ token: string; parentId: string }>
+    ) => {
+      const p = action.payload;
+      state.token = p.token;
+      state.parentId = p.parentId;
+      state.activeChildId = null;
+      state.childToken = null;
+      state.deviceId = null;
+    },
+    hydrateChildSession: (
+      state,
+      action: PayloadAction<{
+        token: string;
+        parentId: string;
+        childId: string;
+        deviceId: string;
+      }>
+    ) => {
+      const p = action.payload;
+      state.token = null;
+      state.childToken = p.token;
+      state.parentId = p.parentId;
+      state.activeChildId = p.childId;
+      state.deviceId = p.deviceId;
+    },
   },
   // extraReducers for async operations - thunks response
   extraReducers: (builder) => {
     builder
-      .addCase(
-        fetchChildren.fulfilled,
-        (state, action: PayloadAction<{ activeChildId: string | null }>) => {  
-          state.activeChildId = action.payload.activeChildId;
-        }
-      )
       .addCase(linkDevice.fulfilled, (state, action) => {
         state.isLoading = false;
         state.error = null;
@@ -122,9 +142,8 @@ const authSlice = createSlice({
   },
 });
 
-export const {
-  setError,
-} = authSlice.actions;
+export const { setError, hydrateParentSession, hydrateChildSession } =
+  authSlice.actions;
 
 // Export all auth thunks, now the components use it from this slice 
 export {
@@ -134,7 +153,6 @@ export {
   forgotPassword,
   generateCodeForPairingChild,
   linkDevice,
-  fetchChildren,
 } from "../thunks/authThunks";
 
 export default authSlice.reducer;

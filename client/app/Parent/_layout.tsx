@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import { COLORS } from "@/constants/theme";
 
 export default function ParentRootLayout() {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const isRTL = i18n.language?.startsWith("he") ?? false;
 
   return (
@@ -52,18 +52,18 @@ export default function ParentRootLayout() {
       />
 
       <Stack.Screen
-        name="kidDetails"
+        name="childDetails"
         options={{
-          title: isRTL ? "פרטי ילד" : "Kid Details",
+          title: t("childDetails.title"),
         }}
       />
 
       <Stack.Screen
         name="childProfile"
         options={{
-          title: isRTL ? "פרופיל ילד" : "Child Profile",
+          title: isRTL ? "פרופיל של הילד/ה" : "Child Profile",
         }}
       />
-    </Stack>
+    </Stack>    
   );
 }

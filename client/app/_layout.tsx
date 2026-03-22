@@ -7,6 +7,11 @@ import { HeaderBackButton } from "@react-navigation/elements";
 
 import { COLORS } from "@/constants/theme";
 import store from "../src/redux/store";
+import {
+  hydrateChildSession,
+  hydrateParentSession,
+} from "../src/redux/slices/auth-slice";
+import { getChildToken, getParentToken } from "../src/services/authStorage";
 
 import i18n, { initLanguage } from "../src/locales/i18n";
 
@@ -62,6 +67,27 @@ export default function RootLayout() {
     (async () => {
       try {
         await initLanguage();
+        const [parent, child] = await Promise.all([
+          getParentToken(),
+          getChildToken(),
+        ]);
+        if (child) {
+          store.dispatch(
+            hydrateChildSession({
+              token: child.token,
+              parentId: child.parentId,
+              childId: child.childId,
+              deviceId: child.deviceId,
+            })
+          );
+        } else if (parent) {
+          store.dispatch(
+            hydrateParentSession({
+              token: parent.token,
+              parentId: parent.parentId,
+            })
+          );
+        }
         if (mounted) setReady(true);
       } catch (e: any) {
         console.error("initLanguage failed:", e);

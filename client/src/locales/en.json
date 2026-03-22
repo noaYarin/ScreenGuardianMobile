@@ -4,7 +4,13 @@
     "save": "Save",
     "cancel": "Cancel",
     "back": "Back",
-    "ok": "OK"
+    "ok": "OK",
+    "retry": "Try again"
+  },
+  "children": {
+    "fetch_failed": "Could not load children.",
+    "add_failed": "Could not add the child.",
+    "profile_failed": "Could not load the child profile."
   },
   "language": {
     "he": "עברית",
@@ -47,7 +53,8 @@
     "tile_ideas": "Ideas",
     "tile_help": "Help",
     "panic": "SOS",
-    "panic_a11y": "Open distress screen"
+    "panic_a11y": "Open distress screen",
+    "default_child_display_name": "Child"
   },
   "distress": {
     "title": "SOS",
@@ -175,6 +182,8 @@
     "code_input_a11y": "Code input",
     "error_title": "Something went wrong",
     "error_generic": "Failed to link device, please try again.",
+    "profile_load_title": "Could not load profile",
+    "profile_load_message": "This device is linked, but your profile could not be loaded. Check your internet connection - the home screen will try again.",
     "connect": "Connect",
     "connect_a11y": "Connect button"
   },
@@ -244,12 +253,13 @@
     "no_children": "No children yet. Add a child to get started"
   },
   "tabs": {
-  "home": "Home",
-  "kids": "Kids",
-  "limits": "Limits",
-  "reports": "Reports",
-  "settings": "Settings"
-},"achievements": {
+    "home": "Home",
+    "children": "Children",
+    "limits": "Limits",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "achievements": {
     "title": "Achievements",
     "heading": "My Achievements",
     "subtitle": "Keep reaching goals and unlock new rewards",
@@ -346,10 +356,35 @@
     "active_now": "Active now",
     "remaining_time_value": "Remaining time: {{value}}",
     "delete_device_a11y": "Delete device {{name}}",
+    "delete_device_title": "Remove {{device}}?",
+    "delete_device_message": "The device will be unlinked from {{child}}. This cannot be undone.",
+    "delete_device_confirm": "Remove",
+    "delete_device_cancel": "Cancel",
+    "delete_device_error": "Could not remove the device. Please try again.",
     "view_limits": "View limits",
     "view_limits_a11y": "View limits for {{name}}",
     "child_profile": "Child profile",
-    "child_profile_a11y": "Open profile for {{name}}"
+    "child_profile_a11y": "Open profile for {{name}}",
+    "status_connected": "Connected",
+    "status_disconnected": "Offline",
+    "location_unknown": "Unknown",
+    "select_child_a11y": "Show details for {{name}}",
+    "loading_children": "Loading children…",
+    "loading_sync": "Updating…",
+    "device_detail_name": "Device name",
+    "device_detail_type": "Device type",
+    "device_detail_platform": "Platform",
+    "device_detail_location": "Location",
+    "device_type": {
+      "phone": "Phone",
+      "tablet": "Tablet",
+      "other": "Other"
+    },
+    "device_platform": {
+      "android": "Android",
+      "ios": "iOS",
+      "other": "Other"
+    }
   },
   "linkDevice": {
     "title": "Connect Device"
@@ -706,5 +741,9 @@
   "api": {
     "generic_error": "Something went wrong. Please try again.",
     "unauthorized": "Session expired. Please log in again."
+  },
+  "devices": {
+    "fetch_devices_failed": "Failed to fetch devices",
+    "fetch_device_failed": "Failed to fetch device"
   }
 }

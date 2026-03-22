@@ -9,6 +9,7 @@ import {
   findDeviceById,
   updateDeviceById,
   findDevicesByChildId,
+  deleteDeviceById,
   resetDailyScreenTime,
   updateApplicationBlockStatus,
   findDeviceDailyLimitById,
@@ -304,6 +305,14 @@ export async function getDeviceByChild(parentId, childId, deviceId) {
   const device = await validateDeviceAccess({ deviceId, parentId, childId });
 
   return device;
+}
+
+// Delete a device that belongs to the given child : parent must own that child
+export async function deleteDeviceForParent(parentId, childId, deviceId) {
+  const childList = await getChildrenByParentId(parentId);
+  ensureChildBelongsToParent(childList, childId);
+  await validateDeviceAccess({ deviceId, parentId, childId });
+  await deleteDeviceById(deviceId);
 }
 
 
