@@ -49,8 +49,8 @@ export default function HomeParentScreen() {
     return list.map((child) => ({
       id: String(child?._id ?? ""),
       name: child?.name ?? "",
-      usedText: "--:--",
-      limitText: "--:--",
+      usedText: "00:00",
+      limitText: "00:00",
       status: "good" as const,
     }));
   }, [children]);
