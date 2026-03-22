@@ -1,10 +1,6 @@
 import { API_BASE_URL } from "../config/env";
-import en from "../locales/en.json";
 import { getParentToken, getChildToken, removeParentToken, removeChildToken } from "../services/authStorage";
-import { useTranslation } from "react-i18next";
-
-const { t } = useTranslation();
-
+import i18n from "../locales/i18n"; 
 
 type RequestOptions = {
   requireAuth?: boolean;
@@ -24,11 +20,12 @@ async function request<T>(
   };
 
   if (options.requireAuth) {
+
     const parentData = await getParentToken();
     const childData = await getChildToken();
-    
-    const token = options.role === "CHILD" ? childData?.token : parentData?.token;
-    
+
+    const authData = options.role === "CHILD" ? childData : parentData;
+    const token = typeof authData === 'object' ? authData?.token : authData;
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
@@ -40,16 +37,17 @@ async function request<T>(
     body: body ? JSON.stringify(body) : undefined,
   });
 
-  const result = await response.json();
+  const result = await response.json().catch(() => ({}));
 
   if (response.status === 401) {
     await removeParentToken();
     await removeChildToken();
-    throw new Error(t("api.unauthorized"));
+    throw new Error(i18n.t("api.unauthorized"));
   }
 
   if (!response.ok) {
-    throw new Error(result?.error?.message || result?.message|| t("api.generic_error"));
+    const errorMessage = result?.error?.message || result?.message || i18n.t("api.generic_error");
+    throw new Error(errorMessage);
   }
 
   return result?.data as T;
