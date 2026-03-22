@@ -64,6 +64,14 @@ export default function ParentRootLayout() {
           title: isRTL ? "פרופיל של הילד/ה" : "Child Profile",
         }}
       />
-    </Stack>    
+
+      <Stack.Screen
+        name="homeMenu"
+        options={{
+          title: t("homeMenu.title"),
+          headerBackButtonDisplayMode: "minimal",
+        }}
+      />
+    </Stack>
   );
 }
