@@ -10,7 +10,7 @@ import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "@/src/redux/store/types";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ChildCard = {
@@ -33,21 +33,10 @@ export default function HomeParentScreen() {
 
   const dispatch = useDispatch<AppDispatch>();
 
-  const { children, isLoading, error } = useSelector(
-    (state: {
-      children: {
-        children: {
-          _id: string;
-          name: string;
-          birthDate?: string;
-          gender?: string;
-          interests?: string[];
-        }[];
-        isLoading: boolean;
-        error: string | null;
-      };
-    }) => state.children
+  const { childrenList, isLoading, error } = useSelector(
+    (state: RootState) => state.children ?? {}
   );
+  const children = Array.isArray(childrenList) ? childrenList : [];
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
@@ -55,24 +44,23 @@ export default function HomeParentScreen() {
 
   const parentName = t("homeParent.parent_name_fallback");
 
-  const childCards: ChildCard[] = useMemo(
-    () =>
-      children.map((child) => ({
-        id: child._id,
-        name: child.name,
-        usedText: "--:--",
-        limitText: "--:--",
-        status: "good",
-      })),
-    [children]
-  );
+  const childCards: ChildCard[] = useMemo(() => {
+    const list = Array.isArray(children) ? children : [];
+    return list.map((child) => ({
+      id: String(child?._id ?? ""),
+      name: child?.name ?? "",
+      usedText: "--:--",
+      limitText: "--:--",
+      status: "good" as const,
+    }));
+  }, [children]);
 
   const onPressOverview = () => router.push("/Parent/(tabs)/reports" as Href);
-  const onPressFullWatch = () => router.push("/Parent/kidDetails" as Href);
+  const onPressFullWatch = () => router.push("/Parent/childDetails" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
   const onPressChildCard = (childId: string, childName: string) =>
     router.push({
-      pathname: "/Parent/kidDetails" as Href,
+      pathname: "/Parent/childDetails" as Href,
       params: { id: childId, name: childName },
     } as never);
 
