@@ -140,26 +140,3 @@ export const linkDevice = createAsyncThunk<
 });
 
 
-
-export const fetchChildren = createAsyncThunk<
-  { childrenIds: string[]; activeChildId: string | null },
-  void,
-  { rejectValue: string }
->("auth/fetchChildren", async (_, thunkAPI) => {
-  try {
-    const data = await getMyChildren();
-    const childrenIds = data.children.map((child) => child._id);
-    const activeChild = data.children.find((child) => child.isActive);
-
-    return {
-      childrenIds,
-      activeChildId: activeChild?._id ?? null,
-    };
-  } catch (error) {
-    const message =
-      (error as Error)?.message ?? "Failed to fetch children. Please try again.";
-
-    return thunkAPI.rejectWithValue(message);
-  }
-});
-
