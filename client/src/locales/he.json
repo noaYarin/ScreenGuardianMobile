@@ -48,7 +48,7 @@
     "tile_help": "עזרה",
     "panic": "מצוקה",
     "panic_a11y": "מעבר למסך מצוקה",
-    "linked_child_display_name": "חבר/ה"
+    "default_child_display_name": "ילד/ה"
   },
   "distress": {
     "title": "מצוקה",

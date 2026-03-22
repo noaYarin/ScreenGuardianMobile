@@ -48,7 +48,7 @@
     "tile_help": "Help",
     "panic": "SOS",
     "panic_a11y": "Open distress screen",
-    "linked_child_display_name": "Friend"
+    "default_child_display_name": "Child"
   },
   "distress": {
     "title": "SOS",
