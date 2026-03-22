@@ -1,5 +1,5 @@
-// client/src/screens/ChildrenScreens/HomeScreen/HomeScreen.tsx
-import React, { useEffect } from "react";
+// client/src/screens/ChildrenScreens/HomeScreenChild/HomeScreen.tsx
+import React, { useEffect, useMemo } from "react";
 import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -13,9 +13,10 @@ import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { pickRTL } from "../../../locales/rtl";
 import type { SupportedLanguage } from "../../../locales/i18n";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Child } from "@/src/redux/slices/children-slice";
-import { RootState } from "@/src/redux/store/types";
+import { fetchCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -41,6 +42,7 @@ export default function HomeScreen() {
   const { t, currentLanguage, changeLanguage } = useTranslation();
   const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
+  const dispatch = useDispatch<AppDispatch>();
 
   const isPhoneSmall = width < 390;
   const isPhone = width < 430;
@@ -52,18 +54,24 @@ export default function HomeScreen() {
   const timerSize = isPhone ? 34 : isTablet ? 40 : 44;
 
   const activeChildId = useSelector((state: RootState) => state.auth.activeChildId);
-  const allChildrenRaw = useSelector((state: RootState) => state.children.childrenList);
-  const allChildren = Array.isArray(allChildrenRaw) ? allChildrenRaw : [];
-  const activeChildData = allChildren.find(
-    (child: Child) => String(child._id) === String(activeChildId)
-  );
+  const childrenList = useSelector((state: RootState) => state.children.childrenList);
+  const activeChildData = useMemo(() => {
+    if (activeChildId == null || String(activeChildId).trim() === "") return undefined;
+    const list = Array.isArray(childrenList) ? childrenList : [];
+    return list.find((c: Child) => String(c._id) === String(activeChildId));
+  }, [childrenList, activeChildId]);
 
-  const userName =
-    activeChildData?.name?.trim() || t("home.default_child_display_name");
-  const avatarLetter =
-    userName.trim().length > 0
-      ? (Array.from(userName.trim())[0] ?? "?")
-      : "?";
+  // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
+  useEffect(() => {
+    if (activeChildId == null || String(activeChildId).trim() === "") return;
+    if (activeChildData != null) return;
+    dispatch(fetchCurrentChildProfileThunk());
+  }, [dispatch, activeChildId, activeChildData]);
+
+  const userName = (
+    activeChildData?.name?.trim() || t("home.default_child_display_name")
+  ).trim();
+  const avatarLetter = userName.length ? (Array.from(userName)[0] ?? "?") : "?";
   const pointsValue = activeChildData?.avatar?.currentXp ?? 0;
   const levelValue = activeChildData?.avatar?.level ?? 0;
   const coinsValue =
