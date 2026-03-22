@@ -4,7 +4,13 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { COLORS } from "@/constants/theme";
 
-const TAB_ROUTES = new Set(["home", "kids", "limits", "reports", "settings"]);
+const TAB_ROUTES = new Set([
+  "home",
+  "children",
+  "limits",
+  "reports",
+  "settings",
+]);
 
 export default function ParentTabsLayout() {
   const { t } = useTranslation();
@@ -44,9 +50,9 @@ export default function ParentTabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="kids"
+        name="children"
         options={{
-          tabBarLabel: t("tabs.kids"),
+          tabBarLabel: t("tabs.children"),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons
               name="account-group-outline"

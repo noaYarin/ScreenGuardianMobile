@@ -56,6 +56,17 @@ export async function setChildActiveController(req, res, next) {
 }
 
 
+export async function getCurrentChildProfileController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+    const data = await getChild(parentId, childId);
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function updateChildInterestsController(req, res, next) {
   try {
     const parentId = req.user.parentId;
