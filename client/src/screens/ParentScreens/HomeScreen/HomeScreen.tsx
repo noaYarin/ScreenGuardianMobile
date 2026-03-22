@@ -123,6 +123,7 @@ const bellButton = (
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>
+          <View style={styles.header}>
             <AppText weight="extraBold" style={[styles.bigHello, text]}>
               {t("homeParent.hello", { name: parentName })}
             </AppText>
@@ -130,17 +131,11 @@ const bellButton = (
             <AppText
               onPress={onPressOverview}
               weight="bold"
-              style={[
-                styles.overviewLink,
-                text,
-                isRTL ? styles.overviewLinkRtl : styles.overviewLinkLtr,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t("homeParent.overview_a11y")}
+              style={[styles.overviewLink, text]}
             >
               {t("homeParent.overview")}
             </AppText>
-
+          </View>
             <View style={styles.summaryCard}>
               <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>
