@@ -9,12 +9,33 @@ function normalizeDevice(raw: unknown): Device {
   if (raw == null || typeof raw !== "object") {
     throw new Error("devices.fetch_device_failed");
   }
-  const o = raw as Record<string, unknown>;
-  const id = o._id ?? o.id;
+  const rawDevice = raw as Record<string, unknown>;
+  const id = rawDevice._id ?? rawDevice.id;
   if (id == null) {
     throw new Error("devices.fetch_device_failed");
   }
-  return { ...o, _id: String(id) } as Device;
+  const screenTime = rawDevice.screenTime;
+  return {
+    _id: String(id),
+    name: rawDevice.name != null ? String(rawDevice.name) : "",
+    type: rawDevice.type != null ? String(rawDevice.type) : "",
+    platform: rawDevice.platform != null ? String(rawDevice.platform) : "",
+    isLocked: Boolean(rawDevice.isLocked),
+    isActive: Boolean(rawDevice.isActive),
+    location:
+      typeof rawDevice.location === "string" ? rawDevice.location : "",
+    parentId:
+      rawDevice.parentId != null ? String(rawDevice.parentId) : "",
+    childId: rawDevice.childId != null ? String(rawDevice.childId) : "",
+    applications: Array.isArray(rawDevice.applications)
+      ? (rawDevice.applications as Device["applications"])
+      : []
+        ,
+    screenTime:
+      screenTime != null && typeof screenTime === "object"
+        ? (screenTime as Device["screenTime"])
+        : {} 
+  };
 }
 
 export const fetchDevicesByChild = createAsyncThunk<

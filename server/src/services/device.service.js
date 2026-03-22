@@ -307,6 +307,7 @@ export async function getDeviceByChild(parentId, childId, deviceId) {
   return device;
 }
 
+// Delete a device that belongs to the given child : parent must own that child
 export async function deleteDeviceForParent(parentId, childId, deviceId) {
   const childList = await getChildrenByParentId(parentId);
   ensureChildBelongsToParent(childList, childId);
