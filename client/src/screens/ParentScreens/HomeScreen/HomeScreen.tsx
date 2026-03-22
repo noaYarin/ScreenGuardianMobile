@@ -60,7 +60,7 @@ export default function HomeParentScreen() {
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
   const onPressChildCard = (childId: string, childName: string) =>
     router.push({
-      pathname: "/Parent/childDetails" as Href,
+      pathname: "/Parent/childProfile" as Href,
       params: { id: childId, name: childName },
     } as never);
 

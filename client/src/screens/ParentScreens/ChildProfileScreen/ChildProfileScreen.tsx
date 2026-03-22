@@ -103,9 +103,11 @@ export default function ChildProfileScreen() {
                 {STATIC_CHILD.name}
               </AppText>
 
-              <AppText weight="medium" style={[styles.childMeta, text]}>
-                {t("childProfile.age", { age: STATIC_CHILD.age })}
-              </AppText>
+              {ageYears != null ? (
+                <AppText weight="medium" style={[styles.childMeta, text]}>
+                  {t("childProfile.age", { age: ageYears })}
+                </AppText>
+              ) : null}
 
               <Pressable
                 accessibilityRole="button"

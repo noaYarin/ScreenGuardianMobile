@@ -391,6 +391,7 @@
   },
   "childProfile": {
     "title": "Child Profile",
+    "name_fallback": "Child",
     "edit": "Edit Details",
     "edit_a11y": "Edit child details",
     "age": "Age {{age}}",
