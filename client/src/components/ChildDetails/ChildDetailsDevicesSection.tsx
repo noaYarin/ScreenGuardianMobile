@@ -58,7 +58,7 @@ export function ChildDetailsDevicesSection({
               {t("childDetails.devices_title")}
             </AppText>
             <MaterialCommunityIcons
-              name={expanded ? "chevron-up" : "chevron-down"}
+              name={expanded ? "chevron-down" : "chevron-up"}
               size={22}
               color="#0F172A"
             />

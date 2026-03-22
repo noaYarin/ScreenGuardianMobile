@@ -14,6 +14,7 @@ export default function ParentRootLayout() {
       screenOptions={({ navigation }) => ({
         headerTitleAlign: "center",
         headerShadowVisible: false,
+        headerBackButtonDisplayMode: "minimal",
         contentStyle: {
           backgroundColor: COLORS.light.background,
         },
@@ -69,7 +70,6 @@ export default function ParentRootLayout() {
         name="homeMenu"
         options={{
           title: t("homeMenu.title"),
-          headerBackButtonDisplayMode: "minimal",
         }}
       />
     </Stack>
