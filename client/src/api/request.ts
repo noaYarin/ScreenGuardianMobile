@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "../config/env";
 import { getParentToken, getChildToken, removeParentToken, removeChildToken } from "../services/authStorage";
-import i18n from "../locales/i18n"; 
+import i18n from "../locales/i18n";
 
 type RequestOptions = {
   requireAuth?: boolean;
@@ -14,18 +14,17 @@ async function request<T>(
   options: RequestOptions = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
-  
+
   const headers: any = {
     "Content-Type": "application/json",
   };
 
   if (options.requireAuth) {
-
     const parentData = await getParentToken();
     const childData = await getChildToken();
 
     const authData = options.role === "CHILD" ? childData : parentData;
-    const token = typeof authData === 'object' ? authData?.token : authData;
+    const token = typeof authData === "object" ? authData?.token : authData;
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
     }
@@ -46,7 +45,8 @@ async function request<T>(
   }
 
   if (!response.ok) {
-    const errorMessage = result?.error?.message || result?.message || i18n.t("api.generic_error");
+    const errorMessage =
+      result?.error?.message || result?.message || i18n.t("api.generic_error");
     throw new Error(errorMessage);
   }
 
