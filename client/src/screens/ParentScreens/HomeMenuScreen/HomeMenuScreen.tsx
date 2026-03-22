@@ -5,61 +5,16 @@ import {
   ScrollView,
   useWindowDimensions,
 } from "react-native";
-import { router, type Href } from "expo-router";
+import { router } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
+import { MENU_ITEMS, type HomeMenuItem } from "@/data/homeMenuItems";
 import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
-
-type MenuItem = {
-  key: string;
-  labelKey: string;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  route?: Href;
-};
-
-const MENU_ITEMS: MenuItem[] = [
-  {
-    key: "location",
-    labelKey: "homeMenu.items.location",
-    icon: "map-marker-outline",
-  },
-  {
-    key: "alerts",
-    labelKey: "homeMenu.items.alerts",
-    icon: "bell-outline",
-  },
-  {
-    key: "requests",
-    labelKey: "homeMenu.items.requests",
-    icon: "message-outline",
-    route: "/Parent/extensionRequests" as Href,
-  },
-  {
-    key: "activities",
-    labelKey: "homeMenu.items.activities",
-    icon: "star-four-points-outline",
-  },
-  {
-    key: "rewards",
-    labelKey: "homeMenu.items.rewards",
-    icon: "gift-outline",
-  },
-  {
-    key: "chatbot",
-    labelKey: "homeMenu.items.chatbot",
-    icon: "emoticon-outline",
-  },
-  {
-    key: "history",
-    labelKey: "homeMenu.items.history",
-    icon: "history",
-  },
-];
 
 export default function HomeMenuScreen() {
   const { t } = useTranslation();
@@ -68,7 +23,7 @@ export default function HomeMenuScreen() {
 
   const maxContentWidth = width >= 900 ? 760 : width >= 600 ? 620 : undefined;
 
-  const handleItemPress = (item: MenuItem) => {
+  const handleItemPress = (item: HomeMenuItem) => {
     if (item.route) {
       router.push(item.route);
     }
