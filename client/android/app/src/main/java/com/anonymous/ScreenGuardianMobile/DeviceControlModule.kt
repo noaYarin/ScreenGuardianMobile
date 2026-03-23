@@ -1,39 +1,76 @@
-package com.anonymous.ScreenGuardianMobile
+package com.screenguardianmobile
 
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 
-// Native module exposed to React Native.
-// This module is the bridge between JavaScript/TypeScript and Android native code.
 class DeviceControlModule(
     reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
 
-    // This is the name that will appear inside NativeModules on the React Native side.
-    override fun getName(): String = "DeviceControlModule"
-
-    /**
-     * Save the "lock now" flag locally on the device.
-     * Called from React Native when we want to update the local policy state.
-     */
-    @ReactMethod
-    fun setLockNow(value: Boolean) {
-        PolicyStore.setLockNow(reactApplicationContext, value)
+    override fun getName(): String {
+        return "DeviceControl"
     }
 
-    /**
-     * Read the current "lock now" flag from local storage
-     * and return it back to React Native.
-     */
     @ReactMethod
-    fun isLockNow(promise: Promise) {
+    fun lockNow(promise: Promise) {
         try {
-            val locked = PolicyStore.isLockNow(reactApplicationContext)
-            promise.resolve(locked)
+            PolicyStore.setLockNow(reactApplicationContext, true)
+            promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("LOCK_NOW_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun unlockNow(promise: Promise) {
+        try {
+            PolicyStore.setLockNow(reactApplicationContext, false)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("UNLOCK_NOW_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun setDailyLimit(minutes: Int, promise: Promise) {
+        try {
+            PolicyStore.setDailyLimit(reactApplicationContext, minutes)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("SET_DAILY_LIMIT_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun approveExtraMinutes(minutes: Int, promise: Promise) {
+        try {
+            PolicyStore.addExtraMinutes(reactApplicationContext, minutes)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("APPROVE_EXTRA_MINUTES_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun getRemainingTime(promise: Promise) {
+        try {
+            UsageStatsHelper.updateTodayUsage(reactApplicationContext)
+
+            val result = Arguments.createMap().apply {
+                putInt("dailyLimitMinutes", PolicyStore.getDailyLimit(reactApplicationContext))
+                putInt("usedTodayMinutes", PolicyStore.getUsedToday(reactApplicationContext))
+                putInt("extraMinutes", PolicyStore.getExtraMinutes(reactApplicationContext))
+                putInt("remainingMinutes", PolicyStore.getRemainingMinutes(reactApplicationContext))
+                putBoolean("lockNow", PolicyStore.isLockNow(reactApplicationContext))
+                putBoolean("shouldLock", PolicyStore.shouldLockDevice(reactApplicationContext))
+            }
+
+            promise.resolve(result)
+        } catch (e: Exception) {
+            promise.reject("GET_REMAINING_TIME_ERROR", e.message, e)
         }
     }
 }

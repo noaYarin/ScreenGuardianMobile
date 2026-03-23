@@ -1,4 +1,4 @@
-package com.anonymous.ScreenGuardianMobile
+package com.screenguardianmobile
 
 import android.os.Build
 import android.os.Bundle
