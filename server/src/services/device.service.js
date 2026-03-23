@@ -1,6 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { notifyChild } from "./notification.service.js";
+import { notifyChild, notifyParent } from "./notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { sendAuditLog } from "./audit.service.js";
@@ -15,7 +15,8 @@ import {
   findDeviceDailyLimitById,
   updateDeviceDailyLimit,
   findDeviceStatusById,
-  updateDeviceUsedTodayMinutes
+  updateDeviceUsedTodayMinutes,
+  updateDeviceHeartbeat
 } from "../dal/device.dal.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
 
@@ -528,4 +529,81 @@ export async function updateDeviceUsageByChild({
   const updatedDevice = await updateDeviceUsedTodayMinutes(deviceId, n);
 
   return buildCurrentStatus(updatedDevice);
+}
+
+
+export async function handleDeviceHeartbeat({
+  deviceId,
+  childId,
+  parentId,
+  accessibilityEnabled,
+  usageAccessEnabled
+}) {
+  if (typeof accessibilityEnabled !== "boolean" || typeof usageAccessEnabled !== "boolean") {
+    throw new AppError(CommonErrors.VALIDATION_ERROR);
+  }
+
+  const device = await findDeviceById(deviceId);
+
+  if (!device) {
+    throw new AppError(CommonErrors.DEVICE_NOT_FOUND);
+  }
+
+  if (String(device.childId) !== String(childId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (parentId && String(device.parentId) !== String(parentId)) {
+    throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
+  }
+
+  if (device.isActive === false) {
+    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
+  }
+
+  const wasAccessibilityEnabled = device.accessibilityEnabled ?? true;
+  const wasUsageAccessEnabled = device.usageAccessEnabled ?? true;
+
+  const updatedDevice = await updateDeviceHeartbeat(deviceId, {
+    lastSeenAt: new Date(),
+    accessibilityEnabled,
+    usageAccessEnabled
+  });
+
+  if (wasAccessibilityEnabled && !accessibilityEnabled) {
+    try {
+      await notifyParent({
+        parentId: device.parentId,
+        childId: device.childId,
+        type: NotificationType.BYPASS_ATTEMPT,
+        severity: NotificationSeverity.CRITICAL,
+        title: "Protection Disabled",
+        description: "Accessibility service was turned off"
+      });
+    } catch (err) {
+      console.error("notifyParent failed in handleDeviceHeartbeat (accessibility):", err.message);
+    }
+  }
+
+  if (wasUsageAccessEnabled && !usageAccessEnabled) {
+    try {
+      await notifyParent({
+        parentId: device.parentId,
+        childId: device.childId,
+        type: NotificationType.BYPASS_ATTEMPT,
+        severity: NotificationSeverity.WARNING,
+        title: "Limited Protection",
+        description: "Usage access permission was turned off"
+      });
+    } catch (err) {
+      console.error("notifyParent failed in handleDeviceHeartbeat (usage):", err.message);
+    }
+  }
+
+  return {
+    deviceId: String(updatedDevice._id),
+    lastSeenAt: updatedDevice.lastSeenAt,
+    accessibilityEnabled: updatedDevice.accessibilityEnabled,
+    usageAccessEnabled: updatedDevice.usageAccessEnabled
+  };
 }

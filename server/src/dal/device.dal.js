@@ -154,3 +154,22 @@ export async function updateDeviceUsedTodayMinutes(deviceId, usedTodayMinutes) {
     { new: true }
   ).lean();
 }
+
+export async function updateDeviceHeartbeat(
+  deviceId,
+  { lastSeenAt, accessibilityEnabled, usageAccessEnabled }
+) {
+  assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
+
+  return DeviceModel.findByIdAndUpdate(
+    deviceId,
+    {
+      $set: {
+        lastSeenAt,
+        accessibilityEnabled,
+        usageAccessEnabled
+      }
+    },
+    { new: true }
+  ).lean();
+}
