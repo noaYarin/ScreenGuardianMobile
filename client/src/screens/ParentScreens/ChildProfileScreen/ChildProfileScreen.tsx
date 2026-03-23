@@ -132,14 +132,15 @@ export default function ChildProfileScreen() {
                 </AppText>
               ) : null}
 
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t("childProfile.edit_a11y")}
-                style={({ pressed }) => [
-                  styles.editButton,
-                  pressed && styles.pressedSoft,
-                ]}
-              >
+             <Pressable
+  onPress={() => router.push("/Parent/defineChildProfile")}
+  accessibilityRole="button"
+  accessibilityLabel={t("childProfile.edit_a11y")}
+  style={({ pressed }) => [
+    styles.editButton,
+    pressed && styles.pressedSoft,
+  ]}
+>
                 <View style={styles.editButtonContent}>
                   <MaterialCommunityIcons
                     name="pencil-outline"
