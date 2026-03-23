@@ -11,11 +11,6 @@ export type HomeMenuItem = {
 
 export const MENU_ITEMS: HomeMenuItem[] = [
   {
-    key: "location",
-    labelKey: "homeMenu.items.location",
-    icon: "map-marker-outline",
-  },
-  {
     key: "alerts",
     labelKey: "homeMenu.items.alerts",
     icon: "bell-outline",

@@ -123,15 +123,6 @@ export function ChildDetailsDeviceCard({
               valueLines={1}
             />
             <View style={styles.deviceDetailRowDivider} />
-            <DeviceDetailRow
-              icon="map-marker-outline"
-              label={t("childDetails.device_detail_location")}
-              value={device.locationText}
-              row={row}
-              text={text}
-              valueLines={2}
-            />
-            <View style={styles.deviceDetailRowDivider} />
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={
