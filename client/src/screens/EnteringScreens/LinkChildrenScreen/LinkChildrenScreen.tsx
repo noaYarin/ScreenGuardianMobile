@@ -12,6 +12,7 @@ import { buildDeviceConnectionPayload } from "../../../lib/deviceConnectionInfo"
 import { hydrateChildSession } from "../../../redux/slices/auth-slice";
 import type { AppDispatch } from "../../../redux/store/types";
 import { styles } from "./styles";
+import { NativeModules } from "react-native";
 
 /** After a failed link, wait before re-enabling scan so the camera does not instantly re-read the same QR. */
 const ERROR_RELEASE_DELAY = 750;
@@ -50,7 +51,7 @@ export default function LinkChildrenScreen() {
   // Prevents the camera from immediately re-scanning the same QR after an error.
   const scheduleFinishLinkAfterError = () => {
     if (finishLinkErrorTimeoutRef.current) {
-      clearTimeout(finishLinkErrorTimeoutRef.current);  
+      clearTimeout(finishLinkErrorTimeoutRef.current);
     }
     finishLinkErrorTimeoutRef.current = setTimeout(() => {
       finishLinkErrorTimeoutRef.current = null;
@@ -62,6 +63,18 @@ export default function LinkChildrenScreen() {
     if (!tryBeginLink()) return;
     try {
       const res = await apiLinkDevice({ ...params, ...buildDeviceConnectionPayload() });
+
+      // After successful pairing, save config in native storage so the device can send heartbeat
+      try {
+        await NativeModules.DeviceControl.saveHeartbeatConfig(
+          process.env.EXPO_PUBLIC_API_URL,
+          res.deviceId,
+          res.token
+        );
+      } catch (e) {
+        console.log("Failed to save heartbeat config:", e);
+      }
+
       dispatch(
         hydrateChildSession({
           token: res.token,
