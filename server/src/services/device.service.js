@@ -526,9 +526,81 @@ export async function updateDeviceUsageByChild({
     device = await resetDailyScreenTime(deviceId, now);
   }
 
+  const previousStatus = buildCurrentStatus(device);
   const updatedDevice = await updateDeviceUsedTodayMinutes(deviceId, n);
+  const currentStatus = buildCurrentStatus(updatedDevice);
 
-  return buildCurrentStatus(updatedDevice);
+  const crossedEndingThreshold =
+    currentStatus.isLimitEnabled &&
+    previousStatus.remainingMinutes > 5 &&
+    currentStatus.remainingMinutes <= 5 &&
+    currentStatus.remainingMinutes > 0;
+
+  const crossedEndedThreshold =
+    currentStatus.isLimitEnabled &&
+    previousStatus.remainingMinutes > 0 &&
+    currentStatus.remainingMinutes <= 0 &&
+    !updatedDevice.isLocked;
+
+  if (crossedEndingThreshold) {
+    try {
+      await notifyParent({
+        parentId: updatedDevice.parentId,
+        childId: updatedDevice.childId,
+        type: NotificationType.SCREEN_TIME_ENDING,
+        severity: NotificationSeverity.WARNING,
+        title: "Screen Time Almost Over",
+        description: `Your child has ${currentStatus.remainingMinutes} minute${currentStatus.remainingMinutes === 1 ? "" : "s"} left`
+      });
+    } catch (err) {
+      console.error("notifyParent failed in updateDeviceUsageByChild (ending):", err.message);
+    }
+  }
+
+  if (crossedEndedThreshold) {
+    const lockedDevice = await updateDeviceById(deviceId, { isLocked: true });
+
+    try {
+      await notifyParent({
+        parentId: lockedDevice.parentId,
+        childId: lockedDevice.childId,
+        type: NotificationType.SCREEN_TIME_ENDED,
+        severity: NotificationSeverity.CRITICAL,
+        title: "Screen Time Ended",
+        description: "Your child has reached the daily screen time limit"
+      });
+    } catch (err) {
+      console.error("notifyParent failed in updateDeviceUsageByChild (ended):", err.message);
+    }
+
+    try {
+      await notifyChild({
+        parentId: lockedDevice.parentId,
+        childId: lockedDevice.childId,
+        type: NotificationType.SCREEN_TIME_ENDED,
+        severity: NotificationSeverity.WARNING,
+        title: "Time's Up",
+        description: "You have reached your daily screen time limit"
+      });
+    } catch (err) {
+      console.error("notifyChild failed in updateDeviceUsageByChild (ended):", err.message);
+    }
+
+    try {
+      await sendAuditLog({
+        parentId: lockedDevice.parentId,
+        childId: lockedDevice.childId,
+        actionType: AuditActionType.LOCK_DEVICE,
+        description: "Device locked due to screen time limit"
+      });
+    } catch (err) {
+      console.error("sendAuditLog failed in updateDeviceUsageByChild (ended):", err.message);
+    }
+
+    return buildCurrentStatus(lockedDevice);
+  }
+
+  return currentStatus;
 }
 
 
@@ -569,6 +641,8 @@ export async function handleDeviceHeartbeat({
     accessibilityEnabled,
     usageAccessEnabled
   });
+
+
 
   if (wasAccessibilityEnabled && !accessibilityEnabled) {
     try {
