@@ -5,7 +5,8 @@
     "cancel": "Cancel",
     "back": "Back",
     "ok": "OK",
-    "retry": "Try again"
+    "retry": "Try again",
+    "change_language": "Change language"
   },
   "children": {
     "fetch_failed": "Could not load children.",
@@ -314,6 +315,40 @@
     "register_a11y": "Sign up button",
     "login_a11y": "Go to login screen"
   },
+
+    "title": "Child Profile Setup",
+    "preview": {
+      "subtitle": "Personal details for smarter limits, recommendations, and reports",
+      "noDevice": "No device selected"
+    },
+    "birthDate": {
+      "title": "Birth Date",
+      "subtitle": "These details help personalize the child experience",
+      "fields": {
+        "month": "Month",
+        "day": "Day",
+        "year": "Year"
+      }
+    },
+    "gender": {
+      "title": "Gender",
+      "subtitle": "This can be updated later",
+      "options": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      }
+    },
+    "actions": {
+      "save": "Save Settings"
+    },
+    "accessibility": {
+      "birthMonth": "Select birth month",
+      "birthDay": "Select birth day",
+      "birthYear": "Select birth year",
+      "genderOption": "Select gender: {{gender}}",
+      "save": "Save child profile settings"
+    },
   "addChild": {
     "title": "Add Child",
     "back_a11y": "Go back",
@@ -751,5 +786,92 @@
   "devices": {
     "fetch_devices_failed": "Failed to fetch devices",
     "fetch_device_failed": "Failed to fetch device"
+  },
+  "childSelector": {
+    "childrenSectionTitle": "Choose Child",
+    "defaultChildSubtitle": "Personal profile settings",
+    "childTabA11y": "Select child {{name}}"
+  },
+  "defineChildProfile": {
+    "title": "Child Profile Setup",
+    "birthDate": {
+      "title": "Birth Date",
+      "fieldLabel": "Child birth date",
+      "change": "Change",
+      "done": "Done"
+    },
+    "gender": {
+      "title": "Gender",
+      "options": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      }
+    },
+    "actions": {
+      "save": "Save Settings"
+    },
+    "accessibility": {
+      "birthDate": "Choose birth date",
+      "confirmBirthDate": "Confirm birth date",
+      "genderOption": "Select gender: {{gender}}",
+      "save": "Save child profile settings"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "heading": "Advanced Settings",
+    "subtitle": "Manage personalization, alerts, and language in one place.",
+    "language": {
+      "title": "Language",
+      "subtitle": "Change the app interface language",
+      "button": "Change Language",
+      "buttonA11y": "Change application language",
+      "current": {
+        "he": "Current language: Hebrew",
+        "en": "Current language: English"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Quick control over the alerts that matter most",
+      "rows": {
+        "appAlerts": {
+          "title": "App alerts",
+          "subtitle": "Receive alerts about activity, restrictions, and updates",
+          "a11y": "Turn app alerts on or off"
+        },
+        "location": {
+          "title": "Location access",
+          "subtitle": "Use location permission for relevant features",
+          "a11y": "Turn location access on or off"
+        },
+        "push": {
+          "title": "Push notifications",
+          "subtitle": "Receive direct alerts on this device",
+          "a11y": "Turn push notifications on or off"
+        }
+      }
+    },
+    "preferences": {
+      "title": "More preferences",
+      "subtitle": "Security, privacy, and support"
+    },
+    "rows": {
+      "privacy": {
+        "title": "Privacy & Security",
+        "subtitle": "Permissions, security, and privacy preferences",
+        "a11y": "Go to privacy and security screen"
+      },
+      "help": {
+        "title": "Help & Support",
+        "subtitle": "FAQ, contact options, and assistance",
+        "a11y": "Go to help and support screen"
+      }
+    },
+    "logout": {
+      "button": "Log Out",
+      "a11y": "Log out from the account"
+    }
   }
 }

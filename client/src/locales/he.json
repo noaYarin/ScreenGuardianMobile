@@ -5,7 +5,8 @@
     "cancel": "בטל",
     "back": "חזרה",
     "ok": "אישור",
-    "retry": "נסו שוב"
+    "retry": "נסו שוב",
+    "change_language": "שינוי שפה"
   },
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
@@ -731,6 +732,93 @@
   "devices": {
     "fetch_devices_failed": "בעיה בטעינת המכשירים",
     "fetch_device_failed": "בעיה בטעינת המכשיר"
+  },
+  "childSelector": {
+    "childrenSectionTitle": "בחירת ילד",
+    "defaultChildSubtitle": "ניהול פרופיל אישי",
+    "childTabA11y": "בחירת הילד {{name}}"
+  },
+  "defineChildProfile": {
+    "title": "הגדרת פרופיל ילד",
+    "birthDate": {
+      "title": "תאריך לידה",
+      "fieldLabel": "תאריך הלידה של הילד",
+      "change": "שינוי",
+      "done": "סיום"
+    },
+    "gender": {
+      "title": "מין",
+      "options": {
+        "male": "זכר",
+        "female": "נקבה",
+        "other": "אחר"
+      }
+    },
+    "actions": {
+      "save": "שמור הגדרות"
+    },
+    "accessibility": {
+      "birthDate": "בחירת תאריך לידה",
+      "confirmBirthDate": "אישור תאריך לידה",
+      "genderOption": "בחירת מין: {{gender}}",
+      "save": "שמירת הגדרות פרופיל הילד"
+    }
+  },
+  "settings": {
+    "title": "הגדרות",
+    "heading": "הגדרות מתקדמות",
+    "subtitle": "התאמה אישית של המערכת, התראות ושפה במקום אחד.",
+    "language": {
+      "title": "שפה",
+      "subtitle": "שינוי שפת הממשק של האפליקציה",
+      "button": "שינוי שפה",
+      "buttonA11y": "שינוי שפת האפליקציה",
+      "current": {
+        "he": "השפה הנוכחית: עברית",
+        "en": "השפה הנוכחית: אנגלית"
+      }
+    },
+    "notifications": {
+      "title": "התראות",
+      "subtitle": "שליטה מהירה על סוגי ההתראות החשובים לך",
+      "rows": {
+        "appAlerts": {
+          "title": "התראות אפליקציות",
+          "subtitle": "קבלת התראות על שימוש, חסימות ועדכונים",
+          "a11y": "הפעלת או כיבוי התראות אפליקציות"
+        },
+        "location": {
+          "title": "גישה למיקום",
+          "subtitle": "שימוש בהרשאת מיקום לצורך יכולות רלוונטיות",
+          "a11y": "הפעלת או כיבוי גישה למיקום"
+        },
+        "push": {
+          "title": "Push Notifications",
+          "subtitle": "קבלת התראות ישירות למכשיר",
+          "a11y": "הפעלת או כיבוי התראות פוש"
+        }
+      }
+    },
+    "preferences": {
+      "title": "העדפות נוספות",
+      "subtitle": "אבטחה, פרטיות ועזרה"
+    },
+    "rows": {
+      "privacy": {
+        "title": "פרטיות ואבטחה",
+        "subtitle": "הרשאות, אבטחה והעדפות פרטיות",
+        "a11y": "מעבר למסך פרטיות ואבטחה"
+      },
+      "help": {
+        "title": "עזרה ותמיכה",
+        "subtitle": "שאלות נפוצות, יצירת קשר וסיוע",
+        "a11y": "מעבר למסך עזרה ותמיכה"
+      }
+    },
+    "logout": {
+      "button": "התנתקות",
+      "a11y": "התנתקות מהחשבון"
+    }
   }
 }
 

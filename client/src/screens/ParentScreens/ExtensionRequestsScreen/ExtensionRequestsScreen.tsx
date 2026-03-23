@@ -32,6 +32,9 @@ type ExtensionRequestItem = {
   status: ExtensionRequestStatus;
 };
 
+const ALL_CHILD_ID = "all-children";
+const ALL_DEVICE_ID = "all-devices";
+
 const STATIC_CHILDREN: ChildOption[] = [
   {
     id: "noa",
@@ -84,6 +87,24 @@ const STATIC_CHILDREN: ChildOption[] = [
       },
     ],
   },
+];
+
+const CHILDREN_WITH_ALL_OPTION: ChildOption[] = [
+  {
+    id: ALL_CHILD_ID,
+    name: "כל הילדים",
+    initial: "ה",
+    accent: "#315BFF",
+    devices: [
+      {
+        id: ALL_DEVICE_ID,
+        type: "phone",
+        name: "כל המכשירים",
+        icon: "devices",
+      },
+    ],
+  },
+  ...STATIC_CHILDREN,
 ];
 
 const STATIC_REQUESTS: ExtensionRequestItem[] = [
@@ -160,38 +181,59 @@ export default function ExtensionRequestsScreen() {
 
   const isWide = width >= 920;
 
-  const [selectedChildId, setSelectedChildId] = useState(STATIC_CHILDREN[0].id);
-  const [selectedDeviceId, setSelectedDeviceId] = useState(
-    STATIC_CHILDREN[0].devices[0]?.id ?? ""
-  );
+  const [selectedChildId, setSelectedChildId] = useState(ALL_CHILD_ID);
+  const [selectedDeviceId, setSelectedDeviceId] = useState(ALL_DEVICE_ID);
 
   const [requests, setRequests] = useState<ExtensionRequestItem[]>(STATIC_REQUESTS);
 
   const selectedChild = useMemo(
-    () => STATIC_CHILDREN.find((child) => child.id === selectedChildId) ?? STATIC_CHILDREN[0],
+    () =>
+      CHILDREN_WITH_ALL_OPTION.find((child) => child.id === selectedChildId) ??
+      CHILDREN_WITH_ALL_OPTION[0],
     [selectedChildId]
   );
 
-  const selectedDevice = useMemo(
-    () =>
+  const selectedDevice = useMemo(() => {
+    if (selectedChildId === ALL_CHILD_ID) {
+      return {
+        id: ALL_DEVICE_ID,
+        type: "phone" as DeviceType,
+        name: "כל המכשירים",
+        icon: "devices" as React.ComponentProps<typeof MaterialCommunityIcons>["name"],
+      };
+    }
+
+    return (
       selectedChild.devices.find((device) => device.id === selectedDeviceId) ??
-      selectedChild.devices[0],
-    [selectedChild, selectedDeviceId]
-  );
+      selectedChild.devices[0]
+    );
+  }, [selectedChild, selectedChildId, selectedDeviceId]);
 
   const visibleRequests = useMemo(() => {
-    return requests.filter(
-      (request) =>
-        request.childId === selectedChildId &&
-        request.deviceId === selectedDeviceId &&
-        request.status === "pending"
-    );
+    return requests.filter((request) => {
+      if (request.status !== "pending") {
+        return false;
+      }
+
+      const matchesChild =
+        selectedChildId === ALL_CHILD_ID || request.childId === selectedChildId;
+
+      const matchesDevice =
+        selectedDeviceId === ALL_DEVICE_ID || request.deviceId === selectedDeviceId;
+
+      return matchesChild && matchesDevice;
+    });
   }, [requests, selectedChildId, selectedDeviceId]);
 
   const onSelectChild = (childId: string) => {
     setSelectedChildId(childId);
 
-    const nextChild = STATIC_CHILDREN.find((child) => child.id === childId);
+    if (childId === ALL_CHILD_ID) {
+      setSelectedDeviceId(ALL_DEVICE_ID);
+      return;
+    }
+
+    const nextChild = CHILDREN_WITH_ALL_OPTION.find((child) => child.id === childId);
     if (nextChild?.devices?.length) {
       setSelectedDeviceId(nextChild.devices[0].id);
     } else {
@@ -278,7 +320,11 @@ export default function ExtensionRequestsScreen() {
 
                 <View style={styles.heroMetaChip}>
                   <MaterialCommunityIcons
-                    name={getDeviceIconName(selectedDevice?.type ?? "phone")}
+                    name={
+                      selectedChildId === ALL_CHILD_ID
+                        ? "devices"
+                        : getDeviceIconName(selectedDevice?.type ?? "phone")
+                    }
                     size={18}
                     color="#315BFF"
                   />
@@ -290,7 +336,7 @@ export default function ExtensionRequestsScreen() {
             </View>
 
             <ChildDeviceSelector
-              childrenOptions={STATIC_CHILDREN}
+              childrenOptions={CHILDREN_WITH_ALL_OPTION}
               selectedChildId={selectedChildId}
               selectedDeviceId={selectedDeviceId}
               onSelectChild={onSelectChild}
@@ -362,26 +408,26 @@ export default function ExtensionRequestsScreen() {
                       </View>
                     </View>
 
-                   <View style={styles.infoGrid}>
-  <View
-    style={[
-      styles.infoChip,
-      isRTL ? styles.infoChipRtl : styles.infoChipLtr,
-    ]}
-  >
-    <MaterialCommunityIcons
-      name="clock-plus-outline"
-      size={16}
-      color="#315BFF"
-    />
+                    <View style={styles.infoGrid}>
+                      <View
+                        style={[
+                          styles.infoChip,
+                          isRTL ? styles.infoChipRtl : styles.infoChipLtr,
+                        ]}
+                      >
+                        <MaterialCommunityIcons
+                          name="clock-plus-outline"
+                          size={16}
+                          color="#315BFF"
+                        />
 
-    <AppText weight="bold" style={[styles.infoChipText, text]}>
-      {t("extensionRequests.requestedMinutesLabel", {
-        minutes: request.requestedMinutes,
-      })}
-    </AppText>
-  </View>
-</View>
+                        <AppText weight="bold" style={[styles.infoChipText, text]}>
+                          {t("extensionRequests.requestedMinutesLabel", {
+                            minutes: request.requestedMinutes,
+                          })}
+                        </AppText>
+                      </View>
+                    </View>
 
                     <View style={styles.reasonBox}>
                       <AppText weight="bold" style={[styles.reasonLabel, text]}>
