@@ -69,3 +69,19 @@ export async function apiDeleteDeviceByChild(
     }
   );
 }
+
+export async function apiUpdateDeviceName(
+  childId: string,
+  deviceId: string,
+  name: string
+): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/child/${encodeURIComponent(childId)}/${encodeURIComponent(deviceId)}/name`,
+    { name },
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}

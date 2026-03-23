@@ -171,6 +171,14 @@ export async function getDevicesByChild(parentId, childId) {
   return findDevicesByChildId(childId);
 }
 
+export async function updateDeviceName(parentId, childId, deviceId, name) {
+  const device = await validateDeviceAccess({ deviceId, parentId, childId });
+  if (device != null && device.name === name) {
+    return device;
+  }
+  return await updateDeviceById(deviceId, { name });
+}
+
 
 // Return current screen-time settings for a specific device
 export async function getDeviceScreenTime(parentId, deviceId) {

@@ -29,6 +29,18 @@ export async function getDevicesByChildController(req, res, next) {
   }
 }
 
+export async function updateDeviceNameController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId, deviceId } = req.params;
+    const { name } = req.body;
+    const data = await updateDeviceName(parentId, childId, deviceId, name);
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function lockDeviceController(req, res, next) {
   try {
     const parentId = req.user.parentId;
