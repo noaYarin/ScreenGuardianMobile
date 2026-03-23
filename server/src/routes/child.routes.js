@@ -13,6 +13,8 @@ router.get("/profile", authJwt, requireChild, getCurrentChildProfileController);
 
 // PATCH /api/v1/child/me/interests
 // Update child interests (self)
-router.patch("/me/interests", authJwt, requireChild, updateChildInterestsController);
+router.patch("/interests", authJwt, requireChild, updateChildInterestsController);
+
+router.put("/profile", authJwt, requireChild, updateCurrentChildProfileController);
 
 export default router;

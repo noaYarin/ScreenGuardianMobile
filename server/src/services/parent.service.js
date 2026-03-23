@@ -147,3 +147,13 @@ export async function getParentHomeSummary(parentId) {
 
   return { children: summary };
 }
+
+export async function updateCurrentChildProfile(parentId, childId, name, birthDate, gender) {
+  const updated = await updateCurrentChildProfileByParentId(parentId, childId, name, birthDate, gender);
+
+  if (!updated) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  return { child: updated };
+}

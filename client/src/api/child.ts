@@ -7,3 +7,12 @@ export async function fetchCurrentChildProfile(): Promise<{ child: Child }> {
     role: "CHILD",
   });
 }
+
+// Update current child profile by id
+export async function updateCurrentChildProfile(name: string, birthDate: string, gender: string): Promise<{ child: Child }> {
+  return api.put<{ child: Child }>("/api/v1/child/profile", { name, birthDate, gender }, {
+      requireAuth: true,
+      role: "CHILD",
+    },
+  );
+}
