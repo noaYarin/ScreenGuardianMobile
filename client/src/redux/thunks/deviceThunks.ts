@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   apiDeleteDeviceByChild,
   apiGetDevicesByChild,
+  apiUpdateDeviceName,
   type Device,
 } from "../../api/device";
 
@@ -66,6 +67,24 @@ export const deleteDeviceForChild = createAsyncThunk<
   } catch (error) {
     const message =
       (error as Error)?.message ?? "devices.delete_device_failed";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const updateDeviceName = createAsyncThunk<
+  Device,
+  { childId: string; deviceId: string; name: string },
+  { rejectValue: string }
+>("devices/updateName", async ({ childId, deviceId, name }, thunkAPI) => {
+  try { 
+    const response = await apiUpdateDeviceName(childId, deviceId, name);
+    if (response == null) {
+      return thunkAPI.rejectWithValue("devices.update_device_name_failed");
+    }
+    return response;
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "devices.update_device_name_failed";
     return thunkAPI.rejectWithValue(message);
   }
 });

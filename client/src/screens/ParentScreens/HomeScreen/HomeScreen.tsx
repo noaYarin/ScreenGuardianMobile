@@ -50,18 +50,19 @@ export default function HomeParentScreen() {
     return list.map((child) => ({
       id: String(child?._id ?? ""),
       name: child?.name ?? "",
-      usedText: "--:--",
-      limitText: "--:--",
+      usedText: "00:00",
+      limitText: "00:00",
       status: "good" as const,
     }));
   }, [children]);
 
   const onPressOverview = () => router.push("/Parent/(tabs)/reports" as Href);
-  const onPressFullWatch = () => router.push("/Parent/childDetails" as Href);
+  const onPressFullWatch = () =>
+    router.push("/Parent/(tabs)/children" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
   const onPressChildCard = (childId: string, childName: string) =>
     router.push({
-      pathname: "/Parent/childDetails" as Href,
+      pathname: "/Parent/childProfile" as Href,
       params: { id: childId, name: childName },
     } as never);
 
@@ -124,6 +125,7 @@ const bellButton = (
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>
+          <View style={styles.header}>
             <AppText weight="extraBold" style={[styles.bigHello, text]}>
               {t("homeParent.hello", { name: parentName })}
             </AppText>
@@ -131,17 +133,11 @@ const bellButton = (
             <AppText
               onPress={onPressOverview}
               weight="bold"
-              style={[
-                styles.overviewLink,
-                text,
-                isRTL ? styles.overviewLinkRtl : styles.overviewLinkLtr,
-              ]}
-              accessibilityRole="button"
-              accessibilityLabel={t("homeParent.overview_a11y")}
+              style={[styles.overviewLink, text]}
             >
               {t("homeParent.overview")}
             </AppText>
-
+          </View>
             <View style={styles.summaryCard}>
               <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>

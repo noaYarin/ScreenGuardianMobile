@@ -17,9 +17,9 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     private val handler = Handler(Looper.getMainLooper())
 
     private val allowedPackages = setOf(
-        "com.screenguardianmobile",   // האפליקציה שלנו
-        "com.android.settings",       // הגדרות
-        "host.exp.exponent"           // Expo Go אם צריך
+        "com.screenguardianmobile",
+        "com.android.settings",
+        "host.exp.exponent"
     )
 
     private val allowedPackagePrefixes = listOf(
@@ -72,6 +72,16 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         val usedToday = PolicyStore.getUsedToday(applicationContext)
         val remaining = PolicyStore.getRemainingMinutes(applicationContext)
         val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
+        val isLockNow = PolicyStore.isLockNow(applicationContext)
+
+        if (isLockNow) {
+            PolicyStore.setBlockReason(applicationContext, "LOCK_NOW")
+        } else if (remaining <= 0) {
+            PolicyStore.setBlockReason(applicationContext, "DAILY_LIMIT_REACHED")
+        } else {
+            PolicyStore.setBlockReason(applicationContext, "")
+        }
+
         val blockReason = PolicyStore.getBlockReason(applicationContext)
 
         Log.d(TAG, "Used today: $usedToday minutes")
@@ -87,11 +97,17 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
             return
         }
 
+        val dailyLimit = PolicyStore.getDailyLimit(applicationContext)
+        val extraMinutes = PolicyStore.getExtraMinutes(applicationContext)
+
         val intent = Intent(this, BlockScreenActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             putExtra("blockReason", blockReason)
+            putExtra("usedTodayMinutes", usedToday)
+            putExtra("dailyLimitMinutes", dailyLimit)
+            putExtra("extraMinutes", extraMinutes)
         }
 
         startActivity(intent)

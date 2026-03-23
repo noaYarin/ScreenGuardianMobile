@@ -18,6 +18,7 @@ class DeviceControlModule(
     fun lockNow(promise: Promise) {
         try {
             PolicyStore.setLockNow(reactApplicationContext, true)
+            PolicyStore.setBlockReason(reactApplicationContext, "LOCK_NOW")
             promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("LOCK_NOW_ERROR", e.message, e)
@@ -28,6 +29,7 @@ class DeviceControlModule(
     fun unlockNow(promise: Promise) {
         try {
             PolicyStore.setLockNow(reactApplicationContext, false)
+            PolicyStore.setBlockReason(reactApplicationContext, "")
             promise.resolve(true)
         } catch (e: Exception) {
             promise.reject("UNLOCK_NOW_ERROR", e.message, e)

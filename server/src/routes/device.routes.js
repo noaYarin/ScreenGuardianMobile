@@ -17,7 +17,8 @@ import {
   getDeviceDailyLimitController,
   updateDeviceDailyLimitController,
   getDeviceCurrentStatusForChildController,
-  updateDeviceUsageByChildController
+  updateDeviceUsageByChildController,
+  updateDeviceNameController
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -29,6 +30,8 @@ router.get("/child/:childId", authJwt, requireParent, getDevicesByChildControlle
 // GET /api/v1/devices/child/:childId/:deviceId
 // Parent gets a specific device of a specific child
 router.get("/child/:childId/:deviceId", authJwt, requireParent, getDeviceByChildController);
+
+router.patch("/child/:childId/:deviceId/name", authJwt, requireParent, updateDeviceNameController);
 
 // DELETE /api/v1/devices/child/:childId/:deviceId
 router.delete(

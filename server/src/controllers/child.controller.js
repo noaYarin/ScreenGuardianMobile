@@ -5,6 +5,7 @@ import {
   updateChildInterests,
   getChild
 } from "../services/parent.service.js";
+import { updateCurrentChildProfile } from "../services/child.service.js";
 
 export async function addChildController(req, res, next) {
   try {
@@ -82,3 +83,16 @@ export async function updateChildInterestsController(req, res, next) {
 }
 
 
+export async function updateCurrentChildProfileController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+    const { name, birthDate, gender } = req.body;
+
+    const data = await updateCurrentChildProfile(parentId, childId, name, birthDate, gender);
+
+    res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}

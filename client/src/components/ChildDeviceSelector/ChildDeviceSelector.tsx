@@ -1,5 +1,5 @@
-import React from "react";
-import { View, ScrollView, Pressable } from "react-native";
+import React, { useMemo } from "react";
+import { View, ScrollView, Pressable, useWindowDimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import AppText from "../AppText/AppText";
@@ -45,13 +45,33 @@ export default function ChildDeviceSelector({
   onSelectDevice,
   childSectionTitleKey = "childDeviceSelector.childrenSectionTitle",
   deviceSectionTitleKey = "childDeviceSelector.devicesSectionTitle",
-  childCardWidth = 145,
+  childCardWidth,
 }: Props) {
+  const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { isRTL, text, row } = useLocaleLayout();
 
   const selectedChild =
     childrenOptions.find((child) => child.id === selectedChildId) ?? childrenOptions[0];
+
+  const computedChildCardWidth = useMemo(() => {
+    if (typeof childCardWidth === "number") {
+      return childCardWidth;
+    }
+
+    if (width < 380) return 110;
+    if (width < 450) return 120;
+    return 132;
+  }, [childCardWidth, width]);
+
+  const computedDeviceChipWidth = useMemo(() => {
+    if (width < 380) return 150;
+    if (width < 450) return 160;
+    return 170;
+  }, [width]);
+
+  const shouldCenterChildren = childrenOptions.length <= 2;
+  const shouldCenterDevices = (selectedChild?.devices?.length ?? 0) <= 2;
 
   if (!selectedChild) {
     return null;
@@ -64,73 +84,93 @@ export default function ChildDeviceSelector({
           {t(childSectionTitleKey)}
         </AppText>
 
-        <View style={styles.childrenWrap}>
-          {childrenOptions.map((child) => {
-            const isSelected = child.id === selectedChildId;
+        <View style={styles.childrenViewport}>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[
+              styles.childrenRow,
+              isRTL ? styles.childrenRowRtl : styles.childrenRowLtr,
+              shouldCenterChildren ? styles.childrenRowCentered : null,
+            ]}
+          >
+            {childrenOptions.map((child) => {
+              const isSelected = child.id === selectedChildId;
 
-            return (
-              <Pressable
-                key={child.id}
-                onPress={() => onSelectChild(child.id)}
-                accessibilityRole="button"
-                accessibilityLabel={t("childDeviceSelector.childTabA11y", {
-                  name: child.name,
-                })}
-                style={({ pressed }) => [
-                  styles.childCard,
-                  { width: childCardWidth },
-                  isSelected && [
-                    styles.childCardSelected,
-                    {
-                      borderColor: child.accent,
-                      shadowColor: child.accent,
-                    },
-                  ],
-                  pressed ? styles.pressed : null,
-                ]}
-              >
-                <View
-                  style={[
-                    styles.childAvatarWrap,
-                    isSelected && styles.childAvatarWrapSelected,
+              return (
+                <Pressable
+                  key={child.id}
+                  onPress={() => onSelectChild(child.id)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t("childDeviceSelector.childTabA11y", {
+                    name: child.name,
+                  })}
+                  style={({ pressed }) => [
+                    styles.childCard,
+                    { width: computedChildCardWidth },
+                    isSelected && [
+                      styles.childCardSelected,
+                      {
+                        borderColor: child.accent,
+                        shadowColor: child.accent,
+                      },
+                    ],
+                    pressed ? styles.pressed : null,
                   ]}
                 >
                   <View
                     style={[
-                      styles.childAvatarCircle,
-                      { backgroundColor: child.accent },
+                      styles.childAvatarWrap,
+                      isSelected && styles.childAvatarWrapSelected,
                     ]}
                   >
-                    <AppText weight="extraBold" style={styles.childAvatarText}>
-                      {child.initial}
-                    </AppText>
+                    <View
+                      style={[
+                        styles.childAvatarCircle,
+                        { backgroundColor: child.accent },
+                      ]}
+                    >
+                      <AppText weight="extraBold" style={styles.childAvatarText}>
+                        {child.initial}
+                      </AppText>
+                    </View>
                   </View>
-                </View>
 
-                <AppText weight="bold" style={styles.childName}>
-                  {child.name}
-                </AppText>
-
-                <AppText weight="medium" style={[styles.childSubtitle, text]}>
-                  {child.subtitleKey
-                    ? t(child.subtitleKey)
-                    : t("childDeviceSelector.defaultChildSubtitle")}
-                </AppText>
-
-                {isSelected ? (
-                  <View
-                    style={[
-                      styles.selectedBadge,
-                      isRTL ? styles.selectedBadgeRtl : styles.selectedBadgeLtr,
-                      { backgroundColor: child.accent },
-                    ]}
+                  <AppText
+                    weight="bold"
+                    style={styles.childName}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
                   >
-                    <MaterialCommunityIcons name="check" size={14} color="#FFFFFF" />
-                  </View>
-                ) : null}
-              </Pressable>
-            );
-          })}
+                    {child.name}
+                  </AppText>
+
+                  <AppText
+                    weight="medium"
+                    style={[styles.childSubtitle, text]}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    {child.subtitleKey
+                      ? t(child.subtitleKey)
+                      : t("childDeviceSelector.defaultChildSubtitle")}
+                  </AppText>
+
+                  {isSelected ? (
+                    <View
+                      style={[
+                        styles.selectedBadge,
+                        isRTL ? styles.selectedBadgeRtl : styles.selectedBadgeLtr,
+                        { backgroundColor: child.accent },
+                      ]}
+                    >
+                      <MaterialCommunityIcons name="check" size={14} color="#FFFFFF" />
+                    </View>
+                  ) : null}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </View>
       </View>
 
@@ -146,6 +186,7 @@ export default function ChildDeviceSelector({
             contentContainerStyle={[
               styles.devicesRow,
               isRTL ? styles.devicesRowRtl : styles.devicesRowLtr,
+              shouldCenterDevices ? styles.devicesRowCentered : null,
             ]}
           >
             {selectedChild.devices.map((device) => {
@@ -163,6 +204,7 @@ export default function ChildDeviceSelector({
                   style={({ pressed }) => [
                     styles.deviceChip,
                     row,
+                    { minWidth: computedDeviceChipWidth },
                     isSelected && styles.deviceChipSelected,
                     pressed ? styles.pressed : null,
                   ]}
@@ -181,11 +223,21 @@ export default function ChildDeviceSelector({
                   </View>
 
                   <View style={styles.deviceTextWrap}>
-                    <AppText weight="bold" style={[styles.deviceName, text]}>
+                    <AppText
+                      weight="bold"
+                      style={[styles.deviceName, text]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
                       {device.name}
                     </AppText>
 
-                    <AppText weight="medium" style={[styles.deviceType, text]}>
+                    <AppText
+                      weight="medium"
+                      style={[styles.deviceType, text]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
                       {t(`childDeviceSelector.devices.${device.type}`)}
                     </AppText>
                   </View>

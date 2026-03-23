@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 export const styles = StyleSheet.create({
   wrapper: {
     gap: 20,
-    marginBottom: 16,
+      marginBottom: 16,
+
   },
 
   section: {
@@ -32,16 +33,11 @@ export const styles = StyleSheet.create({
     flexDirection: "row-reverse",
   },
 
-  childrenRowCentered: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-
   childCard: {
-    minHeight: 110,
-    borderRadius: 18,
-    paddingHorizontal: 10,
-    paddingVertical: 12,
+    minHeight: 110, 
+    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 14,
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: "#E7ECF4",
@@ -72,7 +68,7 @@ export const styles = StyleSheet.create({
   childAvatarCircle: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 26,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -116,75 +112,17 @@ export const styles = StyleSheet.create({
     left: 10,
   },
 
-  devicesViewport: {
-    marginHorizontal: -4,
-  },
-
-  devicesRow: {
-    gap: 10,
-    paddingHorizontal: 4,
-  },
-
-  devicesRowLtr: {
-    flexDirection: "row",
-  },
-
-  devicesRowRtl: {
-    flexDirection: "row-reverse",
-  },
-
-  devicesRowCentered: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
-
-  deviceChip: {
-    maxWidth: 200,
-    borderRadius: 16,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#E7ECF4",
-    alignItems: "center",
-    gap: 10,
-  },
-
-  deviceChipSelected: {
-    borderColor: "#3D6BF2",
-    backgroundColor: "#EEF4FF",
-  },
-
-  deviceIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EEF4FF",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  deviceIconWrapSelected: {
-    backgroundColor: "#3D6BF2",
-  },
-
-  deviceTextWrap: {
-    flexShrink: 1,
-    justifyContent: "center",
-  },
-
-  deviceName: {
-    fontSize: 13,
-    color: "#111827",
-  },
-
-  deviceType: {
-    fontSize: 11,
-    color: "#6B7280",
-    marginTop: 2,
-  },
-
   pressed: {
     opacity: 0.85,
   },
+
+
+
+childrenRowCentered: {
+  justifyContent: "center",
+  flexGrow: 1,
+},
+
+
+
 });

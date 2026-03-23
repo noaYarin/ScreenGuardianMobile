@@ -8,6 +8,7 @@ export type ChildDetailsDeviceRow = {
   platformLabel: string;
   active: boolean;
   locationText: string;
+  isLocked: boolean;
 };
 
 function translateDeviceType(t: TFunction, raw: string | undefined): string {
@@ -30,16 +31,18 @@ export function mapDevicesToRows(
 ): ChildDetailsDeviceRow[] {
   return devices.map((d) => {
     const name = d.name?.trim() ? d.name : "—";
+    const loc =
+      typeof d.location === "string" && d.location.trim().length > 0
+        ? d.location.trim()
+        : t("childDetails.location_unknown");
     return {
       id: String(d._id),
       name,
       typeLabel: translateDeviceType(t, d.type),
       platformLabel: translateDevicePlatform(t, d.platform),
       active: Boolean(d.isActive),
-      locationText:
-        typeof d.location === "string" && d.location.trim().length > 0
-          ? d.location.trim()
-          : t("childDetails.location_unknown"),
+      locationText: loc,
+      isLocked: Boolean(d.isLocked),
     };
   });
 }

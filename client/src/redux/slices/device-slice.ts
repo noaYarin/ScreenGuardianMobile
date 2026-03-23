@@ -26,6 +26,22 @@ const devicesSlice = createSlice({
       delete state.statusByChildId[id];
       delete state.errorByChildId[id];
     },
+    setDeviceLockLocal: (
+      state,
+      action: PayloadAction<{
+        childId: string;
+        deviceId: string;
+        isLocked: boolean;
+      }>
+    ) => {
+      const { childId, deviceId, isLocked } = action.payload;
+      const list = state.byChildId[childId];
+      if (!list) return;
+      const idx = list.findIndex((d) => String(d._id) === String(deviceId));
+      if (idx < 0) return;
+      const device = list[idx];
+      state.byChildId[childId][idx] = { ...device, isLocked };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -57,6 +73,7 @@ const devicesSlice = createSlice({
   },
 });
 
-export const { clearDevicesForChild } = devicesSlice.actions;
+export const { clearDevicesForChild, setDeviceLockLocal } =
+  devicesSlice.actions;
 export { fetchDevicesByChild, deleteDeviceForChild } from "../thunks/deviceThunks";
 export default devicesSlice.reducer;

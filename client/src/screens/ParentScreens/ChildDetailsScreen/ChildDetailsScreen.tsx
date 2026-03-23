@@ -15,6 +15,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
+import ChildSelector, {
+  type ChildSelectorOption,
+} from "../../../components/ChildSelector/ChildSelector";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useChildProfileLabels } from "../../../../hooks/use-child-profile-labels";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
@@ -23,7 +26,7 @@ import {
   fetchDevicesByChild,
   deleteDeviceForChild,
 } from "@/src/redux/thunks/deviceThunks";
-import { ChildrenStrip } from "@/src/components/ChildDetails/ChildrenStrip";
+import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
@@ -45,6 +48,7 @@ export default function ChildDetailsScreen() {
     () => parseRouteParam(params.deviceId),
     [params.deviceId]
   );
+
   const paramChildIdFromRoute = useMemo(
     () => parseRouteParam(params.id),
     [params.id]
@@ -53,6 +57,7 @@ export default function ChildDetailsScreen() {
   const { childrenList, isLoading, error: childrenError } = useSelector(
     (state: RootState) => state.children
   );
+
   const devicesSlice = useSelector((state: RootState) => state.devices);
   const children = Array.isArray(childrenList) ? childrenList : [];
 
@@ -65,7 +70,6 @@ export default function ChildDetailsScreen() {
 
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
-
   /*
    This logic prioritizes (in order): a valid child ID given via route param, one selected by the user,
    or the first child in the children array
@@ -74,18 +78,21 @@ export default function ChildDetailsScreen() {
     if (children.length === 0) {
       return paramChildIdFromRoute || userSelectedChildId || "";
     }
+
     if (
       paramChildIdFromRoute &&
       children.some((c) => String(c._id) === paramChildIdFromRoute)
     ) {
       return paramChildIdFromRoute;
     }
+
     if (
       userSelectedChildId &&
       children.some((c) => String(c._id) === String(userSelectedChildId))
     ) {
       return String(userSelectedChildId);
     }
+
     return String(children[0]._id);
   }, [children, paramChildIdFromRoute, userSelectedChildId]);
 
@@ -112,13 +119,13 @@ export default function ChildDetailsScreen() {
     }, [refreshChildrenList])
   );
 
-  // load devices for that child
+  // Load devices for selected child
   useEffect(() => {
     if (!effectiveChildId) return;
     dispatch(fetchDevicesByChild(effectiveChildId));
   }, [dispatch, effectiveChildId]);
 
-  // Expand devices section
+  // Expand devices section if screen was opened from a deep link
   useEffect(() => {
     if (deepLinkDevices) {
       setIsDevicesExpanded(true);
@@ -128,13 +135,15 @@ export default function ChildDetailsScreen() {
   const handleRefreshDevices = useCallback(() => {
     setDevicesRefreshing(true);
     refreshChildrenList();
-    const p = effectiveChildId
+
+    const promise = effectiveChildId
       ? dispatch(fetchDevicesByChild(effectiveChildId)).unwrap()
       : Promise.resolve();
-    p.catch(() => {}).finally(() => setDevicesRefreshing(false));
+
+    promise.catch(() => {}).finally(() => setDevicesRefreshing(false));
   }, [refreshChildrenList, dispatch, effectiveChildId]);
 
-  // Get child details
+  // Get selected child object
   const selectedChild = useMemo(
     () =>
       children.find((c) => String(c._id) === String(effectiveChildId)) ?? null,
@@ -144,9 +153,37 @@ export default function ChildDetailsScreen() {
   const { childName, birthDateLabel, genderLabel } =
     useChildProfileLabels(selectedChild);
 
-  const deviceRows = useMemo(
-    () => mapDevicesToRows(devices, t),
-    [devices, t]
+  const deviceRows = useMemo(() => mapDevicesToRows(devices, t), [devices, t]);
+
+  const childSelectorOptions = useMemo<ChildSelectorOption[]>(
+    () =>
+      children.map((child, index) => {
+        const fullName =
+          typeof child.name === "string" && child.name.trim()
+            ? child.name.trim()
+            : t("childSelector.defaultChildSubtitle");
+
+        const initial =
+          fullName.length > 0 ? fullName.charAt(0).toUpperCase() : "?";
+
+        const accentPalette = [
+          "#7C3AED",
+          "#2563EB",
+          "#10B981",
+          "#F59E0B",
+          "#EF4444",
+          "#EC4899",
+        ];
+
+        return {
+          id: String(child._id),
+          name: fullName,
+          initial,
+          accent: accentPalette[index % accentPalette.length],
+          subtitleKey: "childSelector.defaultChildSubtitle",
+        };
+      }),
+    [children, t]
   );
 
   const handleRetryLoadChildren = useCallback(() => {
@@ -158,6 +195,7 @@ export default function ChildDetailsScreen() {
 
   const handleConnectDevice = useCallback(() => {
     if (!effectiveChildId) return;
+
     router.push({
       pathname: "/Parent/linkDevice",
       params: { id: effectiveChildId, name: childName },
@@ -174,7 +212,9 @@ export default function ChildDetailsScreen() {
   const handleDeleteDevice = useCallback(
     (deviceId: string, deviceDisplayName: string) => {
       if (!effectiveChildId || deletingDeviceId) return;
+
       const childLabel = childName.trim() || t("childDetails.devices_title");
+
       Alert.alert(
         t("childDetails.delete_device_title", { device: deviceDisplayName }),
         t("childDetails.delete_device_message", { child: childLabel }),
@@ -185,6 +225,7 @@ export default function ChildDetailsScreen() {
             style: "destructive",
             onPress: () => {
               setDeletingDeviceId(deviceId);
+
               dispatch(
                 deleteDeviceForChild({
                   childId: effectiveChildId,
@@ -206,16 +247,27 @@ export default function ChildDetailsScreen() {
     [dispatch, effectiveChildId, deletingDeviceId, childName, t]
   );
 
-  const showFullScreenLoader =
-    isLoading &&
-    children.length === 0 &&
-    !deepLinkDevices;
+  const handleSetDeviceLocked = useCallback(
+    (deviceId: string, locked: boolean) => {
+      if (!effectiveChildId || deletingDeviceId) return;
+
+      dispatch(
+        setDeviceLockLocal({
+          childId: effectiveChildId,
+          deviceId,
+          isLocked: locked,
+        })
+      );
+    },
+    [dispatch, effectiveChildId, deletingDeviceId]
+  );
+
+  const showFullScreenLoader = isLoading && children.length === 0 && !deepLinkDevices;
 
   const showChildrenFetchError =
     Boolean(childrenError) && !isLoading && children.length === 0;
 
-  const showEmptyState =
-    !isLoading && children.length === 0 && !childrenError;
+  const showEmptyState = !isLoading && children.length === 0 && !childrenError;
 
   const errorMessage = childrenError
     ? t(childrenError, { defaultValue: childrenError })
@@ -287,6 +339,7 @@ export default function ChildDetailsScreen() {
               </AppText>
             </View>
           ) : null}
+
           {childrenError && children.length > 0 ? (
             <View style={styles.reduxErrorBox}>
               <AppText style={[styles.childMeta, text]}>{errorMessage}</AppText>
@@ -300,12 +353,16 @@ export default function ChildDetailsScreen() {
               </Pressable>
             </View>
           ) : null}
-          <ChildrenStrip
-            childrenList={children}
+
+          <ChildSelector
+            childrenOptions={childSelectorOptions}
             selectedChildId={effectiveChildId}
-            onSelectChildId={setUserSelectedChildId}
-            row={row}
+            onSelectChild={(childId) => {
+              setUserSelectedChildId(childId);
+              setIsDevicesExpanded(false);
+            }}
           />
+
           <ChildDetailsProfileCard
             childName={childName}
             birthDateLabel={birthDateLabel}
@@ -314,9 +371,10 @@ export default function ChildDetailsScreen() {
             text={text}
             onOpenProfile={handleOpenChildProfile}
           />
+
           <ChildDetailsDevicesSection
             expanded={isDevicesExpanded}
-            onToggleExpanded={() => setIsDevicesExpanded((p) => !p)}
+            onToggleExpanded={() => setIsDevicesExpanded((prev) => !prev)}
             onAddDevice={handleConnectDevice}
             devicesLoading={devicesLoading}
             rows={deviceRows}
@@ -324,7 +382,9 @@ export default function ChildDetailsScreen() {
             text={text}
             deletingDeviceId={deletingDeviceId}
             onDeleteDevice={handleDeleteDevice}
+            onSetDeviceLocked={handleSetDeviceLocked}
           />
+
           <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>

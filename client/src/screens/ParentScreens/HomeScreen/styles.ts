@@ -27,6 +27,12 @@ export const styles = StyleSheet.create({
     opacity: 0.72,
   },
 
+  header: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
   bigHello: {
     fontSize: 28,
     lineHeight: 34,
@@ -38,7 +44,6 @@ export const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 14,
     color: APP_COLORS.primaryBlue,
-    textDecorationLine: "underline",
   },
 
   overviewLinkLtr: {

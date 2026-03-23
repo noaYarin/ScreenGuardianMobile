@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
-import { Stack, router } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -9,6 +11,10 @@ import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { getAgeInFullYearsFromBirthDate } from "../../../../hooks/use-child-profile-labels";
+import { parseRouteParam } from "../ChildDetailsScreen/childDetailsRouteParams";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ActionCard = {
   key: string;
@@ -16,11 +22,6 @@ type ActionCard = {
   subtitleKey: string;
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   route: string;
-};
-
-const STATIC_CHILD = {
-  name: "יעל",
-  age: 10,
 };
 
 const ACTIONS: ActionCard[] = [
@@ -65,6 +66,28 @@ export default function ChildProfileScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { isRTL, text } = useLocaleLayout();
+  const dispatch = useDispatch<AppDispatch>();
+  const params = useLocalSearchParams<{ id?: string; name?: string }>();
+
+  const childId = useMemo(() => parseRouteParam(params.id), [params.id]);
+  const nameFromRoute = useMemo(() => parseRouteParam(params.name), [params.name]);
+
+  const { childrenList } = useSelector((state: RootState) => state.children ?? {});
+  const children = Array.isArray(childrenList) ? childrenList : [];
+
+  const child = useMemo(
+    () => children.find((c) => String(c._id) === childId) ?? null,
+    [children, childId]
+  );
+
+
+  const displayName =
+    (child?.name && child.name.trim()) || nameFromRoute || t("childProfile.name_fallback");
+
+  const ageYears = useMemo(
+    () => getAgeInFullYearsFromBirthDate(child?.birthDate),
+    [child?.birthDate]
+  );
 
   const isTablet = width >= 900;
   const contentMaxWidth = width >= 1200 ? 980 : width >= 900 ? 840 : undefined;
@@ -100,21 +123,24 @@ export default function ChildProfileScreen() {
               </View>
 
               <AppText weight="extraBold" style={[styles.childName, text]}>
-                {STATIC_CHILD.name}
+                {displayName}
               </AppText>
 
-              <AppText weight="medium" style={[styles.childMeta, text]}>
-                {t("childProfile.age", { age: STATIC_CHILD.age })}
-              </AppText>
+              {ageYears != null ? (
+                <AppText weight="medium" style={[styles.childMeta, text]}>
+                  {t("childProfile.age", { age: ageYears })}
+                </AppText>
+              ) : null}
 
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t("childProfile.edit_a11y")}
-                style={({ pressed }) => [
-                  styles.editButton,
-                  pressed && styles.pressedSoft,
-                ]}
-              >
+             <Pressable
+  onPress={() => router.push("/Parent/defineChildProfile")}
+  accessibilityRole="button"
+  accessibilityLabel={t("childProfile.edit_a11y")}
+  style={({ pressed }) => [
+    styles.editButton,
+    pressed && styles.pressedSoft,
+  ]}
+>
                 <View style={styles.editButtonContent}>
                   <MaterialCommunityIcons
                     name="pencil-outline"

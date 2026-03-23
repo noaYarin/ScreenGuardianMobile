@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import { Provider as ReduxProvider } from "react-redux";
+import { Provider as ReduxProvider, useSelector } from "react-redux";
 import { View, ActivityIndicator } from "react-native";
 import { HeaderBackButton } from "@react-navigation/elements";
 
@@ -18,6 +18,30 @@ import i18n, { initLanguage } from "../src/locales/i18n";
 function AppStack() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language?.startsWith("he") ?? false;
+
+  const token = useSelector((state: any) => state.auth.token);
+  const childToken = useSelector((state: any) => state.auth.childToken);
+
+  // All routes in array
+  const segments = useSegments() as string[];
+  const router = useRouter();
+
+  // Check if the current route is the index route
+  const isIndexRoute =
+    segments.length === 0 || segments[segments.length - 1] === "index";
+
+  useEffect(() => {
+    if (!isIndexRoute) return;
+
+    if (childToken) {
+      router.replace("/Child" as any);
+      return;
+    }
+
+    if (token) {
+      router.replace("/Parent" as any);
+    }
+  }, [childToken, token, isIndexRoute, router]);
 
   return (
     <Stack

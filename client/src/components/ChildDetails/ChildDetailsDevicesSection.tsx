@@ -25,6 +25,8 @@ type Props = {
   text: StyleProp<TextStyle>;
   deletingDeviceId: string | null;
   onDeleteDevice: (deviceId: string, displayName: string) => void;
+  /** Local-only lock toggle (no server); wired to Redux `setDeviceLockLocal`. */
+  onSetDeviceLocked: (deviceId: string, locked: boolean) => void;
 };
 
 export function ChildDetailsDevicesSection({
@@ -37,6 +39,7 @@ export function ChildDetailsDevicesSection({
   text,
   deletingDeviceId,
   onDeleteDevice,
+  onSetDeviceLocked,
 }: Props) {
   const { t } = useTranslation();
   const deleteBusy = deletingDeviceId !== null;
@@ -58,7 +61,7 @@ export function ChildDetailsDevicesSection({
               {t("childDetails.devices_title")}
             </AppText>
             <MaterialCommunityIcons
-              name={expanded ? "chevron-up" : "chevron-down"}
+              name={expanded ? "chevron-down" : "chevron-up"}
               size={22}
               color="#0F172A"
             />
@@ -90,7 +93,9 @@ export function ChildDetailsDevicesSection({
                 row={row}
                 text={text}
                 deleteDisabled={deleteBusy}
+                lockDisabled={deleteBusy}
                 onDelete={onDeleteDevice}
+                onSetDeviceLocked={onSetDeviceLocked}
               />
             ))
           )}
