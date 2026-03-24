@@ -25,6 +25,11 @@ object UsageStatsHelper {
 
         if (stats != null) {
             for (usage in stats) {
+                val packageName = usage.packageName ?: continue
+
+                if (packageName.startsWith("com.android")) continue
+                if (packageName.startsWith("com.google.android")) continue
+
                 totalForegroundTimeMillis += usage.totalTimeInForeground
             }
         }
@@ -35,17 +40,21 @@ object UsageStatsHelper {
 
     // Check if the app has Usage Access permission
     fun hasUsageAccess(context: Context): Boolean {
-        val usageStatsManager =
-            context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
+        return try {
+            val usageStatsManager =
+                context.getSystemService(Context.USAGE_STATS_SERVICE) as UsageStatsManager
 
-        val now = System.currentTimeMillis()
-        val stats = usageStatsManager.queryUsageStats(
-            UsageStatsManager.INTERVAL_DAILY,
-            now - 60_000,
-            now
-        )
+            val now = System.currentTimeMillis()
+            val stats = usageStatsManager.queryUsageStats(
+                UsageStatsManager.INTERVAL_DAILY,
+                now - 60_000,
+                now
+            )
 
-        return stats != null && stats.isNotEmpty()
+            stats != null && stats.isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
     }
 
     // Midnight of current day

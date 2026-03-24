@@ -56,6 +56,29 @@ class DeviceControlModule(
         }
     }
 
+
+    @ReactMethod
+    fun saveHeartbeatConfig(baseUrl: String, deviceId: String, childToken: String, promise: Promise) {
+        try {
+            PolicyStore.setHeartbeatBaseUrl(reactApplicationContext, baseUrl)
+            PolicyStore.setHeartbeatDeviceId(reactApplicationContext, deviceId)
+            PolicyStore.setHeartbeatToken(reactApplicationContext, childToken)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("SAVE_HEARTBEAT_CONFIG_ERROR", e.message, e)
+        }
+    }
+
+    @ReactMethod
+    fun syncPolicyNow(promise: Promise) {
+        try {
+            DevicePolicySyncHelper.fetchAndSavePolicy(reactApplicationContext)
+            promise.resolve(true)
+        } catch (e: Exception) {
+            promise.reject("SYNC_POLICY_ERROR", e.message, e)
+        }
+    }
+
     @ReactMethod
     fun getRemainingTime(promise: Promise) {
         try {

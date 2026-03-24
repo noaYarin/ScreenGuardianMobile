@@ -75,6 +75,12 @@ export default function LinkChildrenScreen() {
         console.log("Failed to save heartbeat config:", e);
       }
 
+      try {
+        await NativeModules.DeviceControl.syncPolicyNow();
+      } catch (e) {
+        console.log("Failed to sync initial policy:", e);
+      }
+
       dispatch(
         hydrateChildSession({
           token: res.token,

@@ -11,7 +11,7 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
 
     companion object {
         private const val TAG = "ScreenGuardianService"
-        private const val CHECK_INTERVAL_MS = 5000L
+        private const val CHECK_INTERVAL_MS = 15000L
     }
 
     private val handler = Handler(Looper.getMainLooper())
@@ -32,7 +32,11 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     private val lockChecker = object : Runnable {
         override fun run() {
             try {
+                DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext)
+                UsageStatsHelper.updateTodayUsage(applicationContext)
                 checkAndLockIfNeeded(null)
+                DeviceServerSyncHelper.sendUsage(applicationContext)
+                DeviceServerSyncHelper.sendHeartbeat(applicationContext)
             } catch (e: Exception) {
                 Log.e(TAG, "Error while checking lock state", e)
             }
@@ -67,16 +71,15 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     }
 
     private fun checkAndLockIfNeeded(currentPackage: String?) {
-        UsageStatsHelper.updateTodayUsage(applicationContext)
-
         val usedToday = PolicyStore.getUsedToday(applicationContext)
         val remaining = PolicyStore.getRemainingMinutes(applicationContext)
         val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
         val isLockNow = PolicyStore.isLockNow(applicationContext)
+        val isServerLocked = PolicyStore.isServerLocked(applicationContext)
 
-        if (isLockNow) {
+        if (isLockNow || isServerLocked) {
             PolicyStore.setBlockReason(applicationContext, "LOCK_NOW")
-        } else if (remaining <= 0) {
+        } else if (PolicyStore.isLimitEnabled(applicationContext) && remaining <= 0) {
             PolicyStore.setBlockReason(applicationContext, "DAILY_LIMIT_REACHED")
         } else {
             PolicyStore.setBlockReason(applicationContext, "")
