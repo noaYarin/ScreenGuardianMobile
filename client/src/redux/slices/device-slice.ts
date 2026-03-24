@@ -1,6 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Device } from "../../api/device";
-import { deleteDeviceForChild, fetchDevicesByChild } from "../thunks/deviceThunks";
+import {
+  deleteDeviceForChild,
+  fetchDevicesByChild,
+  updateDeviceScreenTimeThunk,
+} from "../thunks/deviceThunks";
 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -69,11 +73,25 @@ const devicesSlice = createSlice({
         state.byChildId[childId] = list.filter(
           (d) => String(d._id) !== String(deviceId)
         );
+      })
+      .addCase(updateDeviceScreenTimeThunk.fulfilled, (state, action) => {
+        const { childId, device } = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;
+
+        const idx = list.findIndex((d) => String(d._id) === String(device._id));
+        if (idx < 0) return;
+
+        state.byChildId[childId][idx] = device;
       });
   },
 });
 
 export const { clearDevicesForChild, setDeviceLockLocal } =
   devicesSlice.actions;
-export { fetchDevicesByChild, deleteDeviceForChild } from "../thunks/deviceThunks";
+export {
+  fetchDevicesByChild,
+  deleteDeviceForChild,
+  updateDeviceScreenTimeThunk,
+} from "../thunks/deviceThunks";
 export default devicesSlice.reducer;

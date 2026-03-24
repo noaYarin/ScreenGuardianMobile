@@ -85,3 +85,23 @@ export async function apiUpdateDeviceName(
   );
   return data;
 }
+
+
+export async function apiUpdateDeviceScreenTime(
+  deviceId: string,
+  payload: {
+    isLimitEnabled?: boolean;
+    dailyLimitMinutes?: number;
+    weeklyLimitMinutes?: number;
+  }
+): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/screen-time`,
+    payload,
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
