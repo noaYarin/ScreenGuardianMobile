@@ -1,11 +1,13 @@
 package com.screenguardianmobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import android.net.Uri
 
 class BlockScreenActivity : AppCompatActivity() {
 
@@ -15,7 +17,6 @@ class BlockScreenActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isOpen = true
 
         window.decorView.systemUiVisibility = (
                 View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -77,7 +78,7 @@ class BlockScreenActivity : AppCompatActivity() {
         }
 
         requestMoreTimeButton.setOnClickListener {
-            finish()
+            openAppToExtensionRequest()
         }
 
         closeButton.setOnClickListener {
@@ -87,8 +88,35 @@ class BlockScreenActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        isOpen = true
+
+        // If the device was already unlocked, close this screen automatically
+        if (!PolicyStore.shouldLockDevice(this)) {
+            finish()
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        isOpen = false
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         isOpen = false
+    }
+
+    private fun openAppToExtensionRequest() {
+        val intent = Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("screenguardianmobile://Child/extendTime")
+        ).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        }
+
+        startActivity(intent)
     }
 }

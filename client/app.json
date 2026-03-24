@@ -20,7 +20,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ScreenGuardianMobile"
+      "package": "com.screenguardianmobile"
     },
     "web": {
       "output": "static",

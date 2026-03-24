@@ -16,17 +16,17 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
 
     private val handler = Handler(Looper.getMainLooper())
 
+    // Packages allowed while the device is blocked
     private val allowedPackages = setOf(
+        // Your app
         "com.screenguardianmobile",
-        "com.android.settings",
-        "host.exp.exponent"
-    )
 
-    private val allowedPackagePrefixes = listOf(
-        "com.android.launcher",
-        "com.google.android.apps.nexuslauncher",
-        "com.sec.android.app.launcher",
-        "com.miui.home"
+        // Phone / dialer packages (common Android packages)
+        "com.google.android.dialer",
+        "com.samsung.android.dialer",
+        "com.android.dialer",
+        "com.android.server.telecom",
+        "com.android.incallui"
     )
 
     private val lockChecker = object : Runnable {
@@ -73,30 +73,38 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     private fun checkAndLockIfNeeded(currentPackage: String?) {
         val usedToday = PolicyStore.getUsedToday(applicationContext)
         val remaining = PolicyStore.getRemainingMinutes(applicationContext)
-        val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
         val isLockNow = PolicyStore.isLockNow(applicationContext)
         val isServerLocked = PolicyStore.isServerLocked(applicationContext)
+        val isLimitEnabled = PolicyStore.isLimitEnabled(applicationContext)
 
         if (isLockNow || isServerLocked) {
             PolicyStore.setBlockReason(applicationContext, "LOCK_NOW")
-        } else if (PolicyStore.isLimitEnabled(applicationContext) && remaining <= 0) {
+        } else if (isLimitEnabled && remaining <= 0) {
             PolicyStore.setBlockReason(applicationContext, "DAILY_LIMIT_REACHED")
         } else {
             PolicyStore.setBlockReason(applicationContext, "")
         }
 
+        val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
         val blockReason = PolicyStore.getBlockReason(applicationContext)
 
         Log.d(TAG, "Used today: $usedToday minutes")
         Log.d(TAG, "Remaining: $remaining minutes")
         Log.d(TAG, "Should lock device: $shouldLock")
         Log.d(TAG, "Block reason: $blockReason")
+        Log.d(TAG, "Current package: $currentPackage")
 
-        if (!shouldLock) return
-        if (BlockScreenActivity.isOpen) return
+        if (!shouldLock) {
+            return
+        }
 
         if (currentPackage != null && isPackageAllowed(currentPackage)) {
-            Log.d(TAG, "Skipping block for allowed package: $currentPackage")
+            Log.d(TAG, "Allowed package during block: $currentPackage")
+            return
+        }
+
+        if (BlockScreenActivity.isOpen) {
+            Log.d(TAG, "Block screen already open")
             return
         }
 
@@ -113,11 +121,11 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
             putExtra("extraMinutes", extraMinutes)
         }
 
+        Log.d(TAG, "Opening BlockScreenActivity")
         startActivity(intent)
     }
 
     private fun isPackageAllowed(packageName: String): Boolean {
-        if (allowedPackages.contains(packageName)) return true
-        return allowedPackagePrefixes.any { packageName.startsWith(it) }
+        return allowedPackages.contains(packageName)
     }
 }

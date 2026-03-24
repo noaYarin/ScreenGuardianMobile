@@ -59,6 +59,7 @@ object PolicyStore {
     }
 
     fun getUsedToday(context: Context): Int {
+        resetIfNewDay(context)
         return prefs(context).getInt(KEY_USED_TODAY, 0)
     }
 
@@ -72,6 +73,7 @@ object PolicyStore {
     }
 
     fun getExtraMinutes(context: Context): Int {
+        resetIfNewDay(context)
         return prefs(context).getInt(KEY_EXTRA_MINUTES, 0)
     }
 

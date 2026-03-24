@@ -84,10 +84,10 @@ export default function HomeScreen() {
       const result = await DeviceControl.getRemainingTime();
 
       setScreenTime({
-        remainingMinutes: result.remainingMinutes,
-        usedTodayMinutes: result.usedTodayMinutes,
-        dailyLimitMinutes: result.dailyLimitMinutes,
-        extraMinutes: result.extraMinutes,
+        remainingMinutes: Number(result.remainingMinutes) || 0,
+        usedTodayMinutes: Number(result.usedTodayMinutes) || 0,
+        dailyLimitMinutes: Number(result.dailyLimitMinutes) || 0,
+        extraMinutes: Number(result.extraMinutes) || 0,
       });
     } catch (e) {
       console.log("Error loading screen time", e);
@@ -134,12 +134,13 @@ export default function HomeScreen() {
       : styles.statPillMobile;
 
   const formatTime = (minutes: number) => {
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
+    const safeMinutes = Number(minutes) || 0;
+    const h = Math.floor(safeMinutes / 60);
+    const m = safeMinutes % 60;
 
-    return `${h.toString().padStart(2, "0")}:${m
+    return `\u200E${h.toString().padStart(2, "0")}:${m
       .toString()
-      .padStart(2, "0")}`;
+      .padStart(2, "0")}\u200E`;
   };
 
   const total = screenTime.dailyLimitMinutes + screenTime.extraMinutes;
@@ -257,9 +258,16 @@ export default function HomeScreen() {
               </View>
             </View>
 
-            <AppText weight="extraBold" style={[styles.timerValue, { fontSize: timerSize }]}>
-              {formatTime(screenTime.remainingMinutes)}            </AppText>
-
+            <AppText
+              weight="extraBold"
+              style={[
+                styles.timerValue,
+                { fontSize: timerSize, writingDirection: "ltr", textAlign: "center" },
+              ]}
+            >
+              {formatTime(screenTime.remainingMinutes)}
+            </AppText>
+            
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${percent}%` }]} />
             </View>
