@@ -232,7 +232,7 @@
     "success_title": "הסיסמה עודכנה",
     "success_message": "הסיסמה שלך אופסה בהצלחה."
   },
-  "homeParent": {
+    "homeParent": {
     "title": "ברוכים הבאים",
     "parent_name_fallback": "אמא",
     "hello": "שלום, {{name}}!",
@@ -242,12 +242,21 @@
     "out_of": "מתוך {{limit}}",
     "full_watch": "צפייה מלאה",
     "add_child": "הוספת ילד",
+
+    "locked": "נעול",
+    "locked_by_parent": "נעילה פעילה",
+    "locked_subtitle": "המכשיר נעול כרגע",
+    "no_limit": "ללא הגבלה",
+    "refreshing": "מתעדכן...",
+
     "overview_a11y": "מעבר לסקירה כללית",
     "full_watch_a11y": "פתיחת צפייה מלאה",
     "add_child_a11y": "הוספת ילד חדש",
     "child_card_a11y": "בחירת ילד: {{name}}",
+
     "no_children": "אין ילדים עדיין. הוסף ילד כדי להתחיל"
   },
+
   "tabs": {
     "home": "בית",
     "children": "ילדים",
@@ -364,6 +373,7 @@
     "status_connected": "מחובר",
     "status_disconnected": "לא מחובר",
     "location_unknown": "לא ידוע",
+    "lock_error": "לא הצלחנו לעדכן את מצב הנעילה",
     "select_child_a11y": "הצגת פרטים של {{name}}",
     "loading_children": "טוען ילדים…",
     "loading_sync": "מעדכן…",

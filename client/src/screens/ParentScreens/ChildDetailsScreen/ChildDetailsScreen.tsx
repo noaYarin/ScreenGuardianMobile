@@ -25,13 +25,14 @@ import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 import {
   fetchDevicesByChild,
   deleteDeviceForChild,
+  setDeviceLockThunk
 } from "@/src/redux/thunks/deviceThunks";
-import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
 import { childDetailsStyles as styles } from "@/src/components/ChildDetails/childDetails.styles";
 import { parseRouteParam } from "./childDetailsRouteParams";
+
 
 export default function ChildDetailsScreen() {
   const { t } = useTranslation();
@@ -140,7 +141,7 @@ export default function ChildDetailsScreen() {
       ? dispatch(fetchDevicesByChild(effectiveChildId)).unwrap()
       : Promise.resolve();
 
-    promise.catch(() => {}).finally(() => setDevicesRefreshing(false));
+    promise.catch(() => { }).finally(() => setDevicesRefreshing(false));
   }, [refreshChildrenList, dispatch, effectiveChildId]);
 
   // Get selected child object
@@ -248,19 +249,25 @@ export default function ChildDetailsScreen() {
   );
 
   const handleSetDeviceLocked = useCallback(
-    (deviceId: string, locked: boolean) => {
+    async (deviceId: string, locked: boolean) => {
       if (!effectiveChildId || deletingDeviceId) return;
 
-      dispatch(
-        setDeviceLockLocal({
-          childId: effectiveChildId,
-          deviceId,
-          isLocked: locked,
-        })
-      );
+      try {
+        await dispatch(
+          setDeviceLockThunk({
+            deviceId,
+            childId: effectiveChildId,
+            isLocked: locked,
+          })
+        ).unwrap();
+
+      } catch {
+        Alert.alert("", t("childDetails.lock_error"));
+      }
     },
-    [dispatch, effectiveChildId, deletingDeviceId]
+    [dispatch, effectiveChildId, deletingDeviceId, t]
   );
+
 
   const showFullScreenLoader = isLoading && children.length === 0 && !deepLinkDevices;
 

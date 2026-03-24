@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Pressable, ActivityIndicator } from "react-native";
-import { router, Stack, type Href } from "expo-router";
+import { router, Stack, type Href, useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -9,112 +9,114 @@ import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "@/src/redux/store/types";
-import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+import * as parentApi from "@/src/api/parent";
 
+type HomeSummaryChild = {
+  childId: string;
+  name: string;
+  deviceId: string | null;
+  deviceName: string | null;
+  usedTodayMinutes: number | null;
+  dailyLimitMinutes: number | null;
+  remainingMinutes: number | null;
+  status: "good" | "warn" | "bad";
+  isLocked: boolean;
+};
 
 type ChildCard = {
   id: string;
   name: string;
-  usedText: string;
-  limitText: string;
   status: "good" | "warn" | "bad";
+  isLocked: boolean;
+  usedText: string | null;
+  limitText: string | null;
 };
 
 const ICON = {
   user: "account-outline",
   menu: "menu",
   bell: "bell-outline",
+  lock: "lock-outline",
 } as const;
 
 export default function HomeParentScreen() {
   const { t } = useTranslation();
   const { row, text, isRTL } = useLocaleLayout();
 
-  const dispatch = useDispatch<AppDispatch>();
-
-  const { childrenList, isLoading, error } = useSelector(
-    (state: RootState) => state.children ?? {}
-  );
-
-  const devicesByChild = useSelector(
-    (state: RootState) => state.devices.byChildId ?? {}
-  );
-
-  const children = Array.isArray(childrenList) ? childrenList : [];
-
-  useEffect(() => {
-    dispatch(getMyChildrenThunk());
-
-    const interval = setInterval(() => {
-      dispatch(getMyChildrenThunk());
-    }, 15000); 
-
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  const [children, setChildren] = useState<HomeSummaryChild[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const parentName = t("homeParent.parent_name_fallback");
 
+  const fetchSummary = useCallback(async (background = false) => {
+    try {
+      if (background) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
 
-  function pickRepresentativeDevice(devices: any[]) {
-    if (!devices?.length) return null;
+      setError(null);
 
-    const locked = devices.find((d) => d?.isLocked);
-    if (locked) return locked;
+      const response = await parentApi.getHomeSummary();
+      setChildren(Array.isArray(response.children) ? response.children : []);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "homeParent.fetch_summary_failed";
+      setError(message);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
 
-    return devices[0];
-  }
+  useEffect(() => {
+    fetchSummary(false);
+  }, [fetchSummary]);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchSummary(true);
+    }, [fetchSummary])
+  );
+
+  const formatMinutes = (minutes: number | null) => {
+    if (minutes == null) return null;
+
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+
+    return `${h.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   const childCards: ChildCard[] = useMemo(() => {
-    const list = Array.isArray(children) ? children : [];
-
-    return list.map((child) => {
-      const childId = String(child?._id ?? "");
-      const devices = devicesByChild[childId] ?? [];
-
-      const device = pickRepresentativeDevice(devices);
-
-      const used = Number(device?.screenTime?.usedTodayMinutes ?? 0);
-      const limit = Number(device?.screenTime?.dailyLimitMinutes ?? 0);
-      const extra = Number(device?.screenTime?.extraMinutesToday ?? 0);
-
-      const totalLimit = limit + extra;
-      const remaining = Math.max(totalLimit - used, 0);
-
-      const format = (minutes: number) => {
-        const h = Math.floor(minutes / 60);
-        const m = minutes % 60;
-        return `${h.toString().padStart(2, "0")}:${m
-          .toString()
-          .padStart(2, "0")}`;
-      };
-
-      let status: "good" | "warn" | "bad" = "good";
-      if (remaining <= 0) status = "bad";
-      else if (remaining < 30) status = "warn";
-
-      return {
-        id: childId,
-        name: child?.name ?? "",
-        usedText: format(used),
-        limitText: format(totalLimit),
-        status,
-      };
-    });
-  }, [children, devicesByChild]);
-
+    return children.map((child) => ({
+      id: String(child.childId),
+      name: child.name ?? "",
+      status: child.status ?? "good",
+      isLocked: child.isLocked === true,
+      usedText: formatMinutes(child.usedTodayMinutes),
+      limitText:
+        child.dailyLimitMinutes == null
+          ? null
+          : formatMinutes(child.dailyLimitMinutes),
+    }));
+  }, [children]);
 
   const onPressOverview = () => router.push("/Parent/(tabs)/reports" as Href);
   const onPressFullWatch = () =>
     router.push("/Parent/(tabs)/children" as Href);
   const onPressAddChild = () => router.push("/Parent/addChild" as Href);
+
   const onPressChildCard = (childId: string, childName: string) =>
     router.push({
       pathname: "/Parent/childProfile" as Href,
       params: { id: childId, name: childName },
     } as never);
-
 
   const onPressNotifications = () => {
     router.push("/Parent/systemAlerts" as Href);
@@ -134,6 +136,7 @@ export default function HomeParentScreen() {
       <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
     </Pressable>
   );
+
   const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);
 
   const menuButton = (
@@ -161,13 +164,13 @@ export default function HomeParentScreen() {
           headerBackVisible: false,
           ...(isRTL
             ? {
-              headerLeft: () => menuButton,
-              headerRight: () => bellButton,
-            }
+                headerLeft: () => menuButton,
+                headerRight: () => bellButton,
+              }
             : {
-              headerRight: () => menuButton,
-              headerLeft: () => bellButton,
-            }),
+                headerRight: () => menuButton,
+                headerLeft: () => bellButton,
+              }),
         }}
       />
 
@@ -187,6 +190,7 @@ export default function HomeParentScreen() {
                 {t("homeParent.overview")}
               </AppText>
             </View>
+
             <View style={styles.summaryCard}>
               <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>
@@ -201,7 +205,9 @@ export default function HomeParentScreen() {
                   </AppText>
 
                   <AppText style={[styles.sectionSub, text]}>
-                    {t("homeParent.day_screen_time")}
+                    {isRefreshing
+                      ? t("homeParent.refreshing")
+                      : t("homeParent.day_screen_time")}
                   </AppText>
                 </View>
               </View>
@@ -213,7 +219,7 @@ export default function HomeParentScreen() {
               </View>
             ) : error ? (
               <AppText style={[styles.sectionSub, text]}>{t(error)}</AppText>
-            ) : children.length === 0 ? (
+            ) : childCards.length === 0 ? (
               <View style={styles.emptyState}>
                 <AppText style={[styles.sectionSub, text]}>
                   {t("homeParent.no_children")}
@@ -252,13 +258,20 @@ export default function HomeParentScreen() {
                       <View
                         style={[
                           styles.avatarCircle,
-                          c.status === "good" && styles.avatarGood,
-                          c.status === "warn" && styles.avatarWarn,
-                          c.status === "bad" && styles.avatarBad,
+                          c.isLocked && styles.avatarBad,
+                          !c.isLocked &&
+                            c.status === "good" &&
+                            styles.avatarGood,
+                          !c.isLocked &&
+                            c.status === "warn" &&
+                            styles.avatarWarn,
+                          !c.isLocked &&
+                            c.status === "bad" &&
+                            styles.avatarBad,
                         ]}
                       >
                         <MaterialCommunityIcons
-                          name={ICON.user}
+                          name={c.isLocked ? ICON.lock : ICON.user}
                           size={22}
                           color="#0F172A"
                         />
@@ -277,7 +290,9 @@ export default function HomeParentScreen() {
                           style={[styles.childSubtitle, text]}
                           numberOfLines={1}
                         >
-                          {t("homeParent.day_screen_time")}
+                          {c.isLocked
+                            ? t("homeParent.locked_subtitle")
+                            : t("homeParent.day_screen_time")}
                         </AppText>
                       </View>
 
@@ -287,21 +302,42 @@ export default function HomeParentScreen() {
                           isRTL ? styles.cardEdgeRtl : styles.cardEdgeLtr,
                         ]}
                       >
-                        <AppText
-                          weight="extraBold"
-                          style={[
-                            styles.timeMain,
-                            c.status === "good" && styles.timeGood,
-                            c.status === "warn" && styles.timeWarn,
-                            c.status === "bad" && styles.timeBad,
-                          ]}
-                        >
-                          {c.usedText}
-                        </AppText>
+                        {c.isLocked ? (
+                          <>
+                            <AppText
+                              weight="extraBold"
+                              style={[styles.timeMain, styles.timeBad]}
+                            >
+                              {t("homeParent.locked")}
+                            </AppText>
 
-                        <AppText style={styles.timeSub}>
-                          {t("homeParent.out_of", { limit: c.limitText })}
-                        </AppText>
+                            <AppText style={styles.timeSub}>
+                              {t("homeParent.locked_by_parent")}
+                            </AppText>
+                          </>
+                        ) : (
+                          <>
+                            <AppText
+                              weight="extraBold"
+                              style={[
+                                styles.timeMain,
+                                c.status === "good" && styles.timeGood,
+                                c.status === "warn" && styles.timeWarn,
+                                c.status === "bad" && styles.timeBad,
+                              ]}
+                            >
+                              {c.usedText ?? "--:--"}
+                            </AppText>
+
+                            <AppText style={styles.timeSub}>
+                              {c.limitText == null
+                                ? t("homeParent.no_limit")
+                                : t("homeParent.out_of", {
+                                    limit: c.limitText,
+                                  })}
+                            </AppText>
+                          </>
+                        )}
                       </View>
                     </View>
                   </Pressable>

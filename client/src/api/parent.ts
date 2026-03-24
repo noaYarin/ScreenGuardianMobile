@@ -15,6 +15,18 @@ type Child = {
   updatedAt?: string;
 };
 
+type HomeSummaryChild = {
+  childId: string;
+  name: string;
+  deviceId: string | null;
+  deviceName: string | null;
+  usedTodayMinutes: number | null;
+  dailyLimitMinutes: number | null;
+  remainingMinutes: number | null;
+  status: "good" | "warn" | "bad";
+  isLocked: boolean;
+};
+
 const URL = "/api/v1/parent";
 
 export async function addChild(body: {
@@ -53,3 +65,13 @@ export async function setChildActive(
   );
 }
 
+
+
+export async function getHomeSummary(): Promise<{
+  children: HomeSummaryChild[];
+}> {
+  return api.get<{ children: HomeSummaryChild[] }>(
+    `${URL}/home-summary`,
+    { requireAuth: true, role: "PARENT" }
+  );
+}

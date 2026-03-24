@@ -4,6 +4,7 @@ import {
   deleteDeviceForChild,
   fetchDevicesByChild,
   updateDeviceScreenTimeThunk,
+  setDeviceLockThunk
 } from "../thunks/deviceThunks";
 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
@@ -80,6 +81,18 @@ const devicesSlice = createSlice({
         if (!list) return;
 
         const idx = list.findIndex((d) => String(d._id) === String(device._id));
+        if (idx < 0) return;
+
+        state.byChildId[childId][idx] = device;
+      })
+      .addCase(setDeviceLockThunk.fulfilled, (state, action) => {
+        const { childId, device } = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;
+
+        const idx = list.findIndex(
+          (d) => String(d._id) === String(device._id)
+        );
         if (idx < 0) return;
 
         state.byChildId[childId][idx] = device;

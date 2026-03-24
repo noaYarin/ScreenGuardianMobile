@@ -237,7 +237,7 @@
     "success_title": "Password updated",
     "success_message": "Your password has been reset successfully."
   },
-  "homeParent": {
+   "homeParent": {
     "title": "Welcome",
     "parent_name_fallback": "Mom",
     "hello": "Hello, {{name}}!",
@@ -247,12 +247,21 @@
     "out_of": "out of {{limit}}",
     "full_watch": "Full view",
     "add_child": "Add child",
+
+    "locked": "Locked",
+    "locked_by_parent": "Locked by parent",
+    "locked_subtitle": "Device is currently locked",
+    "no_limit": "No limit",
+    "refreshing": "Refreshing...",
+
     "overview_a11y": "Go to overview",
     "full_watch_a11y": "Open full view",
     "add_child_a11y": "Add a new child",
     "child_card_a11y": "Select child: {{name}}",
+
     "no_children": "No children yet. Add a child to get started"
   },
+
   "tabs": {
     "home": "Home",
     "children": "Children",
@@ -406,6 +415,7 @@
     "select_child_a11y": "Show details for {{name}}",
     "loading_children": "Loading children…",
     "loading_sync": "Updating…",
+    "lock_error": "Failed to update device lock state",
     "device_detail_name": "Device name",
     "device_detail_type": "Device type",
     "device_detail_platform": "Platform",

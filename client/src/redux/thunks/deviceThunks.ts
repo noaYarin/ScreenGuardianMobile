@@ -5,6 +5,8 @@ import {
   apiUpdateDeviceName,
   type Device,
   apiUpdateDeviceScreenTime,
+  apiLockDevice,
+  apiUnlockDevice,
 } from "../../api/device";
 
 function normalizeDevice(raw: unknown): Device {
@@ -129,3 +131,28 @@ export const updateDeviceScreenTimeThunk = createAsyncThunk<
     }
   }
 );
+
+export const setDeviceLockThunk = createAsyncThunk<
+  { childId: string; device: Device },
+  { deviceId: string; childId: string; isLocked: boolean },
+  { rejectValue: string }
+>("devices/setLock", async ({ deviceId, childId, isLocked }, thunkAPI) => {
+  try {
+    const response = isLocked
+      ? await apiLockDevice(deviceId)
+      : await apiUnlockDevice(deviceId);
+
+    if (!response) {
+      return thunkAPI.rejectWithValue("devices.lock_device_failed");
+    }
+
+    return {
+      childId,
+      device: normalizeDevice(response),
+    };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "devices.lock_device_failed";
+    return thunkAPI.rejectWithValue(message);
+  }
+});

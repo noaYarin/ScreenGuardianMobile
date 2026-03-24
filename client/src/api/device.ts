@@ -105,3 +105,27 @@ export async function apiUpdateDeviceScreenTime(
   );
   return data;
 }
+
+export async function apiLockDevice(deviceId: string): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/lock`,
+    {},
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
+
+export async function apiUnlockDevice(deviceId: string): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/unlock`,
+    {},
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
