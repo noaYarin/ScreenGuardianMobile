@@ -96,6 +96,13 @@ const authSlice = createSlice({
       state.activeChildId = p.childId;
       state.deviceId = p.deviceId;
     },
+    logout: (state) => {
+      state.parentId = null;
+      state.token = null;
+      state.activeChildId = null;
+      state.childToken = null;
+      state.deviceId = null;
+    },
   },
   // extraReducers for async operations - thunks response
   extraReducers: (builder) => {
