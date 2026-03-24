@@ -873,5 +873,26 @@
       "button": "Log Out",
       "a11y": "Log out from the account"
     }
+  },
+  "childLocation": {
+    "title": "Child Location",
+    "heading": "Child Location",
+    "subtitle": "View the latest known location and quickly refresh device data",
+    "live": "Live location",
+    "detailsTitle": "Location Details",
+    "currentLocationLabel": "Current location",
+    "updatedLabel": "Updated",
+    "accuracyLabel": "Location accuracy",
+    "selectedChildLabel": "Selected child",
+    "refreshButton": "Refresh location",
+    "navigateButton": "Navigate to location",
+    "refreshA11y": "Refresh child location",
+    "navigateA11y": "Open navigation to child location",
+    "batteryValue": "{{value}}% battery",
+    "children": {
+      "noaSubtitle": "Active device",
+      "yonatanSubtitle": "At school",
+      "tamarSubtitle": "Currently connected"
+    }
   }
 }
