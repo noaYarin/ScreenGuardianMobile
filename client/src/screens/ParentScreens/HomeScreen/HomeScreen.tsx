@@ -37,24 +37,73 @@ export default function HomeParentScreen() {
   const { childrenList, isLoading, error } = useSelector(
     (state: RootState) => state.children ?? {}
   );
+
+  const devicesByChild = useSelector(
+    (state: RootState) => state.devices.byChildId ?? {}
+  );
+
   const children = Array.isArray(childrenList) ? childrenList : [];
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
+
+    const interval = setInterval(() => {
+      dispatch(getMyChildrenThunk());
+    }, 15000); 
+
+    return () => clearInterval(interval);
   }, [dispatch]);
 
   const parentName = t("homeParent.parent_name_fallback");
 
+
+  function pickRepresentativeDevice(devices: any[]) {
+    if (!devices?.length) return null;
+
+    const locked = devices.find((d) => d?.isLocked);
+    if (locked) return locked;
+
+    return devices[0];
+  }
+
   const childCards: ChildCard[] = useMemo(() => {
     const list = Array.isArray(children) ? children : [];
-    return list.map((child) => ({
-      id: String(child?._id ?? ""),
-      name: child?.name ?? "",
-      usedText: "00:00",
-      limitText: "00:00",
-      status: "good" as const,
-    }));
-  }, [children]);
+
+    return list.map((child) => {
+      const childId = String(child?._id ?? "");
+      const devices = devicesByChild[childId] ?? [];
+
+      const device = pickRepresentativeDevice(devices);
+
+      const used = Number(device?.screenTime?.usedTodayMinutes ?? 0);
+      const limit = Number(device?.screenTime?.dailyLimitMinutes ?? 0);
+      const extra = Number(device?.screenTime?.extraMinutesToday ?? 0);
+
+      const totalLimit = limit + extra;
+      const remaining = Math.max(totalLimit - used, 0);
+
+      const format = (minutes: number) => {
+        const h = Math.floor(minutes / 60);
+        const m = minutes % 60;
+        return `${h.toString().padStart(2, "0")}:${m
+          .toString()
+          .padStart(2, "0")}`;
+      };
+
+      let status: "good" | "warn" | "bad" = "good";
+      if (remaining <= 0) status = "bad";
+      else if (remaining < 30) status = "warn";
+
+      return {
+        id: childId,
+        name: child?.name ?? "",
+        usedText: format(used),
+        limitText: format(totalLimit),
+        status,
+      };
+    });
+  }, [children, devicesByChild]);
+
 
   const onPressOverview = () => router.push("/Parent/(tabs)/reports" as Href);
   const onPressFullWatch = () =>
@@ -67,24 +116,24 @@ export default function HomeParentScreen() {
     } as never);
 
 
-    const onPressNotifications = () => {
-  router.push("/Parent/systemAlerts" as Href);
-};
+  const onPressNotifications = () => {
+    router.push("/Parent/systemAlerts" as Href);
+  };
 
-const bellButton = (
-  <Pressable
-    onPress={onPressNotifications}
-    accessibilityRole="button"
-    accessibilityLabel={t("homeParent.notifications_a11y")}
-    hitSlop={10}
-    style={({ pressed }) => [
-      styles.headerMenuButton,
-      pressed && styles.headerMenuButtonPressed,
-    ]}
-  >
-    <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
-  </Pressable>
-);
+  const bellButton = (
+    <Pressable
+      onPress={onPressNotifications}
+      accessibilityRole="button"
+      accessibilityLabel={t("homeParent.notifications_a11y")}
+      hitSlop={10}
+      style={({ pressed }) => [
+        styles.headerMenuButton,
+        pressed && styles.headerMenuButtonPressed,
+      ]}
+    >
+      <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
+    </Pressable>
+  );
   const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);
 
   const menuButton = (
@@ -112,32 +161,32 @@ const bellButton = (
           headerBackVisible: false,
           ...(isRTL
             ? {
-                headerLeft: () => menuButton,
-                headerRight: () => bellButton,
-              }
+              headerLeft: () => menuButton,
+              headerRight: () => bellButton,
+            }
             : {
-                headerRight: () => menuButton,
-                headerLeft: () => bellButton,
-              }),
+              headerRight: () => menuButton,
+              headerLeft: () => bellButton,
+            }),
         }}
       />
 
       <ScreenLayout>
         <View style={styles.container}>
           <View style={styles.content}>
-          <View style={styles.header}>
-            <AppText weight="extraBold" style={[styles.bigHello, text]}>
-              {t("homeParent.hello", { name: parentName })}
-            </AppText>
+            <View style={styles.header}>
+              <AppText weight="extraBold" style={[styles.bigHello, text]}>
+                {t("homeParent.hello", { name: parentName })}
+              </AppText>
 
-            <AppText
-              onPress={onPressOverview}
-              weight="bold"
-              style={[styles.overviewLink, text]}
-            >
-              {t("homeParent.overview")}
-            </AppText>
-          </View>
+              <AppText
+                onPress={onPressOverview}
+                weight="bold"
+                style={[styles.overviewLink, text]}
+              >
+                {t("homeParent.overview")}
+              </AppText>
+            </View>
             <View style={styles.summaryCard}>
               <View style={[styles.summaryRow, row]}>
                 <View style={styles.summaryChip}>
