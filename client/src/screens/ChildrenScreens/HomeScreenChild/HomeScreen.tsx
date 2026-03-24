@@ -1,5 +1,5 @@
 // client/src/screens/ChildrenScreens/HomeScreenChild/HomeScreen.tsx
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -17,6 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { Child } from "@/src/redux/slices/children-slice";
 import { fetchCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { NativeModules } from "react-native";
+
+const { DeviceControl } = NativeModules;
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -53,6 +56,12 @@ export default function HomeScreen() {
   const helloSize = isPhone ? 22 : isTablet ? 26 : 28;
   const timerSize = isPhone ? 34 : isTablet ? 40 : 44;
 
+  const [screenTime, setScreenTime] = useState({
+    remainingMinutes: 0,
+    usedTodayMinutes: 0,
+    dailyLimitMinutes: 0,
+    extraMinutes: 0,
+  });
   const activeChildId = useSelector((state: RootState) => state.auth.activeChildId);
   const childrenList = useSelector((state: RootState) => state.children.childrenList);
   const activeChildData = useMemo(() => {
@@ -68,6 +77,33 @@ export default function HomeScreen() {
     dispatch(fetchCurrentChildProfileThunk());
   }, [dispatch, activeChildId, activeChildData]);
 
+
+
+  const loadScreenTime = async () => {
+    try {
+      const result = await DeviceControl.getRemainingTime();
+
+      setScreenTime({
+        remainingMinutes: result.remainingMinutes,
+        usedTodayMinutes: result.usedTodayMinutes,
+        dailyLimitMinutes: result.dailyLimitMinutes,
+        extraMinutes: result.extraMinutes,
+      });
+    } catch (e) {
+      console.log("Error loading screen time", e);
+    }
+  };
+
+
+  useEffect(() => {
+    loadScreenTime();
+
+    const interval = setInterval(() => {
+      loadScreenTime();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
   const userName = (
     activeChildData?.name?.trim() || t("home.default_child_display_name")
   ).trim();
@@ -82,6 +118,9 @@ export default function HomeScreen() {
     await changeLanguage(next);
   };
 
+
+
+
   const leftIcon = pickRTL(isRTL, ICON.accessibility, ICON.settings);
   const rightIcon = pickRTL(isRTL, ICON.settings, ICON.accessibility);
 
@@ -91,8 +130,22 @@ export default function HomeScreen() {
   const statPillResponsiveStyle = isLarge
     ? styles.statPillDesktop
     : isTablet
-    ? styles.statPillTablet
-    : styles.statPillMobile;
+      ? styles.statPillTablet
+      : styles.statPillMobile;
+
+  const formatTime = (minutes: number) => {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+
+    return `${h.toString().padStart(2, "0")}:${m
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const total = screenTime.dailyLimitMinutes + screenTime.extraMinutes;
+  const percent =
+    total > 0 ? (screenTime.usedTodayMinutes / total) * 100 : 0;
+
 
   return (
     <>
@@ -118,7 +171,7 @@ export default function HomeScreen() {
             <View style={[styles.topCol, { alignItems: "flex-start" }]}>
               <RoundIconButton
                 name={leftIcon}
-                onPress={() => {}}
+                onPress={() => { }}
                 accessibilityLabel={leftA11y}
               />
             </View>
@@ -134,7 +187,7 @@ export default function HomeScreen() {
             <View style={[styles.topCol, { alignItems: "flex-end" }]}>
               <RoundIconButton
                 name={rightIcon}
-                onPress={() => {}}
+                onPress={() => { }}
                 accessibilityLabel={rightA11y}
               />
             </View>
@@ -205,11 +258,10 @@ export default function HomeScreen() {
             </View>
 
             <AppText weight="extraBold" style={[styles.timerValue, { fontSize: timerSize }]}>
-              00:12:45
-            </AppText>
+              {formatTime(screenTime.remainingMinutes)}            </AppText>
 
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: "72%" }]} />
+              <View style={[styles.progressFill, { width: `${percent}%` }]} />
             </View>
 
             <AppText weight="bold" style={styles.timerSub}>
@@ -221,7 +273,7 @@ export default function HomeScreen() {
             <Tile
               iconName={ICON.apps}
               label={t("home.tile_apps")}
-              onPress={() => {}}
+              onPress={() => { }}
               colorKey="apps"
             />
 
@@ -263,21 +315,21 @@ export default function HomeScreen() {
             <Tile
               iconName={ICON.reports}
               label={t("home.tile_reports")}
-              onPress={() => {}}
+              onPress={() => { }}
               colorKey="help"
             />
 
             <Tile
               iconName={ICON.bulb}
               label={t("home.tile_ideas")}
-              onPress={() => {}}
+              onPress={() => { }}
               colorKey="ideas"
             />
 
             <Tile
               iconName={ICON.help}
               label={t("home.tile_help")}
-              onPress={() => {}}
+              onPress={() => { }}
               colorKey="help"
             />
           </View>
@@ -342,8 +394,8 @@ function StatPill({
     variant === "blue"
       ? styles.statPillBlue
       : variant === "beige"
-      ? styles.statPillBeige
-      : styles.statPillPrimary;
+        ? styles.statPillBeige
+        : styles.statPillPrimary;
 
   return (
     <View
