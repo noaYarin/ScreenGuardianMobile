@@ -21,8 +21,6 @@ type ExtensionRequestItem = {
   childId: string;
   deviceId: string;
   childName: string;
-  appName: string;
-  appIcon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   requestedMinutes: number;
   reasonKey: string;
   requestedAtKey: string;
@@ -113,8 +111,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "noa",
     deviceId: "noa-phone",
     childName: "נועה",
-    appName: "YouTube",
-    appIcon: "youtube",
     requestedMinutes: 30,
     reasonKey: "extensionRequests.reasons.studyVideo",
     requestedAtKey: "extensionRequests.requestTimes.fiveMinutesAgo",
@@ -128,8 +124,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "noa",
     deviceId: "noa-tablet",
     childName: "נועה",
-    appName: "ROBLOX",
-    appIcon: "gamepad-variant-outline",
     requestedMinutes: 15,
     reasonKey: "extensionRequests.reasons.friendsMission",
     requestedAtKey: "extensionRequests.requestTimes.fifteenMinutesAgo",
@@ -143,8 +137,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "yonatan",
     deviceId: "yonatan-phone",
     childName: "יונתן",
-    appName: "Instagram",
-    appIcon: "instagram",
     requestedMinutes: 15,
     reasonKey: "extensionRequests.reasons.chatWithFriends",
     requestedAtKey: "extensionRequests.requestTimes.oneHourAgo",
@@ -158,8 +150,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "tamar",
     deviceId: "tamar-tablet",
     childName: "תמר",
-    appName: "Duolingo",
-    appIcon: "book-open-variant",
     requestedMinutes: 20,
     reasonKey: "extensionRequests.reasons.finishLesson",
     requestedAtKey: "extensionRequests.requestTimes.tenMinutesAgo",
@@ -183,7 +173,6 @@ export default function ExtensionRequestsScreen() {
 
   const [selectedChildId, setSelectedChildId] = useState(ALL_CHILD_ID);
   const [selectedDeviceId, setSelectedDeviceId] = useState(ALL_DEVICE_ID);
-
   const [requests, setRequests] = useState<ExtensionRequestItem[]>(STATIC_REQUESTS);
 
   const selectedChild = useMemo(
@@ -389,17 +378,17 @@ export default function ExtensionRequestsScreen() {
                     style={[styles.requestCard, isWide ? styles.requestCardWide : undefined]}
                   >
                     <View style={[styles.cardTopRow, row]}>
-                      <View style={styles.appBadge}>
+                      <View style={styles.deviceBadge}>
                         <MaterialCommunityIcons
-                          name={request.appIcon}
-                          size={22}
+                          name={getDeviceIconName(request.deviceType)}
+                          size={24}
                           color="#315BFF"
                         />
                       </View>
 
                       <View style={styles.cardTopTextWrap}>
-                        <AppText weight="extraBold" style={[styles.appName, text]}>
-                          {request.appName}
+                        <AppText weight="extraBold" style={[styles.deviceName, text]}>
+                          {t(request.deviceNameKey)}
                         </AppText>
 
                         <AppText weight="medium" style={[styles.childName, text]}>
@@ -439,16 +428,29 @@ export default function ExtensionRequestsScreen() {
                       </AppText>
                     </View>
 
-                    <View style={[styles.timeRow, row]}>
-                      <MaterialCommunityIcons
-                        name="history"
-                        size={16}
-                        color="#8A94A6"
-                      />
-                      <AppText weight="medium" style={[styles.timeText, text]}>
-                        {t(request.requestedAtKey)}
-                      </AppText>
-                    </View>
+                    <View style={styles.remainingBox}>
+  <View style={isRTL ? styles.remainingRowRtl : styles.remainingRowLtr}>
+    <MaterialCommunityIcons
+      name="timer-sand"
+      size={16}
+      color="#7A8599"
+    />
+    <AppText weight="medium" style={[styles.remainingText, text]}>
+      {t(request.currentRemainingKey)}
+    </AppText>
+  </View>
+</View>
+
+<View style={isRTL ? styles.timeRowRtl : styles.timeRowLtr}>
+  <MaterialCommunityIcons
+    name="history"
+    size={16}
+    color="#8A94A6"
+  />
+  <AppText weight="medium" style={[styles.timeText, text]}>
+    {t(request.requestedAtKey)}
+  </AppText>
+</View>
 
                     <View style={[styles.actionsRow, row]}>
                       <Pressable
@@ -456,7 +458,7 @@ export default function ExtensionRequestsScreen() {
                         accessibilityRole="button"
                         accessibilityLabel={t("extensionRequests.a11y.declineRequest", {
                           childName: request.childName,
-                          appName: request.appName,
+                          deviceName: t(request.deviceNameKey),
                         })}
                         style={({ pressed }) => [
                           styles.actionButton,
@@ -475,7 +477,7 @@ export default function ExtensionRequestsScreen() {
                         accessibilityRole="button"
                         accessibilityLabel={t("extensionRequests.a11y.approveRequest", {
                           childName: request.childName,
-                          appName: request.appName,
+                          deviceName: t(request.deviceNameKey),
                         })}
                         style={({ pressed }) => [
                           styles.actionButton,

@@ -819,6 +819,27 @@
       "button": "התנתקות",
       "a11y": "התנתקות מהחשבון"
     }
+  },
+  "childLocation": {
+    "title": "מיקום הילד",
+    "heading": "מיקום הילד",
+    "subtitle": "צפייה במיקום האחרון הידוע ועדכון מהיר של נתוני המכשיר",
+    "live": "מיקום פעיל",
+    "detailsTitle": "פרטי מיקום",
+    "currentLocationLabel": "מיקום נוכחי",
+    "updatedLabel": "עודכן",
+    "accuracyLabel": "דיוק מיקום",
+    "selectedChildLabel": "ילד נבחר",
+    "refreshButton": "רענון מיקום",
+    "navigateButton": "נווט למיקום",
+    "refreshA11y": "רענון מיקום הילד",
+    "navigateA11y": "פתיחת ניווט למיקום הילד",
+    "batteryValue": "{{value}}% סוללה",
+    "children": {
+      "noaSubtitle": "מכשיר פעיל",
+      "yonatanSubtitle": "בבית הספר",
+      "tamarSubtitle": "מחוברת כעת"
+    }
   }
 }
 

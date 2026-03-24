@@ -51,7 +51,7 @@ const ACTIONS: ActionCard[] = [
     titleKey: "childProfile.actions.location.title",
     subtitleKey: "childProfile.actions.location.subtitle",
     icon: "map-marker-outline",
-    route: "/Parent/child-location",
+    route: "/Parent/childLocation",
   },
   {
     key: "requests",

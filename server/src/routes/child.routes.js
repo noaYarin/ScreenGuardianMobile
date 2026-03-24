@@ -4,6 +4,7 @@ import { requireChild } from "../middlewares/requireChild.js";
 import {
   getCurrentChildProfileController,
   updateChildInterestsController,
+  updateCurrentChildProfileController,
 } from "../controllers/child.controller.js";
 
 const router = Router();
