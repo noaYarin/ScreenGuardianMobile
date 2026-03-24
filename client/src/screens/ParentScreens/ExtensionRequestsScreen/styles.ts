@@ -77,19 +77,16 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 2,
   },
 
-sectionTitleRow: {
-  alignItems: "center",
-  gap: 10,
-  width: "100%",
-  justifyContent: "flex-start",
-},
+  sectionTitleRow: {
+    alignItems: "center",
+    gap: 10,
+    width: "100%",
+    justifyContent: "flex-start",
+  },
 
   sectionTitle: {
     fontSize: 20,
     color: "#1D2433",
-    alignContent: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
   },
 
   sectionSubtitle: {
@@ -146,7 +143,7 @@ sectionTitleRow: {
     gap: 12,
   },
 
-  appBadge: {
+  deviceBadge: {
     width: 52,
     height: 52,
     borderRadius: 16,
@@ -160,7 +157,7 @@ sectionTitleRow: {
     gap: 2,
   },
 
-  appName: {
+  deviceName: {
     fontSize: 20,
     color: "#1D2433",
   },
@@ -170,29 +167,30 @@ sectionTitleRow: {
     color: "#6F7A8F",
   },
 
-infoGrid: {
-  width: "100%",
-},
+  infoGrid: {
+    width: "100%",
+  },
+
+  infoChip: {
+    minHeight: 36,
+    borderRadius: 999,
+    backgroundColor: "#F4F7FB",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    alignItems: "center",
+    gap: 8,
+  },
 
   infoChipLtr: {
-  flexDirection: "row",
-  alignSelf: "flex-start",
-},
+    flexDirection: "row",
+    alignSelf: "flex-start",
+  },
 
-infoChipRtl: {
-  flexDirection: "row-reverse",
-  alignSelf: "flex-end",
-},
+  infoChipRtl: {
+    flexDirection: "row-reverse",
+    alignSelf: "flex-end",
+  },
 
-infoChip: {
-  minHeight: 36,
-  borderRadius: 999,
-  backgroundColor: "#F4F7FB",
-  paddingHorizontal: 12,
-  paddingVertical: 8,
-  alignItems: "center",
-  gap: 8,
-},
   infoChipText: {
     fontSize: 13,
     color: "#344054",
@@ -216,7 +214,40 @@ infoChip: {
     color: "#1D2433",
   },
 
-  timeRow: {
+  remainingBox: {
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: "#FBFCFE",
+    borderWidth: 1,
+    borderColor: "#EEF2F7",
+  },
+
+  remainingRowLtr: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  remainingRowRtl: {
+    flexDirection: "row-reverse",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  remainingText: {
+    fontSize: 13,
+    color: "#667085",
+  },
+
+  timeRowLtr: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+
+  timeRowRtl: {
+    flexDirection: "row-reverse",
     alignItems: "center",
     gap: 8,
   },

@@ -95,11 +95,16 @@ export const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
-  selectorOuter: {
+  selectorCard: {
     width: "100%",
-    backgroundColor: "rgba(255,255,255,0.14)",
-    borderRadius: 22,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
     padding: 10,
+    shadowColor: "#102A43",
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
 
   mapCard: {

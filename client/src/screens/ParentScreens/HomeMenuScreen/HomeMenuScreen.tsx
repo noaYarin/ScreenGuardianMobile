@@ -86,15 +86,7 @@ export default function HomeMenuScreen() {
                         {t(item.labelKey)}
                       </AppText>
                     </View>
-                  </View>
-
-                  <View style={styles.chevronWrap}>
-                    <MaterialCommunityIcons
-                      name={isRTL ? "chevron-left" : "chevron-right"}
-                      size={22}
-                      color="#A7B3C2"
-                    />
-                  </View>
+                  </View>                 
                 </View>
               </Pressable>
             ))}

@@ -57,7 +57,7 @@ const CHILDREN: ChildOption[] = [
   },
 ];
 
-const LOCATION_DATA: ChildLocationItem[] = [
+const LOCATION_DATA: ChildLocationItem[] = [ //static
   {
     childId: "noa",
     cityKey: "childLocation.mock.noa.city",
@@ -95,6 +95,7 @@ export default function ChildLocationScreen() {
   const [selectedChildId, setSelectedChildId] = useState<string>("noa");
 
   const isTablet = width >= 900;
+
   const selectedLocation =
     LOCATION_DATA.find((item) => item.childId === selectedChildId) ??
     LOCATION_DATA[0];
@@ -165,14 +166,14 @@ export default function ChildLocationScreen() {
                 </AppText>
               </View>
             </View>
+          </View>
 
-            <View style={styles.selectorOuter}>
-              <ChildSelector
-                childrenOptions={CHILDREN}
-                selectedChildId={selectedChildId}
-                onSelectChild={setSelectedChildId}
-              />
-            </View>
+          <View style={styles.selectorCard}>
+            <ChildSelector
+              childrenOptions={CHILDREN}
+              selectedChildId={selectedChildId}
+              onSelectChild={setSelectedChildId}
+            />
           </View>
 
           <View style={styles.mapCard}>
