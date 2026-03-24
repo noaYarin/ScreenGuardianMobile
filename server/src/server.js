@@ -8,7 +8,9 @@ import { Sentry } from "./config/sentry.js";
 
 async function bootstrap() {
   await connectMongo();
-  app.listen(env.PORT, () => logger.info(`Server running on port ${env.PORT}`));
+  app.listen(env.PORT, "0.0.0.0", () =>
+    logger.info(`Server running on port ${env.PORT}`)
+  );
 }
 
 bootstrap().catch((err) => {
