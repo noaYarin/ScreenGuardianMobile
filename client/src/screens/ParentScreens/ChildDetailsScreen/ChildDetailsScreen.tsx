@@ -118,7 +118,10 @@ export default function ChildDetailsScreen() {
   useFocusEffect(
     useCallback(() => {
       refreshChildrenList();
-    }, [refreshChildrenList])
+      if (effectiveChildId) {
+        dispatch(fetchDevicesByChild(effectiveChildId));
+      }
+    }, [refreshChildrenList, effectiveChildId, dispatch])
   );
 
   // Load devices for selected child

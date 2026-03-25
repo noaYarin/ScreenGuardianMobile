@@ -4,7 +4,7 @@ import {
   getMyChildrenThunk,
   fetchCurrentChildProfileThunk,
 } from "../thunks/childrenThunks";
-
+import { logout } from "./auth-slice"; 
 
 export type ChildGender = "boy" | "girl" | "other";
 
@@ -94,14 +94,19 @@ const childrenSlice = createSlice({
           (c) => String(c._id) === String(child._id)
         );
         if (idx >= 0) {
-          state.childrenList[idx] = child;
+          state.childrenList[idx] = child as Child;
         } else {
-          state.childrenList.push(child);
+          state.childrenList.push(child as Child);
         }
       })
       .addCase(fetchCurrentChildProfileThunk.rejected, (state, action) => {
         state.isLoading = false;
         state.error = (action.payload as string) || "children.profile_failed";
+      })
+      .addCase(logout, (state) => {
+        state.childrenList = [];
+        state.isLoading = false;
+        state.error = null;
       });
   },
 });

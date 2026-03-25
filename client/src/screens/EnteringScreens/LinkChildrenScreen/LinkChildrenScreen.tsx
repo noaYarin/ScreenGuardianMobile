@@ -61,10 +61,10 @@ export default function LinkChildrenScreen() {
   const runDeviceLink = async (params: { code: string; barcodeToken: string }) => {
     if (!tryBeginLink()) return;
     try {
-      const res = await apiLinkDevice({ ...params, ...buildDeviceConnectionPayload() });
+      const res = await apiLinkDevice({ ...params, ...(await buildDeviceConnectionPayload()) });
       dispatch(
         hydrateChildSession({
-          token: res.token,
+          childToken: res.childToken,
           parentId: res.parentId,
           childId: res.childId,
           deviceId: res.deviceId,
@@ -72,8 +72,8 @@ export default function LinkChildrenScreen() {
       );
       finishLink();
       router.replace("/Child/home");
-    } catch {
-      Alert.alert(t("linkChildren.error_title"), t("linkChildren.error_generic"));
+    } catch(err: any) {
+      Alert.alert(t("linkChildren.error_title"), err?.error?.message );
       scheduleFinishLinkAfterError();
       router.replace("Entering/roleSelectionRoute" as any);
     }
