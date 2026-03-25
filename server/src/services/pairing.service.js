@@ -111,11 +111,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
 
-//const devicePayload = validateDevicePayload(deviceName, deviceType, platform);
-  //const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
-
   // Child token is used to authenticate the child on the device
-  const tokenData = await issueChildToken(parentId, childId, deviceId);
+const tokenData = await issueChildToken(parentId, childId, deviceId);
 
 let currentDevice = await findDeviceByDeviceId(deviceId);
 
@@ -149,48 +146,4 @@ if (currentDevice) {
     ...tokenData,
     deviceId: String(deviceId),
   };
-}
-
-function validateDevicePayload(deviceName, deviceType, platform) {
-  const safeDeviceName =
-    typeof deviceName === "string" && deviceName.trim()
-      ? deviceName.trim()
-      : "Child Device";
-
-  if (!Object.values(DeviceType).includes(deviceType)) {
-    throw new AppError(PairingErrors.INVALID_DEVICE_TYPE);
-  }
-
-  if (!Object.values(DevicePlatform).includes(platform)) {
-    throw new AppError(PairingErrors.INVALID_DEVICE_PLATFORM);
-  }
-
-  return {
-    deviceName: safeDeviceName,
-    deviceType,
-    platform,
-  };
-}
-
-async function createOrGetDeviceForSession(session, devicePayload) {
-  const existing = await findDeviceByBarcodeOrCode(session);
-  if (existing) return existing;
-
-    const createdDevice = await createDevice({
-    name: devicePayload.deviceName,
-    type: devicePayload.deviceType,
-    platform: devicePayload.platform,
-    isLocked: false,
-    code: session.code || "",
-    location: "",
-    isActive: true,
-    barcodeToken: session.barcodeToken || "",
-    applications: [],
-    parentId: String(session.parentId),
-    childId: String(session.childId),
-    screenTime: {},
-  });
-
-
-  return createdDevice;
 }
