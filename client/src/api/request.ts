@@ -59,7 +59,7 @@ async function request<T>(
 
   if (!response.ok) {
     const errorMessage =
-      result?.error?.message || result?.message || i18n.t("api.generic_error");
+      result?.error?.message  || result?.message || i18n.t("api.generic_error");
     throw new Error(errorMessage);
   }
 
@@ -78,3 +78,4 @@ export const api = {
   delete: <T>(path: string, options?: RequestOptions) =>
     request<T>("DELETE", path, null, options),
 };
+

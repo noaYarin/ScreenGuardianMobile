@@ -64,7 +64,6 @@ export default function HomeScreen() {
   // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
   useEffect(() => {
     if (activeChildId == null || String(activeChildId).trim() === "") return;
-    if (activeChildData != null) return;
     dispatch(fetchCurrentChildProfileThunk());
   }, [dispatch, activeChildId, activeChildData]);
 

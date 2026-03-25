@@ -6,6 +6,7 @@ import {
   forgotPassword,
   linkDevice,
   generateCodeForPairingChild, 
+  logoutParent,
 } from "../thunks/authThunks";
 
 // Auth for parent and children
@@ -46,6 +47,7 @@ const authPending = isAnyOf(
   forgotPassword.pending,
   generateCodeForPairingChild.pending,
   linkDevice.pending,
+  logoutParent.pending,
 );
 const authFulfilled = isAnyOf(
   loginParent.fulfilled,
@@ -59,6 +61,7 @@ const authRejected = isAnyOf(
   forgotPassword.rejected,
   generateCodeForPairingChild.rejected,
   linkDevice.rejected,
+  logoutParent.rejected,
 );
 
 const authSlice = createSlice({
@@ -68,6 +71,9 @@ const authSlice = createSlice({
   reducers: {
     setError: (state, action: PayloadAction<string | null>) => {
       state.error = action.payload;
+    },
+    setAuthLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload;
     },
     hydrateParentSession: (
       state,
@@ -83,15 +89,14 @@ const authSlice = createSlice({
     hydrateChildSession: (
       state,
       action: PayloadAction<{
-        token: string;
+        childToken: string;
         parentId: string;
         childId: string;
         deviceId: string;
       }>
     ) => {
       const p = action.payload;
-      state.token = null;
-      state.childToken = p.token;
+      state.childToken = p.childToken;
       state.parentId = p.parentId;
       state.activeChildId = p.childId;
       state.deviceId = p.deviceId;
@@ -102,6 +107,8 @@ const authSlice = createSlice({
       state.activeChildId = null;
       state.childToken = null;
       state.deviceId = null;
+      state.isLoading = false;
+      state.error = null;
     },
   },
   // extraReducers for async operations - thunks response
@@ -112,7 +119,7 @@ const authSlice = createSlice({
         state.error = null;
         state.parentId = action.payload.parentId; 
         state.activeChildId = action.payload.childId;
-        state.childToken = action.payload.token;
+        state.childToken = action.payload.childToken;
         state.deviceId = action.payload.deviceId;
       
       })
@@ -149,7 +156,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setError, hydrateParentSession, hydrateChildSession } =
+export const { setError, setAuthLoading, hydrateParentSession, hydrateChildSession, logout } =
   authSlice.actions;
 
 // Export all auth thunks, now the components use it from this slice 
@@ -160,6 +167,7 @@ export {
   forgotPassword,
   generateCodeForPairingChild,
   linkDevice,
+  logoutParent,
 } from "../thunks/authThunks";
 
 export default authSlice.reducer;

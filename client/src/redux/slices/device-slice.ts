@@ -1,7 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Device } from "../../api/device";
 import { deleteDeviceForChild, fetchDevicesByChild } from "../thunks/deviceThunks";
-
+import { logout } from "./auth-slice"; 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
 type DevicesState = {
@@ -69,6 +69,11 @@ const devicesSlice = createSlice({
         state.byChildId[childId] = list.filter(
           (d) => String(d._id) !== String(deviceId)
         );
+      })
+      .addCase(logout, (state) => {
+        state.byChildId = {};
+        state.statusByChildId = {};
+        state.errorByChildId = {};
       });
   },
 });
