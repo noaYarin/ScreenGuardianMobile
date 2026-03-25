@@ -1,11 +1,20 @@
 import { API_BASE_URL } from "../config/env";
 import { getParentToken, getChildToken, removeParentToken, removeChildToken } from "../services/authStorage";
 import i18n from "../locales/i18n";
+import { logout } from "../redux/slices/auth-slice";
+import store from "../redux/store";
 
 type RequestOptions = {
   requireAuth?: boolean;
   role?: "PARENT" | "CHILD";
 };
+
+let dispatchReference: any = null;
+
+export const injectDispatch = (dispatch: any) => {
+  dispatchReference = dispatch;
+};
+
 
 async function request<T>(
   method: string,
@@ -23,11 +32,11 @@ async function request<T>(
     const parentData = await getParentToken();
     const childData = await getChildToken();
 
-    const authData = options.role === "CHILD" ? childData : parentData;
-    const token = typeof authData === "object" ? authData?.token : authData;
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    // Parent token is stored as `token`, child token is stored as `childToken`.
+    const token =
+      options.role === "CHILD" ? childData?.childToken : parentData?.token;
+
+    if (token) headers["Authorization"] = `Bearer ${token}`;
   }
 
   const response = await fetch(url, {
@@ -41,6 +50,10 @@ async function request<T>(
   if (response.status === 401) {
     await removeParentToken();
     await removeChildToken();
+    
+    if (dispatchReference) {
+      dispatchReference(logout());
+    }
     throw new Error(i18n.t("api.unauthorized"));
   }
 
