@@ -91,6 +91,7 @@ class DeviceControlModule(
                 putInt("remainingMinutes", PolicyStore.getRemainingMinutes(reactApplicationContext))
                 putBoolean("lockNow", PolicyStore.isLockNow(reactApplicationContext))
                 putBoolean("shouldLock", PolicyStore.shouldLockDevice(reactApplicationContext))
+                putBoolean("limitEnabled", PolicyStore.isLimitEnabled(reactApplicationContext))
             }
 
             promise.resolve(result)

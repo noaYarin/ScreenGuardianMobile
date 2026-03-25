@@ -61,23 +61,23 @@ export default function HomeScreen() {
     usedTodayMinutes: 0,
     dailyLimitMinutes: 0,
     extraMinutes: 0,
+    limitEnabled: false,
   });
+
   const activeChildId = useSelector((state: RootState) => state.auth.activeChildId);
   const childrenList = useSelector((state: RootState) => state.children.childrenList);
+
   const activeChildData = useMemo(() => {
     if (activeChildId == null || String(activeChildId).trim() === "") return undefined;
     const list = Array.isArray(childrenList) ? childrenList : [];
     return list.find((c: Child) => String(c._id) === String(activeChildId));
   }, [childrenList, activeChildId]);
 
-  // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
   useEffect(() => {
     if (activeChildId == null || String(activeChildId).trim() === "") return;
     if (activeChildData != null) return;
     dispatch(fetchCurrentChildProfileThunk());
   }, [dispatch, activeChildId, activeChildData]);
-
-
 
   const loadScreenTime = async () => {
     try {
@@ -88,12 +88,12 @@ export default function HomeScreen() {
         usedTodayMinutes: Number(result.usedTodayMinutes) || 0,
         dailyLimitMinutes: Number(result.dailyLimitMinutes) || 0,
         extraMinutes: Number(result.extraMinutes) || 0,
+        limitEnabled: Boolean(result.limitEnabled),
       });
     } catch (e) {
       console.log("Error loading screen time", e);
     }
   };
-
 
   useEffect(() => {
     loadScreenTime();
@@ -104,6 +104,7 @@ export default function HomeScreen() {
 
     return () => clearInterval(interval);
   }, []);
+
   const userName = (
     activeChildData?.name?.trim() || t("home.default_child_display_name")
   ).trim();
@@ -118,9 +119,6 @@ export default function HomeScreen() {
     await changeLanguage(next);
   };
 
-
-
-
   const leftIcon = pickRTL(isRTL, ICON.accessibility, ICON.settings);
   const rightIcon = pickRTL(isRTL, ICON.settings, ICON.accessibility);
 
@@ -134,7 +132,7 @@ export default function HomeScreen() {
       : styles.statPillMobile;
 
   const formatTime = (minutes: number) => {
-    const safeMinutes = Number(minutes) || 0;
+    const safeMinutes = Math.max(0, Number(minutes) || 0);
     const h = Math.floor(safeMinutes / 60);
     const m = safeMinutes % 60;
 
@@ -145,8 +143,9 @@ export default function HomeScreen() {
 
   const total = screenTime.dailyLimitMinutes + screenTime.extraMinutes;
   const percent =
-    total > 0 ? (screenTime.usedTodayMinutes / total) * 100 : 0;
-
+    screenTime.limitEnabled && total > 0
+      ? Math.min((screenTime.usedTodayMinutes / total) * 100, 100)
+      : 0;
 
   return (
     <>
@@ -265,15 +264,19 @@ export default function HomeScreen() {
                 { fontSize: timerSize, writingDirection: "ltr", textAlign: "center" },
               ]}
             >
-              {formatTime(screenTime.remainingMinutes)}
+              {!screenTime.limitEnabled
+                ? t("home.no_limit", "No limit")
+                : formatTime(screenTime.remainingMinutes)}
             </AppText>
-            
+
             <View style={styles.progressTrack}>
               <View style={[styles.progressFill, { width: `${percent}%` }]} />
             </View>
 
             <AppText weight="bold" style={styles.timerSub}>
-              {t("home.time_left_warning")}
+              {!screenTime.limitEnabled
+                ? t("home.no_limit_subtitle", "There is no active limit right now")
+                : t("home.time_left_warning")}
             </AppText>
           </View>
 

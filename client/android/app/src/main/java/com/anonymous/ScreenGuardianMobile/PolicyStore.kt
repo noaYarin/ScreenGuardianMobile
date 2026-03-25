@@ -1,6 +1,7 @@
 package com.screenguardianmobile
 
 import android.content.Context
+import java.util.Calendar
 
 object PolicyStore {
 
@@ -85,15 +86,22 @@ object PolicyStore {
         return prefs(context).getString(KEY_BLOCK_REASON, "") ?: ""
     }
 
+    // ✅ תיקון חשוב: שימוש ב-Calendar ולא בחישוב נאיבי
     fun resetIfNewDay(context: Context) {
         val prefs = prefs(context)
 
-        val today = System.currentTimeMillis() / (1000 * 60 * 60 * 24)
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+
+        val todayStart = calendar.timeInMillis
         val lastReset = prefs.getLong(KEY_LAST_RESET, -1)
 
-        if (lastReset != today) {
+        if (lastReset != todayStart) {
             prefs.edit()
-                .putLong(KEY_LAST_RESET, today)
+                .putLong(KEY_LAST_RESET, todayStart)
                 .putInt(KEY_USED_TODAY, 0)
                 .putInt(KEY_EXTRA_MINUTES, 0)
                 .putString(KEY_BLOCK_REASON, "")

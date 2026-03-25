@@ -11,17 +11,13 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
 
     companion object {
         private const val TAG = "ScreenGuardianService"
-        private const val CHECK_INTERVAL_MS = 15000L
+        private const val CHECK_INTERVAL_MS = 5000L
     }
 
     private val handler = Handler(Looper.getMainLooper())
 
-    // Packages allowed while the device is blocked
     private val allowedPackages = setOf(
-        // Your app
         "com.screenguardianmobile",
-
-        // Phone / dialer packages (common Android packages)
         "com.google.android.dialer",
         "com.samsung.android.dialer",
         "com.android.dialer",
@@ -32,11 +28,16 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     private val lockChecker = object : Runnable {
         override fun run() {
             try {
-                DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext)
-                UsageStatsHelper.updateTodayUsage(applicationContext)
-                checkAndLockIfNeeded(null)
-                DeviceServerSyncHelper.sendUsage(applicationContext)
-                DeviceServerSyncHelper.sendHeartbeat(applicationContext)
+                DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext) {
+                    try {
+                        UsageStatsHelper.updateTodayUsage(applicationContext)
+                        checkAndLockIfNeeded(null)
+                        DeviceServerSyncHelper.sendUsage(applicationContext)
+                        DeviceServerSyncHelper.sendHeartbeat(applicationContext)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error after policy sync", e)
+                    }
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Error while checking lock state", e)
             }
@@ -58,7 +59,18 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         val currentPackage = event.packageName?.toString()
         Log.d(TAG, "Window changed. Current package: $currentPackage")
 
-        checkAndLockIfNeeded(currentPackage)
+        try {
+            DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext) {
+                try {
+                    UsageStatsHelper.updateTodayUsage(applicationContext)
+                    checkAndLockIfNeeded(currentPackage)
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error after policy+usage refresh", e)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to refresh policy/usage before lock check", e)
+        }
     }
 
     override fun onInterrupt() {
@@ -76,6 +88,8 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         val isLockNow = PolicyStore.isLockNow(applicationContext)
         val isServerLocked = PolicyStore.isServerLocked(applicationContext)
         val isLimitEnabled = PolicyStore.isLimitEnabled(applicationContext)
+        val dailyLimit = PolicyStore.getDailyLimit(applicationContext)
+        val extraMinutes = PolicyStore.getExtraMinutes(applicationContext)
 
         if (isLockNow || isServerLocked) {
             PolicyStore.setBlockReason(applicationContext, "LOCK_NOW")
@@ -88,15 +102,12 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
         val blockReason = PolicyStore.getBlockReason(applicationContext)
 
-        Log.d(TAG, "Used today: $usedToday minutes")
-        Log.d(TAG, "Remaining: $remaining minutes")
-        Log.d(TAG, "Should lock device: $shouldLock")
-        Log.d(TAG, "Block reason: $blockReason")
-        Log.d(TAG, "Current package: $currentPackage")
+        Log.d(
+            TAG,
+            "usedToday=$usedToday, remaining=$remaining, dailyLimit=$dailyLimit, extraMinutes=$extraMinutes, isLimitEnabled=$isLimitEnabled, isLockNow=$isLockNow, isServerLocked=$isServerLocked, shouldLock=$shouldLock, blockReason=$blockReason, currentPackage=$currentPackage"
+        )
 
-        if (!shouldLock) {
-            return
-        }
+        if (!shouldLock) return
 
         if (currentPackage != null && isPackageAllowed(currentPackage)) {
             Log.d(TAG, "Allowed package during block: $currentPackage")
@@ -107,9 +118,6 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
             Log.d(TAG, "Block screen already open")
             return
         }
-
-        val dailyLimit = PolicyStore.getDailyLimit(applicationContext)
-        val extraMinutes = PolicyStore.getExtraMinutes(applicationContext)
 
         val intent = Intent(this, BlockScreenActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

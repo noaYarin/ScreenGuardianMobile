@@ -10,10 +10,24 @@ object DevicePolicySyncHelper {
 
     private const val TAG = "DevicePolicySync"
 
-    fun fetchAndSavePolicy(context: Context) {
-        val baseUrl = PolicyStore.getHeartbeatBaseUrl(context) ?: return
-        val deviceId = PolicyStore.getHeartbeatDeviceId(context) ?: return
-        val token = PolicyStore.getHeartbeatToken(context) ?: return
+    fun fetchAndSavePolicy(
+        context: Context,
+        onFinished: (() -> Unit)? = null
+    ) {
+        val baseUrl = PolicyStore.getHeartbeatBaseUrl(context) ?: run {
+            onFinished?.invoke()
+            return
+        }
+
+        val deviceId = PolicyStore.getHeartbeatDeviceId(context) ?: run {
+            onFinished?.invoke()
+            return
+        }
+
+        val token = PolicyStore.getHeartbeatToken(context) ?: run {
+            onFinished?.invoke()
+            return
+        }
 
         Thread {
             try {
@@ -48,10 +62,16 @@ object DevicePolicySyncHelper {
                 PolicyStore.setDailyLimit(context, dailyLimitMinutes)
                 PolicyStore.setExtraMinutes(context, extraMinutesToday)
 
-                Log.d(TAG, "Policy synced successfully")
+                Log.d(
+                    TAG,
+                    "Policy synced successfully: isLocked=$isLocked, isLimitEnabled=$isLimitEnabled, dailyLimitMinutes=$dailyLimitMinutes, extraMinutesToday=$extraMinutesToday"
+                )
+
                 connection.disconnect()
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to fetch policy", e)
+            } finally {
+                onFinished?.invoke()
             }
         }.start()
     }

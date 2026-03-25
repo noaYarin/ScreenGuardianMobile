@@ -57,6 +57,8 @@ object DeviceServerSyncHelper {
             val baseUrl = PolicyStore.getHeartbeatBaseUrl(context) ?: return
             val deviceId = PolicyStore.getHeartbeatDeviceId(context) ?: return
             val token = PolicyStore.getHeartbeatToken(context) ?: return
+
+            UsageStatsHelper.updateTodayUsage(context)
             val usedTodayMinutes = PolicyStore.getUsedToday(context)
 
             Thread {

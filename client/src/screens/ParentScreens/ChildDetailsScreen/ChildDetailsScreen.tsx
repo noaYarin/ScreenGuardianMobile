@@ -113,11 +113,15 @@ export default function ChildDetailsScreen() {
     dispatch(getMyChildrenThunk());
   }, [dispatch]);
 
-  // Refresh parent children list
+  // Refresh parent children and devices list
   useFocusEffect(
     useCallback(() => {
       refreshChildrenList();
-    }, [refreshChildrenList])
+
+      if (effectiveChildId) {
+        dispatch(fetchDevicesByChild(effectiveChildId));
+      }
+    }, [refreshChildrenList, dispatch, effectiveChildId])
   );
 
   // Load devices for selected child
