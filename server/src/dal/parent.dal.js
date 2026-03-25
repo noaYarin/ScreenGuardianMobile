@@ -154,3 +154,20 @@ export async function updateCurrentChildProfileByParentId(parentId, childId, nam
 
   return updated;
 }
+
+// Secure logout: revoke all existing JWTs issued before `lastLogoutAt`.
+export async function setParentLastLogoutAt(parentId, lastLogoutAt = new Date()) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+
+  const updated = await ParentModel.findByIdAndUpdate(
+    parentId,
+    { $set: { lastLogoutAt } },
+    { new: true, projection: { lastLogoutAt: 1 } }
+  ).lean();
+
+  if (!updated) {
+    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+  }
+
+  return updated;
+}

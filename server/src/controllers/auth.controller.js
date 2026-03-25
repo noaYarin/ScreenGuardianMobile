@@ -1,4 +1,10 @@
-import { registerParent, loginParent, forgotPassword, resetPassword } from "../services/auth.service.js";
+import {
+  registerParent,
+  loginParent,
+  forgotPassword,
+  resetPassword,
+  logoutParent,
+} from "../services/auth.service.js";
 import { Auth as AuthErrors } from "../constants/errors.js";
 
 export async function registerParentController(req, res, next) {
@@ -64,6 +70,21 @@ export async function resetPasswordController(req, res, next) {
     const data = await resetPassword({ email, otpCode, password });
 
     res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function logoutParentController(req, res, next) {
+  try {
+    const parentId = req.user?.parentId;
+    if (!parentId) {
+      const e = AuthErrors.NO_AUTH;
+      return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
+    }
+
+    await logoutParent(parentId);
+    res.status(200).json({ ok: true, message: "Logged out successfully" });
   } catch (err) {
     next(err);
   }

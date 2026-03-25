@@ -13,6 +13,8 @@ const ParentSchema = new mongoose.Schema(
     // Forgot password - add password reset code and expires
     passwordResetCode: { type: String },
     passwordResetCodeExpires: { type: Date },
+    // Used for secure logout: any JWT issued at/before this moment is rejected.
+    lastLogoutAt: { type: Date, default: null },
   },
   { timestamps: true, versionKey: false }
 );

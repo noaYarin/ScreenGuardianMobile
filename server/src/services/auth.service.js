@@ -9,6 +9,7 @@ import {
   setPasswordResetCodeByEmail,
   findParentByEmailAndValidResetCode,
   updateParentPasswordAndClearReset,
+  setParentLastLogoutAt,
 } from "../dal/parent.dal.js";
 import { Role } from "../constants/role.js";
 import { sendEmail } from "./emailService.js";
@@ -104,4 +105,10 @@ export async function resetPassword({ email, otpCode, password }) {
   const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   await updateParentPasswordAndClearReset(parent._id, hash);
   return issueAuthResponse(parent);
+}
+
+// Secure logout: invalidate existing JWTs for this parent (and their child tokens).
+export async function logoutParent(parentId) {
+  await setParentLastLogoutAt(parentId, new Date());
+  return { parentId: String(parentId) };
 }
