@@ -553,6 +553,11 @@
     "childrenSectionTitle": "Select Child",
     "devicesSectionTitle": "Select Device",
     "defaultChildSubtitle": "Personal Management",
+    "allChildren": "all children",
+    "allDevices": "all Devices",
+     "allChildrenSubtitle": "all children",
+   "allDevicesSubtitle":"all devices",
+
     "childTabA11y": "Select child {{name}}",
     "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
     "devices": {
@@ -894,5 +899,62 @@
       "yonatanSubtitle": "At school",
       "tamarSubtitle": "Currently connected"
     }
+  },
+  "activityHistory": {
+    "title": "Activity History",
+    "heading": "Activity History",
+    "subtitle": "A clean and professional view of recent actions across your children",
+    "childSectionTitle": "Choose child",
+    "filterTitle": "Filter activity",
+    "activityListTitle": "Recent activity",
+    "resultCount": "{{count}} results",
+    "activityCardA11y": "{{title}}, child: {{childName}}, time: {{time}}",
+    "filters": {
+      "all": "All",
+      "locks": "Locks",
+      "extensions": "Extensions",
+      "updates": "Updates"
+    },
+    "summary": {
+      "today": "Today's events",
+      "locks": "Locks",
+      "extensions": "Extensions"
+    },
+    "children": {
+      "tomerSubtitle": "Active today",
+      "yaelSubtitle": "Balanced usage",
+      "noamSubtitle": "Usage limits"
+    },
+    "items": {
+      "screenLocked": {
+        "title": "Device locked",
+        "description": "{{childName}}'s device was locked after screen time ended"
+      },
+      "extensionApproved": {
+        "title": "Extension approved",
+        "description": "Extra screen time was approved for {{childName}}"
+      },
+      "dailyLimitUpdated": {
+        "title": "Daily limit updated",
+        "description": "{{childName}}'s daily usage limit was updated"
+      },
+      "extensionRequested": {
+        "title": "New extension request",
+        "description": "{{childName}} sent a request for more screen time"
+      },
+      "appLocked": {
+        "title": "App blocked",
+        "description": "An app was blocked on {{childName}}'s device"
+      },
+      "deviceLocked": {
+        "title": "Remote device lock",
+        "description": "A manual lock was triggered on {{childName}}'s device"
+      }
+    },
+    "empty": {
+      "title": "No activity found",
+      "subtitle": "Try switching the selected child or changing the filter"
+    }
   }
-}
+
+  }

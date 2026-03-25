@@ -14,6 +14,7 @@ export const MENU_ITEMS: HomeMenuItem[] = [
     key: "location",
     labelKey: "homeMenu.items.location",
     icon: "map-marker",
+    route: "/Parent/childLocation" as Href,
   },
   {
     key: "requests",
@@ -40,5 +41,6 @@ export const MENU_ITEMS: HomeMenuItem[] = [
     key: "history",
     labelKey: "homeMenu.items.history",
     icon: "history",
+    route: "/Parent/activityHistory" as Href,
   },
 ];
