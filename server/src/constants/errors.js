@@ -11,7 +11,7 @@ export const Pairing = {
   INVALID_DEVICE_TYPE: { status: 400, code: "VALIDATION_ERROR", message: "deviceType is invalid" },
   CHILD_NOT_ACTIVE: { status: 400, code: "CHILD_NOT_ACTIVE", message: "Child is not active" },
   SESSION_INVALID: { status: 410, code: "SESSION_INVALID", message: "Pairing code is invalid, expired, or already used" },
-
+  DEVICE_ALREADY_LINKED: { status: 409, code: "DEVICE_ALREADY_LINKED", message: "Device is already linked to a child" },
 };
 
 

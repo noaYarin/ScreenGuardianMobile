@@ -76,11 +76,6 @@ export async function validateDeviceAccess({ deviceId, parentId, childId, allowI
     throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
   }
 
-  if (!allowInactive && device.isActive === false) {
-    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
-  }
-
-
   return device;
 }
 

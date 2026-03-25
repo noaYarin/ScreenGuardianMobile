@@ -12,7 +12,7 @@ import {
 } from "../dal/pairing.dal.js";
 import { getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
-import { createDevice, findDeviceByBarcodeOrCode } from "../dal/device.dal.js";
+import { createDevice, findDeviceByBarcodeOrCode, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
 import { DeviceType } from "../constants/deviceType.js";
 
 const PAIRING_TTL_MINUTES = 5;
@@ -90,7 +90,7 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER", }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER",deviceId = "" }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -98,8 +98,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
     throw new AppError(PairingErrors.SESSION_NOT_FOUND);
   }
 
-
-
+  const sessionCode = session.code;
+  const sessionBarcode = session.barcodeToken;
   // Check if session is already used or expired
   const consumed = await consumePairingSession(session._id);
   if (!consumed) {
@@ -111,15 +111,43 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
 
-  const devicePayload = validateDevicePayload(deviceName, deviceType, platform);
-  const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
+//const devicePayload = validateDevicePayload(deviceName, deviceType, platform);
+  //const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
 
   // Child token is used to authenticate the child on the device
-  const tokenData = await issueChildToken(parentId, childId);
+  const tokenData = await issueChildToken(parentId, childId, deviceId);
+
+let currentDevice = await findDeviceByDeviceId(deviceId);
+
+if (currentDevice) {
+  if (currentDevice.isActive) {
+    throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
+  }
+  
+  await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
+
+} else {
+  currentDevice = await createDevice({
+    deviceId,
+    deviceName,
+    deviceType,
+    platform,
+    isLocked: false,
+    code: sessionCode || "",
+    location: "",
+    isActive: true,
+    barcodeToken: sessionBarcode || "",
+    applications: [],
+    parentId: String(session.parentId),
+    childId: String(session.childId),
+    screenTime: {},
+    isActive: true
+  });
+}
 
   return {
     ...tokenData,
-    deviceId: String(currentDevice._id),
+    deviceId: String(deviceId),
   };
 }
 

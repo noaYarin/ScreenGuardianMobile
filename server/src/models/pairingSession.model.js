@@ -5,6 +5,7 @@ const PairingSessionSchema = new mongoose.Schema(
     code: { type: String, required: true, unique: true, index: true },
     barcodeToken: { type: String, required: true, unique: true, index: true },
     parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
+    deviceId: { type: String, default: null },
     childId: { type: mongoose.Schema.Types.ObjectId, required: true },
     expiresAt: {
       type: Date,

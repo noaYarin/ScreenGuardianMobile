@@ -27,12 +27,24 @@ function issueAuthResponse(parent) {
   return { token, parentId };
 }
 
-export async function issueChildToken(parentId, childId) {
+export async function issueChildToken(parentId, childId, deviceId) {
   const parentIdStr = parentId != null ? String(parentId) : null;
   const childIdStr = childId != null ? String(childId) : null;
-  // JWT with parentId and childId 
-  const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: Role.CHILD });
-  return { token, parentId: parentIdStr, childId: childIdStr };
+  const deviceIdStr = deviceId != null ? String(deviceId) : null;
+
+  const token = signToken({ 
+    parentId: parentIdStr, 
+    childId: childIdStr, 
+    deviceId: deviceIdStr, 
+    role: Role.CHILD 
+  });
+
+  return { 
+    token, 
+    parentId: parentIdStr, 
+    childId: childIdStr,
+    deviceId: deviceIdStr 
+  };
 }
 
 export async function registerParent({ email, password, name, phoneNumber }) {

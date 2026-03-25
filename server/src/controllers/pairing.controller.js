@@ -14,8 +14,8 @@ export async function generatePairingController(req, res, next) {
 
 export async function linkPairingController(req, res, next) {
   try {
-    const { code, barcodeToken, deviceName, deviceType, platform} = req.body ?? {};
-    const data = await linkByCodeOrToken({ code, barcodeToken, deviceName, deviceType, platform, });
+    const { code, barcodeToken, deviceName, deviceType, platform, deviceId} = req.body ?? {};
+    const data = await linkByCodeOrToken({ code, barcodeToken, deviceName, deviceType, platform, deviceId});
     res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);

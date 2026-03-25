@@ -6,6 +6,7 @@ import {
   logoutParent,
 } from "../services/auth.service.js";
 import { Auth as AuthErrors } from "../constants/errors.js";
+import { updateDevicesIsActiveByParentId } from "../dal/device.dal.js";
 
 export async function registerParentController(req, res, next) {
   try {
@@ -82,6 +83,8 @@ export async function logoutParentController(req, res, next) {
       const e = AuthErrors.NO_AUTH;
       return res.status(e.status).json({ ok: false, error: { code: e.code, message: e.message } });
     }
+
+    await updateDevicesIsActiveByParentId(parentId, false);
 
     await logoutParent(parentId);
     res.status(200).json({ ok: true, message: "Logged out successfully" });
