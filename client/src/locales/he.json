@@ -371,6 +371,9 @@
     "device_detail_type": "סוג מכשיר",
     "device_detail_platform": "פלטפורמה",
     "device_detail_location": "מיקום",
+    "device_active": "פעיל",
+    "device_active_yes": "כן",
+    "device_active_no": "לא",
     "device_lock": "נעילה",
     "device_unlock": "שחרור",
     "device_lock_a11y": "נעילת המכשיר {{name}}",
@@ -822,7 +825,8 @@
     },
     "logout": {
       "button": "התנתקות",
-      "a11y": "התנתקות מהחשבון"
+      "a11y": "התנתקות מהחשבון",
+      "failed": "ההתנתקות נכשלה"
     }
   },
   "childLocation": {

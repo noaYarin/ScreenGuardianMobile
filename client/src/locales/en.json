@@ -410,6 +410,9 @@
     "device_detail_type": "Device type",
     "device_detail_platform": "Platform",
     "device_detail_location": "Location",
+    "device_active": "Active",
+    "device_active_yes": "Yes",
+    "device_active_no": "No",
     "device_lock": "Lock",
     "device_unlock": "Unlock",
     "device_lock_a11y": "Lock device {{name}}",
@@ -876,7 +879,8 @@
     },
     "logout": {
       "button": "Log Out",
-      "a11y": "Log out from the account"
+      "a11y": "Log out from the account",
+      "failed": "Logout failed"
     }
   },
   "childLocation": {
