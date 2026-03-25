@@ -499,6 +499,11 @@
     "childrenSectionTitle": "בחירת ילד",
     "devicesSectionTitle": "בחירת מכשיר",
     "defaultChildSubtitle": "ניהול אישי",
+    "allChildren": "כל הילדים",
+    "allDevices": "כל המכשירים",
+   "allChildrenSubtitle": "כל הילדים",
+   "allDevicesSubtitle":"כל המכשירים",
+
     "childTabA11y": "בחירת הילד {{name}}",
     "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
     "devices": {
@@ -839,6 +844,62 @@
       "noaSubtitle": "מכשיר פעיל",
       "yonatanSubtitle": "בבית הספר",
       "tamarSubtitle": "מחוברת כעת"
+    }
+  },
+  "activityHistory": {
+    "title": "היסטוריית פעילות",
+    "heading": "היסטוריית פעילות",
+    "subtitle": "מעקב נוח וברור אחרי פעולות שבוצעו לילדים לאורך היום",
+    "childSectionTitle": "בחירת ילד",
+    "filterTitle": "סינון פעילות",
+    "activityListTitle": "פעילות אחרונה",
+    "resultCount": "{{count}} תוצאות",
+    "activityCardA11y": "{{title}}, ילד: {{childName}}, שעה: {{time}}",
+    "filters": {
+      "all": "הכל",
+      "locks": "נעילות",
+      "extensions": "הארכות זמן",
+      "updates": "עדכונים"
+    },
+    "summary": {
+      "today": "פעילויות היום",
+      "locks": "נעילות",
+      "extensions": "הארכות"
+    },
+    "children": {
+      "tomerSubtitle": "שימוש פעיל היום",
+      "yaelSubtitle": "זמן מסך מאוזן",
+      "noamSubtitle": "הגבלות פעילות"
+    },
+    "items": {
+      "screenLocked": {
+        "title": "נעילת מכשיר",
+        "description": "המכשיר של {{childName}} ננעל לאחר סיום זמן המסך"
+      },
+      "extensionApproved": {
+        "title": "אישור הארכת זמן",
+        "description": "אושרה תוספת זמן עבור {{childName}}"
+      },
+      "dailyLimitUpdated": {
+        "title": "שינוי מגבלה יומית",
+        "description": "עודכנה מגבלת הזמן היומית של {{childName}}"
+      },
+      "extensionRequested": {
+        "title": "בקשת הארכה חדשה",
+        "description": "{{childName}} שלח/ה בקשה להארכת זמן מסך"
+      },
+      "appLocked": {
+        "title": "חסימת אפליקציה",
+        "description": "נחסמה אפליקציה במכשיר של {{childName}}"
+      },
+      "deviceLocked": {
+        "title": "נעילת התקן מרחוק",
+        "description": "בוצעה נעילה ידנית למכשיר של {{childName}}"
+      }
+    },
+    "empty": {
+      "title": "לא נמצאה פעילות",
+      "subtitle": "נסי לבחור ילד אחר או לשנות את הסינון כדי לראות תוצאות"
     }
   }
 }

@@ -12,7 +12,9 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Href, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-
+import ChildDeviceSelector, {
+  type ChildOption,
+} from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import ChildSelector, {
@@ -155,36 +157,37 @@ export default function ChildDetailsScreen() {
 
   const deviceRows = useMemo(() => mapDevicesToRows(devices, t), [devices, t]);
 
-  const childSelectorOptions = useMemo<ChildSelectorOption[]>(
-    () =>
-      children.map((child, index) => {
-        const fullName =
-          typeof child.name === "string" && child.name.trim()
-            ? child.name.trim()
-            : t("childSelector.defaultChildSubtitle");
+const childDeviceOptions = useMemo<ChildOption[]>(
+  () =>
+    children.map((child, index) => {
+      const fullName =
+        typeof child.name === "string" && child.name.trim()
+          ? child.name.trim()
+          : t("childSelector.defaultChildSubtitle");
 
-        const initial =
-          fullName.length > 0 ? fullName.charAt(0).toUpperCase() : "?";
+      const initial =
+        fullName.length > 0 ? fullName.charAt(0).toUpperCase() : "?";
 
-        const accentPalette = [
-          "#7C3AED",
-          "#2563EB",
-          "#10B981",
-          "#F59E0B",
-          "#EF4444",
-          "#EC4899",
-        ];
+      const accentPalette = [
+        "#7C3AED",
+        "#2563EB",
+        "#10B981",
+        "#F59E0B",
+        "#EF4444",
+        "#EC4899",
+      ];
 
-        return {
-          id: String(child._id),
-          name: fullName,
-          initial,
-          accent: accentPalette[index % accentPalette.length],
-          subtitleKey: "childSelector.defaultChildSubtitle",
-        };
-      }),
-    [children, t]
-  );
+      return {
+        id: String(child._id),
+        name: fullName,
+        initial,
+        accent: accentPalette[index % accentPalette.length],
+        subtitleKey: "childSelector.defaultChildSubtitle",
+        devices: [],
+      };
+    }),
+  [children, t]
+);
 
   const handleRetryLoadChildren = useCallback(() => {
     refreshChildrenList();
@@ -354,14 +357,15 @@ export default function ChildDetailsScreen() {
             </View>
           ) : null}
 
-          <ChildSelector
-            childrenOptions={childSelectorOptions}
-            selectedChildId={effectiveChildId}
-            onSelectChild={(childId) => {
-              setUserSelectedChildId(childId);
-              setIsDevicesExpanded(false);
-            }}
-          />
+          <ChildDeviceSelector
+  childrenOptions={childDeviceOptions}
+  selectedChildId={effectiveChildId}
+  onSelectChild={(childId) => {
+    setUserSelectedChildId(childId);
+    setIsDevicesExpanded(false);
+  }}
+  showDevices={false}
+/>
 
           <ChildDetailsProfileCard
             childName={childName}

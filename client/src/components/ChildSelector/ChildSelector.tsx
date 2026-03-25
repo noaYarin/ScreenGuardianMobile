@@ -35,14 +35,13 @@ export default function ChildSelector({
 
   if (!childrenOptions.length) return null;
 
-  // 🔥 רוחב דינמי קטן יותר לטלפון
+
   const cardWidth = useMemo(() => {
     if (width < 380) return 110;
     if (width < 450) return 120;
     return 132;
   }, [width]);
 
-  // 🔥 אם מעט ילדים → נמרכז
   const shouldCenter = childrenOptions.length <= 2;
 
   return (

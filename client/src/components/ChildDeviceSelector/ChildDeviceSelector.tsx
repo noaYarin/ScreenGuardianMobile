@@ -26,33 +26,48 @@ export type ChildOption = {
   devices: ChildDevice[];
 };
 
+export const ALL_CHILD_ID = "all-children";
+export const ALL_DEVICE_ID = "all-devices";
+
 type Props = {
   childrenOptions: ChildOption[];
   selectedChildId: string;
-  selectedDeviceId: string;
   onSelectChild: (childId: string) => void;
-  onSelectDevice: (deviceId: string) => void;
+
+  showDevices?: boolean;
+  selectedDeviceId?: string;
+  onSelectDevice?: (deviceId: string) => void;
+
   childSectionTitleKey?: string;
   deviceSectionTitleKey?: string;
   childCardWidth?: number;
+
+  includeAllChildrenOption?: boolean;
+  includeAllDevicesOption?: boolean;
+  allChildrenLabel?: string;
+  allDevicesLabel?: string;
+  allChildrenSubtitleKey?: string;
 };
 
 export default function ChildDeviceSelector({
   childrenOptions,
   selectedChildId,
-  selectedDeviceId,
   onSelectChild,
+  showDevices = true,
+  selectedDeviceId,
   onSelectDevice,
   childSectionTitleKey = "childDeviceSelector.childrenSectionTitle",
   deviceSectionTitleKey = "childDeviceSelector.devicesSectionTitle",
   childCardWidth,
+  includeAllChildrenOption = false,
+  includeAllDevicesOption = false,
+  allChildrenLabel,
+  allDevicesLabel,
+  allChildrenSubtitleKey = "childDeviceSelector.allChildrenSubtitle",
 }: Props) {
   const { width } = useWindowDimensions();
   const { t } = useTranslation();
   const { isRTL, text, row } = useLocaleLayout();
-
-  const selectedChild =
-    childrenOptions.find((child) => child.id === selectedChildId) ?? childrenOptions[0];
 
   const computedChildCardWidth = useMemo(() => {
     if (typeof childCardWidth === "number") {
@@ -70,12 +85,73 @@ export default function ChildDeviceSelector({
     return 170;
   }, [width]);
 
-  const shouldCenterChildren = childrenOptions.length <= 2;
-  const shouldCenterDevices = (selectedChild?.devices?.length ?? 0) <= 2;
+  const allDeviceOption = useMemo<ChildDevice>(
+    () => ({
+      id: ALL_DEVICE_ID,
+      type: "phone",
+      name: allDevicesLabel ?? t("childDeviceSelector.allDevices"),
+      icon: "devices",
+    }),
+    [allDevicesLabel, t]
+  );
 
-  if (!selectedChild) {
+  const resolvedChildrenOptions = useMemo<ChildOption[]>(() => {
+    const baseChildren = childrenOptions.map((child) => ({
+      ...child,
+      devices: includeAllDevicesOption ? [allDeviceOption, ...child.devices] : child.devices,
+    }));
+
+    if (!includeAllChildrenOption) {
+      return baseChildren;
+    }
+
+    const allChildrenOption: ChildOption = {
+      id: ALL_CHILD_ID,
+      name: allChildrenLabel ?? t("childDeviceSelector.allChildren"),
+      initial: "ה",
+      accent: "#315BFF",
+      subtitleKey: allChildrenSubtitleKey,
+      devices: [allDeviceOption],
+    };
+
+    return [allChildrenOption, ...baseChildren];
+  }, [
+    childrenOptions,
+    includeAllDevicesOption,
+    includeAllChildrenOption,
+    allChildrenLabel,
+    allChildrenSubtitleKey,
+    allDeviceOption,
+    t,
+  ]);
+
+  const selectedChild =
+    resolvedChildrenOptions.find((child) => child.id === selectedChildId) ??
+    resolvedChildrenOptions[0];
+
+  const shouldCenterChildren = resolvedChildrenOptions.length <= 2;
+  const shouldCenterDevices =
+    showDevices && (selectedChild?.devices?.length ?? 0) <= 2;
+
+  if (!resolvedChildrenOptions.length || !selectedChild) {
     return null;
   }
+
+  const handleSelectChild = (childId: string) => {
+    onSelectChild(childId);
+
+    if (!showDevices || !onSelectDevice) {
+      return;
+    }
+
+    const nextChild = resolvedChildrenOptions.find((child) => child.id === childId);
+
+    if (nextChild?.devices?.length) {
+      onSelectDevice(nextChild.devices[0].id);
+    } else {
+      onSelectDevice("");
+    }
+  };
 
   return (
     <View style={styles.wrapper}>
@@ -94,13 +170,13 @@ export default function ChildDeviceSelector({
               shouldCenterChildren ? styles.childrenRowCentered : null,
             ]}
           >
-            {childrenOptions.map((child) => {
+            {resolvedChildrenOptions.map((child) => {
               const isSelected = child.id === selectedChildId;
 
               return (
                 <Pressable
                   key={child.id}
-                  onPress={() => onSelectChild(child.id)}
+                  onPress={() => handleSelectChild(child.id)}
                   accessibilityRole="button"
                   accessibilityLabel={t("childDeviceSelector.childTabA11y", {
                     name: child.name,
@@ -130,9 +206,17 @@ export default function ChildDeviceSelector({
                         { backgroundColor: child.accent },
                       ]}
                     >
-                      <AppText weight="extraBold" style={styles.childAvatarText}>
-                        {child.initial}
-                      </AppText>
+                      {child.id === ALL_CHILD_ID ? (
+                        <MaterialCommunityIcons
+                          name="account-group-outline"
+                          size={18}
+                          color="#FFFFFF"
+                        />
+                      ) : (
+                        <AppText weight="extraBold" style={styles.childAvatarText}>
+                          {child.initial}
+                        </AppText>
+                      )}
                     </View>
                   </View>
 
@@ -174,79 +258,83 @@ export default function ChildDeviceSelector({
         </View>
       </View>
 
-      <View style={styles.section}>
-        <AppText weight="bold" style={[styles.sectionTitle, text]}>
-          {t(deviceSectionTitleKey)}
-        </AppText>
+      {showDevices ? (
+        <View style={styles.section}>
+          <AppText weight="bold" style={[styles.sectionTitle, text]}>
+            {t(deviceSectionTitleKey)}
+          </AppText>
 
-        <View style={styles.devicesViewport}>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[
-              styles.devicesRow,
-              isRTL ? styles.devicesRowRtl : styles.devicesRowLtr,
-              shouldCenterDevices ? styles.devicesRowCentered : null,
-            ]}
-          >
-            {selectedChild.devices.map((device) => {
-              const isSelected = device.id === selectedDeviceId;
+          <View style={styles.devicesViewport}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={[
+                styles.devicesRow,
+                isRTL ? styles.devicesRowRtl : styles.devicesRowLtr,
+                shouldCenterDevices ? styles.devicesRowCentered : null,
+              ]}
+            >
+              {selectedChild.devices.map((device) => {
+                const isSelected = device.id === selectedDeviceId;
 
-              return (
-                <Pressable
-                  key={device.id}
-                  onPress={() => onSelectDevice(device.id)}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("childDeviceSelector.deviceTabA11y", {
-                    childName: selectedChild.name,
-                    deviceName: device.name,
-                  })}
-                  style={({ pressed }) => [
-                    styles.deviceChip,
-                    row,
-                    { minWidth: computedDeviceChipWidth },
-                    isSelected && styles.deviceChipSelected,
-                    pressed ? styles.pressed : null,
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.deviceIconWrap,
-                      isSelected && styles.deviceIconWrapSelected,
+                return (
+                  <Pressable
+                    key={device.id}
+                    onPress={() => onSelectDevice?.(device.id)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("childDeviceSelector.deviceTabA11y", {
+                      childName: selectedChild.name,
+                      deviceName: device.name,
+                    })}
+                    style={({ pressed }) => [
+                      styles.deviceChip,
+                      row,
+                      { minWidth: computedDeviceChipWidth },
+                      isSelected && styles.deviceChipSelected,
+                      pressed ? styles.pressed : null,
                     ]}
                   >
-                    <MaterialCommunityIcons
-                      name={device.icon}
-                      size={20}
-                      color={isSelected ? "#FFFFFF" : "#3D6BF2"}
-                    />
-                  </View>
-
-                  <View style={styles.deviceTextWrap}>
-                    <AppText
-                      weight="bold"
-                      style={[styles.deviceName, text]}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
+                    <View
+                      style={[
+                        styles.deviceIconWrap,
+                        isSelected && styles.deviceIconWrapSelected,
+                      ]}
                     >
-                      {device.name}
-                    </AppText>
+                      <MaterialCommunityIcons
+                        name={device.icon}
+                        size={20}
+                        color={isSelected ? "#FFFFFF" : "#3D6BF2"}
+                      />
+                    </View>
 
-                    <AppText
-                      weight="medium"
-                      style={[styles.deviceType, text]}
-                      numberOfLines={1}
-                      ellipsizeMode="tail"
-                    >
-                      {t(`childDeviceSelector.devices.${device.type}`)}
-                    </AppText>
-                  </View>
-                </Pressable>
-              );
-            })}
-          </ScrollView>
+                    <View style={styles.deviceTextWrap}>
+                      <AppText
+                        weight="bold"
+                        style={[styles.deviceName, text]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {device.name}
+                      </AppText>
+
+                      <AppText
+                        weight="medium"
+                        style={[styles.deviceType, text]}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {device.id === ALL_DEVICE_ID
+                          ? t("childDeviceSelector.allDevicesSubtitle")
+                          : t(`childDeviceSelector.devices.${device.type}`)}
+                      </AppText>
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
         </View>
-      </View>
+      ) : null}
     </View>
   );
 }
