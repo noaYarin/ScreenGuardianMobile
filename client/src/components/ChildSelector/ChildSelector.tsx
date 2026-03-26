@@ -2,11 +2,21 @@ import React, { useMemo } from "react";
 import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
+import { CHILD_ACCENT_COLORS } from "../../../../server/src/constants/childAccentColors";
+
 import AppText from "../AppText/AppText";
 import { styles } from "./styles";
 
 import { useTranslation } from "../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../hooks/use-locale-layout";
+import type { RootState } from "@/src/redux/store/types";
+import { useSelector } from "react-redux";
+
+// Get accent color for child id using the sum of the character codes
+function accentColorForChildId(childId: string): string {
+  const sum = [...childId].reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return CHILD_ACCENT_COLORS[sum % CHILD_ACCENT_COLORS.length];
+}
 
 export type ChildSelectorOption = {
   id: string;
@@ -17,14 +27,12 @@ export type ChildSelectorOption = {
 };
 
 type Props = {
-  childrenOptions: ChildSelectorOption[];
   selectedChildId: string;
   onSelectChild: (childId: string) => void;
   childSectionTitleKey?: string;
 };
 
 export default function ChildSelector({
-  childrenOptions,
   selectedChildId,
   onSelectChild,
   childSectionTitleKey = "childSelector.childrenSectionTitle",
@@ -32,15 +40,17 @@ export default function ChildSelector({
   const { t } = useTranslation();
   const { isRTL, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
-
-  if (!childrenOptions.length) return null;
-
+  const childrenOptions = useSelector(
+    (state: RootState) => state.children.childrenList ?? []
+  );
 
   const cardWidth = useMemo(() => {
     if (width < 380) return 110;
     if (width < 450) return 120;
     return 132;
   }, [width]);
+
+  if (!childrenOptions.length) return null;
 
   const shouldCenter = childrenOptions.length <= 2;
 
@@ -58,24 +68,28 @@ export default function ChildSelector({
             contentContainerStyle={[
               styles.childrenRow,
               isRTL ? styles.childrenRowRtl : styles.childrenRowLtr,
-              shouldCenter && styles.childrenRowCentered, // 🔥 חדש
+              shouldCenter && styles.childrenRowCentered, 
             ]}
           >
             {childrenOptions.map((child) => {
-              const isSelected = child.id === selectedChildId;
+              const childId = String(child._id);
+              const accentColor = accentColorForChildId(childId);
+              const childName = String(child.name ?? "");
+              const childInitial = childName.trim()[0] ?? "";
+              const isSelected = childId === selectedChildId;
 
               return (
                 <Pressable
-                  key={child.id}
-                  onPress={() => onSelectChild(child.id)}
+                  key={childId}
+                  onPress={() => onSelectChild(childId)}
                   style={({ pressed }) => [
                     styles.childCard,
-                    { width: cardWidth }, // 🔥 דינמי
+                    { width: cardWidth }, 
                     isSelected && [
                       styles.childCardSelected,
                       {
-                        borderColor: child.accent,
-                        shadowColor: child.accent,
+                        borderColor: accentColor,
+                        shadowColor: accentColor,
                       },
                     ],
                     pressed ? styles.pressed : null,
@@ -90,11 +104,11 @@ export default function ChildSelector({
                     <View
                       style={[
                         styles.childAvatarCircle,
-                        { backgroundColor: child.accent },
+                      { backgroundColor: accentColor },
                       ]}
                     >
                       <AppText weight="extraBold" style={styles.childAvatarText}>
-                        {child.initial}
+                      {childInitial}
                       </AppText>
                     </View>
                   </View>
@@ -104,17 +118,7 @@ export default function ChildSelector({
                     style={styles.childName}
                     numberOfLines={1}
                   >
-                    {child.name}
-                  </AppText>
-
-                  <AppText
-                    weight="medium"
-                    style={[styles.childSubtitle, text]}
-                    numberOfLines={1}
-                  >
-                    {child.subtitleKey
-                      ? t(child.subtitleKey)
-                      : t("childSelector.defaultChildSubtitle")}
+                  {childName}
                   </AppText>
 
                   {isSelected && (
@@ -124,7 +128,7 @@ export default function ChildSelector({
                         isRTL
                           ? styles.selectedBadgeRtl
                           : styles.selectedBadgeLtr,
-                        { backgroundColor: child.accent },
+                        { backgroundColor: accentColor },
                       ]}
                     >
                       <MaterialCommunityIcons
