@@ -80,9 +80,23 @@ export async function apiLinkDevice(
     deviceType?: string;
     platform?: string;
   }
-): Promise<{ childToken: string; parentId: string; childId: string; deviceId: string }> {
+): Promise<{
+  childToken: string;
+  parentId: string;
+  childId: string;
+  deviceId: string;
+  physicalId?: string;
+  childName?: string;
+}> {
     // Server returns `token` (child JWT). We normalize it to `childToken` in the client.
-    const data = await api.post<{ token: string; parentId: string; childId: string; deviceId: string }>(
+    const data = await api.post<{
+      token: string;
+      parentId: string;
+      childId: string;
+      deviceId: string;
+      physicalId?: string;
+      childName?: string;
+    }>(
     `${PAIRING_URL}/link-device`,
     params
   );
@@ -94,6 +108,7 @@ export async function apiLinkDevice(
       childId: data.childId,
       parentId: data.parentId,
       deviceId: data.deviceId,
+      physicalId: data.physicalId,
     });
   }
 
@@ -102,6 +117,8 @@ export async function apiLinkDevice(
     parentId: data.parentId,
     childId: data.childId,
     deviceId: data.deviceId,
+    physicalId: data.physicalId,
+    childName: data.childName,
   };
 }
 

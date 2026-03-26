@@ -13,6 +13,7 @@ export type ChildAuthData = {
   childId: string;
   parentId: string;
   deviceId: string;
+  physicalId?: string;
 };
 
 export async function getParentToken(): Promise<ParentAuthData | null> {

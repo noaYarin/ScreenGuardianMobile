@@ -1,7 +1,7 @@
 // client/src/screens/ChildrenScreens/HomeScreenChild/HomeScreen.tsx
 import React, { useEffect, useMemo } from "react";
-import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
-import { router, Stack, type Href } from "expo-router";
+import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle, Alert } from "react-native";
+import { router, Stack, useLocalSearchParams, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -17,6 +17,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Child } from "@/src/redux/slices/children-slice";
 import { fetchCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import * as Location from "expo-location";
+import { updateDeviceLocation } from "@/src/redux/thunks/deviceThunks";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -40,6 +42,7 @@ const ICON = {
 
 export default function HomeScreen() {
   const { t, currentLanguage, changeLanguage } = useTranslation();
+  const params = useLocalSearchParams<{ initialName?: string }>();
   const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
   const dispatch = useDispatch<AppDispatch>();
@@ -60,15 +63,45 @@ export default function HomeScreen() {
     const list = Array.isArray(childrenList) ? childrenList : [];
     return list.find((c: Child) => String(c._id) === String(activeChildId));
   }, [childrenList, activeChildId]);
+  const deviceId = useSelector((state: RootState) => state.auth.deviceId);
 
   // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
   useEffect(() => {
     if (activeChildId == null || String(activeChildId).trim() === "") return;
+  
     dispatch(fetchCurrentChildProfileThunk());
-  }, [dispatch, activeChildId, activeChildData]);
+  
+    const syncLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+  
+        const loc = await Location.getCurrentPositionAsync({ 
+          accuracy: Location.Accuracy.Balanced 
+        });
+  
+        if (deviceId) {
+          await dispatch(updateDeviceLocation({
+            childId: String(activeChildId),
+            deviceId: deviceId,
+            location: {
+              lat: loc.coords.latitude,
+              lng: loc.coords.longitude,
+            }
+          })).unwrap();
+        }
+      } catch (error) {
+        Alert.alert(t("home.location_sync_error"), t("home.location_sync_error_message", "Failed to sync location"));
+      }
+    };
+  
+    syncLocation();
+  }, [dispatch, activeChildId, deviceId]);
 
   const userName = (
-    activeChildData?.name?.trim() || t("home.default_child_display_name")
+    activeChildData?.name?.trim() ||
+    (typeof params.initialName === "string" ? params.initialName.trim() : "") ||
+    t("home.default_child_display_name")
   ).trim();
   const avatarLetter = userName.length ? (Array.from(userName)[0] ?? "?") : "?";
   const pointsValue = activeChildData?.avatar?.currentXp ?? 0;

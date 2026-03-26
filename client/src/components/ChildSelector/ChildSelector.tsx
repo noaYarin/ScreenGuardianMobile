@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-import { CHILD_ACCENT_COLORS } from "../../../../server/src/constants/childAccentColors";
+import { CHILD_ACCENT_COLORS } from "../../../../client/constants/childAccentColors";
 
 import AppText from "../AppText/AppText";
 import { styles } from "./styles";
