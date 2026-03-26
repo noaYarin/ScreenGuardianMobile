@@ -1,17 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, ScrollView, Pressable, useWindowDimensions, Platform } from "react-native";
 import { Stack } from "expo-router";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import ChildSelector, {
-  type ChildSelectorOption,
-} from "../../../components/ChildSelector/ChildSelector";
+import ChildSelector from "../../../components/ChildSelector/ChildSelector";
 import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import type { RootState } from "@/src/redux/store/types";
+import { useSelector } from "react-redux";
 
 type GenderValue = "male" | "female" | "other";
 
@@ -19,30 +19,6 @@ type GenderOption = {
   key: GenderValue;
   labelKey: string;
 };
-
-const STATIC_CHILDREN: ChildSelectorOption[] = [
-  {
-    id: "tamar",
-    name: "תמר",
-    initial: "ת",
-    accent: "#D96AD9",
-    subtitleKey: "childSelector.defaultChildSubtitle",
-  },
-  {
-    id: "yonatan",
-    name: "יונתן",
-    initial: "י",
-    accent: "#6C8CFF",
-    subtitleKey: "childSelector.defaultChildSubtitle",
-  },
-  {
-    id: "noa",
-    name: "נועה",
-    initial: "נ",
-    accent: "#15C9A8",
-    subtitleKey: "childSelector.defaultChildSubtitle",
-  },
-];
 
 const GENDER_OPTIONS: GenderOption[] = [
   { key: "male", labelKey: "defineChildProfile.gender.options.male" },
@@ -66,15 +42,20 @@ const { t, currentLanguage } = useTranslation();
   const isTablet = width >= 768;
   const isLargeTablet = width >= 1100;
 
-  const [selectedChildId, setSelectedChildId] = useState(STATIC_CHILDREN[2].id);
+  const children = useSelector(
+    (state: RootState) => state.children.childrenList ?? []
+  );
+
+  const [selectedChildId, setSelectedChildId] = useState<string>("");
   const [birthDate, setBirthDate] = useState<Date>(new Date(2016, 4, 12));
   const [gender, setGender] = useState<GenderValue>("female");
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const selectedChild = useMemo(
-    () => STATIC_CHILDREN.find((child) => child.id === selectedChildId) ?? STATIC_CHILDREN[0],
-    [selectedChildId]
-  );
+  useEffect(() => {
+    if (selectedChildId) return;
+    if (!children.length) return;
+    setSelectedChildId(String(children[0]._id));
+  }, [children, selectedChildId]);
 
   const formattedBirthDate = useMemo(() => {
     const locale = currentLanguage === "he" ? "he-IL" : "en-US";
@@ -104,7 +85,6 @@ const { t, currentLanguage } = useTranslation();
             ]}
           >
             <ChildSelector
-              childrenOptions={STATIC_CHILDREN}
               selectedChildId={selectedChildId}
               onSelectChild={setSelectedChildId}
               //childCardWidth={isLargeTablet ? 180 : isTablet ? 160 : 136}
