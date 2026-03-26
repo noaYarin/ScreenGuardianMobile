@@ -837,13 +837,27 @@
     "detailsTitle": "פרטי מיקום",
     "currentLocationLabel": "מיקום נוכחי",
     "updatedLabel": "עודכן",
-    "accuracyLabel": "דיוק מיקום",
     "selectedChildLabel": "ילד נבחר",
     "refreshButton": "רענון מיקום",
     "navigateButton": "נווט למיקום",
     "refreshA11y": "רענון מיקום הילד",
     "navigateA11y": "פתיחת ניווט למיקום הילד",
-    "batteryValue": "{{value}}% סוללה",
+    "noDevicesTitle": "אין מכשירים זמינים",
+    "noDevicesMessage": "הילד לא נוסף עדיין מכשירים. הוסף מכשיר כדי להתחיל לעקוב אחר המיקום.",
+    "addDeviceButton": "הוסף מכשיר",
+    "map": {
+      "updating": "מעדכן...",
+      "waitingForLocation": "ממתין למיקום של הילד/ה..."
+    },
+    "locationSharing": {
+      "mapBanner": "הפעילו את «גישה למיקום» תחת הגדרות ← התראות כדי לטעון את המיקום שלכם על המפה.",
+      "alertTitle": "גישה למיקום כבויה",
+      "alertMessage": "הפעילו את מתג המיקום תחת הגדרות ← התראות, ואז נסו שוב.",
+      "disabledAddressValue": "שיתוף מיקום כבוי",
+      "disabledAddressHint": "פתחו את ההגדרות והפעילו גישה למיקום כדי לראות כאן פרטי GPS.",
+      "navigateNoCoordsTitle": "אין מיקום עדיין",
+      "navigateNoCoordsMessage": "אפשרו מיקום בהגדרות ואז רעננו. אם זה עדיין לא עובד, בדקו את הרשאת המיקום של האפליקציה במערכת."
+    },
     "children": {
       "noaSubtitle": "מכשיר פעיל",
       "yonatanSubtitle": "בבית הספר",

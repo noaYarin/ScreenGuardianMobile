@@ -891,13 +891,27 @@
     "detailsTitle": "Location Details",
     "currentLocationLabel": "Current location",
     "updatedLabel": "Updated",
-    "accuracyLabel": "Location accuracy",
     "selectedChildLabel": "Selected child",
     "refreshButton": "Refresh location",
     "navigateButton": "Navigate to location",
     "refreshA11y": "Refresh child location",
     "navigateA11y": "Open navigation to child location",
-    "batteryValue": "{{value}}% battery",
+    "noDevicesTitle": "No devices found",
+    "noDevicesMessage": "The child has not added any devices yet. Add a device to start tracking location.",
+    "addDeviceButton": "Add device",
+    "map": {
+      "updating": "Updating...",
+      "waitingForLocation": "Waiting for child's location..."
+    },
+    "locationSharing": {
+      "mapBanner": "Turn on “Location access” in Settings → Notifications to load your position on the map.",
+      "alertTitle": "Location access is off",
+      "alertMessage": "Enable the location toggle under Settings → Notifications, then try again.",
+      "disabledAddressValue": "Location sharing disabled",
+      "disabledAddressHint": "Open Settings and turn on location access to see GPS details here.",
+      "navigateNoCoordsTitle": "No location yet",
+      "navigateNoCoordsMessage": "Allow location in Settings, then refresh. If it still fails, check the system location permission for the app."
+    },
     "children": {
       "noaSubtitle": "Active device",
       "yonatanSubtitle": "At school",

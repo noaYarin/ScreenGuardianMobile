@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { I18nextProvider, useTranslation } from "react-i18next";
 import { Provider as ReduxProvider, useSelector } from "react-redux";
 import { View, ActivityIndicator } from "react-native";
@@ -29,17 +29,16 @@ function AppStack() {
   // Check if the current route is the index route
   const isIndexRoute =
     segments.length === 0 || segments[segments.length - 1] === "index";
-
   useEffect(() => {
-    if (!isIndexRoute) return;
 
-    if (childToken) {
-      router.replace("/Child" as any);
-      return;
-    }
-
-    if (token) {
-      router.replace("/Parent" as any);
+    if (isIndexRoute) {
+      if (childToken) {
+        router.replace("/Child" as Href);
+        return;
+      } else if (token) {
+        router.replace("/Parent" as Href);
+        return;
+      }
     }
   }, [childToken, token, isIndexRoute, router]);
 
@@ -95,23 +94,26 @@ export default function RootLayout() {
           getParentToken(),
           getChildToken(),
         ]);
-        if (child) {
-          store.dispatch(
-            hydrateChildSession({
-              token: child.token,
-              parentId: child.parentId,
-              childId: child.childId,
-              deviceId: child.deviceId,
-            })
-          );
-        } else if (parent) {
+        if (parent) {
           store.dispatch(
             hydrateParentSession({
               token: parent.token,
               parentId: parent.parentId,
             })
-          );
+          )
+          if (child) {
+            store.dispatch(
+              hydrateChildSession({
+                childToken: child.childToken,
+                parentId: child.parentId,
+                childId: child.childId,
+                deviceId: child.deviceId,
+                physicalId: child.physicalId,
+              })
+            );
+          } 
         }
+       
         if (mounted) setReady(true);
       } catch (e: any) {
         console.error("initLanguage failed:", e);
