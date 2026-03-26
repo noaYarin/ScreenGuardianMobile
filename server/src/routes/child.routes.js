@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { authJwt } from "../middlewares/authJwt.js";
 import { requireChild } from "../middlewares/requireChild.js";
+import { requireParent } from "../middlewares/requireParent.js";
 import {
   getCurrentChildProfileController,
   updateChildInterestsController,
@@ -16,6 +17,7 @@ router.get("/profile", authJwt, requireChild, getCurrentChildProfileController);
 // Update child interests (self)
 router.patch("/interests", authJwt, requireChild, updateChildInterestsController);
 
-router.put("/profile", authJwt, requireChild, updateCurrentChildProfileController);
+// PUT /api/v1/child/profile
+router.put("/:childId/profile", authJwt, requireParent, updateCurrentChildProfileController);
 
 export default router;
