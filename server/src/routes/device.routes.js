@@ -18,7 +18,8 @@ import {
   updateDeviceDailyLimitController,
   getDeviceCurrentStatusForChildController,
   updateDeviceUsageByChildController,
-  updateDeviceNameController
+  updateDeviceNameController,
+  updateDeviceLocationController
 } from "../controllers/device.controller.js";
 
 const router = Router();
@@ -89,6 +90,11 @@ router.get(
   requireChild,
   getDeviceCurrentStatusForChildController
 );
+
+// PATCH /api/v1/devices/:deviceId/location
+// Parent updates the location of a device
+router.patch("/:deviceId/location", authJwt, updateDeviceLocationController);
+
 
 // PATCH /api/v1/devices/:deviceId/usage
 // Child app updates used screen-time minutes

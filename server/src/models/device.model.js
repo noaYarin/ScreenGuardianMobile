@@ -17,7 +17,11 @@ export const DeviceSchema = new mongoose.Schema(
         isLocked: { type: Boolean, default: false },
         isActive: { type: Boolean, default: true },
         code: { type: String, default: "" },
-        location: { type: String, default: "" },
+        location: {
+            lat: { type: Number, default: 0 },
+            lng: { type: Number, default: 0 },
+            lastUpdated: { type: Date, default: Date.now },
+        },
         barcodeToken: { type: String, default: "" },
         parentId: { type: mongoose.Schema.Types.ObjectId, ref: "Parent", required: true },
         childId: { type: mongoose.Schema.Types.ObjectId, required: true },

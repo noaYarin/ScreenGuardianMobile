@@ -10,7 +10,7 @@ import {
   findByBarcodeToken,
   consumePairingSession,
 } from "../dal/pairing.dal.js";
-import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { getChildByParentId, getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
 import { createDevice, findDeviceByBarcodeOrCode, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
 import { DeviceType } from "../constants/deviceType.js";
@@ -110,9 +110,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   const childId = String(consumed.childId);
   if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
-
-  // Child token is used to authenticate the child on the device
-const tokenData = await issueChildToken(parentId, childId, deviceId);
+  const child = await getChildByParentId(parentId, childId);
+  const childName = child?.name != null ? String(child.name) : "";
 
 let currentDevice = await findDeviceByDeviceId(deviceId);
 
@@ -131,7 +130,7 @@ if (currentDevice) {
     platform,
     isLocked: false,
     code: sessionCode || "",
-    location: "",
+    location: { lat: 0, lng: 0, lastUpdated: new Date() }, 
     isActive: true,
     barcodeToken: sessionBarcode || "",
     applications: [],
@@ -142,8 +141,13 @@ if (currentDevice) {
   });
 }
 
+  const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
+  const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
+
   return {
     ...tokenData,
-    deviceId: String(deviceId),
+    deviceId: mongoDeviceId,
+    physicalId: String(deviceId),
+    childName,
   };
 }
