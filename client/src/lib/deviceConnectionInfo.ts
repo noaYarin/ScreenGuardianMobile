@@ -45,7 +45,6 @@ export async function buildDeviceConnectionPayload() {
     throw new Error("Failed to get device ID");
   }
 
-  console.log("Payload Debug - DeviceID:", deviceId); //
   return {
     deviceName: "Child Device",
     deviceType: detectConnectionDeviceType(),

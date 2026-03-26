@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Device } from "../../api/device";
-import { deleteDeviceForChild, fetchDevicesByChild } from "../thunks/deviceThunks";
+import { deleteDeviceForChild, fetchDevicesByChild, updateDeviceLocation } from "../thunks/deviceThunks";
 import { logout } from "./auth-slice"; 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -61,6 +61,16 @@ const devicesSlice = createSlice({
         state.statusByChildId[childId] = "failed";
         state.errorByChildId[childId] =
           action.payload ?? action.error.message ?? "devices.fetch_device_failed";
+      })
+      .addCase(updateDeviceLocation.fulfilled, (state, action) => {
+        const { childId, deviceId } = action.meta.arg;
+        const updatedDevice = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;   
+        const idx = list.findIndex((d) => String(d._id) === String(deviceId));
+        if (idx !== -1) {
+          state.byChildId[childId][idx] = updatedDevice;
+        }
       })
       .addCase(deleteDeviceForChild.fulfilled, (state, action) => {
         const { childId, deviceId } = action.meta.arg;

@@ -126,7 +126,13 @@ export const generateCodeForPairingChild = createAsyncThunk<
 
 
 export const linkDevice = createAsyncThunk<
-  { childToken: string; parentId: string; childId: string; deviceId: string },
+  {
+    childToken: string;
+    parentId: string;
+    childId: string;
+    deviceId: string;
+    physicalId?: string;
+  },
   { code: string; barcodeToken: string; deviceName: string; deviceType: string; platform: string },
   { rejectValue: string }
 >("auth/linkDevice", async (params, thunkAPI) => {

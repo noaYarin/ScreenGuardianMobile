@@ -19,6 +19,8 @@ type AuthState = {
   activeChildId: string | null;
   childToken: string | null;
   deviceId: string | null;
+  // Physical device id (UUID/hardware id) that the child sent while linking.
+  physicalId: string | null;
 
   // Loading and error
   isLoading: boolean;
@@ -36,6 +38,7 @@ const initialState: AuthState = {
   activeChildId: null,
   childToken: null,
   deviceId: null,
+  physicalId: null,
   isLoading: false,
   error: null,
 };
@@ -92,7 +95,10 @@ const authSlice = createSlice({
         childToken: string;
         parentId: string;
         childId: string;
+        // Mongo `_id` of the linked device (NOT the physical hardware UUID).
         deviceId: string;
+        // Physical device id (UUID/hardware id).
+        physicalId?: string;
       }>
     ) => {
       const p = action.payload;
@@ -100,6 +106,7 @@ const authSlice = createSlice({
       state.parentId = p.parentId;
       state.activeChildId = p.childId;
       state.deviceId = p.deviceId;
+      state.physicalId = p.physicalId ?? null;
     },
     logout: (state) => {
       state.parentId = null;
@@ -107,6 +114,7 @@ const authSlice = createSlice({
       state.activeChildId = null;
       state.childToken = null;
       state.deviceId = null;
+      state.physicalId = null;
       state.isLoading = false;
       state.error = null;
     },
@@ -121,6 +129,7 @@ const authSlice = createSlice({
         state.activeChildId = action.payload.childId;
         state.childToken = action.payload.childToken;
         state.deviceId = action.payload.deviceId;
+        state.physicalId = action.payload.physicalId ?? null;
       
       })
       .addCase(generateCodeForPairingChild.fulfilled, (state, action) => {
