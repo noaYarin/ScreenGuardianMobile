@@ -1,363 +1,177 @@
-import React, { useMemo, useState } from "react";
-import {
-  View,
-  ScrollView,
-  Pressable,
-  useWindowDimensions,
-} from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { View, ScrollView, useWindowDimensions, Alert, Linking, Platform, Button } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+import { useSelector, useDispatch } from "react-redux";
+import { Href, router } from "expo-router";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
-import AppText from "../../../components/AppText/AppText";
 import ChildSelector from "../../../components/ChildSelector/ChildSelector";
+import LocationMapCard from "../../../components/ChildLocation/LocationMapCard";
+import LocationDetailsCard from "../../../components/ChildLocation/LocationDetailsCard";
+import LocationActions from "../../../components/ChildLocation/LocationActions";
+import AppText from "@/src/components/AppText/AppText";
+
+import { getLocationSharingEnabled } from "../../../services/locationSharingPreference";
+import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
 import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import type { RootState, AppDispatch } from "@/src/redux/store/types";
+import { CHILD_ACCENT_COLORS } from "../../../../constants/childAccentColors";
+import type { DeviceLocationSnapshot } from "../../../components/ChildLocation/types";
 
-type ChildOption = {
-  id: string;
-  name: string;
-  initial: string;
-  accent: string;
-  subtitleKey?: string;
-};
-
-type ChildLocationItem = {
-  childId: string;
-  cityKey: string;
-  areaKey: string;
-  addressKey: string;
-  updatedAtKey: string;
-  battery: number;
-  accuracyKey: string;
-};
-
-const CHILDREN: ChildOption[] = [
-  {
-    id: "noa",
-    name: "נועה",
-    initial: "נ",
-    accent: "#18C29C",
-    subtitleKey: "childLocation.children.noaSubtitle",
-  },
-  {
-    id: "yonatan",
-    name: "יונתן",
-    initial: "י",
-    accent: "#7B9CFF",
-    subtitleKey: "childLocation.children.yonatanSubtitle",
-  },
-  {
-    id: "tamar",
-    name: "תמר",
-    initial: "ת",
-    accent: "#D46AD8",
-    subtitleKey: "childLocation.children.tamarSubtitle",
-  },
-];
-
-const LOCATION_DATA: ChildLocationItem[] = [ //static
-  {
-    childId: "noa",
-    cityKey: "childLocation.mock.noa.city",
-    areaKey: "childLocation.mock.noa.area",
-    addressKey: "childLocation.mock.noa.address",
-    updatedAtKey: "childLocation.mock.noa.updatedAt",
-    battery: 74,
-    accuracyKey: "childLocation.mock.noa.accuracy",
-  },
-  {
-    childId: "yonatan",
-    cityKey: "childLocation.mock.yonatan.city",
-    areaKey: "childLocation.mock.yonatan.area",
-    addressKey: "childLocation.mock.yonatan.address",
-    updatedAtKey: "childLocation.mock.yonatan.updatedAt",
-    battery: 52,
-    accuracyKey: "childLocation.mock.yonatan.accuracy",
-  },
-  {
-    childId: "tamar",
-    cityKey: "childLocation.mock.tamar.city",
-    areaKey: "childLocation.mock.tamar.area",
-    addressKey: "childLocation.mock.tamar.address",
-    updatedAtKey: "childLocation.mock.tamar.updatedAt",
-    battery: 88,
-    accuracyKey: "childLocation.mock.tamar.accuracy",
-  },
-];
+const getAccent = (id: string) => 
+  CHILD_ACCENT_COLORS[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % CHILD_ACCENT_COLORS.length];
 
 export default function ChildLocationScreen() {
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { text, row, isRTL } = useLocaleLayout();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [selectedChildId, setSelectedChildId] = useState<string>("noa");
+  // --- Redux State ---
+  const childrenList = useSelector((state: RootState) => state.children.childrenList ?? []);
+  const { byChildId, statusByChildId } = useSelector((state: RootState) => state.devices);
 
-  const isTablet = width >= 900;
+  const [selectedChildId, setSelectedChildId] = useState(childrenList[0]?._id ?? "");
+  const [locationSharingEnabled, setLocationSharingEnabled] = useState(true);
+  const [deviceSnapshot, setDeviceSnapshot] = useState<DeviceLocationSnapshot | null>(null);
 
-  const selectedLocation =
-    LOCATION_DATA.find((item) => item.childId === selectedChildId) ??
-    LOCATION_DATA[0];
+  
+  const selectedChild = useMemo(() => 
+    childrenList.find(c => c._id === selectedChildId), 
+    [childrenList, selectedChildId]
+  );
 
-  const selectedChild =
-    CHILDREN.find((child) => child.id === selectedChildId) ?? CHILDREN[0];
+  const devicesForSelectedChild = useMemo(
+    () => byChildId[selectedChildId] ?? [],
+    [byChildId, selectedChildId]
+  );
 
-  const markerLeft = useMemo(() => {
-    if (selectedChildId === "noa") return "57%";
-    if (selectedChildId === "yonatan") return "45%";
-    return "63%";
-  }, [selectedChildId]);
+  const isUpdating = statusByChildId[selectedChildId] === "loading";
 
-  const markerTop = useMemo(() => {
-    if (selectedChildId === "noa") return "43%";
-    if (selectedChildId === "yonatan") return "34%";
-    return "58%";
-  }, [selectedChildId]);
+  const childOption = useMemo(() => selectedChild ? {
+    id: selectedChild._id,
+    name: selectedChild.name,
+    accent: getAccent(selectedChild._id),
+    initial: selectedChild.name?.[0] ?? "",
+  } : null, [selectedChild]);
 
+  
+  useFocusEffect(useCallback(() => { 
+    getLocationSharingEnabled().then(setLocationSharingEnabled); 
+  }, []));
+
+  useEffect(() => {
+    if (selectedChildId) {
+      dispatch(fetchDevicesByChild(selectedChildId));
+    }
+  }, [selectedChildId, dispatch]);
+
+  // --- Handlers ---
   const onRefreshLocation = () => {
-    // TODO: connect to thunk / API refresh action
-    console.log("refresh child location");
+    dispatch(fetchDevicesByChild(selectedChildId));
   };
 
-  const onNavigateToLocation = () => {
-    // TODO: connect to maps / deep link
-    console.log("navigate to child location");
+  const onNavigate = async () => {
+    if (!deviceSnapshot) {
+      return Alert.alert(t("childLocation.navigateNoCoordsTitle"), t("childLocation.navigateNoCoordsMessage"));
+    }
+  
+    const { latitude, longitude } = deviceSnapshot;
+    const label = selectedChild?.name || "Child";
+  
+    const url = Platform.select({
+      ios: `maps://app?q=${label}&ll=${latitude},${longitude}`,
+      android: `geo:${latitude},${longitude}?q=${latitude},${longitude}(${label})`,
+      default: `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`
+    });
+  
+    try {
+      const supported = await Linking.canOpenURL(url!);
+      if (supported) {
+        await Linking.openURL(url!);
+      } else {
+        const browserUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+        await Linking.openURL(browserUrl);
+      }
+    } catch (err) {
+      Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`);
+    }
   };
+
+  if (!selectedChild || !childOption) return null;
+
+  const hasNoDevices = statusByChildId[selectedChildId] === "succeeded" && devicesForSelectedChild.length === 0;
+
+  if (hasNoDevices) {
+    return (
+      <ScreenLayout>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={[styles.container, width >= 900 && styles.containerTablet]}>
+            <ChildSelector selectedChildId={selectedChildId} onSelectChild={setSelectedChildId} />
+            <View style={{ marginTop: 60, alignItems: 'center', paddingHorizontal: 20 }}>
+              <AppText weight="bold" style={{ fontSize: 20, textAlign: 'center', color: '#333' }}>
+                {t("childLocation.noDevicesTitle")}
+              </AppText>
+              <AppText style={{ textAlign: 'center', marginTop: 12, color: '#666', fontSize: 16, marginBottom: 20 }}>
+                {t("childLocation.noDevicesMessage")}
+              </AppText>
+              <Button
+                title={t("childLocation.addDeviceButton")}
+                onPress={() =>
+                  router.push({
+                    pathname: "/Parent/childDetails" as Href,
+                    params: { id: selectedChildId, name: selectedChild.name },
+                  } as never)
+                }
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </ScreenLayout>
+    );
+  }
 
   return (
     <ScreenLayout>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.container, isTablet && styles.containerTablet]}>
-          <View style={styles.heroCard}>
-            <View style={styles.heroGlowOne} />
-            <View style={styles.heroGlowTwo} />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        <View style={[styles.container, width >= 900 && styles.containerTablet]}>
+          <ChildSelector selectedChildId={selectedChildId} onSelectChild={setSelectedChildId} />
+          
+          <LocationMapCard 
+            isRTL={isRTL} 
+            text={text} 
+            selectedChild={childOption} 
+            locationSharingEnabled={locationSharingEnabled} 
+            onDeviceLocation={setDeviceSnapshot} 
+            mapDisabledBannerText={t("childLocation.locationSharing.mapBanner")}
+          />
 
-            <View style={styles.heroHeader}>
-              <View style={styles.heroTitleWrap}>
-                <AppText weight="extraBold" style={[styles.heroTitle, text]}>
-                  {t("childLocation.heading")}
-                </AppText>
+          <LocationDetailsCard 
+            text={text} 
+            row={row} 
+            detailsTitle={t("childLocation.detailsTitle")}
+            addressLabel={t("childLocation.currentLocationLabel")}
+            updatedLabel={t("childLocation.updatedLabel")}
+            selectedChildLabel={t("childLocation.selectedChildLabel")}
+            selectedChildName={selectedChild.name} 
+            locationSharingEnabled={locationSharingEnabled} 
+            deviceSnapshot={deviceSnapshot} 
+            disabledAddressValue={t("childLocation.locationDisabled")}
+          />
 
-                <AppText weight="medium" style={[styles.heroSubtitle, text]}>
-                  {t("childLocation.subtitle")}
-                </AppText>
-              </View>
-
-              <View
-                style={[
-                  styles.statusPill,
-                  row,
-                  selectedLocation.battery <= 25 && styles.statusPillWarn,
-                ]}
-              >
-                <MaterialCommunityIcons
-                  name="battery-medium"
-                  size={16}
-                  color="#FFFFFF"
-                />
-                <AppText weight="bold" style={styles.statusPillText}>
-                  {t("childLocation.batteryValue", {
-                    value: selectedLocation.battery,
-                  })}
-                </AppText>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.selectorCard}>
-            <ChildSelector
-              childrenOptions={CHILDREN}
-              selectedChildId={selectedChildId}
-              onSelectChild={setSelectedChildId}
-            />
-          </View>
-
-          <View style={styles.mapCard}>
-            <View style={styles.mapTopRow}>
-              <View style={[styles.liveBadge, row]}>
-                <View style={styles.liveDot} />
-                <AppText weight="bold" style={styles.liveBadgeText}>
-                  {t("childLocation.live")}
-                </AppText>
-              </View>
-
-              <View style={[styles.cityPill, isRTL && styles.cityPillRtl]}>
-                <AppText weight="bold" style={[styles.cityPillText, text]}>
-                  {t(selectedLocation.cityKey)}
-                </AppText>
-              </View>
-            </View>
-
-            <View style={styles.mapArea}>
-              <View style={styles.mapBase} />
-              <View style={styles.mapRoadRoad1} />
-              <View style={styles.mapRoadRoad2} />
-              <View style={styles.mapRoadRoad3} />
-              <View style={styles.mapRoadRoad4} />
-              <View style={styles.mapWater} />
-              <View style={styles.mapParkOne} />
-              <View style={styles.mapParkTwo} />
-
-              <View
-                style={[
-                  styles.markerWrap,
-                  {
-                    left: markerLeft,
-                    top: markerTop,
-                  },
-                ]}
-              >
-                <View
-                  style={[
-                    styles.markerHalo,
-                    { backgroundColor: `${selectedChild.accent}22` },
-                  ]}
-                />
-                <View
-                  style={[
-                    styles.markerCore,
-                    { backgroundColor: selectedChild.accent },
-                  ]}
-                >
-                  <MaterialCommunityIcons
-                    name="map-marker"
-                    size={28}
-                    color="#FFFFFF"
-                  />
-                </View>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.detailsCard}>
-            <View style={styles.sectionHeader}>
-              <AppText weight="bold" style={[styles.sectionTitle, text]}>
-                {t("childLocation.detailsTitle")}
-              </AppText>
-            </View>
-
-            <View style={styles.infoGrid}>
-              <View style={styles.infoItem}>
-                <View style={[styles.infoLabelRow, row]}>
-                  <MaterialCommunityIcons
-                    name="map-marker-radius-outline"
-                    size={18}
-                    color="#4C7CF0"
-                  />
-                  <AppText weight="bold" style={[styles.infoLabel, text]}>
-                    {t("childLocation.currentLocationLabel")}
-                  </AppText>
-                </View>
-
-                <AppText weight="medium" style={[styles.infoValue, text]}>
-                  {t(selectedLocation.addressKey)}
-                </AppText>
-
-                <AppText weight="regular" style={[styles.infoHint, text]}>
-                  {t(selectedLocation.areaKey)}
-                </AppText>
-              </View>
-
-              <View style={styles.infoItem}>
-                <View style={[styles.infoLabelRow, row]}>
-                  <MaterialCommunityIcons
-                    name="clock-time-four-outline"
-                    size={18}
-                    color="#4C7CF0"
-                  />
-                  <AppText weight="bold" style={[styles.infoLabel, text]}>
-                    {t("childLocation.updatedLabel")}
-                  </AppText>
-                </View>
-
-                <AppText weight="medium" style={[styles.infoValue, text]}>
-                  {t(selectedLocation.updatedAtKey)}
-                </AppText>
-              </View>
-
-              <View style={styles.infoItem}>
-                <View style={[styles.infoLabelRow, row]}>
-                  <MaterialCommunityIcons
-                    name="crosshairs-gps"
-                    size={18}
-                    color="#4C7CF0"
-                  />
-                  <AppText weight="bold" style={[styles.infoLabel, text]}>
-                    {t("childLocation.accuracyLabel")}
-                  </AppText>
-                </View>
-
-                <AppText weight="medium" style={[styles.infoValue, text]}>
-                  {t(selectedLocation.accuracyKey)}
-                </AppText>
-              </View>
-
-              <View style={styles.infoItem}>
-                <View style={[styles.infoLabelRow, row]}>
-                  <MaterialCommunityIcons
-                    name="account-circle-outline"
-                    size={18}
-                    color="#4C7CF0"
-                  />
-                  <AppText weight="bold" style={[styles.infoLabel, text]}>
-                    {t("childLocation.selectedChildLabel")}
-                  </AppText>
-                </View>
-
-                <AppText weight="medium" style={[styles.infoValue, text]}>
-                  {selectedChild.name}
-                </AppText>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.actionsWrap}>
-            <Pressable
-              onPress={onRefreshLocation}
-              accessibilityRole="button"
-              accessibilityLabel={t("childLocation.refreshA11y")}
-              style={({ pressed }) => [
-                styles.primaryButton,
-                pressed && styles.buttonPressed,
-              ]}
-            >
-              <View style={[styles.buttonContent, row]}>
-                <MaterialCommunityIcons
-                  name="refresh"
-                  size={22}
-                  color="#FFFFFF"
-                />
-                <AppText weight="bold" style={styles.primaryButtonText}>
-                  {t("childLocation.refreshButton")}
-                </AppText>
-              </View>
-            </Pressable>
-
-            <Pressable
-              onPress={onNavigateToLocation}
-              accessibilityRole="button"
-              accessibilityLabel={t("childLocation.navigateA11y")}
-              style={({ pressed }) => [
-                styles.secondaryButton,
-                pressed && styles.buttonPressed,
-              ]}
-            >
-              <View style={[styles.buttonContent, row]}>
-                <MaterialCommunityIcons
-                  name="navigation-variant-outline"
-                  size={22}
-                  color="#2A63E8"
-                />
-                <AppText weight="bold" style={styles.secondaryButtonText}>
-                  {t("childLocation.navigateButton")}
-                </AppText>
-              </View>
-            </Pressable>
-          </View>
+          <LocationActions 
+            row={row} 
+            onRefreshLocation={onRefreshLocation} 
+            onNavigateToLocation={onNavigate} 
+            isLoading={isUpdating} 
+            refreshButtonText={t("childLocation.refreshButton")} 
+            navigateButtonText={t("childLocation.navigateButton")}
+            refreshA11y={t("childLocation.refreshA11y")} 
+            navigateA11y={t("childLocation.navigateA11y")} 
+          />
         </View>
       </ScrollView>
     </ScreenLayout>
