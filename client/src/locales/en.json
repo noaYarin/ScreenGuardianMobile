@@ -6,7 +6,12 @@
     "back": "Back",
     "ok": "OK",
     "retry": "Try again",
-    "change_language": "Change language"
+    "change_language": "Change language",
+    "success": "Success",
+    "success_message": "The action was successful.",
+    "error": "Error",
+    "error_message": "The action failed. Please try again."
+
   },
   "children": {
     "fetch_failed": "Could not load children.",
@@ -811,8 +816,8 @@
     "gender": {
       "title": "Gender",
       "options": {
-        "male": "Male",
-        "female": "Female",
+        "boy": "Boy",
+        "girl": "Girl",
         "other": "Other"
       }
     },

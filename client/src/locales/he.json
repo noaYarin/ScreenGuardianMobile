@@ -6,7 +6,11 @@
     "back": "חזרה",
     "ok": "אישור",
     "retry": "נסו שוב",
-    "change_language": "שינוי שפה"
+    "change_language": "שינוי שפה",
+    "success": "הצלחה",
+    "success_message": "הפעולה בוצעה בהצלחה.",
+    "error": "שגיאה",
+    "error_message": "הפעולה נכשלה. נסו שוב."
   },
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
@@ -757,8 +761,8 @@
     "gender": {
       "title": "מין",
       "options": {
-        "male": "זכר",
-        "female": "נקבה",
+        "boy": "ילד",
+        "girl": "ילדה",
         "other": "אחר"
       }
     },

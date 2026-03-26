@@ -4,7 +4,7 @@ import * as childApi from "@/src/api/child";
 import type { Child } from "@/src/redux/slices/children-slice";
 
 type UpdateCurrentChildProfilePayload = {
-  name: string;
+  childId: string;
   birthDate: string;
   gender: string;
 };
@@ -78,26 +78,31 @@ export const fetchCurrentChildProfileThunk = createAsyncThunk<
 });
 
 // Update current child profile by id
+// בתוך childrenThunks.ts
+
 export const updateCurrentChildProfileThunk = createAsyncThunk<
-  Child,
-  UpdateCurrentChildProfilePayload,
+  Child, // טיפוס ההחזרה (מה שיגיע ל-Slice)
+  { childId: string; birthDate: string; gender: string }, // Payload
   { rejectValue: string }
 >("children/updateCurrentChildProfile", async (payload, thunkAPI) => {
   try {
-    const { name, birthDate, gender } = payload;
-    const response = await childApi.updateCurrentChildProfile(name, birthDate, gender);
-    if (response?.child == null) {
+    const { childId, birthDate, gender } = payload;
+    const response: any = await childApi.updateCurrentChildProfile(childId, birthDate, gender);
+    const parentData = response.child; 
+    const rawChild = parentData?.children?.find(
+      (c: any) => String(c._id) === String(childId)
+    );
+
+    if (!rawChild) {
       return thunkAPI.rejectWithValue("children.profile_failed");
     }
-    const raw = response.child;
-    const child = {
-      ...raw,
-      _id: raw._id != null ? String(raw._id) : raw._id,
-    };
-    return child as Child;
+
+    return {
+      ...rawChild,
+      _id: String(rawChild._id),
+    } as Child;
+
   } catch (error) {
-    const message =
-      (error as Error)?.message ?? "children.profile_failed";
-    return thunkAPI.rejectWithValue(message);
+    return thunkAPI.rejectWithValue("children.profile_failed");
   }
 });

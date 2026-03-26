@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Pressable, useWindowDimensions, Platform } from "react-native";
-import { Stack } from "expo-router";
+import { View, ScrollView, Pressable, useWindowDimensions, Platform, Alert, ActivityIndicator, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
@@ -11,9 +10,12 @@ import { styles } from "./styles";
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import type { RootState } from "@/src/redux/store/types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
+import { router } from "expo-router"; 
+import { AppDispatch } from "@/src/redux/store/types";
 
-type GenderValue = "male" | "female" | "other";
+type GenderValue = "boy" | "girl" | "other";
 
 type GenderOption = {
   key: GenderValue;
@@ -21,8 +23,8 @@ type GenderOption = {
 };
 
 const GENDER_OPTIONS: GenderOption[] = [
-  { key: "male", labelKey: "defineChildProfile.gender.options.male" },
-  { key: "female", labelKey: "defineChildProfile.gender.options.female" },
+  { key: "boy", labelKey: "defineChildProfile.gender.options.boy" },
+  { key: "girl", labelKey: "defineChildProfile.gender.options.girl" },
   { key: "other", labelKey: "defineChildProfile.gender.options.other" },
 ];
 
@@ -34,44 +36,72 @@ function formatDateForDisplay(date: Date, locale: string) {
   }).format(date);
 }
 
-export default function DefineChildProfileScreen() {
-const { t, currentLanguage } = useTranslation();
+export default function EditChildProfileScreen() {
+  const { t, currentLanguage } = useTranslation();
   const { width } = useWindowDimensions();
   const { text, isRTL, row } = useLocaleLayout();
-
+  const dispatch = useDispatch<AppDispatch>();
   const isTablet = width >= 768;
   const isLargeTablet = width >= 1100;
 
-  const children = useSelector(
-    (state: RootState) => state.children.childrenList ?? []
-  );
+  const children = useSelector((state: RootState) => state.children.childrenList ?? []);
+  const { isLoading } = useSelector((state: RootState) => state.children);
 
   const [selectedChildId, setSelectedChildId] = useState<string>("");
-  const [birthDate, setBirthDate] = useState<Date>(new Date(2016, 4, 12));
-  const [gender, setGender] = useState<GenderValue>("female");
+  const [birthDate, setBirthDate] = useState<Date>(new Date()); 
+  const [gender, setGender] = useState<GenderValue>("girl");
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   useEffect(() => {
-    if (selectedChildId) return;
-    if (!children.length) return;
-    setSelectedChildId(String(children[0]._id));
+    if (!children || children.length === 0) return;
+
+    const targetId = selectedChildId || String(children[0]._id);
+    const currentChild = children.find(c => String(c._id) === targetId);
+  
+    if (currentChild) {
+      if (!selectedChildId) {
+        setSelectedChildId(String(currentChild._id));
+      }
+  
+      if (currentChild.birthDate) {
+        const newDate = new Date(currentChild.birthDate);
+        if (birthDate.getTime() !== newDate.getTime()) {
+          setBirthDate(newDate);
+        }
+      }
+      
+      if (currentChild.gender && currentChild.gender !== gender) {
+        setGender(currentChild.gender as GenderValue);
+      }
+    }
   }, [children, selectedChildId]);
 
   const formattedBirthDate = useMemo(() => {
     const locale = currentLanguage === "he" ? "he-IL" : "en-US";
-    return formatDateForDisplay(birthDate, locale);
+      return formatDateForDisplay(birthDate, locale);
   }, [birthDate, currentLanguage]);
 
-  const handleSave = () => {
-    console.log("Save child profile", {
-      childId: selectedChildId,
-      birthDate: birthDate.toISOString(),
-      gender,
-    });
+  const handleSave = async () => {
+    if (!selectedChildId || !birthDate) return;
+    try {
+      await dispatch(updateCurrentChildProfileThunk({
+        childId: selectedChildId,
+        birthDate: birthDate.toISOString(),
+        gender,
+      })).unwrap();
+      Alert.alert(
+      t("common.success"), 
+      t("common.success_message"),
+      [{ text: "OK", onPress: () => router.back() }]
+    );
+      
+    } catch (error) {
+      Alert.alert(t("common.error"), error as string || t("common.error_message"));
+    }
   };
+
   return (
     <>
-
       <ScreenLayout>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
@@ -87,7 +117,6 @@ const { t, currentLanguage } = useTranslation();
             <ChildSelector
               selectedChildId={selectedChildId}
               onSelectChild={setSelectedChildId}
-              //childCardWidth={isLargeTablet ? 180 : isTablet ? 160 : 136}
             />
 
             <View style={[styles.formGrid, isTablet && styles.formGridTablet]}>
@@ -109,6 +138,7 @@ const { t, currentLanguage } = useTranslation();
                 >
                   <View
                     style={[
+                      // eslint-disable-next-line react-native/no-inline-styles
                       styles.dateFieldContent,
                       isRTL ? styles.dateFieldContentRtl : styles.dateFieldContentLtr,
                     ]}
@@ -137,7 +167,7 @@ const { t, currentLanguage } = useTranslation();
 
                 {showDatePicker ? (
                   <DateTimePicker
-                    value={birthDate}
+                    value={birthDate ?? new Date()}
                     mode="date"
                     display={Platform.OS === "ios" ? "spinner" : "default"}
                     maximumDate={new Date()}
@@ -145,7 +175,6 @@ const { t, currentLanguage } = useTranslation();
                       if (Platform.OS === "android") {
                         setShowDatePicker(false);
                       }
-
                       if (selectedDate) {
                         setBirthDate(selectedDate);
                       }
@@ -158,7 +187,9 @@ const { t, currentLanguage } = useTranslation();
                     <Pressable
                       onPress={() => setShowDatePicker(false)}
                       accessibilityRole="button"
-                      accessibilityLabel={t("defineChildProfile.accessibility.confirmBirthDate")}
+                      accessibilityLabel={t(
+                        "defineChildProfile.accessibility.confirmBirthDate"
+                      )}
                       style={({ pressed }) => [
                         styles.iosPickerDoneButton,
                         pressed && styles.pressedSoft,
@@ -187,7 +218,6 @@ const { t, currentLanguage } = useTranslation();
                 >
                   {GENDER_OPTIONS.map((option) => {
                     const isSelected = option.key === gender;
-
                     return (
                       <Pressable
                         key={option.key}
@@ -195,9 +225,7 @@ const { t, currentLanguage } = useTranslation();
                         accessibilityRole="button"
                         accessibilityLabel={t(
                           "defineChildProfile.accessibility.genderOption",
-                          {
-                            gender: t(option.labelKey),
-                          }
+                          { gender: t(option.labelKey) }
                         )}
                         style={({ pressed }) => [
                           styles.genderChip,
@@ -232,19 +260,19 @@ const { t, currentLanguage } = useTranslation();
             </View>
 
             <View style={styles.footer}>
-              <Pressable
-                onPress={handleSave}
-                accessibilityRole="button"
-                accessibilityLabel={t("defineChildProfile.accessibility.save")}
-                style={({ pressed }) => [
-                  styles.saveButton,
-                  pressed && styles.saveButtonPressed,
-                ]}
+            <TouchableOpacity 
+                onPress={handleSave} 
+                disabled={isLoading}
+                style={[styles.saveButton, isLoading && styles.disabledButton]}
               >
-                <AppText weight="extraBold" style={styles.saveButtonText}>
-                  {t("defineChildProfile.actions.save")}
-                </AppText>
-              </Pressable>
+                {isLoading ? (
+                  <ActivityIndicator color="#ffffff" />
+                ) : (
+                  <AppText style={styles.saveButtonText} weight="bold">
+                    {t("common.save")}
+                  </AppText>
+                )}
+              </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
@@ -252,3 +280,4 @@ const { t, currentLanguage } = useTranslation();
     </>
   );
 }
+

@@ -2,7 +2,7 @@ import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { Role } from "../constants/role.js";
 import { Gender } from "../constants/gender.js";
-
+import { updateCurrentChildProfileByParentId } from "../dal/parent.dal.js";
 
 export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;
@@ -43,8 +43,8 @@ export function validateAndBuildChildDoc(body = {}) {
 }
 
 
-export async function updateCurrentChildProfile(parentId, childId, name, birthDate, gender) {
-  const updated = await updateCurrentChildProfileByParentId(parentId, childId, name, birthDate, gender);
+export async function updateCurrentChildProfile(parentId, childId, birthDate, gender) {
+  const updated = await updateCurrentChildProfileByParentId(parentId, childId, birthDate, gender);
 
   if (!updated) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);

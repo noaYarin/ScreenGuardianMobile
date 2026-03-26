@@ -1,12 +1,11 @@
 import { Stack } from "expo-router";
 import { useTranslation } from "../../hooks/use-translation";
-import DefineChildProfileScreen from "@/src/screens/ParentScreens/DefineChildProfileScreen/DefineChildProfileScreen";
+import EditChildProfileScreen from "@/src/screens/ParentScreens/EditChildProfileScreen/EditChildProfileScreen";
 
+export default function EditChildProfileRoute() {
+  const { t } = useTranslation();
 
-export default function DefineChildProfileRoute() {
-    const { t } = useTranslation();
-
-    return (
+  return (
     <>
       <Stack.Screen
         options={{
@@ -15,7 +14,8 @@ export default function DefineChildProfileRoute() {
           headerShadowVisible: false,
         }}
       />
-      <DefineChildProfileScreen />
+      <EditChildProfileScreen />
     </>
   );
 }
+

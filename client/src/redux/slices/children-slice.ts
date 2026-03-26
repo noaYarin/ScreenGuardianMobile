@@ -3,6 +3,7 @@ import {
   addChildThunk,
   getMyChildrenThunk,
   fetchCurrentChildProfileThunk,
+  updateCurrentChildProfileThunk,
 } from "../thunks/childrenThunks";
 import { logout } from "./auth-slice"; 
 
@@ -107,7 +108,24 @@ const childrenSlice = createSlice({
         state.childrenList = [];
         state.isLoading = false;
         state.error = null;
-      });
+      })
+      .addCase(updateCurrentChildProfileThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateCurrentChildProfileThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const updatedChild = action.payload; 
+
+        state.childrenList = state.childrenList.map((child) =>
+          child._id === updatedChild._id ? updatedChild : child
+        );
+
+      })
+      .addCase(updateCurrentChildProfileThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = state.error = (action.payload as string) || action.error.message || "Update failed";
+      })
   },
 });
 
