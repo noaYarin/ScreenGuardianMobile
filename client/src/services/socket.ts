@@ -14,6 +14,18 @@ export const connectSocket = (userId: string) => {
     return socket;
 };
 
+
+// Emit events to the server
+export const emitEvent = (event: string, data: any) => {
+    if (socket && socket.connected) {
+        socket.emit(event, data);
+    } else {
+        console.warn(`Socket not connected. Could not emit: ${event}`);
+    }
+};
+
+
+// Listen to events from the server
 export const onEvent = (event: string, handler: (...args: any[]) => void) => {
     socket?.on(event, handler);
     // Return a function to clean up the event listener
