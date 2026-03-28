@@ -2,14 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   ScrollView,
-  Pressable,
   RefreshControl,
   useWindowDimensions,
   ActivityIndicator,
   Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { Href, router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import ChildDeviceSelector from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
@@ -19,22 +18,16 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useChildProfileLabels } from "../../../../hooks/use-child-profile-labels";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-<<<<<<< HEAD
 import {
   fetchDevicesByChild,
   deleteDeviceForChild,
-  setDeviceLockThunk
+  setDeviceLockThunk,
 } from "@/src/redux/thunks/deviceThunks";
-=======
-import { fetchDevicesByChild, deleteDeviceForChild } from "@/src/redux/thunks/deviceThunks";
-import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
 import { childDetailsStyles as styles } from "@/src/components/ChildDetails/childDetails.styles";
 import { parseRouteParam } from "./childDetailsRouteParams";
-
 
 export default function ChildDetailsScreen() {
   const { t } = useTranslation();
@@ -43,10 +36,21 @@ export default function ChildDetailsScreen() {
   const params = useLocalSearchParams<{ id?: string; deviceId?: string | string[] }>();
   const dispatch = useDispatch<AppDispatch>();
 
-  const paramDeviceId = useMemo(() => parseRouteParam(params.deviceId), [params.deviceId]);
-  const paramChildIdFromRoute = useMemo(() => parseRouteParam(params.id), [params.id]);
+  const paramDeviceId = useMemo(
+    () => parseRouteParam(params.deviceId),
+    [params.deviceId]
+  );
+  const paramChildIdFromRoute = useMemo(
+    () => parseRouteParam(params.id),
+    [params.id]
+  );
 
-  const { childrenList, isLoading, error: childrenError } = useSelector((state: RootState) => state.children);
+  const {
+    childrenList,
+    isLoading,
+    error: childrenError,
+  } = useSelector((state: RootState) => state.children);
+
   const devicesSlice = useSelector((state: RootState) => state.devices);
   const children = Array.isArray(childrenList) ? childrenList : [];
 
@@ -58,70 +62,72 @@ export default function ChildDetailsScreen() {
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
   const effectiveChildId = useMemo(() => {
-    if (children.length === 0) return paramChildIdFromRoute || userSelectedChildId || "";
-    if (paramChildIdFromRoute && children.some((c) => String(c._id) === paramChildIdFromRoute)) {
+    if (children.length === 0) {
+      return paramChildIdFromRoute || userSelectedChildId || "";
+    }
+
+    if (
+      paramChildIdFromRoute &&
+      children.some((c) => String(c._id) === paramChildIdFromRoute)
+    ) {
       return paramChildIdFromRoute;
     }
-    if (userSelectedChildId && children.some((c) => String(c._id) === String(userSelectedChildId))) {
+
+    if (
+      userSelectedChildId &&
+      children.some((c) => String(c._id) === String(userSelectedChildId))
+    ) {
       return String(userSelectedChildId);
     }
+
     return String(children[0]._id);
   }, [children, paramChildIdFromRoute, userSelectedChildId]);
 
   const devices = useMemo(() => {
     if (!effectiveChildId) return [];
-    return Array.isArray(devicesSlice.byChildId[effectiveChildId]) ? devicesSlice.byChildId[effectiveChildId] : [];
+    return Array.isArray(devicesSlice.byChildId[effectiveChildId])
+      ? devicesSlice.byChildId[effectiveChildId]
+      : [];
   }, [devicesSlice.byChildId, effectiveChildId]);
 
-  const devicesLoading = Boolean(effectiveChildId) && devicesSlice.statusByChildId[effectiveChildId] === "loading";
+  const devicesLoading =
+    Boolean(effectiveChildId) &&
+    devicesSlice.statusByChildId[effectiveChildId] === "loading";
 
   const refreshChildrenList = useCallback(() => {
     dispatch(getMyChildrenThunk());
   }, [dispatch]);
 
-  // Refresh parent children and devices list
   useFocusEffect(
     useCallback(() => {
       refreshChildrenList();
-<<<<<<< HEAD
 
-      if (effectiveChildId) {
-        dispatch(fetchDevicesByChild(effectiveChildId));
-      }
-    }, [refreshChildrenList, dispatch, effectiveChildId])
-=======
       if (effectiveChildId) {
         dispatch(fetchDevicesByChild(effectiveChildId));
       }
     }, [refreshChildrenList, effectiveChildId, dispatch])
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
   );
 
   useEffect(() => {
-<<<<<<< HEAD
-    if (!effectiveChildId) return;
-    dispatch(fetchDevicesByChild(effectiveChildId));
-  }, [dispatch, effectiveChildId]);
-
-  // Expand devices section if screen was opened from a deep link
-  useEffect(() => {
-    if (deepLinkDevices) {
+    if (paramDeviceId && paramChildIdFromRoute) {
       setIsDevicesExpanded(true);
     }
-  }, [deepLinkDevices]);
+  }, [paramDeviceId, paramChildIdFromRoute]);
 
-  const handleRefreshDevices = useCallback(() => {
+  const handleRefreshDevices = useCallback(async () => {
     setDevicesRefreshing(true);
-    refreshChildrenList();
 
-    const promise = effectiveChildId
-      ? dispatch(fetchDevicesByChild(effectiveChildId)).unwrap()
-      : Promise.resolve();
+    await dispatch(getMyChildrenThunk());
 
-    promise.catch(() => { }).finally(() => setDevicesRefreshing(false));
-  }, [refreshChildrenList, dispatch, effectiveChildId]);
+    if (effectiveChildId) {
+      await dispatch(fetchDevicesByChild(effectiveChildId))
+        .unwrap()
+        .catch(() => { });
+    }
 
-  // Get selected child object
+    setDevicesRefreshing(false);
+  }, [dispatch, effectiveChildId]);
+
   const selectedChild = useMemo(
     () =>
       children.find((c) => String(c._id) === String(effectiveChildId)) ?? null,
@@ -133,101 +139,64 @@ export default function ChildDetailsScreen() {
 
   const deviceRows = useMemo(() => mapDevicesToRows(devices, t), [devices, t]);
 
-  const childSelectorOptions = useMemo<ChildSelectorOption[]>(
-    () =>
-      children.map((child, index) => {
-        const fullName =
-          typeof child.name === "string" && child.name.trim()
-            ? child.name.trim()
-            : t("childSelector.defaultChildSubtitle");
-
-        const initial =
-          fullName.length > 0 ? fullName.charAt(0).toUpperCase() : "?";
-
-        const accentPalette = [
-          "#7C3AED",
-          "#2563EB",
-          "#10B981",
-          "#F59E0B",
-          "#EF4444",
-          "#EC4899",
-        ];
-
-        return {
-          id: String(child._id),
-          name: fullName,
-          initial,
-          accent: accentPalette[index % accentPalette.length],
-          subtitleKey: "childSelector.defaultChildSubtitle",
-        };
-      }),
-    [children, t]
-  );
-
-  const handleRetryLoadChildren = useCallback(() => {
-    refreshChildrenList();
-=======
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
-    if (effectiveChildId) {
-      dispatch(fetchDevicesByChild(effectiveChildId));
-    }
-  }, [dispatch, effectiveChildId]);
-
-  useEffect(() => {
-    if (paramDeviceId && paramChildIdFromRoute) {
-      setIsDevicesExpanded(true);
-    }
-  }, [paramDeviceId, paramChildIdFromRoute]);
-
-  const handleRefreshDevices = useCallback(async () => {
-    setDevicesRefreshing(true);
-    await dispatch(getMyChildrenThunk());
-    if (effectiveChildId) {
-      await dispatch(fetchDevicesByChild(effectiveChildId)).unwrap().catch(() => {});
-    }
-    setDevicesRefreshing(false);
-  }, [dispatch, effectiveChildId]);
-
-  const selectedChild = useMemo(() => children.find((c) => String(c._id) === String(effectiveChildId)) ?? null, [children, effectiveChildId]);
-  const { childName, birthDateLabel, genderLabel } = useChildProfileLabels(selectedChild);
-  const deviceRows = useMemo(() => mapDevicesToRows(devices, t), [devices, t]);
-
   const handleConnectDevice = useCallback(() => {
     if (!effectiveChildId) return;
-    router.push({ pathname: "/Parent/linkDevice", params: { id: effectiveChildId, name: childName } } as never);
+
+    router.push({
+      pathname: "/Parent/linkDevice",
+      params: { id: effectiveChildId, name: childName },
+    } as never);
   }, [effectiveChildId, childName]);
 
   const handleOpenChildProfile = useCallback(() => {
     if (!effectiveChildId) return;
-    router.push({ pathname: "/Parent/childProfile", params: { id: effectiveChildId, name: childName } } as never);
+
+    router.push({
+      pathname: "/Parent/childProfile",
+      params: { id: effectiveChildId, name: childName },
+    } as never);
   }, [effectiveChildId, childName]);
 
-  const handleDeleteDevice = useCallback((deviceId: string, deviceDisplayName: string) => {
-    if (!effectiveChildId || deletingDeviceId) return;
-    Alert.alert(
-      t("childDetails.delete_device_title", { device: deviceDisplayName }),
-      t("childDetails.delete_device_message", { child: childName.trim() || t("childDetails.devices_title") }),
-      [
-        { text: t("childDetails.delete_device_cancel"), style: "cancel" },
-        {
-          text: t("childDetails.delete_device_confirm"),
-          style: "destructive",
-          onPress: async () => {
-            setDeletingDeviceId(deviceId);
-            try {
-              await dispatch(deleteDeviceForChild({ childId: effectiveChildId, deviceId })).unwrap();
-            } catch {
-              Alert.alert("", t("childDetails.delete_device_error"));
-            } finally {
-              setDeletingDeviceId(null);
-            }
-          },
-        },
-      ]
-    );
-  }, [dispatch, effectiveChildId, deletingDeviceId, childName, t]);
+  const handleDeleteDevice = useCallback(
+    (deviceId: string, deviceDisplayName: string) => {
+      if (!effectiveChildId || deletingDeviceId) return;
 
-<<<<<<< HEAD
+      Alert.alert(
+        t("childDetails.delete_device_title", { device: deviceDisplayName }),
+        t("childDetails.delete_device_message", {
+          child: childName.trim() || t("childDetails.devices_title"),
+        }),
+        [
+          {
+            text: t("childDetails.delete_device_cancel"),
+            style: "cancel",
+          },
+          {
+            text: t("childDetails.delete_device_confirm"),
+            style: "destructive",
+            onPress: async () => {
+              setDeletingDeviceId(deviceId);
+
+              try {
+                await dispatch(
+                  deleteDeviceForChild({
+                    childId: effectiveChildId,
+                    deviceId,
+                  })
+                ).unwrap();
+              } catch {
+                Alert.alert("", t("childDetails.delete_device_error"));
+              } finally {
+                setDeletingDeviceId(null);
+              }
+            },
+          },
+        ]
+      );
+    },
+    [dispatch, effectiveChildId, deletingDeviceId, childName, t]
+  );
+
   const handleSetDeviceLocked = useCallback(
     async (deviceId: string, locked: boolean) => {
       if (!effectiveChildId || deletingDeviceId) return;
@@ -241,6 +210,12 @@ export default function ChildDetailsScreen() {
           })
         ).unwrap();
 
+        Alert.alert(
+          "",
+          locked
+            ? t("childDetails.device_locked_success")
+            : t("childDetails.device_unlocked_success")
+        );
       } catch {
         Alert.alert("", t("childDetails.lock_error"));
       }
@@ -248,8 +223,7 @@ export default function ChildDetailsScreen() {
     [dispatch, effectiveChildId, deletingDeviceId, t]
   );
 
-
-  const showFullScreenLoader = isLoading && children.length === 0 && !deepLinkDevices;
+  const showFullScreenLoader = isLoading && children.length === 0;
 
   const showChildrenFetchError =
     Boolean(childrenError) && !isLoading && children.length === 0;
@@ -261,19 +235,43 @@ export default function ChildDetailsScreen() {
     : "";
 
   if (showFullScreenLoader) {
-=======
-  const handleSetDeviceLocked = useCallback((deviceId: string, locked: boolean) => {
-    if (!effectiveChildId) return;
-    dispatch(setDeviceLockLocal({ childId: effectiveChildId, deviceId, isLocked: locked }));
-  }, [dispatch, effectiveChildId]);
-
-  if (isLoading && children.length === 0) {
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
     return (
       <ScreenLayout>
         <View style={[styles.container, { alignItems: "center", paddingTop: 40 }]}>
           <ActivityIndicator />
-          <AppText style={[styles.loadingHint, text]}>{t("childDetails.loading_children")}</AppText>
+          <AppText style={[styles.loadingHint, text]}>
+            {t("childDetails.loading_children")}
+          </AppText>
+        </View>
+      </ScreenLayout>
+    );
+  }
+
+  if (showChildrenFetchError) {
+    return (
+      <ScreenLayout>
+        <View style={[styles.container, { paddingTop: 24 }]}>
+          <AppText style={[styles.childMeta, text]}>{errorMessage}</AppText>
+          <View style={{ marginTop: 12 }}>
+            <AppText
+              style={[styles.childMeta, text]}
+              onPress={refreshChildrenList}
+            >
+              {t("common.retry")}
+            </AppText>
+          </View>
+        </View>
+      </ScreenLayout>
+    );
+  }
+
+  if (showEmptyState) {
+    return (
+      <ScreenLayout>
+        <View style={[styles.container, { paddingTop: 24 }]}>
+          <AppText style={[styles.childMeta, text]}>
+            {t("homeParent.no_children")}
+          </AppText>
         </View>
       </ScreenLayout>
     );
@@ -284,7 +282,12 @@ export default function ChildDetailsScreen() {
       <ScrollView
         style={styles.scrollRoot}
         contentContainerStyle={styles.scrollContent}
-        refreshControl={<RefreshControl refreshing={devicesRefreshing} onRefresh={handleRefreshDevices} />}
+        refreshControl={
+          <RefreshControl
+            refreshing={devicesRefreshing}
+            onRefresh={handleRefreshDevices}
+          />
+        }
       >
         <View style={[styles.content, { maxWidth: maxContentWidth }]}>
           <ChildDeviceSelector

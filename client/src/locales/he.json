@@ -236,7 +236,7 @@
     "success_title": "הסיסמה עודכנה",
     "success_message": "הסיסמה שלך אופסה בהצלחה."
   },
-    "homeParent": {
+  "homeParent": {
     "title": "ברוכים הבאים",
     "parent_name_fallback": "אמא",
     "hello": "שלום, {{name}}!",
@@ -246,21 +246,17 @@
     "out_of": "מתוך {{limit}}",
     "full_watch": "צפייה מלאה",
     "add_child": "הוספת ילד",
-
     "locked": "נעול",
     "locked_by_parent": "נעילה פעילה",
     "locked_subtitle": "המכשיר נעול כרגע",
     "no_limit": "ללא הגבלה",
     "refreshing": "מתעדכן...",
-
     "overview_a11y": "מעבר לסקירה כללית",
     "full_watch_a11y": "פתיחת צפייה מלאה",
     "add_child_a11y": "הוספת ילד חדש",
     "child_card_a11y": "בחירת ילד: {{name}}",
-
     "no_children": "אין ילדים עדיין. הוסף ילד כדי להתחיל"
   },
-
   "tabs": {
     "home": "בית",
     "children": "ילדים",
@@ -390,6 +386,8 @@
     "device_active_no": "לא",
     "device_lock": "נעילה",
     "device_unlock": "שחרור",
+    "device_locked_success": "המכשיר ננעל בהצלחה",
+    "device_unlocked_success": "המכשיר שוחרר בהצלחה",
     "device_lock_a11y": "נעילת המכשיר {{name}}",
     "device_unlock_a11y": "שחרור נעילת המכשיר {{name}}",
     "device_lock_error": "לא ניתן לעדכן את מצב הנעילה. נסו שוב.",
@@ -452,7 +450,8 @@
       "chatbot": "צ'אט בוט",
       "history": "היסטוריית פעולות"
     }
-  },"limits": {
+  },
+  "limits": {
     "title": "מגבלות",
     "heading": "ניהול מגבלות",
     "subtitle": "כאן אפשר להגדיר זמן מסך, הפסקות והגבלות נוספות בצורה מסודרת.",
@@ -483,6 +482,8 @@
     "editA11y": "עריכת מגבלה עבור {{section}}",
     "childTabA11y": "בחירת הילד {{name}}",
     "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "update_success": "המגבלה עודכנה בהצלחה",
+    "update_error": "שגיאה בעדכון המגבלה",
     "daily": {
       "title": "מגבלה יומית",
       "summary": "המגבלה המוגדרת כרגע היא {{value}} ביום"
@@ -498,19 +499,21 @@
     "devices": {
       "phone": "טלפון",
       "tablet": "טאבלט"
-    },"status": {
-  "ok": "תקין"
- }, "almostReached": "כמעט הגיע למגבלה",
-   "done": "סיום",
+    },
+    "status": {
+      "ok": "תקין"
+    },
+    "almostReached": "כמעט הגיע למגבלה",
+    "done": "סיום",
     "currentLimit": "מגבלה נוכחית",
-     "editWeekly": "עריכת שבועי",
-  "a11y": {
-    "editWeeklySchedule": "עריכת לוח זמנים שבועי",
-    "editDailyLimit": "עריכת הגבלה יומית",
-    "doneEditing": "סיום עריכה",
-    "decreaseByFiveMinutes": "הפחתה של חמש דקות",
-    "increaseByFiveMinutes": "הוספה של חמש דקות"
-  }
+    "editWeekly": "עריכת שבועי",
+    "a11y": {
+      "editWeeklySchedule": "עריכת לוח זמנים שבועי",
+      "editDailyLimit": "עריכת הגבלה יומית",
+      "doneEditing": "סיום עריכה",
+      "decreaseByFiveMinutes": "הפחתה של חמש דקות",
+      "increaseByFiveMinutes": "הוספה של חמש דקות"
+    }
   },
   "childDeviceSelector": {
     "childrenSectionTitle": "בחירת ילד",
@@ -518,16 +521,14 @@
     "defaultChildSubtitle": "ניהול אישי",
     "allChildren": "כל הילדים",
     "allDevices": "כל המכשירים",
-   "allChildrenSubtitle": "כל הילדים",
-   "allDevicesSubtitle":"כל המכשירים",
-
+    "allChildrenSubtitle": "כל הילדים",
+    "allDevicesSubtitle": "כל המכשירים",
     "childTabA11y": "בחירת הילד {{name}}",
     "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
     "devices": {
       "phone": "טלפון",
       "tablet": "טאבלט"
     }
-    
   },
   "systemAlerts": {
     "title": "התראות מערכת",
@@ -730,13 +731,34 @@
       "totalHours": "שעות שבועיות"
     },
     "days": {
-      "sun": { "short": "א", "full": "ראשון" },
-      "mon": { "short": "ב", "full": "שני" },
-      "tue": { "short": "ג", "full": "שלישי" },
-      "wed": { "short": "ד", "full": "רביעי" },
-      "thu": { "short": "ה", "full": "חמישי" },
-      "fri": { "short": "ו", "full": "שישי" },
-      "sat": { "short": "ש", "full": "שבת" }
+      "sun": {
+        "short": "א",
+        "full": "ראשון"
+      },
+      "mon": {
+        "short": "ב",
+        "full": "שני"
+      },
+      "tue": {
+        "short": "ג",
+        "full": "שלישי"
+      },
+      "wed": {
+        "short": "ד",
+        "full": "רביעי"
+      },
+      "thu": {
+        "short": "ה",
+        "full": "חמישי"
+      },
+      "fri": {
+        "short": "ו",
+        "full": "שישי"
+      },
+      "sat": {
+        "short": "ש",
+        "full": "שבת"
+      }
     },
     "a11y": {
       "scrollToDay": "מעבר מהיר ליום {{day}}",
@@ -746,7 +768,7 @@
       "copyToAllDays": "העתקת ההגדרות לכל הימים",
       "saveSchedule": "שמירת לוח הזמנים השבועי"
     }
-  },      
+  },
   "api": {
     "generic_error": "משהו השתבש, נסה שוב."
   },
@@ -935,7 +957,3 @@
     }
   }
 }
-
-
-
-
