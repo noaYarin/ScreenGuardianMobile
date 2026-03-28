@@ -13,13 +13,9 @@ import {
   getDeviceByChild,
   getDeviceCurrentStatusForChild,
   updateDeviceUsageByChild,
-<<<<<<< HEAD
   deleteDeviceForParent, 
-  handleDeviceHeartbeat 
-=======
-  deleteDeviceForParent,
-  updateDeviceLocation,
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
+  handleDeviceHeartbeat,
+  updateDeviceLocation
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {

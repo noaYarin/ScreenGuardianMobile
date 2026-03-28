@@ -5,11 +5,7 @@ import { requireParent } from "../middlewares/requireParent.js";
 import {
   getCurrentChildProfileController,
   updateChildInterestsController,
-<<<<<<< HEAD
-  updateCurrentChildProfileController
-=======
   updateCurrentChildProfileController,
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
 } from "../controllers/child.controller.js";
 
 const router = Router();

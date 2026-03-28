@@ -19,12 +19,8 @@ import {
   getDeviceCurrentStatusForChildController,
   updateDeviceUsageByChildController,
   updateDeviceNameController,
-<<<<<<< HEAD
-  deviceHeartbeatController
-
-=======
+  deviceHeartbeatController,
   updateDeviceLocationController
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
 } from "../controllers/device.controller.js";
 
 const router = Router();
