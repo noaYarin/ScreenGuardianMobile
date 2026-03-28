@@ -71,10 +71,9 @@ export default function LocationDetailsCard({
       return { address: disabledAddressValue || "---", updated: "--:--" };
     }
     
-    // טיפול בפורמט הזמן
     let timeStr = "--:--";
-    if (deviceSnapshot?.timestamp) {
-      const date = new Date(deviceSnapshot.timestamp);
+    if (deviceSnapshot?.lastUpdated) {
+      const date = new Date(deviceSnapshot.lastUpdated);
       if (!isNaN(date.getTime())) {
         timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       }
