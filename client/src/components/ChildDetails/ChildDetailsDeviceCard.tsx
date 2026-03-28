@@ -123,6 +123,19 @@ export function ChildDetailsDeviceCard({
               valueLines={1}
             />
             <View style={styles.deviceDetailRowDivider} />
+            <DeviceDetailRow
+              icon="power"
+              label={t("childDetails.device_active")}
+              value={
+                device.active
+                  ? t("childDetails.device_active_yes")
+                  : t("childDetails.device_active_no")
+              }
+              row={row}
+              text={text}
+              valueLines={1}
+            />
+            <View style={styles.deviceDetailRowDivider} />
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={

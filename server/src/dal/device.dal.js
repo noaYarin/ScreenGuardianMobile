@@ -6,6 +6,13 @@ export async function createDevice(doc) {
   return DeviceModel.create(doc);
 }
 
+export async function updateDevicesIsActiveByParentId(parentId, isActive) {
+  return DeviceModel.updateMany(
+    { parentId }, 
+    { $set: { isActive } }
+  ).lean();
+}
+
 export async function findDeviceByBarcodeOrCode(session) {
   const existingDevice = await DeviceModel.findOne({
     $or: [
@@ -155,6 +162,7 @@ export async function updateDeviceUsedTodayMinutes(deviceId, usedTodayMinutes) {
   ).lean();
 }
 
+
 export async function updateDeviceHeartbeat(
   deviceId,
   { lastSeenAt, accessibilityEnabled, usageAccessEnabled }
@@ -171,5 +179,25 @@ export async function updateDeviceHeartbeat(
       }
     },
     { new: true }
+    ).lean();
+  }
+
+
+export async function findDeviceByDeviceId(deviceId) {
+  return DeviceModel.findOne({ deviceId }).lean();
+}
+
+export async function updateDeviceActivation(deviceId, { childId, parentId, deviceName }) {
+  return DeviceModel.findOneAndUpdate(
+    { deviceId }, 
+    { 
+      $set: { 
+        isActive: true, 
+        childId: String(childId), 
+        parentId: String(parentId),
+        ...(deviceName && { name: deviceName })
+      } 
+    },
+    { new: true } 
   ).lean();
 }

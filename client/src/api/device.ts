@@ -9,8 +9,11 @@ export type Device = {
   platform: string;
   isLocked: boolean;
   isActive: boolean;
-  location?: string;
-  parentId: string;
+  location: {
+    lat: number;
+    lng: number;
+    lastUpdated: string;
+  };  parentId: string;
   childId: string;
   applications?: Array<{
     packageName: string;
@@ -101,6 +104,21 @@ export async function apiUpdateDeviceScreenTime(
     {
       requireAuth: true,
       role: "PARENT",
+          }
+  );
+  return data;
+}
+
+export async function apiUpdateDeviceLocation(
+  deviceId: string,
+  location: { lat: number; lng: number }
+): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/location`,
+    { location },
+    {
+      requireAuth: true,
+      role: "CHILD", 
     }
   );
   return data;

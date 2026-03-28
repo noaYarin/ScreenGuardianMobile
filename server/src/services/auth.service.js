@@ -9,6 +9,7 @@ import {
   setPasswordResetCodeByEmail,
   findParentByEmailAndValidResetCode,
   updateParentPasswordAndClearReset,
+  setParentLastLogoutAt,
 } from "../dal/parent.dal.js";
 import { Role } from "../constants/role.js";
 import { sendEmail } from "./emailService.js";
@@ -26,12 +27,24 @@ function issueAuthResponse(parent) {
   return { token, parentId };
 }
 
-export async function issueChildToken(parentId, childId) {
+export async function issueChildToken(parentId, childId, deviceId) {
   const parentIdStr = parentId != null ? String(parentId) : null;
   const childIdStr = childId != null ? String(childId) : null;
-  // JWT with parentId and childId 
-  const token = signToken({ parentId: parentIdStr, childId: childIdStr, role: Role.CHILD });
-  return { token, parentId: parentIdStr, childId: childIdStr };
+  const deviceIdStr = deviceId != null ? String(deviceId) : null;
+
+  const token = signToken({ 
+    parentId: parentIdStr, 
+    childId: childIdStr, 
+    deviceId: deviceIdStr, 
+    role: Role.CHILD 
+  });
+
+  return { 
+    token, 
+    parentId: parentIdStr, 
+    childId: childIdStr,
+    deviceId: deviceIdStr 
+  };
 }
 
 export async function registerParent({ email, password, name, phoneNumber }) {
@@ -104,4 +117,10 @@ export async function resetPassword({ email, otpCode, password }) {
   const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
   await updateParentPasswordAndClearReset(parent._id, hash);
   return issueAuthResponse(parent);
+}
+
+// Secure logout: invalidate existing JWTs for this parent (and their child tokens).
+export async function logoutParent(parentId) {
+  await setParentLastLogoutAt(parentId, new Date());
+  return { parentId: String(parentId) };
 }

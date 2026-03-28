@@ -6,6 +6,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import ChildDeviceSelector, {
+  ALL_CHILD_ID,
+  ALL_DEVICE_ID,
   type ChildOption,
   type DeviceType,
 } from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
@@ -21,8 +23,6 @@ type ExtensionRequestItem = {
   childId: string;
   deviceId: string;
   childName: string;
-  appName: string;
-  appIcon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   requestedMinutes: number;
   reasonKey: string;
   requestedAtKey: string;
@@ -31,9 +31,6 @@ type ExtensionRequestItem = {
   deviceNameKey: string;
   status: ExtensionRequestStatus;
 };
-
-const ALL_CHILD_ID = "all-children";
-const ALL_DEVICE_ID = "all-devices";
 
 const STATIC_CHILDREN: ChildOption[] = [
   {
@@ -89,32 +86,12 @@ const STATIC_CHILDREN: ChildOption[] = [
   },
 ];
 
-const CHILDREN_WITH_ALL_OPTION: ChildOption[] = [
-  {
-    id: ALL_CHILD_ID,
-    name: "כל הילדים",
-    initial: "ה",
-    accent: "#315BFF",
-    devices: [
-      {
-        id: ALL_DEVICE_ID,
-        type: "phone",
-        name: "כל המכשירים",
-        icon: "devices",
-      },
-    ],
-  },
-  ...STATIC_CHILDREN,
-];
-
 const STATIC_REQUESTS: ExtensionRequestItem[] = [
   {
     id: "req-1",
     childId: "noa",
     deviceId: "noa-phone",
     childName: "נועה",
-    appName: "YouTube",
-    appIcon: "youtube",
     requestedMinutes: 30,
     reasonKey: "extensionRequests.reasons.studyVideo",
     requestedAtKey: "extensionRequests.requestTimes.fiveMinutesAgo",
@@ -128,8 +105,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "noa",
     deviceId: "noa-tablet",
     childName: "נועה",
-    appName: "ROBLOX",
-    appIcon: "gamepad-variant-outline",
     requestedMinutes: 15,
     reasonKey: "extensionRequests.reasons.friendsMission",
     requestedAtKey: "extensionRequests.requestTimes.fifteenMinutesAgo",
@@ -143,8 +118,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "yonatan",
     deviceId: "yonatan-phone",
     childName: "יונתן",
-    appName: "Instagram",
-    appIcon: "instagram",
     requestedMinutes: 15,
     reasonKey: "extensionRequests.reasons.chatWithFriends",
     requestedAtKey: "extensionRequests.requestTimes.oneHourAgo",
@@ -158,8 +131,6 @@ const STATIC_REQUESTS: ExtensionRequestItem[] = [
     childId: "tamar",
     deviceId: "tamar-tablet",
     childName: "תמר",
-    appName: "Duolingo",
-    appIcon: "book-open-variant",
     requestedMinutes: 20,
     reasonKey: "extensionRequests.reasons.finishLesson",
     requestedAtKey: "extensionRequests.requestTimes.tenMinutesAgo",
@@ -183,31 +154,44 @@ export default function ExtensionRequestsScreen() {
 
   const [selectedChildId, setSelectedChildId] = useState(ALL_CHILD_ID);
   const [selectedDeviceId, setSelectedDeviceId] = useState(ALL_DEVICE_ID);
-
   const [requests, setRequests] = useState<ExtensionRequestItem[]>(STATIC_REQUESTS);
 
-  const selectedChild = useMemo(
-    () =>
-      CHILDREN_WITH_ALL_OPTION.find((child) => child.id === selectedChildId) ??
-      CHILDREN_WITH_ALL_OPTION[0],
-    [selectedChildId]
-  );
+  const selectedChild = useMemo(() => {
+    if (selectedChildId === ALL_CHILD_ID) {
+      return null;
+    }
+
+    return STATIC_CHILDREN.find((child) => child.id === selectedChildId) ?? null;
+  }, [selectedChildId]);
 
   const selectedDevice = useMemo(() => {
-    if (selectedChildId === ALL_CHILD_ID) {
+    if (selectedDeviceId === ALL_DEVICE_ID) {
       return {
         id: ALL_DEVICE_ID,
         type: "phone" as DeviceType,
-        name: "כל המכשירים",
+        name: t("childDeviceSelector.allDevices"),
+        icon: "devices" as React.ComponentProps<typeof MaterialCommunityIcons>["name"],
+      };
+    }
+
+    if (!selectedChild) {
+      return {
+        id: ALL_DEVICE_ID,
+        type: "phone" as DeviceType,
+        name: t("childDeviceSelector.allDevices"),
         icon: "devices" as React.ComponentProps<typeof MaterialCommunityIcons>["name"],
       };
     }
 
     return (
-      selectedChild.devices.find((device) => device.id === selectedDeviceId) ??
-      selectedChild.devices[0]
+      selectedChild.devices.find((device) => device.id === selectedDeviceId) ?? null
     );
-  }, [selectedChild, selectedChildId, selectedDeviceId]);
+  }, [selectedChild, selectedDeviceId, t]);
+
+  const selectedChildLabel =
+    selectedChildId === ALL_CHILD_ID
+      ? t("childDeviceSelector.allChildren")
+      : selectedChild?.name ?? "";
 
   const visibleRequests = useMemo(() => {
     return requests.filter((request) => {
@@ -224,32 +208,6 @@ export default function ExtensionRequestsScreen() {
       return matchesChild && matchesDevice;
     });
   }, [requests, selectedChildId, selectedDeviceId]);
-
-  const onSelectChild = (childId: string) => {
-    setSelectedChildId(childId);
-
-    if (childId === ALL_CHILD_ID) {
-      setSelectedDeviceId(ALL_DEVICE_ID);
-      return;
-    }
-
-    const nextChild = CHILDREN_WITH_ALL_OPTION.find((child) => child.id === childId);
-    if (nextChild?.devices?.length) {
-      setSelectedDeviceId(nextChild.devices[0].id);
-    } else {
-      setSelectedDeviceId("");
-    }
-
-    // TODO: Server integration
-    // Fetch requests for the selected child here if needed.
-  };
-
-  const onSelectDevice = (deviceId: string) => {
-    setSelectedDeviceId(deviceId);
-
-    // TODO: Server integration
-    // Fetch requests for the selected device here if needed.
-  };
 
   const handleApprove = (requestId: string) => {
     setRequests((prev) =>
@@ -314,14 +272,14 @@ export default function ExtensionRequestsScreen() {
                     color="#315BFF"
                   />
                   <AppText weight="bold" style={[styles.heroMetaText, text]}>
-                    {selectedChild.name}
+                    {selectedChildLabel}
                   </AppText>
                 </View>
 
                 <View style={styles.heroMetaChip}>
                   <MaterialCommunityIcons
                     name={
-                      selectedChildId === ALL_CHILD_ID
+                      selectedDeviceId === ALL_DEVICE_ID
                         ? "devices"
                         : getDeviceIconName(selectedDevice?.type ?? "phone")
                     }
@@ -329,19 +287,21 @@ export default function ExtensionRequestsScreen() {
                     color="#315BFF"
                   />
                   <AppText weight="bold" style={[styles.heroMetaText, text]}>
-                    {selectedDevice?.name ?? ""}
+                    {selectedDevice?.name ?? t("childDeviceSelector.allDevices")}
                   </AppText>
                 </View>
               </View>
             </View>
 
             <ChildDeviceSelector
-              childrenOptions={CHILDREN_WITH_ALL_OPTION}
+              childrenOptions={STATIC_CHILDREN}
               selectedChildId={selectedChildId}
               selectedDeviceId={selectedDeviceId}
-              onSelectChild={onSelectChild}
-              onSelectDevice={onSelectDevice}
+              onSelectChild={setSelectedChildId}
+              onSelectDevice={setSelectedDeviceId}
               childCardWidth={width >= 700 ? 160 : 140}
+              includeAllChildrenOption
+              includeAllDevicesOption
             />
 
             <View
@@ -389,17 +349,17 @@ export default function ExtensionRequestsScreen() {
                     style={[styles.requestCard, isWide ? styles.requestCardWide : undefined]}
                   >
                     <View style={[styles.cardTopRow, row]}>
-                      <View style={styles.appBadge}>
+                      <View style={styles.deviceBadge}>
                         <MaterialCommunityIcons
-                          name={request.appIcon}
-                          size={22}
+                          name={getDeviceIconName(request.deviceType)}
+                          size={24}
                           color="#315BFF"
                         />
                       </View>
 
                       <View style={styles.cardTopTextWrap}>
-                        <AppText weight="extraBold" style={[styles.appName, text]}>
-                          {request.appName}
+                        <AppText weight="extraBold" style={[styles.deviceName, text]}>
+                          {t(request.deviceNameKey)}
                         </AppText>
 
                         <AppText weight="medium" style={[styles.childName, text]}>
@@ -439,7 +399,20 @@ export default function ExtensionRequestsScreen() {
                       </AppText>
                     </View>
 
-                    <View style={[styles.timeRow, row]}>
+                    <View style={styles.remainingBox}>
+                      <View style={isRTL ? styles.remainingRowRtl : styles.remainingRowLtr}>
+                        <MaterialCommunityIcons
+                          name="timer-sand"
+                          size={16}
+                          color="#7A8599"
+                        />
+                        <AppText weight="medium" style={[styles.remainingText, text]}>
+                          {t(request.currentRemainingKey)}
+                        </AppText>
+                      </View>
+                    </View>
+
+                    <View style={isRTL ? styles.timeRowRtl : styles.timeRowLtr}>
                       <MaterialCommunityIcons
                         name="history"
                         size={16}
@@ -456,7 +429,7 @@ export default function ExtensionRequestsScreen() {
                         accessibilityRole="button"
                         accessibilityLabel={t("extensionRequests.a11y.declineRequest", {
                           childName: request.childName,
-                          appName: request.appName,
+                          deviceName: t(request.deviceNameKey),
                         })}
                         style={({ pressed }) => [
                           styles.actionButton,
@@ -475,7 +448,7 @@ export default function ExtensionRequestsScreen() {
                         accessibilityRole="button"
                         accessibilityLabel={t("extensionRequests.a11y.approveRequest", {
                           childName: request.childName,
-                          appName: request.appName,
+                          deviceName: t(request.deviceNameKey),
                         })}
                         style={({ pressed }) => [
                           styles.actionButton,

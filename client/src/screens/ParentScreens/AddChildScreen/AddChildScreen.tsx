@@ -132,21 +132,6 @@ export default function AddChildScreen() {
         options={{
           title: t("addChild.title"),
           headerTitleAlign: "center",
-          headerShadowVisible: false,
-          headerRight: () => (
-            <HeaderIconButton
-              name={backIconName}
-              onPress={() => router.back()}
-              accessibilityLabel={t("addChild.back_a11y")}
-            />
-          ),
-          headerLeft: () => (
-            <HeaderIconButton
-              name="menu"
-              onPress={() => { }}
-              accessibilityLabel={t("addChild.menu_a11y")}
-            />
-          ),
         }}
       />
 

@@ -6,7 +6,11 @@
     "back": "חזרה",
     "ok": "אישור",
     "retry": "נסו שוב",
-    "change_language": "שינוי שפה"
+    "change_language": "שינוי שפה",
+    "success": "הצלחה",
+    "success_message": "הפעולה בוצעה בהצלחה.",
+    "error": "שגיאה",
+    "error_message": "הפעולה נכשלה. נסו שוב."
   },
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
@@ -381,6 +385,9 @@
     "device_detail_type": "סוג מכשיר",
     "device_detail_platform": "פלטפורמה",
     "device_detail_location": "מיקום",
+    "device_active": "פעיל",
+    "device_active_yes": "כן",
+    "device_active_no": "לא",
     "device_lock": "נעילה",
     "device_unlock": "שחרור",
     "device_lock_a11y": "נעילת המכשיר {{name}}",
@@ -509,6 +516,11 @@
     "childrenSectionTitle": "בחירת ילד",
     "devicesSectionTitle": "בחירת מכשיר",
     "defaultChildSubtitle": "ניהול אישי",
+    "allChildren": "כל הילדים",
+    "allDevices": "כל המכשירים",
+   "allChildrenSubtitle": "כל הילדים",
+   "allDevicesSubtitle":"כל המכשירים",
+
     "childTabA11y": "בחירת הילד {{name}}",
     "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
     "devices": {
@@ -759,8 +771,8 @@
     "gender": {
       "title": "מין",
       "options": {
-        "male": "זכר",
-        "female": "נקבה",
+        "boy": "ילד",
+        "girl": "ילדה",
         "other": "אחר"
       }
     },
@@ -827,7 +839,99 @@
     },
     "logout": {
       "button": "התנתקות",
-      "a11y": "התנתקות מהחשבון"
+      "a11y": "התנתקות מהחשבון",
+      "failed": "ההתנתקות נכשלה"
+    }
+  },
+  "childLocation": {
+    "title": "מיקום הילד",
+    "heading": "מיקום הילד",
+    "subtitle": "צפייה במיקום האחרון הידוע ועדכון מהיר של נתוני המכשיר",
+    "live": "מיקום פעיל",
+    "detailsTitle": "פרטי מיקום",
+    "currentLocationLabel": "מיקום נוכחי",
+    "updatedLabel": "עודכן",
+    "selectedChildLabel": "ילד נבחר",
+    "refreshButton": "רענון מיקום",
+    "navigateButton": "נווט למיקום",
+    "refreshA11y": "רענון מיקום הילד",
+    "navigateA11y": "פתיחת ניווט למיקום הילד",
+    "noDevicesTitle": "אין מכשירים זמינים",
+    "noDevicesMessage": "הילד לא נוסף עדיין מכשירים. הוסף מכשיר כדי להתחיל לעקוב אחר המיקום.",
+    "addDeviceButton": "הוסף מכשיר",
+    "map": {
+      "updating": "מעדכן...",
+      "waitingForLocation": "ממתין למיקום של הילד/ה..."
+    },
+    "locationSharing": {
+      "mapBanner": "הפעילו את «גישה למיקום» תחת הגדרות ← התראות כדי לטעון את המיקום שלכם על המפה.",
+      "alertTitle": "גישה למיקום כבויה",
+      "alertMessage": "הפעילו את מתג המיקום תחת הגדרות ← התראות, ואז נסו שוב.",
+      "disabledAddressValue": "שיתוף מיקום כבוי",
+      "disabledAddressHint": "פתחו את ההגדרות והפעילו גישה למיקום כדי לראות כאן פרטי GPS.",
+      "navigateNoCoordsTitle": "אין מיקום עדיין",
+      "navigateNoCoordsMessage": "אפשרו מיקום בהגדרות ואז רעננו. אם זה עדיין לא עובד, בדקו את הרשאת המיקום של האפליקציה במערכת."
+    },
+    "children": {
+      "noaSubtitle": "מכשיר פעיל",
+      "yonatanSubtitle": "בבית הספר",
+      "tamarSubtitle": "מחוברת כעת"
+    }
+  },
+  "activityHistory": {
+    "title": "היסטוריית פעילות",
+    "heading": "היסטוריית פעילות",
+    "subtitle": "מעקב נוח וברור אחרי פעולות שבוצעו לילדים לאורך היום",
+    "childSectionTitle": "בחירת ילד",
+    "filterTitle": "סינון פעילות",
+    "activityListTitle": "פעילות אחרונה",
+    "resultCount": "{{count}} תוצאות",
+    "activityCardA11y": "{{title}}, ילד: {{childName}}, שעה: {{time}}",
+    "filters": {
+      "all": "הכל",
+      "locks": "נעילות",
+      "extensions": "הארכות זמן",
+      "updates": "עדכונים"
+    },
+    "summary": {
+      "today": "פעילויות היום",
+      "locks": "נעילות",
+      "extensions": "הארכות"
+    },
+    "children": {
+      "tomerSubtitle": "שימוש פעיל היום",
+      "yaelSubtitle": "זמן מסך מאוזן",
+      "noamSubtitle": "הגבלות פעילות"
+    },
+    "items": {
+      "screenLocked": {
+        "title": "נעילת מכשיר",
+        "description": "המכשיר של {{childName}} ננעל לאחר סיום זמן המסך"
+      },
+      "extensionApproved": {
+        "title": "אישור הארכת זמן",
+        "description": "אושרה תוספת זמן עבור {{childName}}"
+      },
+      "dailyLimitUpdated": {
+        "title": "שינוי מגבלה יומית",
+        "description": "עודכנה מגבלת הזמן היומית של {{childName}}"
+      },
+      "extensionRequested": {
+        "title": "בקשת הארכה חדשה",
+        "description": "{{childName}} שלח/ה בקשה להארכת זמן מסך"
+      },
+      "appLocked": {
+        "title": "חסימת אפליקציה",
+        "description": "נחסמה אפליקציה במכשיר של {{childName}}"
+      },
+      "deviceLocked": {
+        "title": "נעילת התקן מרחוק",
+        "description": "בוצעה נעילה ידנית למכשיר של {{childName}}"
+      }
+    },
+    "empty": {
+      "title": "לא נמצאה פעילות",
+      "subtitle": "נסי לבחור ילד אחר או לשנות את הסינון כדי לראות תוצאות"
     }
   }
 }

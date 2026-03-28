@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   View,
   ScrollView,
   Pressable,
@@ -7,7 +8,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Href, router } from "expo-router";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -15,7 +16,9 @@ import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
-
+import { logout, setError, setAuthLoading, logoutParent } from "../../../redux/slices/auth-slice";
+import { useDispatch, useSelector } from "react-redux";
+import { clearAuthTokens } from "../../../services/authStorage";
 type SettingRow = {
   key: string;
   titleKey: string;
@@ -28,7 +31,8 @@ export default function SettingsScreen() {
   const { t, changeLanguage, currentLanguage } = useTranslation();
   const { isRTL, row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
-
+  const dispatch = useDispatch();
+  const isLoggingOut = useSelector((state: any) => state.auth.isLoading);
   const isTablet = width >= 900;
   const iconTextRow = {
     flexDirection: isRTL ? "row-reverse" : "row",
@@ -64,17 +68,26 @@ export default function SettingsScreen() {
   };
 
   const onPressLogout = async () => {
-    // TODO: Replace with your real logout flow.
-    // Example:
-    // 1. Clear auth tokens from storage
-    // 2. Reset redux auth/user state
-    // 3. Navigate to auth / welcome screen
-    router.replace("/" as never);
+    dispatch(setAuthLoading(true));
+    dispatch(setError(null));
+
+    try {
+      await (dispatch as any)(logoutParent()).unwrap();
+    } catch (error) {
+      const message = (error as Error)?.message ?? "settings.logout.failed";
+      dispatch(setError(message));
+      Alert.alert("", t(message));
+    } finally {
+      await clearAuthTokens();
+      dispatch(logout());
+      router.replace("/" as Href);
+      dispatch(setAuthLoading(false));
+    }
   };
 
   const onPressRow = (route?: string) => {
     if (!route) return;
-    router.push(route as never);
+    router.push(route as Href);
   };
 
   return (
@@ -339,11 +352,13 @@ export default function SettingsScreen() {
 
           <Pressable
             onPress={onPressLogout}
+            disabled={isLoggingOut}
             accessibilityRole="button"
             accessibilityLabel={t("settings.logout.a11y")}
             style={({ pressed }) => [
               styles.logoutButton,
-              pressed && styles.logoutPressed,
+              !isLoggingOut && pressed && styles.logoutPressed,
+              isLoggingOut ? { opacity: 0.7 } : null,
             ]}
           >
             <View style={[styles.logoutContent, row]}>

@@ -10,9 +10,9 @@ import {
   findByBarcodeToken,
   consumePairingSession,
 } from "../dal/pairing.dal.js";
-import { getChildrenByParentId } from "../dal/parent.dal.js";
+import { getChildByParentId, getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
-import { createDevice, findDeviceByBarcodeOrCode } from "../dal/device.dal.js";
+import { createDevice, findDeviceByBarcodeOrCode, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
 import { DeviceType } from "../constants/deviceType.js";
 
 const PAIRING_TTL_MINUTES = 5;
@@ -90,7 +90,7 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER", }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER",deviceId = "" }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -98,8 +98,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
     throw new AppError(PairingErrors.SESSION_NOT_FOUND);
   }
 
-
-
+  const sessionCode = session.code;
+  const sessionBarcode = session.barcodeToken;
   // Check if session is already used or expired
   const consumed = await consumePairingSession(session._id);
   if (!consumed) {
@@ -110,59 +110,44 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   const childId = String(consumed.childId);
   if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+  const child = await getChildByParentId(parentId, childId);
+  const childName = child?.name != null ? String(child.name) : "";
 
-  const devicePayload = validateDevicePayload(deviceName, deviceType, platform);
-  const currentDevice = await createOrGetDeviceForSession(consumed, devicePayload);
+let currentDevice = await findDeviceByDeviceId(deviceId);
 
-  // Child token is used to authenticate the child on the device
-  const tokenData = await issueChildToken(parentId, childId);
-
-  return {
-    ...tokenData,
-    deviceId: String(currentDevice._id),
-  };
-}
-
-function validateDevicePayload(deviceName, deviceType, platform) {
-  const safeDeviceName =
-    typeof deviceName === "string" && deviceName.trim()
-      ? deviceName.trim()
-      : "Child Device";
-
-  if (!Object.values(DeviceType).includes(deviceType)) {
-    throw new AppError(PairingErrors.INVALID_DEVICE_TYPE);
+if (currentDevice) {
+  if (currentDevice.isActive) {
+    throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
   }
+  
+  await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
 
-  if (!Object.values(DevicePlatform).includes(platform)) {
-    throw new AppError(PairingErrors.INVALID_DEVICE_PLATFORM);
-  }
-
-  return {
-    deviceName: safeDeviceName,
+} else {
+  currentDevice = await createDevice({
+    deviceId,
+    deviceName,
     deviceType,
     platform,
-  };
-}
-
-async function createOrGetDeviceForSession(session, devicePayload) {
-  const existing = await findDeviceByBarcodeOrCode(session);
-  if (existing) return existing;
-
-    const createdDevice = await createDevice({
-    name: devicePayload.deviceName,
-    type: devicePayload.deviceType,
-    platform: devicePayload.platform,
     isLocked: false,
-    code: session.code || "",
-    location: "",
+    code: sessionCode || "",
+    location: { lat: 0, lng: 0, lastUpdated: new Date() }, 
     isActive: true,
-    barcodeToken: session.barcodeToken || "",
+    barcodeToken: sessionBarcode || "",
     applications: [],
     parentId: String(session.parentId),
     childId: String(session.childId),
     screenTime: {},
+    isActive: true
   });
+}
 
+  const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
+  const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
 
-  return createdDevice;
+  return {
+    ...tokenData,
+    deviceId: mongoDeviceId,
+    physicalId: String(deviceId),
+    childName,
+  };
 }

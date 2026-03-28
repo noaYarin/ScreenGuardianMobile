@@ -86,7 +86,9 @@ export const styles = StyleSheet.create({
   genderRow: {
     width: "100%",
     flexWrap: "wrap",
-    gap: 10,
+    gap: 5,
+    justifyContent: "center",
+
   },
 
   genderButton: {

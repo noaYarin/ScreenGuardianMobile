@@ -13,6 +13,8 @@ import { hydrateChildSession } from "../../../redux/slices/auth-slice";
 import type { AppDispatch } from "../../../redux/store/types";
 import { styles } from "./styles";
 import { NativeModules } from "react-native";
+import * as Location from "expo-location";  
+import { updateDeviceLocation } from "../../../redux/thunks/deviceThunks";
 
 /** After a failed link, wait before re-enabling scan so the camera does not instantly re-read the same QR. */
 const ERROR_RELEASE_DELAY = 750;
@@ -28,7 +30,6 @@ export default function LinkChildrenScreen() {
   const [code, setCode] = useState("");
   const [permission, requestPermission] = useCameraPermissions();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  // Blocks duplicate link-device calls while React state updates are still async.
   const linkInFlightRef = useRef(false);
   const finishLinkErrorTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isBarcode = mode === "barcode";
@@ -62,14 +63,14 @@ export default function LinkChildrenScreen() {
   const runDeviceLink = async (params: { code: string; barcodeToken: string }) => {
     if (!tryBeginLink()) return;
     try {
-      const res = await apiLinkDevice({ ...params, ...buildDeviceConnectionPayload() });
+      const res = await apiLinkDevice({ ...params, ...(await buildDeviceConnectionPayload()) });
 
       // After successful pairing, save config in native storage so the device can send heartbeat
       try {
         await NativeModules.DeviceControl.saveHeartbeatConfig(
           process.env.EXPO_PUBLIC_API_URL,
           res.deviceId,
-          res.token
+          res.childToken
         );
       } catch (e) {
         console.log("Failed to save heartbeat config:", e);
@@ -81,18 +82,26 @@ export default function LinkChildrenScreen() {
         console.log("Failed to sync initial policy:", e);
       }
 
+      const dbDeviceId = res.deviceId;
       dispatch(
         hydrateChildSession({
-          token: res.token,
+          childToken: res.childToken,
           parentId: res.parentId,
           childId: res.childId,
-          deviceId: res.deviceId,
+          deviceId: dbDeviceId,
+          physicalId: res.physicalId,
         })
       );
+
+// Need to add socket for location updates
+
       finishLink();
-      router.replace("/Child/home");
-    } catch {
-      Alert.alert(t("linkChildren.error_title"), t("linkChildren.error_generic"));
+      router.replace({
+        pathname: "/Child/home",
+        params: { initialName: res.childName ?? "" }
+      });
+    } catch(err: any) {
+      Alert.alert(t("linkChildren.error_title"), err?.error?.message );
       scheduleFinishLinkAfterError();
       router.replace("Entering/roleSelectionRoute" as any);
     }

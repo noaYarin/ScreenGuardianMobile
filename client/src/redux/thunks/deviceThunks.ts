@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   apiDeleteDeviceByChild,
   apiGetDevicesByChild,
+  apiUpdateDeviceLocation,
   apiUpdateDeviceName,
   type Device,
   apiUpdateDeviceScreenTime,
@@ -18,6 +19,17 @@ function normalizeDevice(raw: unknown): Device {
   if (id == null) {
     throw new Error("devices.fetch_device_failed");
   }
+  const rawLocation = rawDevice.location as
+    | { lat?: unknown; lng?: unknown; lastUpdated?: unknown }
+    | undefined;
+  const location = {
+    lat: typeof rawLocation?.lat === "number" ? rawLocation.lat : 0,
+    lng: typeof rawLocation?.lng === "number" ? rawLocation.lng : 0,
+    lastUpdated:
+      typeof rawLocation?.lastUpdated === "string"
+        ? rawLocation.lastUpdated
+        : new Date().toISOString(),
+  };
   const screenTime = rawDevice.screenTime;
   return {
     _id: String(id),
@@ -26,19 +38,17 @@ function normalizeDevice(raw: unknown): Device {
     platform: rawDevice.platform != null ? String(rawDevice.platform) : "",
     isLocked: Boolean(rawDevice.isLocked),
     isActive: Boolean(rawDevice.isActive),
-    location:
-      typeof rawDevice.location === "string" ? rawDevice.location : "",
+    location,
     parentId:
       rawDevice.parentId != null ? String(rawDevice.parentId) : "",
     childId: rawDevice.childId != null ? String(rawDevice.childId) : "",
     applications: Array.isArray(rawDevice.applications)
       ? (rawDevice.applications as Device["applications"])
-      : []
-        ,
+      : [],
     screenTime:
       screenTime != null && typeof screenTime === "object"
         ? (screenTime as Device["screenTime"])
-        : {} 
+        : {}
   };
 }
 
@@ -91,6 +101,7 @@ export const updateDeviceName = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
+<<<<<<< HEAD
 
 
 export const updateDeviceScreenTimeThunk = createAsyncThunk<
@@ -156,3 +167,20 @@ export const setDeviceLockThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
+=======
+export const updateDeviceLocation = createAsyncThunk(
+  "devices/updateLocation",
+  async (
+    { childId, deviceId, location }: { childId: string; deviceId: string; location: { lat: number; lng: number } },
+    thunkAPI
+  ) => {
+    try {
+      const response = await apiUpdateDeviceLocation(deviceId, location);
+      return response; 
+    } catch (error) {
+      const message = (error as Error)?.message ?? "devices.update_device_location_failed";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae

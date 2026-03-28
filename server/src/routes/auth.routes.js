@@ -4,7 +4,9 @@ import {
   loginParentController,
   forgotPasswordController,
   resetPasswordController,
+  logoutParentController,
 } from "../controllers/auth.controller.js";
+import { authJwt } from "../middlewares/authJwt.js";
 import { requireParent } from "../middlewares/requireParent.js";
 
 const router = Router();
@@ -17,6 +19,10 @@ router.post("/register-parent", registerParentController);
 // POST /api/v1/auth/login-parent
 // Login parent and receive JWT token
 router.post("/login-parent", loginParentController);
+
+// POST /api/v1/auth/logout
+// Parent logout (revokes parent + child JWTs issued before logout)
+router.post("/logout", authJwt, requireParent, logoutParentController);
 
 
 // POST /api/v1/auth/forgot-password

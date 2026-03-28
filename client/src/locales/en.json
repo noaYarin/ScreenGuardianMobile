@@ -6,7 +6,12 @@
     "back": "Back",
     "ok": "OK",
     "retry": "Try again",
-    "change_language": "Change language"
+    "change_language": "Change language",
+    "success": "Success",
+    "success_message": "The action was successful.",
+    "error": "Error",
+    "error_message": "The action failed. Please try again."
+
   },
   "children": {
     "fetch_failed": "Could not load children.",
@@ -420,6 +425,9 @@
     "device_detail_type": "Device type",
     "device_detail_platform": "Platform",
     "device_detail_location": "Location",
+    "device_active": "Active",
+    "device_active_yes": "Yes",
+    "device_active_no": "No",
     "device_lock": "Lock",
     "device_unlock": "Unlock",
     "device_lock_a11y": "Lock device {{name}}",
@@ -563,6 +571,11 @@
     "childrenSectionTitle": "Select Child",
     "devicesSectionTitle": "Select Device",
     "defaultChildSubtitle": "Personal Management",
+    "allChildren": "all children",
+    "allDevices": "all Devices",
+     "allChildrenSubtitle": "all children",
+   "allDevicesSubtitle":"all devices",
+
     "childTabA11y": "Select child {{name}}",
     "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
     "devices": {
@@ -813,8 +826,8 @@
     "gender": {
       "title": "Gender",
       "options": {
-        "male": "Male",
-        "female": "Female",
+        "boy": "Boy",
+        "girl": "Girl",
         "other": "Other"
       }
     },
@@ -881,7 +894,100 @@
     },
     "logout": {
       "button": "Log Out",
-      "a11y": "Log out from the account"
+      "a11y": "Log out from the account",
+      "failed": "Logout failed"
+    }
+  },
+  "childLocation": {
+    "title": "Child Location",
+    "heading": "Child Location",
+    "subtitle": "View the latest known location and quickly refresh device data",
+    "live": "Live location",
+    "detailsTitle": "Location Details",
+    "currentLocationLabel": "Current location",
+    "updatedLabel": "Updated",
+    "selectedChildLabel": "Selected child",
+    "refreshButton": "Refresh location",
+    "navigateButton": "Navigate to location",
+    "refreshA11y": "Refresh child location",
+    "navigateA11y": "Open navigation to child location",
+    "noDevicesTitle": "No devices found",
+    "noDevicesMessage": "The child has not added any devices yet. Add a device to start tracking location.",
+    "addDeviceButton": "Add device",
+    "map": {
+      "updating": "Updating...",
+      "waitingForLocation": "Waiting for child's location..."
+    },
+    "locationSharing": {
+      "mapBanner": "Turn on “Location access” in Settings → Notifications to load your position on the map.",
+      "alertTitle": "Location access is off",
+      "alertMessage": "Enable the location toggle under Settings → Notifications, then try again.",
+      "disabledAddressValue": "Location sharing disabled",
+      "disabledAddressHint": "Open Settings and turn on location access to see GPS details here.",
+      "navigateNoCoordsTitle": "No location yet",
+      "navigateNoCoordsMessage": "Allow location in Settings, then refresh. If it still fails, check the system location permission for the app."
+    },
+    "children": {
+      "noaSubtitle": "Active device",
+      "yonatanSubtitle": "At school",
+      "tamarSubtitle": "Currently connected"
+    }
+  },
+  "activityHistory": {
+    "title": "Activity History",
+    "heading": "Activity History",
+    "subtitle": "A clean and professional view of recent actions across your children",
+    "childSectionTitle": "Choose child",
+    "filterTitle": "Filter activity",
+    "activityListTitle": "Recent activity",
+    "resultCount": "{{count}} results",
+    "activityCardA11y": "{{title}}, child: {{childName}}, time: {{time}}",
+    "filters": {
+      "all": "All",
+      "locks": "Locks",
+      "extensions": "Extensions",
+      "updates": "Updates"
+    },
+    "summary": {
+      "today": "Today's events",
+      "locks": "Locks",
+      "extensions": "Extensions"
+    },
+    "children": {
+      "tomerSubtitle": "Active today",
+      "yaelSubtitle": "Balanced usage",
+      "noamSubtitle": "Usage limits"
+    },
+    "items": {
+      "screenLocked": {
+        "title": "Device locked",
+        "description": "{{childName}}'s device was locked after screen time ended"
+      },
+      "extensionApproved": {
+        "title": "Extension approved",
+        "description": "Extra screen time was approved for {{childName}}"
+      },
+      "dailyLimitUpdated": {
+        "title": "Daily limit updated",
+        "description": "{{childName}}'s daily usage limit was updated"
+      },
+      "extensionRequested": {
+        "title": "New extension request",
+        "description": "{{childName}} sent a request for more screen time"
+      },
+      "appLocked": {
+        "title": "App blocked",
+        "description": "An app was blocked on {{childName}}'s device"
+      },
+      "deviceLocked": {
+        "title": "Remote device lock",
+        "description": "A manual lock was triggered on {{childName}}'s device"
+      }
+    },
+    "empty": {
+      "title": "No activity found",
+      "subtitle": "Try switching the selected child or changing the filter"
     }
   }
-}
+
+  }

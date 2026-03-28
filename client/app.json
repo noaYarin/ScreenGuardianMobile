@@ -9,7 +9,14 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": [
+          "maps",
+          "comgooglemaps",
+          "waze"
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +27,15 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.screenguardianmobile"
+      "package": "com.screenguardianmobile",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": {
+            "scheme": "geo"
+          }
+        }
+      ]
     },
     "web": {
       "output": "static",
@@ -42,7 +57,13 @@
       ],
       "expo-localization",
       "expo-secure-store",
-      "@react-native-community/datetimepicker"
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow ScreenGuardian to use your location to keep your child safe."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

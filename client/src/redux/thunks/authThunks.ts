@@ -6,6 +6,7 @@ import {
   apiForgotPassword,
   apiGenerateCodeForPairingChild,
   apiLinkDevice,
+  apiLogoutParent,
 } from "../../api/auth";
 import { getMyChildren } from "../../api/parent";
 
@@ -125,7 +126,13 @@ export const generateCodeForPairingChild = createAsyncThunk<
 
 
 export const linkDevice = createAsyncThunk<
-  { token: string; parentId: string; childId: string; deviceId: string },
+  {
+    childToken: string;
+    parentId: string;
+    childId: string;
+    deviceId: string;
+    physicalId?: string;
+  },
   { code: string; barcodeToken: string; deviceName: string; deviceType: string; platform: string },
   { rejectValue: string }
 >("auth/linkDevice", async (params, thunkAPI) => {
@@ -135,6 +142,22 @@ export const linkDevice = createAsyncThunk<
   } catch (error) {
     const message =
       (error as Error)?.message ?? "linkDevice.generic_error";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+// Secure server-side logout so other devices get revoked too.
+export const logoutParent = createAsyncThunk<
+  { message?: string },
+  void,
+  { rejectValue: string }
+>("auth/logoutParent", async (_: void, thunkAPI) => {
+  try {
+    const data = await apiLogoutParent();
+    return { message: data?.message };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "logoutParent.generic_error";
     return thunkAPI.rejectWithValue(message);
   }
 });

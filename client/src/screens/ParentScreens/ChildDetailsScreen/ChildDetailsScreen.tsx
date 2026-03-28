@@ -12,21 +12,23 @@ import { useFocusEffect } from "@react-navigation/native";
 import { Href, router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-
+import ChildDeviceSelector from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import ChildSelector, {
-  type ChildSelectorOption,
-} from "../../../components/ChildSelector/ChildSelector";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useChildProfileLabels } from "../../../../hooks/use-child-profile-labels";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+<<<<<<< HEAD
 import {
   fetchDevicesByChild,
   deleteDeviceForChild,
   setDeviceLockThunk
 } from "@/src/redux/thunks/deviceThunks";
+=======
+import { fetchDevicesByChild, deleteDeviceForChild } from "@/src/redux/thunks/deviceThunks";
+import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
@@ -38,76 +40,40 @@ export default function ChildDetailsScreen() {
   const { t } = useTranslation();
   const { row, text } = useLocaleLayout();
   const { width } = useWindowDimensions();
-  const params = useLocalSearchParams<{
-    id?: string;
-    name?: string;
-    deviceId?: string | string[];
-  }>();
+  const params = useLocalSearchParams<{ id?: string; deviceId?: string | string[] }>();
   const dispatch = useDispatch<AppDispatch>();
 
-  const paramDeviceId = useMemo(
-    () => parseRouteParam(params.deviceId),
-    [params.deviceId]
-  );
+  const paramDeviceId = useMemo(() => parseRouteParam(params.deviceId), [params.deviceId]);
+  const paramChildIdFromRoute = useMemo(() => parseRouteParam(params.id), [params.id]);
 
-  const paramChildIdFromRoute = useMemo(
-    () => parseRouteParam(params.id),
-    [params.id]
-  );
-
-  const { childrenList, isLoading, error: childrenError } = useSelector(
-    (state: RootState) => state.children
-  );
-
+  const { childrenList, isLoading, error: childrenError } = useSelector((state: RootState) => state.children);
   const devicesSlice = useSelector((state: RootState) => state.devices);
   const children = Array.isArray(childrenList) ? childrenList : [];
 
-  const [userSelectedChildId, setUserSelectedChildId] = useState<string | null>(
-    null
-  );
+  const [userSelectedChildId, setUserSelectedChildId] = useState<string | null>(null);
   const [isDevicesExpanded, setIsDevicesExpanded] = useState(false);
   const [devicesRefreshing, setDevicesRefreshing] = useState(false);
   const [deletingDeviceId, setDeletingDeviceId] = useState<string | null>(null);
 
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
-  /*
-   This logic prioritizes (in order): a valid child ID given via route param, one selected by the user,
-   or the first child in the children array
-   */
   const effectiveChildId = useMemo(() => {
-    if (children.length === 0) {
-      return paramChildIdFromRoute || userSelectedChildId || "";
-    }
-
-    if (
-      paramChildIdFromRoute &&
-      children.some((c) => String(c._id) === paramChildIdFromRoute)
-    ) {
+    if (children.length === 0) return paramChildIdFromRoute || userSelectedChildId || "";
+    if (paramChildIdFromRoute && children.some((c) => String(c._id) === paramChildIdFromRoute)) {
       return paramChildIdFromRoute;
     }
-
-    if (
-      userSelectedChildId &&
-      children.some((c) => String(c._id) === String(userSelectedChildId))
-    ) {
+    if (userSelectedChildId && children.some((c) => String(c._id) === String(userSelectedChildId))) {
       return String(userSelectedChildId);
     }
-
     return String(children[0]._id);
   }, [children, paramChildIdFromRoute, userSelectedChildId]);
 
   const devices = useMemo(() => {
     if (!effectiveChildId) return [];
-    const list = devicesSlice.byChildId[effectiveChildId];
-    return Array.isArray(list) ? list : [];
+    return Array.isArray(devicesSlice.byChildId[effectiveChildId]) ? devicesSlice.byChildId[effectiveChildId] : [];
   }, [devicesSlice.byChildId, effectiveChildId]);
 
-  const devicesLoading =
-    Boolean(effectiveChildId) &&
-    devicesSlice.statusByChildId[effectiveChildId] === "loading";
-
-  const deepLinkDevices = Boolean(paramDeviceId && paramChildIdFromRoute);
+  const devicesLoading = Boolean(effectiveChildId) && devicesSlice.statusByChildId[effectiveChildId] === "loading";
 
   const refreshChildrenList = useCallback(() => {
     dispatch(getMyChildrenThunk());
@@ -117,15 +83,22 @@ export default function ChildDetailsScreen() {
   useFocusEffect(
     useCallback(() => {
       refreshChildrenList();
+<<<<<<< HEAD
 
       if (effectiveChildId) {
         dispatch(fetchDevicesByChild(effectiveChildId));
       }
     }, [refreshChildrenList, dispatch, effectiveChildId])
+=======
+      if (effectiveChildId) {
+        dispatch(fetchDevicesByChild(effectiveChildId));
+      }
+    }, [refreshChildrenList, effectiveChildId, dispatch])
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
   );
 
-  // Load devices for selected child
   useEffect(() => {
+<<<<<<< HEAD
     if (!effectiveChildId) return;
     dispatch(fetchDevicesByChild(effectiveChildId));
   }, [dispatch, effectiveChildId]);
@@ -193,65 +166,68 @@ export default function ChildDetailsScreen() {
 
   const handleRetryLoadChildren = useCallback(() => {
     refreshChildrenList();
+=======
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
     if (effectiveChildId) {
       dispatch(fetchDevicesByChild(effectiveChildId));
     }
-  }, [refreshChildrenList, dispatch, effectiveChildId]);
+  }, [dispatch, effectiveChildId]);
+
+  useEffect(() => {
+    if (paramDeviceId && paramChildIdFromRoute) {
+      setIsDevicesExpanded(true);
+    }
+  }, [paramDeviceId, paramChildIdFromRoute]);
+
+  const handleRefreshDevices = useCallback(async () => {
+    setDevicesRefreshing(true);
+    await dispatch(getMyChildrenThunk());
+    if (effectiveChildId) {
+      await dispatch(fetchDevicesByChild(effectiveChildId)).unwrap().catch(() => {});
+    }
+    setDevicesRefreshing(false);
+  }, [dispatch, effectiveChildId]);
+
+  const selectedChild = useMemo(() => children.find((c) => String(c._id) === String(effectiveChildId)) ?? null, [children, effectiveChildId]);
+  const { childName, birthDateLabel, genderLabel } = useChildProfileLabels(selectedChild);
+  const deviceRows = useMemo(() => mapDevicesToRows(devices, t), [devices, t]);
 
   const handleConnectDevice = useCallback(() => {
     if (!effectiveChildId) return;
-
-    router.push({
-      pathname: "/Parent/linkDevice",
-      params: { id: effectiveChildId, name: childName },
-    } as never);
+    router.push({ pathname: "/Parent/linkDevice", params: { id: effectiveChildId, name: childName } } as never);
   }, [effectiveChildId, childName]);
 
   const handleOpenChildProfile = useCallback(() => {
-    router.push({
-      pathname: "/Parent/childProfile" as Href,
-      params: { id: effectiveChildId, name: childName },
-    } as never);
+    if (!effectiveChildId) return;
+    router.push({ pathname: "/Parent/childProfile", params: { id: effectiveChildId, name: childName } } as never);
   }, [effectiveChildId, childName]);
 
-  const handleDeleteDevice = useCallback(
-    (deviceId: string, deviceDisplayName: string) => {
-      if (!effectiveChildId || deletingDeviceId) return;
-
-      const childLabel = childName.trim() || t("childDetails.devices_title");
-
-      Alert.alert(
-        t("childDetails.delete_device_title", { device: deviceDisplayName }),
-        t("childDetails.delete_device_message", { child: childLabel }),
-        [
-          { text: t("childDetails.delete_device_cancel"), style: "cancel" },
-          {
-            text: t("childDetails.delete_device_confirm"),
-            style: "destructive",
-            onPress: () => {
-              setDeletingDeviceId(deviceId);
-
-              dispatch(
-                deleteDeviceForChild({
-                  childId: effectiveChildId,
-                  deviceId,
-                })
-              )
-                .unwrap()
-                .catch(() => {
-                  Alert.alert("", t("childDetails.delete_device_error"));
-                })
-                .finally(() => {
-                  setDeletingDeviceId(null);
-                });
-            },
+  const handleDeleteDevice = useCallback((deviceId: string, deviceDisplayName: string) => {
+    if (!effectiveChildId || deletingDeviceId) return;
+    Alert.alert(
+      t("childDetails.delete_device_title", { device: deviceDisplayName }),
+      t("childDetails.delete_device_message", { child: childName.trim() || t("childDetails.devices_title") }),
+      [
+        { text: t("childDetails.delete_device_cancel"), style: "cancel" },
+        {
+          text: t("childDetails.delete_device_confirm"),
+          style: "destructive",
+          onPress: async () => {
+            setDeletingDeviceId(deviceId);
+            try {
+              await dispatch(deleteDeviceForChild({ childId: effectiveChildId, deviceId })).unwrap();
+            } catch {
+              Alert.alert("", t("childDetails.delete_device_error"));
+            } finally {
+              setDeletingDeviceId(null);
+            }
           },
-        ]
-      );
-    },
-    [dispatch, effectiveChildId, deletingDeviceId, childName, t]
-  );
+        },
+      ]
+    );
+  }, [dispatch, effectiveChildId, deletingDeviceId, childName, t]);
 
+<<<<<<< HEAD
   const handleSetDeviceLocked = useCallback(
     async (deviceId: string, locked: boolean) => {
       if (!effectiveChildId || deletingDeviceId) return;
@@ -285,43 +261,19 @@ export default function ChildDetailsScreen() {
     : "";
 
   if (showFullScreenLoader) {
+=======
+  const handleSetDeviceLocked = useCallback((deviceId: string, locked: boolean) => {
+    if (!effectiveChildId) return;
+    dispatch(setDeviceLockLocal({ childId: effectiveChildId, deviceId, isLocked: locked }));
+  }, [dispatch, effectiveChildId]);
+
+  if (isLoading && children.length === 0) {
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
     return (
       <ScreenLayout>
-        <View
-          style={[styles.container, { alignItems: "center", paddingTop: 40 }]}
-        >
+        <View style={[styles.container, { alignItems: "center", paddingTop: 40 }]}>
           <ActivityIndicator />
-          <AppText style={[styles.loadingHint, text]}>
-            {t("childDetails.loading_children")}
-          </AppText>
-        </View>
-      </ScreenLayout>
-    );
-  }
-
-  if (showChildrenFetchError) {
-    return (
-      <ScreenLayout>
-        <View style={[styles.container, { paddingTop: 24 }]}>
-          <AppText style={[styles.childMeta, text]}>{errorMessage}</AppText>
-          <Pressable
-            onPress={handleRetryLoadChildren}
-            style={styles.reduxRetryPressable}
-          >
-            <AppText style={styles.reduxRetryText}>{t("common.retry")}</AppText>
-          </Pressable>
-        </View>
-      </ScreenLayout>
-    );
-  }
-
-  if (showEmptyState) {
-    return (
-      <ScreenLayout>
-        <View style={[styles.container, { paddingTop: 24 }]}>
-          <AppText style={[styles.childMeta, text]}>
-            {t("homeParent.no_children")}
-          </AppText>
+          <AppText style={[styles.loadingHint, text]}>{t("childDetails.loading_children")}</AppText>
         </View>
       </ScreenLayout>
     );
@@ -332,46 +284,16 @@ export default function ChildDetailsScreen() {
       <ScrollView
         style={styles.scrollRoot}
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={devicesRefreshing}
-            onRefresh={handleRefreshDevices}
-          />
-        }
+        refreshControl={<RefreshControl refreshing={devicesRefreshing} onRefresh={handleRefreshDevices} />}
       >
         <View style={[styles.content, { maxWidth: maxContentWidth }]}>
-          {isLoading && children.length > 0 ? (
-            <View style={[styles.reduxSyncRow, row]}>
-              <ActivityIndicator size="small" />
-              <AppText style={[styles.childMeta, text]}>
-                {t("childDetails.loading_sync")}
-              </AppText>
-            </View>
-          ) : null}
-
-          {childrenError && children.length > 0 ? (
-            <View style={styles.reduxErrorBox}>
-              <AppText style={[styles.childMeta, text]}>{errorMessage}</AppText>
-              <Pressable
-                onPress={handleRetryLoadChildren}
-                style={styles.reduxRetryPressable}
-              >
-                <AppText style={styles.reduxRetryText}>
-                  {t("common.retry")}
-                </AppText>
-              </Pressable>
-            </View>
-          ) : null}
-
-          <ChildSelector
-            childrenOptions={childSelectorOptions}
+          <ChildDeviceSelector
             selectedChildId={effectiveChildId}
             onSelectChild={(childId) => {
               setUserSelectedChildId(childId);
               setIsDevicesExpanded(false);
             }}
+            showDevices={false}
           />
 
           <ChildDetailsProfileCard
@@ -395,8 +317,6 @@ export default function ChildDetailsScreen() {
             onDeleteDevice={handleDeleteDevice}
             onSetDeviceLocked={handleSetDeviceLocked}
           />
-
-          <View style={styles.bottomSpacer} />
         </View>
       </ScrollView>
     </ScreenLayout>

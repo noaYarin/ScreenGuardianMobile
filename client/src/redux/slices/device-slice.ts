@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Device } from "../../api/device";
+<<<<<<< HEAD
 import {
   deleteDeviceForChild,
   fetchDevicesByChild,
@@ -7,6 +8,10 @@ import {
   setDeviceLockThunk
 } from "../thunks/deviceThunks";
 
+=======
+import { deleteDeviceForChild, fetchDevicesByChild, updateDeviceLocation } from "../thunks/deviceThunks";
+import { logout } from "./auth-slice"; 
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
 type DevicesState = {
@@ -67,6 +72,16 @@ const devicesSlice = createSlice({
         state.errorByChildId[childId] =
           action.payload ?? action.error.message ?? "devices.fetch_device_failed";
       })
+      .addCase(updateDeviceLocation.fulfilled, (state, action) => {
+        const { childId, deviceId } = action.meta.arg;
+        const updatedDevice = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;   
+        const idx = list.findIndex((d) => String(d._id) === String(deviceId));
+        if (idx !== -1) {
+          state.byChildId[childId][idx] = updatedDevice;
+        }
+      })
       .addCase(deleteDeviceForChild.fulfilled, (state, action) => {
         const { childId, deviceId } = action.meta.arg;
         const list = state.byChildId[childId];
@@ -75,6 +90,7 @@ const devicesSlice = createSlice({
           (d) => String(d._id) !== String(deviceId)
         );
       })
+<<<<<<< HEAD
       .addCase(updateDeviceScreenTimeThunk.fulfilled, (state, action) => {
         const { childId, device } = action.payload;
         const list = state.byChildId[childId];
@@ -96,6 +112,12 @@ const devicesSlice = createSlice({
         if (idx < 0) return;
 
         state.byChildId[childId][idx] = device;
+=======
+      .addCase(logout, (state) => {
+        state.byChildId = {};
+        state.statusByChildId = {};
+        state.errorByChildId = {};
+>>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
       });
   },
 });

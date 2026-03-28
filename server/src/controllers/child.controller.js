@@ -85,11 +85,11 @@ export async function updateChildInterestsController(req, res, next) {
 
 export async function updateCurrentChildProfileController(req, res, next) {
   try {
-    const parentId = req.user.parentId;
-    const childId = req.user.childId;
-    const { name, birthDate, gender } = req.body;
+      const parentId = req.user.parentId;
+      const { childId } = req.params;
+    const { birthDate, gender } = req.body;
 
-    const data = await updateCurrentChildProfile(parentId, childId, name, birthDate, gender);
+    const data = await updateCurrentChildProfile(parentId, childId, birthDate, gender);
 
     res.json({ ok: true, data });
   } catch (err) {

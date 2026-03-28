@@ -77,11 +77,6 @@ export async function validateDeviceAccess({ deviceId, parentId, childId, allowI
     throw new AppError(CommonErrors.DEVICE_NOT_OWNED);
   }
 
-  if (!allowInactive && device.isActive === false) {
-    throw new AppError(CommonErrors.DEVICE_NOT_ACTIVE);
-  }
-
-
   return device;
 }
 
@@ -485,6 +480,19 @@ export async function getDeviceCurrentStatusForChild({ deviceId, childId, parent
   return buildCurrentStatus(device);
 }
 
+
+export async function updateDeviceLocation(deviceId, location, parentId, childId) {
+  await validateDeviceAccess({ deviceId, parentId, childId });
+
+  const locationUpdate = {
+    ...location,
+    lastUpdated: new Date() 
+  };
+
+  const updatedDevice = await updateDeviceById(deviceId, { location: locationUpdate });
+  return updatedDevice;
+
+}
 
 export async function updateDeviceUsageByChild({
   deviceId,

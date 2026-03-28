@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
@@ -14,7 +14,6 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { getAgeInFullYearsFromBirthDate } from "../../../../hooks/use-child-profile-labels";
 import { parseRouteParam } from "../ChildDetailsScreen/childDetailsRouteParams";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
-import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ActionCard = {
   key: string;
@@ -51,7 +50,7 @@ const ACTIONS: ActionCard[] = [
     titleKey: "childProfile.actions.location.title",
     subtitleKey: "childProfile.actions.location.subtitle",
     icon: "map-marker-outline",
-    route: "/Parent/child-location",
+    route: "/Parent/childLocation",
   },
   {
     key: "requests",
@@ -73,12 +72,11 @@ export default function ChildProfileScreen() {
   const nameFromRoute = useMemo(() => parseRouteParam(params.name), [params.name]);
 
   const { childrenList } = useSelector((state: RootState) => state.children ?? {});
-  const children = Array.isArray(childrenList) ? childrenList : [];
-
-  const child = useMemo(
-    () => children.find((c) => String(c._id) === childId) ?? null,
-    [children, childId]
-  );
+  
+  const child = useMemo(() => {
+    if (!childrenList) return null;
+    return childrenList.find((c) => String(c._id) === childId) || null;
+  }, [childrenList, childId]);
 
 
   const displayName =
@@ -133,14 +131,14 @@ export default function ChildProfileScreen() {
               ) : null}
 
              <Pressable
-  onPress={() => router.push("/Parent/defineChildProfile")}
-  accessibilityRole="button"
-  accessibilityLabel={t("childProfile.edit_a11y")}
-  style={({ pressed }) => [
-    styles.editButton,
-    pressed && styles.pressedSoft,
-  ]}
->
+                onPress={() => router.push({ pathname: "/Parent/editChildProfile", params: { childId: childId } } as never)}
+                accessibilityRole="button"
+                accessibilityLabel={t("childProfile.edit_a11y")}
+                style={({ pressed }) => [
+                  styles.editButton,
+                  pressed && styles.pressedSoft,
+                ]}
+              >
                 <View style={styles.editButtonContent}>
                   <MaterialCommunityIcons
                     name="pencil-outline"
