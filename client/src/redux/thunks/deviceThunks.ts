@@ -101,7 +101,6 @@ export const updateDeviceName = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
-<<<<<<< HEAD
 
 
 export const updateDeviceScreenTimeThunk = createAsyncThunk<
@@ -167,7 +166,7 @@ export const setDeviceLockThunk = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
-=======
+
 export const updateDeviceLocation = createAsyncThunk(
   "devices/updateLocation",
   async (
@@ -183,4 +182,3 @@ export const updateDeviceLocation = createAsyncThunk(
     }
   }
 );
->>>>>>> 735d2459ba95675ec2bfb6680b8a8174926d7cae
