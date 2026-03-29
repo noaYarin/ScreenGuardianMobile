@@ -20,6 +20,9 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import type { RootState, AppDispatch } from "@/src/redux/store/types";
 import { CHILD_ACCENT_COLORS } from "../../../../constants/childAccentColors";
 import type { DeviceLocationSnapshot } from "../../../components/ChildLocation/types";
+import { REQUEST_REFRESH_FROM_PARENT } from "@/src/constants/socketEvents";
+import { emitEvent } from "@/src/services/socket";
+
 
 const getAccent = (id: string) => 
   CHILD_ACCENT_COLORS[[...id].reduce((a, c) => a + c.charCodeAt(0), 0) % CHILD_ACCENT_COLORS.length];
@@ -33,6 +36,7 @@ export default function ChildLocationScreen() {
   // --- Redux State ---
   const childrenList = useSelector((state: RootState) => state.children.childrenList ?? []);
   const { byChildId, statusByChildId } = useSelector((state: RootState) => state.devices);
+  const { parentId } = useSelector((state: RootState) => state.auth ?? {});
 
   const [selectedChildId, setSelectedChildId] = useState(childrenList[0]?._id ?? "");
   const [locationSharingEnabled, setLocationSharingEnabled] = useState(true);
@@ -70,8 +74,8 @@ export default function ChildLocationScreen() {
   }, [selectedChildId, dispatch]);
 
   // --- Handlers ---
-  const onRefreshLocation = () => {
-    dispatch(fetchDevicesByChild(selectedChildId));
+  const onRefreshLocation = (childId: string) => {
+    emitEvent(REQUEST_REFRESH_FROM_PARENT, { parentId, childId });
   };
 
   const onNavigate = async () => {
@@ -89,9 +93,9 @@ export default function ChildLocationScreen() {
     });
   
     try {
-      const supported = await Linking.canOpenURL(url!);
+      const supported = await Linking.canOpenURL(url);
       if (supported) {
-        await Linking.openURL(url!);
+        await Linking.openURL(url);
       } else {
         const browserUrl = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
         await Linking.openURL(browserUrl);
@@ -164,7 +168,7 @@ export default function ChildLocationScreen() {
 
           <LocationActions 
             row={row} 
-            onRefreshLocation={onRefreshLocation} 
+            onRefreshLocation={() => onRefreshLocation(selectedChildId)} 
             onNavigateToLocation={onNavigate} 
             isLoading={isUpdating} 
             refreshButtonText={t("childLocation.refreshButton")} 

@@ -2,17 +2,23 @@ import { io, type Socket } from "socket.io-client";
 import { API_BASE_URL } from "../config/env";
 
 let socket: Socket | null = null;
-
 export const connectSocket = (userId: string) => {
     if (!socket) {
-        socket = io(API_BASE_URL);
-        
-        socket?.on("connect", () => {
-            socket?.emit("join", userId);
-        });
+      console.log("Creating Singleton Socket...");
+      socket = io(API_BASE_URL);
     }
+  
+    if (socket.connected) {
+      socket.emit("join", userId);
+    } else {
+        // Child is joining the socket or reconnecting
+      socket.once("connect", () => {
+        socket?.emit("join", userId);
+      });
+    }
+  
     return socket;
-};
+  };
 
 
 // Emit events to the server
