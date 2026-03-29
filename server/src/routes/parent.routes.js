@@ -4,7 +4,8 @@ import {
   addChildController,
   getChildrenController,
   setChildActiveController,
-  getChildController
+  getChildController,
+  deleteChildController 
 } from "../controllers/child.controller.js";
 import { requireParent } from "../middlewares/requireParent.js";
 import { getParentHomeSummaryController } from "../controllers/parent.controller.js";
@@ -31,5 +32,7 @@ router.patch("/children/:childId/active", authJwt, requireParent, setChildActive
 // Parent dashboard summary
 router.get("/home-summary", authJwt, requireParent, getParentHomeSummaryController);
 
-
+// DELETE /api/v1/parent/children/:childId
+// Delete child
+router.delete("/children/:childId", authJwt, requireParent, deleteChildController);
 export default router;

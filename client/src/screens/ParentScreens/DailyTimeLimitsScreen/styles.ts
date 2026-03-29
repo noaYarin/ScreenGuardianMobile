@@ -386,4 +386,25 @@ export const styles = StyleSheet.create({
     color: "#1F2A44",
     textAlign: "center",
   },
+  emptyState: {
+  width: "100%",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingVertical: 32,
+  paddingHorizontal: 16,
+  gap: 8,
+},
+
+emptyTitle: {
+  fontSize: 16,
+  color: "#1F2A44",
+  textAlign: "center",
+},
+
+emptySubtitle: {
+  fontSize: 13,
+  color: "#6B7280",
+  textAlign: "center",
+  lineHeight: 18,
+},
 });

@@ -6,7 +6,9 @@ import {
   updateChildActiveByParentId,
   pushChildToParent,
   updateChildInterestsByParentId,
-  getChildByParentId
+  getChildByParentId,
+  deleteChildByParentId,
+  updateCurrentChildProfileByParentId
 
 } from "../dal/parent.dal.js";
 import { validateAndBuildChildDoc } from "./child.service.js";
@@ -156,4 +158,32 @@ export async function updateCurrentChildProfile(parentId, childId, name, birthDa
   }
 
   return { child: updated };
+}
+
+export async function deleteChild(parentId, childId) {
+  const child = await getChildByParentId(parentId, childId);
+
+  if (!child) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  const devices = await findDevicesByChildId(childId);
+
+  if (devices && devices.length > 0) {
+    throw new AppError({
+      code: "CHILD_HAS_CONNECTED_DEVICES",
+      message: "Cannot delete child with connected devices",
+      statusCode: 400
+    });
+  }
+
+  const updatedParent = await deleteChildByParentId(parentId, childId);
+
+  if (!updatedParent) {
+    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  return {
+    deletedChildId: childId
+  };
 }

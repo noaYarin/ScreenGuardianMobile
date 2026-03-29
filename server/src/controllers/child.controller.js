@@ -3,7 +3,8 @@ import {
   getChildren,
   setChildActive,
   updateChildInterests,
-  getChild
+  getChild,
+  deleteChild
 } from "../services/parent.service.js";
 import { updateCurrentChildProfile } from "../services/child.service.js";
 
@@ -92,6 +93,19 @@ export async function updateCurrentChildProfileController(req, res, next) {
     const data = await updateCurrentChildProfile(parentId, childId, birthDate, gender);
 
     res.json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteChildController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { childId } = req.params;
+
+    const data = await deleteChild(parentId, childId);
+
+    res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);
   }

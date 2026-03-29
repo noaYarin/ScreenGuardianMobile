@@ -42,6 +42,8 @@ export async function getChildById(
   );
 }
 
+
+
 export async function setChildActive(
   childId: string,
   isActive: boolean
@@ -53,3 +55,11 @@ export async function setChildActive(
   );
 }
 
+export async function deleteChild(
+  childId: string
+): Promise<{ deletedChildId: string }> {
+  return api.delete<{ deletedChildId: string }>(
+    `${URL}/children/${encodeURIComponent(childId)}`,
+    { requireAuth: true, role: "PARENT" }
+  );
+}
