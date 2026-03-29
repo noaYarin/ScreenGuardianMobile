@@ -635,6 +635,11 @@
     "pendingSectionSubtitle": "Requests are filtered by the currently selected child and device.",
     "approve": "Approve",
     "decline": "Decline",
+    "unlimited": "Unlimited",
+    "requestApproved": "Request approved successfully",
+    "requestDeclined": "Request declined successfully",
+    "remainingMinutes": "{{minutes}} minutes remaining",
+    "remainingInfoUnavailable": "Remaining time not available",
     "reasonLabel": "Request reason",
     "requestedMinutesLabel": "{{minutes}} extra minutes",
     "childSubtitles": {

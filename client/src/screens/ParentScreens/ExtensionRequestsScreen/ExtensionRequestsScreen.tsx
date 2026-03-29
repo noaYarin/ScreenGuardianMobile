@@ -1,14 +1,20 @@
-import React, { useMemo, useState } from "react";
-import { View, ScrollView, Pressable, useWindowDimensions } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  View,
+  ScrollView,
+  Pressable,
+  useWindowDimensions,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { Stack } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import ChildDeviceSelector, {
-  ALL_CHILD_ID,
   ALL_DEVICE_ID,
-  type ChildOption,
   type DeviceType,
 } from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
 import { styles } from "./styles";
@@ -16,219 +22,198 @@ import { styles } from "./styles";
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
-type ExtensionRequestStatus = "pending" | "approved" | "declined";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
+import {
+  fetchPendingRequestsThunk,
+  decideRequestThunk,
+} from "@/src/redux/thunks/requestThunks";
 
-type ExtensionRequestItem = {
-  id: string;
-  childId: string;
-  deviceId: string;
-  childName: string;
-  requestedMinutes: number;
-  reasonKey: string;
-  requestedAtKey: string;
-  currentRemainingKey: string;
-  deviceType: DeviceType;
-  deviceNameKey: string;
-  status: ExtensionRequestStatus;
-};
-
-const STATIC_CHILDREN: ChildOption[] = [
-  {
-    id: "noa",
-    name: "נועה",
-    initial: "נ",
-    accent: "#12C9A0",
-    subtitleKey: "extensionRequests.childSubtitles.personal",
-    devices: [
-      {
-        id: "noa-phone",
-        type: "phone",
-        name: "Galaxy S23",
-        icon: "cellphone",
-      },
-      {
-        id: "noa-tablet",
-        type: "tablet",
-        name: "iPad Air",
-        icon: "tablet-dashboard",
-      },
-    ],
-  },
-  {
-    id: "yonatan",
-    name: "יונתן",
-    initial: "י",
-    accent: "#6C8CFF",
-    subtitleKey: "extensionRequests.childSubtitles.personal",
-    devices: [
-      {
-        id: "yonatan-phone",
-        type: "phone",
-        name: "iPhone 13",
-        icon: "cellphone",
-      },
-    ],
-  },
-  {
-    id: "tamar",
-    name: "תמר",
-    initial: "ת",
-    accent: "#D56CE0",
-    subtitleKey: "extensionRequests.childSubtitles.personal",
-    devices: [
-      {
-        id: "tamar-tablet",
-        type: "tablet",
-        name: "Lenovo Tab",
-        icon: "tablet-dashboard",
-      },
-    ],
-  },
-];
-
-const STATIC_REQUESTS: ExtensionRequestItem[] = [
-  {
-    id: "req-1",
-    childId: "noa",
-    deviceId: "noa-phone",
-    childName: "נועה",
-    requestedMinutes: 30,
-    reasonKey: "extensionRequests.reasons.studyVideo",
-    requestedAtKey: "extensionRequests.requestTimes.fiveMinutesAgo",
-    currentRemainingKey: "extensionRequests.remaining.almostFinished",
-    deviceType: "phone",
-    deviceNameKey: "extensionRequests.devices.galaxyS23",
-    status: "pending",
-  },
-  {
-    id: "req-2",
-    childId: "noa",
-    deviceId: "noa-tablet",
-    childName: "נועה",
-    requestedMinutes: 15,
-    reasonKey: "extensionRequests.reasons.friendsMission",
-    requestedAtKey: "extensionRequests.requestTimes.fifteenMinutesAgo",
-    currentRemainingKey: "extensionRequests.remaining.timeEnded",
-    deviceType: "tablet",
-    deviceNameKey: "extensionRequests.devices.ipadAir",
-    status: "pending",
-  },
-  {
-    id: "req-3",
-    childId: "yonatan",
-    deviceId: "yonatan-phone",
-    childName: "יונתן",
-    requestedMinutes: 15,
-    reasonKey: "extensionRequests.reasons.chatWithFriends",
-    requestedAtKey: "extensionRequests.requestTimes.oneHourAgo",
-    currentRemainingKey: "extensionRequests.remaining.twoMinutesLeft",
-    deviceType: "phone",
-    deviceNameKey: "extensionRequests.devices.iphone13",
-    status: "pending",
-  },
-  {
-    id: "req-4",
-    childId: "tamar",
-    deviceId: "tamar-tablet",
-    childName: "תמר",
-    requestedMinutes: 20,
-    reasonKey: "extensionRequests.reasons.finishLesson",
-    requestedAtKey: "extensionRequests.requestTimes.tenMinutesAgo",
-    currentRemainingKey: "extensionRequests.remaining.fiveMinutesLeft",
-    deviceType: "tablet",
-    deviceNameKey: "extensionRequests.devices.lenovoTab",
-    status: "pending",
-  },
-];
-
-function getDeviceIconName(deviceType: DeviceType) {
+function getDeviceIconName(deviceType?: string) {
   return deviceType === "tablet" ? "tablet-dashboard" : "cellphone";
+}
+
+function getRemainingMinutes(device: any | null) {
+  if (!device?.screenTime) return null;
+
+  const {
+    isLimitEnabled,
+    dailyLimitMinutes = 0,
+    extraMinutesToday = 0,
+    usedTodayMinutes = 0,
+  } = device.screenTime;
+
+  if (!isLimitEnabled) return "UNLIMITED";
+
+  return Math.max(
+    0,
+    dailyLimitMinutes + extraMinutesToday - usedTodayMinutes
+  );
 }
 
 export default function ExtensionRequestsScreen() {
   const { t } = useTranslation();
   const { text, row, isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
+  const dispatch = useDispatch<AppDispatch>();
 
   const isWide = width >= 920;
 
-  const [selectedChildId, setSelectedChildId] = useState(ALL_CHILD_ID);
+  const children = useSelector(
+    (state: RootState) => state.children.childrenList ?? []
+  );
+
+  const devicesByChild = useSelector(
+    (state: RootState) => state.devices.byChildId ?? {}
+  );
+
+  const pendingRequests = useSelector(
+    (state: RootState) => state.requests.pending
+  );
+
+  const requestsStatus = useSelector(
+    (state: RootState) => state.requests.status
+  );
+
+  const requestsError = useSelector(
+    (state: RootState) => state.requests.error
+  );
+
+  const [selectedChildId, setSelectedChildId] = useState("");
   const [selectedDeviceId, setSelectedDeviceId] = useState(ALL_DEVICE_ID);
-  const [requests, setRequests] = useState<ExtensionRequestItem[]>(STATIC_REQUESTS);
+
+  useEffect(() => {
+    dispatch(getMyChildrenThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (!selectedChildId && children.length > 0) {
+      setSelectedChildId(String(children[0]._id));
+    }
+  }, [children, selectedChildId]);
+
+  useEffect(() => {
+    children.forEach((child) => {
+      dispatch(fetchDevicesByChild(String(child._id)));
+    });
+  }, [children, dispatch]);
+
+  useEffect(() => {
+    if (!selectedChildId) return;
+
+    dispatch(
+      fetchPendingRequestsThunk({
+        childId: selectedChildId,
+      })
+    );
+  }, [dispatch, selectedChildId]);
 
   const selectedChild = useMemo(() => {
-    if (selectedChildId === ALL_CHILD_ID) {
-      return null;
-    }
+    if (!selectedChildId) return null;
 
-    return STATIC_CHILDREN.find((child) => child.id === selectedChildId) ?? null;
-  }, [selectedChildId]);
+    return (
+      children.find((child) => String(child._id) === String(selectedChildId)) ??
+      null
+    );
+  }, [children, selectedChildId]);
 
   const selectedDevice = useMemo(() => {
     if (selectedDeviceId === ALL_DEVICE_ID) {
       return {
-        id: ALL_DEVICE_ID,
+        _id: ALL_DEVICE_ID,
         type: "phone" as DeviceType,
         name: t("childDeviceSelector.allDevices"),
-        icon: "devices" as React.ComponentProps<typeof MaterialCommunityIcons>["name"],
       };
     }
 
     if (!selectedChild) {
       return {
-        id: ALL_DEVICE_ID,
+        _id: ALL_DEVICE_ID,
         type: "phone" as DeviceType,
         name: t("childDeviceSelector.allDevices"),
-        icon: "devices" as React.ComponentProps<typeof MaterialCommunityIcons>["name"],
       };
     }
 
-    return (
-      selectedChild.devices.find((device) => device.id === selectedDeviceId) ?? null
-    );
-  }, [selectedChild, selectedDeviceId, t]);
+    const childDevices = devicesByChild[String(selectedChild._id)] ?? [];
 
-  const selectedChildLabel =
-    selectedChildId === ALL_CHILD_ID
-      ? t("childDeviceSelector.allChildren")
-      : selectedChild?.name ?? "";
+    return (
+      childDevices.find(
+        (device) => String(device._id) === String(selectedDeviceId)
+      ) ?? null
+    );
+  }, [devicesByChild, selectedChild, selectedDeviceId, t]);
+
+  const selectedChildLabel = selectedChild?.name ?? "";
 
   const visibleRequests = useMemo(() => {
-    return requests.filter((request) => {
-      if (request.status !== "pending") {
-        return false;
-      }
-
-      const matchesChild =
-        selectedChildId === ALL_CHILD_ID || request.childId === selectedChildId;
-
+    return pendingRequests.filter((request) => {
       const matchesDevice =
-        selectedDeviceId === ALL_DEVICE_ID || request.deviceId === selectedDeviceId;
+        selectedDeviceId === ALL_DEVICE_ID ||
+        String(request.deviceId) === String(selectedDeviceId);
 
-      return matchesChild && matchesDevice;
+      return matchesDevice;
     });
-  }, [requests, selectedChildId, selectedDeviceId]);
+  }, [pendingRequests, selectedDeviceId]);
 
-  const handleApprove = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((item) =>
-        item.id === requestId ? { ...item, status: "approved" } : item
-      )
-    );
-
-    // TODO: Server integration
-    // Send approve action to backend, e.g. PATCH /extension-requests/:id/approve
+  const getChildName = (childId: string) => {
+    const child = children.find((c) => String(c._id) === String(childId));
+    return child?.name ?? "";
   };
 
-  const handleDecline = (requestId: string) => {
-    setRequests((prev) =>
-      prev.map((item) =>
-        item.id === requestId ? { ...item, status: "declined" } : item
-      )
-    );
+  const getDeviceByIds = (childId: string, deviceId: string) => {
+    const list = devicesByChild[String(childId)] ?? [];
+    return list.find((d) => String(d._id) === String(deviceId)) ?? null;
+  };
 
-    // TODO: Server integration
-    // Send decline action to backend, e.g. PATCH /extension-requests/:id/decline
+  const handleApprove = async (requestId: string) => {
+    try {
+      await dispatch(
+        decideRequestThunk({
+          requestId,
+          decision: "APPROVED",
+        })
+      ).unwrap();
+
+      if (selectedChildId) {
+        await dispatch(fetchDevicesByChild(selectedChildId));
+      }
+
+      Alert.alert(
+        t("common.success"),
+        t("extensionRequests.requestApproved")
+      );
+    } catch (error) {
+      Alert.alert(
+        t("common.error"),
+        (error as Error)?.message ?? t("api.generic_error")
+      );
+    }
+  };
+
+  const handleDecline = async (requestId: string) => {
+    try {
+      await dispatch(
+        decideRequestThunk({
+          requestId,
+          decision: "REJECTED",
+        })
+      ).unwrap();
+
+      if (selectedChildId) {
+        await dispatch(fetchDevicesByChild(selectedChildId));
+      }
+
+      Alert.alert(
+        t("common.success"),
+        t("extensionRequests.requestDeclined")
+      );
+    } catch (error) {
+      Alert.alert(
+        t("common.error"),
+        (error as Error)?.message ?? t("api.generic_error")
+      );
+    }
   };
 
   return (
@@ -293,16 +278,19 @@ export default function ExtensionRequestsScreen() {
               </View>
             </View>
 
-            <ChildDeviceSelector
-              childrenOptions={STATIC_CHILDREN}
-              selectedChildId={selectedChildId}
-              selectedDeviceId={selectedDeviceId}
-              onSelectChild={setSelectedChildId}
-              onSelectDevice={setSelectedDeviceId}
-              childCardWidth={width >= 700 ? 160 : 140}
-              includeAllChildrenOption
-              includeAllDevicesOption
-            />
+            {!!selectedChildId && (
+              <ChildDeviceSelector
+                selectedChildId={selectedChildId}
+                selectedDeviceId={selectedDeviceId}
+                onSelectChild={(childId) => {
+                  setSelectedChildId(childId);
+                  setSelectedDeviceId(ALL_DEVICE_ID);
+                }}
+                onSelectDevice={setSelectedDeviceId}
+                showDevices
+                includeAllDevicesOption
+              />
+            )}
 
             <View
               style={[
@@ -327,7 +315,20 @@ export default function ExtensionRequestsScreen() {
               </AppText>
             </View>
 
-            {visibleRequests.length === 0 ? (
+            {requestsStatus === "loading" ? (
+              <View style={styles.emptyCard}>
+                <ActivityIndicator />
+              </View>
+            ) : requestsError ? (
+              <View style={styles.emptyCard}>
+                <AppText weight="extraBold" style={[styles.emptyTitle, text]}>
+                  {t("common.error")}
+                </AppText>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {requestsError}
+                </AppText>
+              </View>
+            ) : visibleRequests.length === 0 ? (
               <View style={styles.emptyCard}>
                 <MaterialCommunityIcons
                   name="check-decagram-outline"
@@ -342,128 +343,171 @@ export default function ExtensionRequestsScreen() {
                 </AppText>
               </View>
             ) : (
-              <View style={[styles.cardsWrap, isWide ? styles.cardsWrapWide : undefined]}>
-                {visibleRequests.map((request) => (
-                  <View
-                    key={request.id}
-                    style={[styles.requestCard, isWide ? styles.requestCardWide : undefined]}
-                  >
-                    <View style={[styles.cardTopRow, row]}>
-                      <View style={styles.deviceBadge}>
-                        <MaterialCommunityIcons
-                          name={getDeviceIconName(request.deviceType)}
-                          size={24}
-                          color="#315BFF"
-                        />
+              <View
+                style={[styles.cardsWrap, isWide ? styles.cardsWrapWide : undefined]}
+              >
+                {visibleRequests.map((request) => {
+                  const childName = getChildName(request.childId);
+                  const device = getDeviceByIds(request.childId, request.deviceId);
+                  const deviceName =
+                    device?.name ?? t("childDeviceSelector.allDevices");
+                  const deviceType = (device?.type as DeviceType) ?? "phone";
+                  const remaining = getRemainingMinutes(device);
+
+                  return (
+                    <View
+                      key={request._id}
+                      style={[
+                        styles.requestCard,
+                        isWide ? styles.requestCardWide : undefined,
+                      ]}
+                    >
+                      <View style={[styles.cardTopRow, row]}>
+                        <View style={styles.deviceBadge}>
+                          <MaterialCommunityIcons
+                            name={getDeviceIconName(deviceType)}
+                            size={24}
+                            color="#315BFF"
+                          />
+                        </View>
+
+                        <View style={styles.cardTopTextWrap}>
+                          <AppText weight="extraBold" style={[styles.deviceName, text]}>
+                            {deviceName}
+                          </AppText>
+
+                          <AppText weight="medium" style={[styles.childName, text]}>
+                            {childName}
+                          </AppText>
+                        </View>
                       </View>
 
-                      <View style={styles.cardTopTextWrap}>
-                        <AppText weight="extraBold" style={[styles.deviceName, text]}>
-                          {t(request.deviceNameKey)}
+                      <View style={styles.infoGrid}>
+                        <View
+                          style={[
+                            styles.infoChip,
+                            isRTL ? styles.infoChipRtl : styles.infoChipLtr,
+                          ]}
+                        >
+                          <MaterialCommunityIcons
+                            name="clock-plus-outline"
+                            size={16}
+                            color="#315BFF"
+                          />
+
+                          <AppText weight="bold" style={[styles.infoChipText, text]}>
+                            {t("extensionRequests.requestedMinutesLabel", {
+                              minutes: request.requestedMinutes,
+                            })}
+                          </AppText>
+                        </View>
+                      </View>
+
+                      <View style={styles.reasonBox}>
+                        <AppText weight="bold" style={[styles.reasonLabel, text]}>
+                          {t("extensionRequests.reasonLabel")}
                         </AppText>
 
-                        <AppText weight="medium" style={[styles.childName, text]}>
-                          {request.childName}
+                        <AppText weight="medium" style={[styles.reasonText, text]}>
+                          {request.reason}
                         </AppText>
                       </View>
-                    </View>
 
-                    <View style={styles.infoGrid}>
-                      <View
-                        style={[
-                          styles.infoChip,
-                          isRTL ? styles.infoChipRtl : styles.infoChipLtr,
-                        ]}
-                      >
+                      <View style={styles.remainingBox}>
+                        <View
+                          style={
+                            isRTL ? styles.remainingRowRtl : styles.remainingRowLtr
+                          }
+                        >
+                          <MaterialCommunityIcons
+                            name="timer-sand"
+                            size={16}
+                            color="#7A8599"
+                          />
+                          <AppText
+                            weight="medium"
+                            style={[styles.remainingText, text]}
+                          >
+                            {remaining === "UNLIMITED"
+                              ? t("extensionRequests.unlimited")
+                              : remaining !== null
+                              ? t("extensionRequests.remainingMinutes", {
+                                  minutes: remaining,
+                                })
+                              : t("extensionRequests.remainingInfoUnavailable")}
+                          </AppText>
+                        </View>
+                      </View>
+
+                      <View style={isRTL ? styles.timeRowRtl : styles.timeRowLtr}>
                         <MaterialCommunityIcons
-                          name="clock-plus-outline"
+                          name="history"
                           size={16}
-                          color="#315BFF"
+                          color="#8A94A6"
                         />
-
-                        <AppText weight="bold" style={[styles.infoChipText, text]}>
-                          {t("extensionRequests.requestedMinutesLabel", {
-                            minutes: request.requestedMinutes,
-                          })}
+                        <AppText weight="medium" style={[styles.timeText, text]}>
+                          {request.createdAt
+                            ? new Date(request.createdAt).toLocaleString()
+                            : ""}
                         </AppText>
                       </View>
-                    </View>
 
-                    <View style={styles.reasonBox}>
-                      <AppText weight="bold" style={[styles.reasonLabel, text]}>
-                        {t("extensionRequests.reasonLabel")}
-                      </AppText>
+                      <View style={[styles.actionsRow, row]}>
+                        <Pressable
+                          onPress={() => handleDecline(request._id)}
+                          accessibilityRole="button"
+                          accessibilityLabel={t(
+                            "extensionRequests.a11y.declineRequest",
+                            {
+                              childName,
+                              deviceName,
+                            }
+                          )}
+                          style={({ pressed }) => [
+                            styles.actionButton,
+                            styles.declineButton,
+                            pressed && styles.actionButtonPressed,
+                          ]}
+                        >
+                          <MaterialCommunityIcons
+                            name="close"
+                            size={18}
+                            color="#FFFFFF"
+                          />
+                          <AppText weight="extraBold" style={styles.actionButtonText}>
+                            {t("extensionRequests.decline")}
+                          </AppText>
+                        </Pressable>
 
-                      <AppText weight="medium" style={[styles.reasonText, text]}>
-                        {t(request.reasonKey)}
-                      </AppText>
-                    </View>
-
-                    <View style={styles.remainingBox}>
-                      <View style={isRTL ? styles.remainingRowRtl : styles.remainingRowLtr}>
-                        <MaterialCommunityIcons
-                          name="timer-sand"
-                          size={16}
-                          color="#7A8599"
-                        />
-                        <AppText weight="medium" style={[styles.remainingText, text]}>
-                          {t(request.currentRemainingKey)}
-                        </AppText>
+                        <Pressable
+                          onPress={() => handleApprove(request._id)}
+                          accessibilityRole="button"
+                          accessibilityLabel={t(
+                            "extensionRequests.a11y.approveRequest",
+                            {
+                              childName,
+                              deviceName,
+                            }
+                          )}
+                          style={({ pressed }) => [
+                            styles.actionButton,
+                            styles.approveButton,
+                            pressed && styles.actionButtonPressed,
+                          ]}
+                        >
+                          <MaterialCommunityIcons
+                            name="check"
+                            size={18}
+                            color="#FFFFFF"
+                          />
+                          <AppText weight="extraBold" style={styles.actionButtonText}>
+                            {t("extensionRequests.approve")}
+                          </AppText>
+                        </Pressable>
                       </View>
                     </View>
-
-                    <View style={isRTL ? styles.timeRowRtl : styles.timeRowLtr}>
-                      <MaterialCommunityIcons
-                        name="history"
-                        size={16}
-                        color="#8A94A6"
-                      />
-                      <AppText weight="medium" style={[styles.timeText, text]}>
-                        {t(request.requestedAtKey)}
-                      </AppText>
-                    </View>
-
-                    <View style={[styles.actionsRow, row]}>
-                      <Pressable
-                        onPress={() => handleDecline(request.id)}
-                        accessibilityRole="button"
-                        accessibilityLabel={t("extensionRequests.a11y.declineRequest", {
-                          childName: request.childName,
-                          deviceName: t(request.deviceNameKey),
-                        })}
-                        style={({ pressed }) => [
-                          styles.actionButton,
-                          styles.declineButton,
-                          pressed && styles.actionButtonPressed,
-                        ]}
-                      >
-                        <MaterialCommunityIcons name="close" size={18} color="#FFFFFF" />
-                        <AppText weight="extraBold" style={styles.actionButtonText}>
-                          {t("extensionRequests.decline")}
-                        </AppText>
-                      </Pressable>
-
-                      <Pressable
-                        onPress={() => handleApprove(request.id)}
-                        accessibilityRole="button"
-                        accessibilityLabel={t("extensionRequests.a11y.approveRequest", {
-                          childName: request.childName,
-                          deviceName: t(request.deviceNameKey),
-                        })}
-                        style={({ pressed }) => [
-                          styles.actionButton,
-                          styles.approveButton,
-                          pressed && styles.actionButtonPressed,
-                        ]}
-                      >
-                        <MaterialCommunityIcons name="check" size={18} color="#FFFFFF" />
-                        <AppText weight="extraBold" style={styles.actionButtonText}>
-                          {t("extensionRequests.approve")}
-                        </AppText>
-                      </Pressable>
-                    </View>
-                  </View>
-                ))}
+                  );
+                })}
               </View>
             )}
           </View>

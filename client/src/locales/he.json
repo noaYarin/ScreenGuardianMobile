@@ -602,8 +602,13 @@
     "pendingSectionSubtitle": "הבקשות מסוננות לפי הילד והמכשיר שנבחרו כרגע.",
     "approve": "אשר",
     "decline": "דחה",
+    "unlimited": "ללא הגבלה",
     "reasonLabel": "סיבה לבקשה",
     "requestedMinutesLabel": "{{minutes}} דקות נוספות",
+    "requestApproved": "הבקשה אושרה בהצלחה",
+    "requestDeclined": "הבקשה נדחתה בהצלחה",
+    "remainingMinutes": "נשארו {{minutes}} דקות",
+    "remainingInfoUnavailable": "אין מידע על הזמן שנותר",
     "childSubtitles": {
       "personal": "ניהול אישי"
     },
