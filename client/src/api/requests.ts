@@ -14,6 +14,7 @@ export type ParentExtensionRequest = {
   updatedAt?: string;
 };
 
+
 export type CreateChildExtensionRequestBody = {
   deviceId: string;
   requestedMinutes: number;
@@ -26,6 +27,17 @@ export async function apiCreateRequest(
   return api.post<ParentExtensionRequest>(
     `${URL}/child`,
     body,
+    {
+      requireAuth: true,
+      role: "CHILD",
+    }
+  );
+}
+
+
+export async function apiGetMyRequests() {
+  return api.get<ParentExtensionRequest[]>(
+    `${URL}/child`,
     {
       requireAuth: true,
       role: "CHILD",

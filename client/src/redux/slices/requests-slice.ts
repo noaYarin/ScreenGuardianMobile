@@ -2,19 +2,22 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { ParentExtensionRequest } from "../../api/requests";
 import {
   fetchPendingRequestsThunk,
-  decideRequestThunk, 
-  createRequestThunk
+  decideRequestThunk,
+  createRequestThunk,
+  fetchMyRequestsThunk,
 } from "../thunks/requestThunks";
 import { logout } from "./auth-slice";
 
 type RequestsState = {
   pending: ParentExtensionRequest[];
+  mine: ParentExtensionRequest[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
 };
 
 const initialState: RequestsState = {
   pending: [],
+  mine: [],
   status: "idle",
   error: null,
 };
@@ -36,15 +39,31 @@ const requestsSlice = createSlice({
       })
       .addCase(fetchPendingRequestsThunk.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload ?? action.error.message ?? "api.generic_error";
+        state.error =
+          action.payload ?? action.error.message ?? "api.generic_error";
       })
-       .addCase(createRequestThunk.pending, (state) => {
+      .addCase(fetchMyRequestsThunk.pending, (state) => {
         state.status = "loading";
         state.error = null;
       })
-      .addCase(createRequestThunk.fulfilled, (state) => {
+      .addCase(fetchMyRequestsThunk.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.mine = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchMyRequestsThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          action.payload ?? action.error.message ?? "api.generic_error";
+      })
+      .addCase(createRequestThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createRequestThunk.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.error = null;
+        state.mine.unshift(action.payload);
       })
       .addCase(createRequestThunk.rejected, (state, action) => {
         state.status = "failed";
@@ -58,6 +77,7 @@ const requestsSlice = createSlice({
       })
       .addCase(logout, (state) => {
         state.pending = [];
+        state.mine = [];
         state.status = "idle";
         state.error = null;
       });

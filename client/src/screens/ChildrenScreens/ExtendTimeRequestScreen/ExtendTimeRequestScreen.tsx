@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   Pressable,
@@ -19,7 +19,10 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { pickRTL } from "../../../locales/rtl";
 
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
-import { createRequestThunk } from "@/src/redux/thunks/requestThunks";
+import {
+  createRequestThunk,
+  fetchMyRequestsThunk,
+} from "@/src/redux/thunks/requestThunks";
 
 type MinuteOption = {
   minutes: number;
@@ -38,6 +41,10 @@ export default function ExtendTimeRequestScreen() {
 
   const devicesByChild = useSelector(
     (state: RootState) => state.devices.byChildId
+  );
+
+  const myRequests = useSelector(
+    (state: RootState) => state.requests.mine ?? []
   );
 
   const device =
@@ -61,6 +68,16 @@ export default function ExtendTimeRequestScreen() {
   const [message, setMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    dispatch(fetchMyRequestsThunk());
+  }, [dispatch]);
+
+  const hasPendingRequestForThisDevice = myRequests.some(
+    (request) =>
+      String(request.deviceId) === String(deviceId) &&
+      request.status === "PENDING"
+  );
+
   const selectPreset = (m: number) => setSelectedMinutes(m);
 
   const selectCustom = (m: number) => {
@@ -71,19 +88,41 @@ export default function ExtendTimeRequestScreen() {
   const incCustom = () => selectCustom(Math.min(120, customMinutes + 1));
   const decCustom = () => selectCustom(Math.max(1, customMinutes - 1));
 
+  const getErrorMessage = (msg?: string) => {
+    if (!msg) return t("api.generic_error");
+
+    const lower = msg.toLowerCase();
+
+    if (lower.includes("already")) {
+      return t(
+        "extendTime.alreadyRequested",
+        "A pending extension request already exists for this device"
+      );
+    }
+
+    if (lower.includes("invalid")) {
+      return t("extendTime.invalidMinutes", "Invalid number of minutes");
+    }
+
+    return msg;
+  };
+
   const onSend = async () => {
     if (isSubmitting) return;
 
     try {
       if (!deviceId) {
-        Alert.alert(t("common.error"), t("extendTime.noDevice", "No device found"));
+        Alert.alert(
+          t("common.error"),
+          t("extendTime.noDevice", "No linked device found")
+        );
         return;
       }
 
       if (!selectedMinutes || selectedMinutes < 1 || selectedMinutes > 120) {
         Alert.alert(
           t("common.error"),
-          t("extendTime.invalidMinutes", "Invalid minutes")
+          t("extendTime.invalidMinutes", "Invalid number of minutes")
         );
         return;
       }
@@ -91,7 +130,21 @@ export default function ExtendTimeRequestScreen() {
       if (!device?.screenTime?.isLimitEnabled) {
         Alert.alert(
           t("common.error"),
-          t("extendTime.noActiveLimit", "No active limit on this device")
+          t(
+            "extendTime.noActiveLimit",
+            "There is no active screen-time limit on this device"
+          )
+        );
+        return;
+      }
+
+      if (hasPendingRequestForThisDevice) {
+        Alert.alert(
+          t("common.error"),
+          t(
+            "extendTime.alreadyRequested",
+            "A pending extension request already exists for this device"
+          )
         );
         return;
       }
@@ -108,14 +161,14 @@ export default function ExtendTimeRequestScreen() {
 
       Alert.alert(
         t("common.success"),
-        t("extendTime.requestSent", "Request sent successfully")
+        t("extendTime.requestSent", "Extension request sent successfully")
       );
 
       router.back();
     } catch (error) {
       Alert.alert(
         t("common.error"),
-        (error as Error)?.message ?? t("api.generic_error")
+        getErrorMessage((error as Error)?.message)
       );
     } finally {
       setIsSubmitting(false);
@@ -329,20 +382,27 @@ export default function ExtendTimeRequestScreen() {
 
               <Pressable
                 onPress={onSend}
-                disabled={isSubmitting}
+                disabled={isSubmitting || hasPendingRequestForThisDevice}
                 accessibilityRole="button"
                 accessibilityLabel={t("extendTime.send_a11y")}
                 style={({ pressed }) => [
                   styles.sendBtn,
                   pressed ? styles.sendBtnPressed : null,
-                  isSubmitting && { opacity: 0.6 },
+                  (isSubmitting || hasPendingRequestForThisDevice) && {
+                    opacity: 0.6,
+                  },
                 ]}
               >
                 <View style={styles.sendIconBadge}>
                   <MaterialCommunityIcons name="send" size={16} color="#FFFFFF" />
                 </View>
                 <AppText weight="extraBold" style={styles.sendBtnText}>
-                  {isSubmitting
+                  {hasPendingRequestForThisDevice
+                    ? t(
+                        "extendTime.alreadyRequested",
+                        "A pending extension request already exists for this device"
+                      )
+                    : isSubmitting
                     ? t("extendTime.sending", "Sending...")
                     : t("extendTime.send")}
                 </AppText>
