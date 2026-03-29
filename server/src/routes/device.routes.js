@@ -93,7 +93,7 @@ router.get(
 
 // PATCH /api/v1/devices/:deviceId/location
 // Parent updates the location of a device
-router.patch("/:deviceId/location", authJwt, updateDeviceLocationController);
+router.patch("/:deviceId/location", authJwt, requireChild, updateDeviceLocationController);
 
 
 // PATCH /api/v1/devices/:deviceId/usage
