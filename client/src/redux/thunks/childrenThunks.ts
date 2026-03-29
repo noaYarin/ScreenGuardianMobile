@@ -53,6 +53,23 @@ export const getMyChildrenThunk = createAsyncThunk<
   }
 });
 
+
+export const deleteChildThunk = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>("children/deleteChild", async (childId, thunkAPI) => {
+  try {
+    await parentApi.deleteChild(childId);
+    return childId;
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "children.delete_failed";
+
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 // Get current child profile by id
 export const fetchCurrentChildProfileThunk = createAsyncThunk<
   Child,

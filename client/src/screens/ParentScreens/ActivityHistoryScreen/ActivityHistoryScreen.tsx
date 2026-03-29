@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   View,
   ScrollView,
@@ -6,17 +6,18 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
-import ChildDeviceSelector, {
-  ALL_CHILD_ID,
-  type ChildOption,
-} from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
+import ChildDeviceSelector from "../../../components/ChildDeviceSelector/ChildDeviceSelector";
 import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ActivityType =
   | "app_locked"
@@ -37,37 +38,13 @@ type ActivityItem = {
 
 type FilterKey = "all" | "locks" | "extensions" | "updates";
 
-const CHILDREN: ChildOption[] = [
-  {
-    id: "tomer",
-    name: "תומר",
-    initial: "ת",
-    accent: "#FF6B6B",
-    subtitleKey: "activityHistory.children.tomerSubtitle",
-    devices: [],
-  },
-  {
-    id: "yael",
-    name: "יעל",
-    initial: "י",
-    accent: "#22C55E",
-    subtitleKey: "activityHistory.children.yaelSubtitle",
-    devices: [],
-  },
-  {
-    id: "noam",
-    name: "נועם",
-    initial: "נ",
-    accent: "#3B82F6",
-    subtitleKey: "activityHistory.children.noamSubtitle",
-    devices: [],
-  },
-];
+const ALL_CHILDREN_FILTER_ID = "all-children-filter";
 
+// זמני בלבד עד שתחברי את ההיסטוריה האמיתית מהשרת/Redux
 const ACTIVITIES: ActivityItem[] = [
   {
     id: "1",
-    childId: "tomer",
+    childId: "demo-child-1",
     type: "screen_locked",
     titleKey: "activityHistory.items.screenLocked.title",
     descriptionKey: "activityHistory.items.screenLocked.description",
@@ -75,7 +52,7 @@ const ACTIVITIES: ActivityItem[] = [
   },
   {
     id: "2",
-    childId: "yael",
+    childId: "demo-child-2",
     type: "extension_approved",
     titleKey: "activityHistory.items.extensionApproved.title",
     descriptionKey: "activityHistory.items.extensionApproved.description",
@@ -83,7 +60,7 @@ const ACTIVITIES: ActivityItem[] = [
   },
   {
     id: "3",
-    childId: "noam",
+    childId: "demo-child-3",
     type: "daily_limit_updated",
     titleKey: "activityHistory.items.dailyLimitUpdated.title",
     descriptionKey: "activityHistory.items.dailyLimitUpdated.description",
@@ -91,7 +68,7 @@ const ACTIVITIES: ActivityItem[] = [
   },
   {
     id: "4",
-    childId: "tomer",
+    childId: "demo-child-1",
     type: "extension_requested",
     titleKey: "activityHistory.items.extensionRequested.title",
     descriptionKey: "activityHistory.items.extensionRequested.description",
@@ -99,7 +76,7 @@ const ACTIVITIES: ActivityItem[] = [
   },
   {
     id: "5",
-    childId: "yael",
+    childId: "demo-child-2",
     type: "app_locked",
     titleKey: "activityHistory.items.appLocked.title",
     descriptionKey: "activityHistory.items.appLocked.description",
@@ -107,7 +84,7 @@ const ACTIVITIES: ActivityItem[] = [
   },
   {
     id: "6",
-    childId: "noam",
+    childId: "demo-child-3",
     type: "device_locked",
     titleKey: "activityHistory.items.deviceLocked.title",
     descriptionKey: "activityHistory.items.deviceLocked.description",
@@ -163,21 +140,33 @@ function getActivityMeta(type: ActivityType) {
 }
 
 export default function ActivityHistoryScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const { row, text, isRTL } = useLocaleLayout();
 
   const isTablet = width >= 900;
 
-  const [selectedChildId, setSelectedChildId] = useState<string>(ALL_CHILD_ID);
+  const {
+    childrenList,
+    isLoading: childrenLoading,
+    error: childrenError,
+  } = useSelector((state: RootState) => state.children);
+
+  const [selectedChildId, setSelectedChildId] = useState<string>(
+    ALL_CHILDREN_FILTER_ID
+  );
   const [selectedFilter, setSelectedFilter] = useState<FilterKey>("all");
 
-  const childCardWidth = width >= 700 ? 160 : 140;
+  useEffect(() => {
+    dispatch(getMyChildrenThunk());
+  }, [dispatch]);
 
   const filteredActivities = useMemo(() => {
     return ACTIVITIES.filter((item) => {
       const matchesChild =
-        selectedChildId === ALL_CHILD_ID || item.childId === selectedChildId;
+        selectedChildId === ALL_CHILDREN_FILTER_ID ||
+        item.childId === selectedChildId;
 
       const matchesFilter =
         selectedFilter === "all"
@@ -208,6 +197,10 @@ export default function ActivityHistoryScreen() {
     { key: "extensions", labelKey: "activityHistory.filters.extensions" },
     { key: "updates", labelKey: "activityHistory.filters.updates" },
   ];
+
+  const hasChildren = childrenList.length > 0;
+  const shouldShowChildSelector =
+    hasChildren && selectedChildId !== ALL_CHILDREN_FILTER_ID;
 
   return (
     <ScreenLayout>
@@ -276,15 +269,99 @@ export default function ActivityHistoryScreen() {
           </View>
 
           <View style={styles.selectorSection}>
-            <ChildDeviceSelector
-              childrenOptions={CHILDREN}
-              selectedChildId={selectedChildId}
-              onSelectChild={setSelectedChildId}
-              showDevices={false}
-              includeAllChildrenOption
-              childCardWidth={childCardWidth}
-              childSectionTitleKey="activityHistory.childSectionTitle"
-            />
+            <AppText weight="bold" style={[styles.sectionTitle, text]}>
+              {t("activityHistory.childSectionTitle", "Children")}
+            </AppText>
+
+            <View style={styles.filtersSection}>
+              <View
+                style={[
+                  styles.filtersRow,
+                  isRTL ? styles.filtersRowRtl : styles.filtersRowLtr,
+                ]}
+              >
+                <Pressable
+                  onPress={() => setSelectedChildId(ALL_CHILDREN_FILTER_ID)}
+                  accessibilityRole="button"
+                  accessibilityLabel={t(
+                    "activityHistory.allChildren",
+                    "All children"
+                  )}
+                  style={({ pressed }) => [
+                    styles.filterChip,
+                    selectedChildId === ALL_CHILDREN_FILTER_ID
+                      ? styles.filterChipActive
+                      : null,
+                    pressed ? styles.pressed : null,
+                  ]}
+                >
+                  <AppText
+                    weight={
+                      selectedChildId === ALL_CHILDREN_FILTER_ID
+                        ? "bold"
+                        : "medium"
+                    }
+                    style={[
+                      styles.filterChipText,
+                      text,
+                      selectedChildId === ALL_CHILDREN_FILTER_ID
+                        ? styles.filterChipTextActive
+                        : null,
+                    ]}
+                  >
+                    {t("activityHistory.allChildren", "All children")}
+                  </AppText>
+                </Pressable>
+              </View>
+            </View>
+
+            {childrenLoading ? (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t("common.loading", "Loading...")}
+                </AppText>
+              </View>
+            ) : childrenError ? (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t(childrenError, childrenError)}
+                </AppText>
+              </View>
+            ) : hasChildren ? (
+              <ChildDeviceSelector
+                selectedChildId={
+                  shouldShowChildSelector
+                    ? selectedChildId
+                    : String(childrenList[0]?._id ?? "")
+                }
+                onSelectChild={(childId) => setSelectedChildId(childId)}
+                showDevices={false}
+              />
+            ) : (
+              <View style={styles.emptyState}>
+                <View style={styles.emptyIconWrap}>
+                  <MaterialCommunityIcons
+                    name="account-child-outline"
+                    size={26}
+                    color="#4F46E5"
+                  />
+                </View>
+
+                <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                  {t(
+                    "activityHistory.empty.noChildrenTitle",
+                    "No children found"
+                  )}
+                </AppText>
+
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t(
+                    "activityHistory.empty.noChildrenSubtitle",
+                    "There are no children linked to this account yet."
+                  )}
+                </AppText>
+              </View>
+            )}
           </View>
 
           <View style={styles.filtersSection}>
@@ -292,41 +369,41 @@ export default function ActivityHistoryScreen() {
               {t("activityHistory.filterTitle")}
             </AppText>
 
-<View
-  style={[
-    styles.filtersRow,
-    isRTL ? styles.filtersRowRtl : styles.filtersRowLtr,
-  ]}
->
-  {filters.map((filter) => {
-    const active = filter.key === selectedFilter;
+            <View
+              style={[
+                styles.filtersRow,
+                isRTL ? styles.filtersRowRtl : styles.filtersRowLtr,
+              ]}
+            >
+              {filters.map((filter) => {
+                const active = filter.key === selectedFilter;
 
-    return (
-      <Pressable
-        key={filter.key}
-        onPress={() => setSelectedFilter(filter.key)}
-        accessibilityRole="button"
-        accessibilityLabel={t(filter.labelKey)}
-        style={({ pressed }) => [
-          styles.filterChip,
-          active ? styles.filterChipActive : null,
-          pressed ? styles.pressed : null,
-        ]}
-      >
-        <AppText
-          weight={active ? "bold" : "medium"}
-          style={[
-            styles.filterChipText,
-            text,
-            active ? styles.filterChipTextActive : null,
-          ]}
-        >
-          {t(filter.labelKey)}
-        </AppText>
-      </Pressable>
-    );
-  })}
-</View>
+                return (
+                  <Pressable
+                    key={filter.key}
+                    onPress={() => setSelectedFilter(filter.key)}
+                    accessibilityRole="button"
+                    accessibilityLabel={t(filter.labelKey)}
+                    style={({ pressed }) => [
+                      styles.filterChip,
+                      active ? styles.filterChipActive : null,
+                      pressed ? styles.pressed : null,
+                    ]}
+                  >
+                    <AppText
+                      weight={active ? "bold" : "medium"}
+                      style={[
+                        styles.filterChipText,
+                        text,
+                        active ? styles.filterChipTextActive : null,
+                      ]}
+                    >
+                      {t(filter.labelKey)}
+                    </AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
 
           <View style={styles.listSection}>
@@ -362,7 +439,9 @@ export default function ActivityHistoryScreen() {
               </View>
             ) : (
               filteredActivities.map((item) => {
-                const child = CHILDREN.find((c) => c.id === item.childId);
+                const child = childrenList.find(
+                  (c) => String(c._id) === String(item.childId)
+                );
                 const meta = getActivityMeta(item.type);
 
                 return (

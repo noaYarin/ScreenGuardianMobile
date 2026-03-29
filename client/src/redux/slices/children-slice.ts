@@ -4,8 +4,9 @@ import {
   getMyChildrenThunk,
   fetchCurrentChildProfileThunk,
   updateCurrentChildProfileThunk,
+  deleteChildThunk,
 } from "../thunks/childrenThunks";
-import { logout } from "./auth-slice"; 
+import { logout } from "./auth-slice";
 
 export type ChildGender = "boy" | "girl" | "other";
 
@@ -42,7 +43,6 @@ const initialState: ChildrenState = {
   isLoading: false,
   error: null,
 };
-
 
 const childrenSlice = createSlice({
   name: "children",
@@ -83,7 +83,23 @@ const childrenSlice = createSlice({
         state.error = (action.payload as string) || "children.fetch_failed";
       })
 
-      // Fetch current child profile for child home screen 
+      .addCase(deleteChildThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteChildThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.error = null;
+        state.childrenList = state.childrenList.filter(
+          (child) => String(child._id) !== String(action.payload)
+        );
+      })
+      .addCase(deleteChildThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = (action.payload as string) || "children.delete_failed";
+      })
+
+      // Fetch current child profile for child home screen
       .addCase(fetchCurrentChildProfileThunk.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -104,28 +120,32 @@ const childrenSlice = createSlice({
         state.isLoading = false;
         state.error = (action.payload as string) || "children.profile_failed";
       })
-      .addCase(logout, (state) => {
-        state.childrenList = [];
-        state.isLoading = false;
-        state.error = null;
-      })
+
       .addCase(updateCurrentChildProfileThunk.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(updateCurrentChildProfileThunk.fulfilled, (state, action) => {
         state.isLoading = false;
-        const updatedChild = action.payload; 
+        const updatedChild = action.payload;
 
         state.childrenList = state.childrenList.map((child) =>
           child._id === updatedChild._id ? updatedChild : child
         );
-
       })
       .addCase(updateCurrentChildProfileThunk.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = state.error = (action.payload as string) || action.error.message || "Update failed";
+        state.error =
+          (action.payload as string) ||
+          action.error.message ||
+          "Update failed";
       })
+
+      .addCase(logout, (state) => {
+        state.childrenList = [];
+        state.isLoading = false;
+        state.error = null;
+      });
   },
 });
 

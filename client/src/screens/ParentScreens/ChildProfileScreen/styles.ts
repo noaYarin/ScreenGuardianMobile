@@ -56,12 +56,29 @@ export const styles = StyleSheet.create({
     marginBottom: 16,
   },
 
+  // 🔥 שורת כפתורים (עריכה + מחיקה)
+  profileActionsRow: {
+    width: "100%",
+    marginTop: 14,
+    gap: 10,
+    alignItems: "stretch",
+  },
+
+  profileActionsRowLtr: {
+    flexDirection: "row",
+  },
+
+  profileActionsRowRtl: {
+    flexDirection: "row-reverse",
+  },
+
+  // ✏️ כפתור עריכה (מתוקן!)
   editButton: {
-    minWidth: 170,
+    flex: 1,
+    minHeight: 46,
     backgroundColor: "#F3F8FD",
     borderRadius: 14,
-    paddingHorizontal: 18,
-    paddingVertical: 11,
+    paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
@@ -71,6 +88,7 @@ export const styles = StyleSheet.create({
   editButtonContent: {
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
 
@@ -79,6 +97,36 @@ export const styles = StyleSheet.create({
     color: "#3B5B7A",
   },
 
+  // 🗑️ כפתור מחיקה
+  deleteButton: {
+    flex: 1,
+    minHeight: 46,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "#FECACA",
+    backgroundColor: "#FFF1F2",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 14,
+  },
+
+  deleteButtonDisabled: {
+    opacity: 0.6,
+  },
+
+  deleteButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+
+  deleteButtonText: {
+    color: "#B42318",
+    fontSize: 15,
+  },
+
+  // 📦 גריד כרטיסים
   cardsGrid: {
     width: "100%",
     gap: 14,
@@ -161,6 +209,7 @@ export const styles = StyleSheet.create({
     flexShrink: 0,
   },
 
+  // ✨ מצבי לחיצה
   pressed: {
     opacity: 0.72,
   },
