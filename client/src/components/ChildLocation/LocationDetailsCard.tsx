@@ -74,9 +74,9 @@ export default function LocationDetailsCard({
     let timeStr = "--:--";
     if (deviceSnapshot?.lastUpdated) {
       const date = new Date(deviceSnapshot.lastUpdated);
-      if (!isNaN(date.getTime())) {
-        timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
+      const datePart = date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+        const timePart = date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+        timeStr = `${datePart}, ${timePart}`;
     }
 
     return {
