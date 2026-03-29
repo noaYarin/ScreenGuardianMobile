@@ -81,8 +81,12 @@ export default function LinkChildrenScreen() {
         pathname: "/Child/home",
         params: { initialName: res.childName ?? "" }
       });
-    } catch(err: any) {
-      Alert.alert(t("linkChildren.error_title"), err?.error?.message );
+     } catch (err: any) {
+      console.log("link error:", err);
+      Alert.alert(
+        t("linkChildren.error_title"),
+        err?.message ?? t("api.generic_error")
+      );
       scheduleFinishLinkAfterError();
       router.replace("Entering/roleSelectionRoute" as any);
     }

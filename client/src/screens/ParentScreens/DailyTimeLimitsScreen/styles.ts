@@ -240,8 +240,9 @@ export const styles = StyleSheet.create({
     color: "#C67A18",
   },
 
-  editButtonWrap: {
+  actionButtonsWrap: {
     width: "100%",
+    gap: 10,
   },
 
   editButton: {
@@ -270,141 +271,207 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
 
-  editorWrap: {
+  removeButton: {
+    alignSelf: "stretch",
+    minHeight: 48,
+    borderRadius: 16,
+    backgroundColor: "#FFF5F5",
+    borderWidth: 1,
+    borderColor: "#FFD7D7",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 18,
+  },
+
+  removeButtonText: {
+    fontSize: 15,
+    color: "#DC2626",
+    textAlign: "center",
+  },
+
+  emptyState: {
     width: "100%",
-    borderRadius: 20,
-    backgroundColor: "#F8FAFF",
-    borderWidth: 1,
-    borderColor: "#E6EEFF",
-    padding: 14,
-    gap: 12,
-  },
-
-  editorHeaderRow: {
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-
-  editorTitle: {
-    fontSize: 15,
-    color: "#1F2A44",
-  },
-
-  doneButton: {
-    minHeight: 34,
-    borderRadius: 999,
-    backgroundColor: "#EAF1FF",
-    paddingHorizontal: 14,
     alignItems: "center",
     justifyContent: "center",
-  },
-
-  doneButtonPressed: {
-    opacity: 0.8,
-  },
-
-  doneButtonText: {
-    fontSize: 13,
-    color: "#3D6BF2",
-  },
-
-  editorControlsRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    paddingVertical: 32,
+    paddingHorizontal: 16,
     gap: 10,
-  },
-
-  editorControlsRowRtl: {
-    flexDirection: "row-reverse",
-  },
-
-  stepButton: {
-    minWidth: 76,
-    minHeight: 48,
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
-
-  stepButtonPrimary: {
-    backgroundColor: "#3D6BF2",
-  },
-
-  stepButtonSecondary: {
-    backgroundColor: "#EEF3FB",
-    borderWidth: 1,
-    borderColor: "#D9E4F6",
-  },
-
-  stepButtonPressed: {
-    opacity: 0.85,
-  },
-
-  stepButtonDisabled: {
-    opacity: 0.55,
-  },
-
-  stepButtonTextPrimary: {
-    fontSize: 15,
-    color: "#FFFFFF",
-  },
-
-  stepButtonTextSecondary: {
-    fontSize: 15,
-    color: "#1F2A44",
-  },
-
-  stepButtonTextDisabled: {
-    color: "#A8B3C7",
-  },
-
-  currentValueBox: {
-    flex: 1,
-    minHeight: 48,
-    borderRadius: 16,
+    borderRadius: 24,
     backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E8EEF8",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    shadowColor: "#102040",
+    shadowOpacity: 0.05,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 2,
   },
 
-  currentValueLabel: {
-    fontSize: 11,
-    color: "#7B879C",
-    marginBottom: 3,
-  },
-
-  currentValueText: {
-    fontSize: 18,
+  emptyTitle: {
+    fontSize: 16,
     color: "#1F2A44",
     textAlign: "center",
   },
-  emptyState: {
-  width: "100%",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingVertical: 32,
-  paddingHorizontal: 16,
-  gap: 8,
-},
 
-emptyTitle: {
-  fontSize: 16,
-  color: "#1F2A44",
-  textAlign: "center",
-},
+  emptySubtitle: {
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 18,
+    maxWidth: 540,
+  },
 
-emptySubtitle: {
-  fontSize: 13,
-  color: "#6B7280",
-  textAlign: "center",
-  lineHeight: 18,
+  emptyActionsRow: {
+    width: "100%",
+    gap: 12,
+    marginTop: 8,
+  },
+
+  emptyActionsRowRtl: {
+    flexDirection: "column",
+  },
+
+  primaryActionButton: {
+    minHeight: 52,
+    borderRadius: 16,
+    backgroundColor: "#3D6BF2",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 18,
+    shadowColor: "#3D6BF2",
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+
+  primaryActionButtonText: {
+    fontSize: 15,
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+
+  secondaryActionButton: {
+    minHeight: 52,
+    borderRadius: 16,
+    backgroundColor: "#EEF4FF",
+    borderWidth: 1,
+    borderColor: "#D8E5FF",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    paddingHorizontal: 18,
+  },
+
+  secondaryActionButtonText: {
+    fontSize: 15,
+    color: "#2B4EFF",
+    textAlign: "center",
+  },
+
+  buttonPressed: {
+    opacity: 0.85,
+  },
+
+  modeSwitchRow: {
+    flexDirection: "row",
+    gap: 10,
+    marginBottom: 14,
+  },
+
+  modeSwitchRowRtl: {
+    flexDirection: "row-reverse",
+  },
+
+  modeChip: {
+    flex: 1,
+    minHeight: 46,
+    borderRadius: 14,
+    backgroundColor: "#F4F7FC",
+    borderWidth: 1,
+    borderColor: "#E2E8F4",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+
+  modeChipActive: {
+    backgroundColor: "#EAF1FF",
+    borderColor: "#BFD2FF",
+  },
+
+  modeChipText: {
+    fontSize: 14,
+    color: "#607089",
+    textAlign: "center",
+  },
+
+  modeChipTextActive: {
+    color: "#2B4EFF",
+  },
+
+  inputBlock: {
+    width: "100%",
+    gap: 8,
+    marginBottom: 14,
+  },
+
+  inputLabel: {
+    fontSize: 13,
+    color: "#617089",
+  },
+
+  minutesInput: {
+    width: "100%",
+    minHeight: 54,
+    borderRadius: 16,
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1,
+    borderColor: "#DDE7F5",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: "#1F2A44",
+    textAlign: "left",
+  },
+
+  minutesInputRtl: {
+    textAlign: "right",
+  },
+
+  infoBanner: {
+    width: "100%",
+    borderRadius: 16,
+    backgroundColor: "#F3F7FF",
+    borderWidth: 1,
+    borderColor: "#DCE7FF",
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 14,
+  },
+
+  infoBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: "#49607D",
+    lineHeight: 18,
+  },
+
+  editorButtonsRow: {
+    width: "100%",
+    gap: 10,
+  },
+
+  editorButtonsRowRtl: {
+    flexDirection: "column",
+  },
+  statusChipRtl: {
+  alignSelf: "flex-end",
 },
 });

@@ -104,21 +104,27 @@ export async function findDeviceDailyLimitById(deviceId) {
   return DeviceModel.findById(
     deviceId,
     {
+      "screenTime.dailyLimitMode": 1,
       "screenTime.isLimitEnabled": 1,
       "screenTime.dailyLimitMinutes": 1,
       "screenTime.extraMinutesToday": 1,
-      "screenTime.usedTodayMinutes": 1
+      "screenTime.usedTodayMinutes": 1,
+      "screenTime.lastDailyResetAt": 1
     }
   ).lean();
 }
 
-export async function updateDeviceDailyLimit(deviceId, { isLimitEnabled, dailyLimitMinutes }) {
+export async function updateDeviceDailyLimit(
+  deviceId,
+  { dailyLimitMode, isLimitEnabled, dailyLimitMinutes }
+) {
   assertValidObjectId(deviceId, CommonErrors.INVALID_DEVICE_ID);
 
   return DeviceModel.findByIdAndUpdate(
     deviceId,
     {
       $set: {
+        "screenTime.dailyLimitMode": dailyLimitMode,
         "screenTime.isLimitEnabled": isLimitEnabled,
         "screenTime.dailyLimitMinutes": dailyLimitMinutes
       }
@@ -139,6 +145,7 @@ export async function findDeviceStatusById(deviceId) {
       childId: 1,
       isLocked: 1,
       isActive: 1,
+      "screenTime.dailyLimitMode": 1,
       "screenTime.isLimitEnabled": 1,
       "screenTime.dailyLimitMinutes": 1,
       "screenTime.extraMinutesToday": 1,
