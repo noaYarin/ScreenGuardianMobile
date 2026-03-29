@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { ParentExtensionRequest } from "../../api/requests";
 import {
   fetchPendingRequestsThunk,
-  decideRequestThunk,
+  decideRequestThunk, 
+  createRequestThunk
 } from "../thunks/requestThunks";
 import { logout } from "./auth-slice";
 
@@ -36,6 +37,19 @@ const requestsSlice = createSlice({
       .addCase(fetchPendingRequestsThunk.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload ?? action.error.message ?? "api.generic_error";
+      })
+       .addCase(createRequestThunk.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(createRequestThunk.fulfilled, (state) => {
+        state.status = "succeeded";
+        state.error = null;
+      })
+      .addCase(createRequestThunk.rejected, (state, action) => {
+        state.status = "failed";
+        state.error =
+          action.payload ?? action.error.message ?? "api.generic_error";
       })
       .addCase(decideRequestThunk.fulfilled, (state, action) => {
         state.pending = state.pending.filter(

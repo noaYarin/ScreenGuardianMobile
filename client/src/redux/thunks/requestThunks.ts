@@ -1,9 +1,29 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   apiGetPendingRequests,
-  apiDecideRequest,
+  apiDecideRequest, 
+  apiCreateRequest,
   type ParentExtensionRequest,
 } from "../../api/requests";
+
+
+export const createRequestThunk = createAsyncThunk<
+  ParentExtensionRequest,
+  { deviceId: string; requestedMinutes: number; reason: string },
+  { rejectValue: string }
+>("requests/create", async ({ deviceId, requestedMinutes, reason }, thunkAPI) => {
+  try {
+    return await apiCreateRequest({
+      deviceId,
+      requestedMinutes,
+      reason,
+    });
+  } catch (error) {
+    return thunkAPI.rejectWithValue(
+      (error as Error)?.message ?? "api.generic_error"
+    );
+  }
+});
 
 export const fetchPendingRequestsThunk = createAsyncThunk<
   ParentExtensionRequest[],

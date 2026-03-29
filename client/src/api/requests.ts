@@ -14,6 +14,25 @@ export type ParentExtensionRequest = {
   updatedAt?: string;
 };
 
+export type CreateChildExtensionRequestBody = {
+  deviceId: string;
+  requestedMinutes: number;
+  reason: string;
+};
+
+export async function apiCreateRequest(
+  body: CreateChildExtensionRequestBody
+) {
+  return api.post<ParentExtensionRequest>(
+    `${URL}/child`,
+    body,
+    {
+      requireAuth: true,
+      role: "CHILD",
+    }
+  );
+}
+
 export async function apiGetPendingRequests(childId?: string) {
   const query = childId ? `?childId=${encodeURIComponent(childId)}` : "";
 

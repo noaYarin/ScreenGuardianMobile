@@ -136,7 +136,13 @@
     "customPlus_a11y": "Increase minutes",
     "customMinus_a11y": "Decrease minutes",
     "message_a11y": "Message field",
-    "send_a11y": "Send extension request"
+    "send_a11y": "Send extension request",
+    "noDevice": "No linked device found",
+    "invalidMinutes": "Invalid number of minutes",
+    "noActiveLimit": "There is no active screen-time limit on this device",
+    "requestSent": "Extension request sent successfully",
+    "sending": "Sending...",
+    "alreadyRequested": "A pending extension request already exists for this device"
   },
   "selectRole": {
     "title": "Who uses the app?",
