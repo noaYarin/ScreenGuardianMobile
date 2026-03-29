@@ -71,13 +71,12 @@ export default function LocationDetailsCard({
       return { address: disabledAddressValue || "---", updated: "--:--" };
     }
     
-    // טיפול בפורמט הזמן
     let timeStr = "--:--";
-    if (deviceSnapshot?.timestamp) {
-      const date = new Date(deviceSnapshot.timestamp);
-      if (!isNaN(date.getTime())) {
-        timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      }
+    if (deviceSnapshot?.lastUpdated) {
+      const date = new Date(deviceSnapshot.lastUpdated);
+      const datePart = date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit' });
+        const timePart = date.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+        timeStr = `${datePart}, ${timePart}`;
     }
 
     return {

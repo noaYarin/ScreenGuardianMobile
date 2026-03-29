@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import { Provider as ReduxProvider, useSelector } from "react-redux";
+import { Provider as ReduxProvider, useDispatch, useSelector } from "react-redux";
 import { View, ActivityIndicator } from "react-native";
 import { HeaderBackButton } from "@react-navigation/elements";
 
@@ -14,6 +14,9 @@ import {
 import { getChildToken, getParentToken } from "../src/services/authStorage";
 
 import i18n, { initLanguage } from "../src/locales/i18n";
+import { connectSocket, onEvent } from "@/src/services/socket";
+import {LOCATION_LIVE_UPDATE } from "@/src/constants/socketEvents";
+import { updateDeviceFromSocket } from "@/src/redux/slices/device-slice";
 
 function AppStack() {
   const { i18n } = useTranslation();
@@ -22,9 +25,30 @@ function AppStack() {
   const token = useSelector((state: any) => state.auth.token);
   const childToken = useSelector((state: any) => state.auth.childToken);
 
+  const dispatch = useDispatch<any>();
+  const parentId = useSelector((state: any) => state.auth.parentId);
+
+
   // All routes in array
   const segments = useSegments() as string[];
   const router = useRouter();
+
+  useEffect(() => {
+    const isInsideParentScreens = segments.includes("Parent");
+
+    if (isInsideParentScreens && parentId) {
+      connectSocket(String(parentId));
+      
+      const unsubscribe = onEvent(LOCATION_LIVE_UPDATE, (data: any) => {
+        dispatch(updateDeviceFromSocket(data));
+      });
+
+      return () => {
+        if (unsubscribe) unsubscribe();
+      };
+    }
+  }, [segments, token, parentId]);
+
 
   // Check if the current route is the index route
   const isIndexRoute =
