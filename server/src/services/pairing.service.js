@@ -3,7 +3,6 @@ import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { DevicePlatform } from "../constants/devicePlatform.js";
-import { DeviceType } from "../constants/deviceType.js";
 
 import {
   createPairingSession,
@@ -11,19 +10,10 @@ import {
   findByBarcodeToken,
   consumePairingSession,
 } from "../dal/pairing.dal.js";
-
-import {
-  getChildByParentId,
-  getChildrenByParentId,
-} from "../dal/parent.dal.js";
-
+import { getChildByParentId, getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
-
-import {
-  createDevice,
-  findDeviceByDeviceId,
-  updateDeviceActivation,
-} from "../dal/device.dal.js";
+import { createDevice, findDeviceByBarcodeOrCode, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
+import { DeviceType } from "../constants/deviceType.js";
 
 const PAIRING_TTL_MINUTES = 5;
 const SHORT_CODE_MAX_ATTEMPTS = 20;
@@ -37,40 +27,23 @@ function generateBarcodeToken() {
   return crypto.randomUUID();
 }
 
+
 async function createUniqueCode() {
   for (let attempt = 0; attempt < SHORT_CODE_MAX_ATTEMPTS; attempt++) {
     const code = generateCode();
     const existing = await findByCode(code);
     if (!existing) return code;
   }
-
   throw new AppError(PairingErrors.SHORT_CODE_COLLISION);
 }
 
 function assertChildBelongsToParent(childList, childId) {
   const child = childList.find((c) => String(c._id) === String(childId));
-
-  if (!child) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
+  if (!child) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
 
   if (child.isActive === false) {
     throw new AppError(PairingErrors.CHILD_NOT_ACTIVE);
   }
-}
-
-function normalizeDevicePlatform(platform = "") {
-  const normalized = String(platform).trim().toUpperCase();
-  return Object.values(DevicePlatform).includes(normalized)
-    ? normalized
-    : DevicePlatform.OTHER;
-}
-
-function normalizeDeviceType(deviceType = "") {
-  const normalized = String(deviceType).trim().toUpperCase();
-  return Object.values(DeviceType).includes(normalized)
-    ? normalized
-    : DeviceType.OTHER;
 }
 
 export async function generatePairing(parentId, childIdFromBody) {
@@ -105,18 +78,11 @@ export async function generatePairing(parentId, childIdFromBody) {
 
 function validateLinkPayload(payload) {
   const { code, barcodeToken } = payload;
-
   const hasCode = code != null && String(code).trim() !== "";
-  const hasBarcode =
-    barcodeToken != null && String(barcodeToken).trim() !== "";
+  const hasBarcode = barcodeToken != null && String(barcodeToken).trim() !== "";
 
-  if (!hasCode && !hasBarcode) {
-    throw new AppError(PairingErrors.LINK_NEED_ONE);
-  }
-
-  if (hasCode && hasBarcode) {
-    throw new AppError(PairingErrors.LINK_ONLY_ONE);
-  }
+  if (!hasCode && !hasBarcode) throw new AppError(PairingErrors.LINK_NEED_ONE);
+  if (hasCode && hasBarcode) throw new AppError(PairingErrors.LINK_ONLY_ONE);
 
   return hasCode
     ? { byCode: true, value: String(code).trim() }
@@ -124,30 +90,9 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({
-  code = "",
-  barcodeToken = "",
-  deviceName = "",
-  deviceType = "OTHER",
-  platform = "OTHER",
-  deviceId = "",
-}) {
-  const normalizedDeviceId = String(deviceId).trim();
-
-  if (!normalizedDeviceId) {
-    throw new AppError(CommonErrors.INVALID_DEVICE_ID);
-  }
-
-  const normalizedDeviceName =
-    String(deviceName).trim() || "Child Device";
-  const normalizedDeviceType = normalizeDeviceType(deviceType);
-  const normalizedPlatform = normalizeDevicePlatform(platform);
-
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER",deviceId = "" }) {
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
-
-  const session = byCode
-    ? await findByCode(value)
-    : await findByBarcodeToken(value);
+  const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
   if (!session) {
     throw new AppError(PairingErrors.SESSION_NOT_FOUND);
@@ -155,72 +100,54 @@ export async function linkByCodeOrToken({
 
   const sessionCode = session.code;
   const sessionBarcode = session.barcodeToken;
-
-  const parentId = String(session.parentId);
-  const childId = String(session.childId);
-
-  if (!childId) {
-    throw new AppError(CommonErrors.CHILD_NOT_FOUND);
-  }
-
-  if (!parentId) {
-    throw new AppError(CommonErrors.PARENT_NOT_FOUND);
-  }
-
-  const child = await getChildByParentId(parentId, childId);
-  const childName = child?.name != null ? String(child.name) : "";
-
-  let currentDevice = await findDeviceByDeviceId(normalizedDeviceId);
-
-  if (currentDevice) {
-    if (currentDevice.isActive) {
-      throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
-    }
-
-    currentDevice = await updateDeviceActivation(normalizedDeviceId, {
-      childId,
-      parentId,
-      deviceName: normalizedDeviceName,
-    });
-  } else {
-    currentDevice = await createDevice({
-      deviceId: normalizedDeviceId,
-      name: normalizedDeviceName,
-      type: normalizedDeviceType,
-      platform: normalizedPlatform,
-      isLocked: false,
-      isActive: true,
-      code: sessionCode || "",
-      barcodeToken: sessionBarcode || "",
-      location: {
-        lat: 0,
-        lng: 0,
-        lastUpdated: new Date(),
-      },
-      applications: [],
-      parentId,
-      childId,
-      screenTime: {},
-    });
-  }
-
-  if (!currentDevice?._id) {
-    throw new AppError(CommonErrors.INVALID_DEVICE_ID);
-  }
-
-  // Consume the pairing session only after the device was linked successfully
+  // Check if session is already used or expired
   const consumed = await consumePairingSession(session._id);
   if (!consumed) {
     throw new AppError(PairingErrors.SESSION_INVALID);
   }
 
-  const mongoDeviceId = String(currentDevice._id);
+  const parentId = String(consumed.parentId);
+  const childId = String(consumed.childId);
+  if (!childId) throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  if (!parentId) throw new AppError(CommonErrors.PARENT_NOT_FOUND);
+  const child = await getChildByParentId(parentId, childId);
+  const childName = child?.name != null ? String(child.name) : "";
+
+let currentDevice = await findDeviceByDeviceId(deviceId);
+
+if (currentDevice) {
+  if (currentDevice.isActive) {
+    throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
+  }
+  
+  await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
+
+} else {
+  currentDevice = await createDevice({
+    deviceId,
+    deviceName,
+    deviceType,
+    platform,
+    isLocked: false,
+    code: sessionCode || "",
+    location: { lat: 0, lng: 0, lastUpdated: new Date() }, 
+    isActive: true,
+    barcodeToken: sessionBarcode || "",
+    applications: [],
+    parentId: String(session.parentId),
+    childId: String(session.childId),
+    screenTime: {},
+    isActive: true
+  });
+}
+
+  const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
   const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
 
   return {
     ...tokenData,
     deviceId: mongoDeviceId,
-    physicalId: normalizedDeviceId,
+    physicalId: String(deviceId),
     childName,
   };
 }

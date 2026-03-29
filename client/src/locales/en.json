@@ -10,9 +10,7 @@
     "success": "Success",
     "success_message": "The action was successful.",
     "error": "Error",
-    "error_message": "The action failed. Please try again.",
-    "minutes":"min"
-
+    "error_message": "The action failed. Please try again."
 
   },
   "children": {
@@ -504,67 +502,60 @@
       "blockedAppsDescription": "Manage apps that should not be allowed."
     }
   },
-  "dailyTimeLimits": {
+ "dailyTimeLimits": {
     "title": "Screen Time Limits",
-    "heroTitle": "Screen Time Limits",
-    "heroSubtitle": "Choose a child and device, then define a daily screen-time rule.",
-    "deviceContext": "{{childName}} • {{deviceName}}",
-    "edit": "Edit",
-    "removeRule": "Remove rule",
-    "usedToday": "Used today",
-    "usedLabel": "Used",
-    "limitType": "Rule",
-    "limitLabel": "Daily limit",
-    "unlimitedShort": "No limit",
-    "unlimitedInfo": "This device will not have a daily screen-time limit.",
-    "minutesPerDay": "Minutes allowed per day",
-    "enterMinutes": "Enter minutes",
-    "currentLimit": "Current limit",
-    "done": "Done",
-    "createLimited": "Set daily limit",
-    "createUnlimited": "No limit",
+
+    "heroTitle": "Manage screen time per child and device",
+    "heroSubtitle": "Select a child and then choose the relevant device to adjust limits accurately.",
+
+    "childrenSectionTitle": "Select Child",
+    "devicesSectionTitle": "Select Device",
+
+    "childRole": "Personal Management",
+
+    "deviceContext": "{{childName}} · {{deviceName}}",
+
+    "usedLabel": "Used so far",
+
+    "edit": "Edit Limit",
+    "editA11y": "Edit limit for {{section}}",
+
+    "childTabA11y": "Select child {{name}}",
+    "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
+
     "daily": {
-      "title": "Daily screen time"
+      "title": "Daily Limit",
+      "summary": "Current limit is {{value}} per day"
     },
-    "mode": {
-      "limited": "Limit by minutes",
-      "unlimited": "No limit"
+
+    "weekly": {
+      "title": "Weekly Limit",
+      "summary": "Current limit is {{value}} per week"
     },
-    "actions": {
-      "setDailyLimit": "Set daily limit",
-      "noLimit": "No limit"
+
+    "range": {
+      "startLabel": "Current usage",
+      "endLabel": "Limit"
+    },
+
+    "devices": {
+      "phone": "Phone",
+      "tablet": "Tablet"
     },
     "status": {
-      "ok": "Within limit",
-      "almostReached": "Almost reached",
-      "unlimited": "Unlimited"
-    },
-    "summary": {
-      "unlimited": "This device currently has no daily screen-time limit.",
-      "limited": "This device is limited to {{value}} minutes per day."
-    },
-    "validation": {
-      "invalidMinutes": "Please enter a valid number of minutes greater than 0."
-    },
-    "errors": {
-      "saveFailed": "Failed to save screen-time rule.",
-      "removeFailed": "Failed to remove the screen-time rule."
-    },
-    "empty": {
-      "noDevicesTitle": "No devices found",
-      "noDevicesSubtitle": "There are no connected devices for this child yet.",
-      "noRuleTitle": "No screen-time rule yet",
-      "noRuleSubtitle": "You can set a daily limit in minutes, or choose not to limit this device at all."
-    },
+  "ok": "OK"
+},
+  "almostReached": "Almost reached limit",
+      "done": "Done",
+    "currentLimit": "Current limit",
+    "editWeekly": "Edit weekly",
     "a11y": {
-      "setDailyLimit": "Set daily screen-time limit",
-      "setUnlimited": "Set no screen-time limit",
-      "modeLimited": "Choose limit by minutes mode",
-      "modeUnlimited": "Choose no limit mode",
-      "minutesInput": "Minutes allowed per day",
-      "editRule": "Edit screen-time rule",
-      "removeRule": "Remove screen-time rule"
-    }
+    "editWeeklySchedule": "Edit weekly schedule",
+    "editDailyLimit": "Edit daily limit",
+    "doneEditing": "Finish editing",
+    "decreaseByFiveMinutes": "Decrease by five minutes",
+    "increaseByFiveMinutes": "Increase by five minutes"
+  }
   },
   "childDeviceSelector": {
     "childrenSectionTitle": "Select Child",

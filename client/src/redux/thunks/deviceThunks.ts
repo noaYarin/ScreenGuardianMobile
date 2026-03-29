@@ -4,10 +4,7 @@ import {
   apiGetDevicesByChild,
   apiUpdateDeviceLocation,
   apiUpdateDeviceName,
-  apiUpdateDeviceDailyLimit,
   type Device,
-  type DeviceDailyLimit,
-  type DailyLimitMode,
 } from "../../api/device";
 
 function normalizeDevice(raw: unknown): Device {
@@ -112,37 +109,6 @@ export const updateDeviceLocation = createAsyncThunk(
       return response; 
     } catch (error) {
       const message = (error as Error)?.message ?? "devices.update_device_location_failed";
-      return thunkAPI.rejectWithValue(message);
-    }
-  }
-);
-
-export const updateDeviceDailyLimitThunk = createAsyncThunk<
-  DeviceDailyLimit,
-  {
-    childId: string;
-    deviceId: string;
-    dailyLimitMode: DailyLimitMode;
-    dailyLimitMinutes: number | null;
-  },
-  { rejectValue: string }
->(
-  "devices/updateDailyLimit",
-  async ({ childId, deviceId, dailyLimitMode, dailyLimitMinutes }, thunkAPI) => {
-    try {
-      const response = await apiUpdateDeviceDailyLimit(deviceId, {
-        dailyLimitMode,
-        dailyLimitMinutes,
-      });
-
-      if (response == null) {
-        return thunkAPI.rejectWithValue("devices.update_daily_limit_failed");
-      }
-
-      return response;
-    } catch (error) {
-      const message =
-        (error as Error)?.message ?? "devices.update_daily_limit_failed";
       return thunkAPI.rejectWithValue(message);
     }
   }

@@ -1,13 +1,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Device } from "../../api/device";
-import {
-  deleteDeviceForChild,
-  fetchDevicesByChild,
-  updateDeviceLocation,
-  updateDeviceDailyLimitThunk
-} from "../thunks/deviceThunks";
+import { deleteDeviceForChild, fetchDevicesByChild, updateDeviceLocation } from "../thunks/deviceThunks";
 import { logout } from "./auth-slice"; 
-
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
 type DevicesState = {
@@ -71,7 +65,6 @@ const devicesSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-    
       .addCase(fetchDevicesByChild.pending, (state, action) => {
         const childId = action.meta.arg;
         state.statusByChildId[childId] = "loading";
@@ -107,35 +100,11 @@ const devicesSlice = createSlice({
           (d) => String(d._id) !== String(deviceId)
         );
       })
-      .addCase(updateDeviceDailyLimitThunk.fulfilled, (state, action) => {
-  const { childId, deviceId } = action.meta.arg;
-  const updatedLimit = action.payload;
-  const list = state.byChildId[childId];
-  if (!list) return;
-
-  const idx = list.findIndex((d) => String(d._id) === String(deviceId));
-  if (idx === -1) return;
-
-  const currentDevice = list[idx];
-
-  state.byChildId[childId][idx] = {
-    ...currentDevice,
-    screenTime: {
-      ...currentDevice.screenTime,
-      dailyLimitMode: updatedLimit.dailyLimitMode,
-      isLimitEnabled: updatedLimit.isLimitEnabled,
-      dailyLimitMinutes: updatedLimit.dailyLimitMinutes ?? undefined,
-      extraMinutesToday: updatedLimit.extraMinutesToday,
-      usedTodayMinutes: updatedLimit.usedTodayMinutes,
-    },
-  };
-})
       .addCase(logout, (state) => {
         state.byChildId = {};
         state.statusByChildId = {};
         state.errorByChildId = {};
       });
-      
   },
 });
 
