@@ -67,36 +67,8 @@ export default function HomeScreen() {
 
   // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
   useEffect(() => {
-    if (activeChildId == null || String(activeChildId).trim() === "") return;
-  
     dispatch(fetchCurrentChildProfileThunk());
-  
-    const syncLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') return;
-  
-        const loc = await Location.getCurrentPositionAsync({ 
-          accuracy: Location.Accuracy.Balanced 
-        });
-  
-        if (deviceId) {
-          await dispatch(updateDeviceLocation({
-            childId: String(activeChildId),
-            deviceId: deviceId,
-            location: {
-              lat: loc.coords.latitude,
-              lng: loc.coords.longitude,
-            }
-          })).unwrap();
-        }
-      } catch (error) {
-        Alert.alert(t("home.location_sync_error"), t("home.location_sync_error_message", "Failed to sync location"));
-      }
-    };
-  
-    syncLocation();
-  }, [dispatch, activeChildId, deviceId]);
+  }, [dispatch]);
 
   const userName = (
     activeChildData?.name?.trim() ||
