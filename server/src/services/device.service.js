@@ -29,7 +29,15 @@ function assertDailyLimitMinutes(value) {
 
   return n;
 }
+function assertDailyLimitMode(value) {
+  const allowed = ["NONE", "UNLIMITED", "LIMITED"];
 
+  if (!allowed.includes(value)) {
+    throw new AppError(CommonErrors.VALIDATION_ERROR);
+  }
+
+  return value;
+}
 
 function isSameDay(date1, date2) {
   return (
@@ -42,16 +50,21 @@ function isSameDay(date1, date2) {
 
 
 function buildCurrentStatus(device) {
+  const dailyLimitMode = device.screenTime?.dailyLimitMode ?? "NONE";
   const dailyLimitMinutes = Number(device.screenTime?.dailyLimitMinutes ?? 0);
   const extraMinutesToday = Number(device.screenTime?.extraMinutesToday ?? 0);
   const usedTodayMinutes = Number(device.screenTime?.usedTodayMinutes ?? 0);
 
-  const totalAllowedMinutes = dailyLimitMinutes + extraMinutesToday;
-  const remainingMinutes = Math.max(totalAllowedMinutes - usedTodayMinutes, 0);
+  const isLimited = dailyLimitMode === "LIMITED";
+  const totalAllowedMinutes = isLimited ? dailyLimitMinutes + extraMinutesToday : 0;
+  const remainingMinutes = isLimited
+    ? Math.max(totalAllowedMinutes - usedTodayMinutes, 0)
+    : null;
 
   return {
-    isLimitEnabled: device.screenTime?.isLimitEnabled ?? false,
-    dailyLimitMinutes,
+    dailyLimitMode,
+    isLimitEnabled: isLimited,
+    dailyLimitMinutes: isLimited ? dailyLimitMinutes : null,
     extraMinutesToday,
     usedTodayMinutes,
     remainingMinutes,
@@ -385,9 +398,15 @@ export async function getDeviceDailyLimit(parentId, deviceId) {
     device = await resetDailyScreenTime(deviceId, now);
   }
 
+  const mode = device.screenTime?.dailyLimitMode ?? "NONE";
+
   return {
-    isLimitEnabled: device.screenTime?.isLimitEnabled ?? false,
-    dailyLimitMinutes: device.screenTime?.dailyLimitMinutes ?? 0,
+    dailyLimitMode: mode,
+    isLimitEnabled: mode === "LIMITED",
+    dailyLimitMinutes:
+      mode === "LIMITED"
+        ? device.screenTime?.dailyLimitMinutes ?? 0
+        : null,
     extraMinutesToday: device.screenTime?.extraMinutesToday ?? 0,
     usedTodayMinutes: device.screenTime?.usedTodayMinutes ?? 0
   };
@@ -399,17 +418,31 @@ export async function getDeviceDailyLimit(parentId, deviceId) {
 export async function updateDeviceDailyLimitService(parentId, deviceId, body) {
   const device = await validateDeviceAccess({ deviceId, parentId });
 
-  const isLimitEnabled =
-    typeof body.isLimitEnabled === "boolean"
-      ? body.isLimitEnabled
-      : device.screenTime?.isLimitEnabled ?? false;
+  const dailyLimitMode = assertDailyLimitMode(
+    body.dailyLimitMode ?? device.screenTime?.dailyLimitMode ?? "NONE"
+  );
 
-  const dailyLimitMinutes =
-    body.dailyLimitMinutes !== undefined
-      ? assertDailyLimitMinutes(body.dailyLimitMinutes)
-      : device.screenTime?.dailyLimitMinutes ?? 0;
+  let dailyLimitMinutes = 0;
+  let isLimitEnabled = false;
+
+  if (dailyLimitMode === "LIMITED") {
+    dailyLimitMinutes = assertDailyLimitMinutes(body.dailyLimitMinutes);
+
+    if (dailyLimitMinutes <= 0) {
+      throw new AppError(CommonErrors.VALIDATION_ERROR);
+    }
+
+    isLimitEnabled = true;
+  } else if (dailyLimitMode === "UNLIMITED") {
+    dailyLimitMinutes = 0;
+    isLimitEnabled = false;
+  } else {
+    dailyLimitMinutes = 0;
+    isLimitEnabled = false;
+  }
 
   const updatedDevice = await updateDeviceDailyLimit(deviceId, {
+    dailyLimitMode,
     isLimitEnabled,
     dailyLimitMinutes
   });
@@ -439,8 +472,12 @@ export async function updateDeviceDailyLimitService(parentId, deviceId, body) {
   }
 
   return {
-    isLimitEnabled: updatedDevice.screenTime?.isLimitEnabled ?? false,
-    dailyLimitMinutes: updatedDevice.screenTime?.dailyLimitMinutes ?? 0,
+    dailyLimitMode: updatedDevice.screenTime?.dailyLimitMode ?? "NONE",
+    isLimitEnabled: updatedDevice.screenTime?.dailyLimitMode === "LIMITED",
+    dailyLimitMinutes:
+      updatedDevice.screenTime?.dailyLimitMode === "LIMITED"
+        ? updatedDevice.screenTime?.dailyLimitMinutes ?? 0
+        : null,
     extraMinutesToday: updatedDevice.screenTime?.extraMinutesToday ?? 0,
     usedTodayMinutes: updatedDevice.screenTime?.usedTodayMinutes ?? 0
   };

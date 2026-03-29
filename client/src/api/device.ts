@@ -21,19 +21,32 @@ export type Device = {
     isBlocked?: boolean;
   }>;
   screenTime?: {
-    isLimitEnabled?: boolean;
-    dailyLimitMinutes?: number;
-    extraMinutesToday?: number;
-    weeklyLimitMinutes?: number;
-    usedTodayMinutes?: number;
-    usedWeekMinutes?: number;
-    lastDailyResetAt?: string | null;
-    lastWeeklyResetAt?: string | null;
-    weeklySchedule?: unknown[];
-  };
+  dailyLimitMode?: DailyLimitMode;
+  isLimitEnabled?: boolean;
+  dailyLimitMinutes?: number | null;
+  extraMinutesToday?: number;
+  weeklyLimitMinutes?: number;
+  usedTodayMinutes?: number;
+  usedWeekMinutes?: number;
+  lastDailyResetAt?: string | null;
+  lastWeeklyResetAt?: string | null;
+  weeklySchedule?: unknown[];
+};
   createdAt?: string;
   updatedAt?: string;
 };
+
+
+export type DailyLimitMode = "NONE" | "UNLIMITED" | "LIMITED";
+
+export type DeviceDailyLimit = {
+  dailyLimitMode: DailyLimitMode;
+  isLimitEnabled: boolean;
+  dailyLimitMinutes: number | null;
+  extraMinutesToday: number;
+  usedTodayMinutes: number;
+};
+
 
 export async function apiGetDevicesByChild(childId: string): Promise<Device[]> {
   const data = await api.get<Device[]>(
@@ -104,3 +117,33 @@ export async function apiUpdateDeviceLocation(
   return data;
 }
 
+export async function apiGetDeviceDailyLimit(
+  deviceId: string
+): Promise<DeviceDailyLimit> {
+  const data = await api.get<DeviceDailyLimit>(
+    `${URL}/${encodeURIComponent(deviceId)}/daily-limit`,
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
+
+export async function apiUpdateDeviceDailyLimit(
+  deviceId: string,
+  body: {
+    dailyLimitMode: DailyLimitMode;
+    dailyLimitMinutes: number | null;
+  }
+): Promise<DeviceDailyLimit> {
+  const data = await api.patch<DeviceDailyLimit>(
+    `${URL}/${encodeURIComponent(deviceId)}/daily-limit`,
+    body,
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
