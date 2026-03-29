@@ -49,6 +49,26 @@ const devicesSlice = createSlice({
       const device = list[idx];
       state.byChildId[childId][idx] = { ...device, isLocked };
     },
+    updateDeviceFromSocket: (
+      state,
+      action: PayloadAction<{
+        childId: string;
+        location: { lat: number; lng: number };
+        lastUpdated: string;
+      }>
+    ) => {
+      const { childId, location, lastUpdated } = action.payload;
+      if (state.byChildId[childId]) {
+        state.byChildId[childId] = state.byChildId[childId].map((device) => ({
+            ...device,
+            location: {
+                lat: location.lat,
+                lng: location.lng,
+                lastUpdated: lastUpdated
+            }
+        }));
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -119,7 +139,7 @@ const devicesSlice = createSlice({
   },
 });
 
-export const { clearDevicesForChild, setDeviceLockLocal } =
+export const { clearDevicesForChild, setDeviceLockLocal, updateDeviceFromSocket  } =
   devicesSlice.actions;
 export {
   fetchDevicesByChild,

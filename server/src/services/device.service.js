@@ -484,12 +484,15 @@ export async function getDeviceCurrentStatusForChild({ deviceId, childId, parent
 export async function updateDeviceLocation(deviceId, location, parentId, childId) {
   await validateDeviceAccess({ deviceId, parentId, childId });
 
-  const locationUpdate = {
-    ...location,
-    lastUpdated: new Date() 
+  const fieldsToUpdate = {
+    location: {
+      lat: location.lat,
+      lng: location.lng,
+      lastUpdated: new Date() 
+    }
   };
 
-  const updatedDevice = await updateDeviceById(deviceId, { location: locationUpdate });
+  const updatedDevice = await updateDeviceById(deviceId, fieldsToUpdate);
   return updatedDevice;
 
 }

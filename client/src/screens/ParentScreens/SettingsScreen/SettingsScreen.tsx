@@ -19,6 +19,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { logout, setError, setAuthLoading, logoutParent } from "../../../redux/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { clearAuthTokens } from "../../../services/authStorage";
+import { disconnectSocket } from "../../../services/socket";
 type SettingRow = {
   key: string;
   titleKey: string;
@@ -78,6 +79,7 @@ export default function SettingsScreen() {
       dispatch(setError(message));
       Alert.alert("", t(message));
     } finally {
+      disconnectSocket();
       await clearAuthTokens();
       dispatch(logout());
       router.replace("/" as Href);

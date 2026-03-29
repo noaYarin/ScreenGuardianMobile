@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Stack, router, type Href } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -17,7 +18,6 @@ import { styles } from "./styles";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
-import { useDispatch, useSelector } from "react-redux";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 import {
   fetchDevicesByChild,
@@ -36,7 +36,6 @@ type ScreenLimitCard = {
 
 const STEP_HOURS = 5 / 60;
 const MIN_HOURS = 5 / 60;
-const HERO_ACCENT_COLOR = "#7C3AED";
 
 function formatHoursToClock(totalHours: number) {
   const wholeHours = Math.floor(totalHours);
@@ -48,27 +47,33 @@ function formatHoursToClock(totalHours: number) {
   return `${normalizedHours}:${String(normalizedMinutes).padStart(2, "0")}`;
 }
 
+function getAccentFromIndex(index: number) {
+  const accents = ["#EC6FB7", "#5B8DEF", "#16C7A1", "#F59E0B", "#8B5CF6"];
+  return accents[index % accents.length];
+}
+
 export default function DailyTimeLimitsScreen() {
+  const dispatch = useDispatch<AppDispatch>();
   const { t } = useTranslation();
   const { isRTL, text, row } = useLocaleLayout();
-
-  const dispatch = useDispatch<AppDispatch>();
 
   const { childrenList, isLoading, error } = useSelector(
     (state: RootState) => state.children
   );
 
-  const children = Array.isArray(childrenList) ? childrenList : [];
-
-  const devicesByChild = useSelector(
-    (state: RootState) => state.devices.byChildId ?? {}
+  const { byChildId, statusByChildId, errorByChildId } = useSelector(
+    (state: RootState) => state.devices
   );
+
+  const children = Array.isArray(childrenList) ? childrenList : [];
 
   const [selectedChildId, setSelectedChildId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
-
   const [tempLimits, setTempLimits] = useState<Record<string, number>>({});
+  const [tempLimitEnabled, setTempLimitEnabled] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
@@ -81,56 +86,71 @@ export default function DailyTimeLimitsScreen() {
   }, [children, selectedChildId]);
 
   useEffect(() => {
-    if (selectedChildId) {
-      dispatch(fetchDevicesByChild(selectedChildId));
-    }
+    if (!selectedChildId) return;
+    dispatch(fetchDevicesByChild(selectedChildId));
   }, [dispatch, selectedChildId]);
 
   const selectedChild = useMemo(() => {
     if (!children.length) return null;
 
     return (
-      children.find((c) => String(c._id) === String(selectedChildId)) ??
+      children.find((child) => String(child._id) === String(selectedChildId)) ??
       children[0]
     );
   }, [children, selectedChildId]);
 
-  const devices = selectedChild ? devicesByChild[selectedChild._id] ?? [] : [];
+  const selectedChildIndex = useMemo(() => {
+    return children.findIndex(
+      (child) => String(child._id) === String(selectedChildId)
+    );
+  }, [children, selectedChildId]);
+
+  const currentChildDevices = useMemo(() => {
+    return selectedChild ? byChildId[selectedChild._id] ?? [] : [];
+  }, [byChildId, selectedChild]);
+
+  const devicesStatus = selectedChildId
+    ? statusByChildId[selectedChildId] ?? "idle"
+    : "idle";
+
+  const devicesError = selectedChildId
+    ? errorByChildId[selectedChildId] ?? null
+    : null;
 
   useEffect(() => {
     if (!selectedChild?._id) return;
 
-    const currentDevices = devicesByChild[selectedChild._id] ?? [];
-    const firstDeviceId = currentDevices[0]?._id;
-
-    const exists = currentDevices.some(
-      (d) => String(d._id) === String(selectedDeviceId)
+    const firstDeviceId = currentChildDevices[0]?._id;
+    const exists = currentChildDevices.some(
+      (device: any) => String(device._id) === String(selectedDeviceId)
     );
 
     if (!exists) {
       setSelectedDeviceId(firstDeviceId ? String(firstDeviceId) : "");
       setEditingCardId(null);
       setTempLimits({});
+      setTempLimitEnabled({});
     }
-  }, [selectedChild, selectedDeviceId, devicesByChild]);
+  }, [selectedChild, currentChildDevices, selectedDeviceId]);
 
   const selectedDevice = useMemo(() => {
-    if (!devices.length) return null;
+    if (!currentChildDevices.length) return null;
 
     return (
-      devices.find((d) => String(d._id) === String(selectedDeviceId)) ??
-      devices[0]
+      currentChildDevices.find(
+        (device: any) => String(device._id) === String(selectedDeviceId)
+      ) ?? currentChildDevices[0]
     );
-  }, [devices, selectedDeviceId]);
+  }, [currentChildDevices, selectedDeviceId]);
 
-  const selectedChildName = useMemo(() => {
-    if (!selectedChild) return "";
-    return typeof selectedChild.name === "string" ? selectedChild.name : "";
-  }, [selectedChild]);
-
-  const selectedChildInitial = useMemo(() => {
-    return selectedChildName.trim()[0] ?? "?";
-  }, [selectedChildName]);
+  const selectedDeviceName = selectedDevice
+    ? String(
+        (selectedDevice as any).deviceName ??
+          (selectedDevice as any).model ??
+          (selectedDevice as any).name ??
+          ""
+      )
+    : "";
 
   const selectedLimits: ScreenLimitCard[] = useMemo(() => {
     if (!selectedDevice) return [];
@@ -173,12 +193,22 @@ export default function DailyTimeLimitsScreen() {
 
     const currentMinutes =
       limitId === "daily"
-        ? selectedDevice.screenTime?.dailyLimitMinutes ?? 0
+        ? selectedDevice.screenTime?.dailyLimitMinutes ?? MIN_HOURS * 60
         : selectedDevice.screenTime?.weeklyLimitMinutes ?? 0;
+
+    const currentEnabled =
+      limitId === "daily"
+        ? selectedDevice.screenTime?.isLimitEnabled ?? false
+        : true;
 
     setTempLimits((prev) => ({
       ...prev,
-      [limitId]: currentMinutes,
+      [limitId]: Math.max(MIN_HOURS * 60, currentMinutes),
+    }));
+
+    setTempLimitEnabled((prev) => ({
+      ...prev,
+      [limitId]: currentEnabled,
     }));
 
     setEditingCardId(limitId);
@@ -187,10 +217,13 @@ export default function DailyTimeLimitsScreen() {
   const updateLimitByStep = (limitId: string, deltaHours: number) => {
     if (!selectedDevice || !selectedChildId) return;
 
+    const isEnabled = tempLimitEnabled[limitId] ?? false;
+    if (!isEnabled) return;
+
     const baseMinutes =
       tempLimits[limitId] ??
       (limitId === "daily"
-        ? selectedDevice.screenTime?.dailyLimitMinutes ?? 0
+        ? selectedDevice.screenTime?.dailyLimitMinutes ?? MIN_HOURS * 60
         : selectedDevice.screenTime?.weeklyLimitMinutes ?? 0);
 
     const nextMinutes = Math.max(MIN_HOURS * 60, baseMinutes + deltaHours * 60);
@@ -205,41 +238,55 @@ export default function DailyTimeLimitsScreen() {
     if (!selectedDevice || !selectedChildId) return;
 
     const nextMinutes = tempLimits[limitId];
-    if (nextMinutes == null) {
-      setEditingCardId(null);
-      return;
-    }
+    const nextEnabled = tempLimitEnabled[limitId];
 
     try {
       await dispatch(
         updateDeviceScreenTimeThunk({
           childId: selectedChildId,
           deviceId: selectedDevice._id,
-          isLimitEnabled: true,
           ...(limitId === "daily"
-            ? { dailyLimitMinutes: nextMinutes }
-            : { weeklyLimitMinutes: nextMinutes }),
+            ? {
+                isLimitEnabled: nextEnabled ?? false,
+                dailyLimitMinutes:
+                  nextEnabled === false
+                    ? selectedDevice.screenTime?.dailyLimitMinutes ??
+                      MIN_HOURS * 60
+                    : Math.max(MIN_HOURS * 60, nextMinutes ?? MIN_HOURS * 60),
+              }
+            : {
+                weeklyLimitMinutes:
+                  nextMinutes ??
+                  selectedDevice.screenTime?.weeklyLimitMinutes ??
+                  0,
+              }),
         })
       ).unwrap();
 
-      Alert.alert(
-        t("common.success"),
-        t("dailyTimeLimits.update_success")
-      );
+      Alert.alert(t("common.success"), t("dailyTimeLimits.update_success"));
 
       setEditingCardId(null);
+
       setTempLimits((prev) => {
         const updated = { ...prev };
         delete updated[limitId];
         return updated;
       });
+
+      setTempLimitEnabled((prev) => {
+        const updated = { ...prev };
+        delete updated[limitId];
+        return updated;
+      });
     } catch {
-      Alert.alert(
-        t("common.error"),
-        t("dailyTimeLimits.update_error")
-      );
+      Alert.alert(t("common.error"), t("dailyTimeLimits.update_error"));
     }
   };
+
+  const heroInitial = String(selectedChild?.name ?? "").trim()[0] ?? "?";
+  const heroAccent = getAccentFromIndex(
+    selectedChildIndex >= 0 ? selectedChildIndex : 0
+  );
 
   if (isLoading && children.length === 0) {
     return (
@@ -319,11 +366,11 @@ export default function DailyTimeLimitsScreen() {
                 <View
                   style={[
                     styles.heroAvatar,
-                    { backgroundColor: HERO_ACCENT_COLOR },
+                    { backgroundColor: heroAccent },
                   ]}
                 >
                   <AppText weight="extraBold" style={styles.heroAvatarText}>
-                    {selectedChildInitial}
+                    {heroInitial}
                   </AppText>
                 </View>
 
@@ -342,29 +389,98 @@ export default function DailyTimeLimitsScreen() {
             <ChildDeviceSelector
               selectedChildId={selectedChildId}
               selectedDeviceId={selectedDeviceId}
+              showDevices={true}
               onSelectChild={(childId) => {
                 setSelectedChildId(String(childId));
+                setSelectedDeviceId("");
                 setEditingCardId(null);
                 setTempLimits({});
+                setTempLimitEnabled({});
               }}
               onSelectDevice={(deviceId) => {
                 setSelectedDeviceId(String(deviceId));
                 setEditingCardId(null);
                 setTempLimits({});
+                setTempLimitEnabled({});
               }}
-              showDevices={true}
             />
 
-            {!selectedDevice ? (
-              <View style={styles.cardsList}>
-                <AppText style={text}>
-                  {t("devices.fetch_devices_failed")}
+            {isLoading && (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t("common.loading", "Loading...")}
                 </AppText>
               </View>
-            ) : (
+            )}
+
+            {!!devicesError && (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t(devicesError, devicesError)}
+                </AppText>
+              </View>
+            )}
+
+            {!isLoading &&
+              !devicesError &&
+              selectedChildId &&
+              devicesStatus === "loading" && (
+                <View style={styles.emptyState}>
+                  <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                    {t("common.loading", "Loading...")}
+                  </AppText>
+                </View>
+              )}
+
+            {!isLoading &&
+              !devicesError &&
+              selectedChildId &&
+              devicesStatus !== "loading" &&
+              currentChildDevices.length === 0 && (
+                <View style={styles.emptyState}>
+                  <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                    {t("dailyTimeLimits.empty.noDevicesTitle", "No devices found")}
+                  </AppText>
+
+                  <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                    {t(
+                      "dailyTimeLimits.empty.noDevicesSubtitle",
+                      "There are no connected devices for this child yet."
+                    )}
+                  </AppText>
+                </View>
+              )}
+
+            {!isLoading &&
+              !devicesError &&
+              selectedDeviceId &&
+              currentChildDevices.length > 0 &&
+              selectedLimits.length === 0 && (
+                <View style={styles.emptyState}>
+                  <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                    {t("dailyTimeLimits.empty.noLimitsTitle", "No limits yet")}
+                  </AppText>
+
+                  <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                    {t(
+                      "dailyTimeLimits.empty.noLimitsSubtitle",
+                      "No screen-time limits were found for this device yet."
+                    )}
+                  </AppText>
+                </View>
+              )}
+
+            {selectedLimits.length > 0 && (
               <View style={styles.cardsList}>
                 {selectedLimits.map((limitCard) => {
                   const isEditing = editingCardId === limitCard.id;
+                  const isWeeklyCard = limitCard.id === "weekly";
+
+                  const isEnabled = isWeeklyCard
+                    ? true
+                    : tempLimitEnabled[limitCard.id] ??
+                      (selectedDevice?.screenTime?.isLimitEnabled ?? false);
+
                   const effectiveMaxHours = isEditing
                     ? (tempLimits[limitCard.id] ?? limitCard.maxHours * 60) / 60
                     : limitCard.maxHours;
@@ -374,27 +490,21 @@ export default function DailyTimeLimitsScreen() {
                       ? Math.min(limitCard.currentHours / effectiveMaxHours, 1)
                       : 0;
 
-                  const canDecrease = effectiveMaxHours > MIN_HOURS;
-                  const isWeeklyCard = limitCard.id === "weekly";
+                  const canDecrease =
+                    isEnabled && effectiveMaxHours > MIN_HOURS;
 
                   return (
                     <View key={limitCard.id} style={styles.limitCard}>
                       <View style={[styles.limitTopRow, row]}>
                         <View style={styles.limitTitleWrap}>
-                          <AppText
-                            weight="bold"
-                            style={[styles.limitTitle, text]}
-                          >
+                          <AppText weight="bold" style={[styles.limitTitle, text]}>
                             {t(limitCard.titleKey)}
                           </AppText>
 
-                          <AppText
-                            weight="medium"
-                            style={[styles.limitMeta, text]}
-                          >
+                          <AppText weight="medium" style={[styles.limitMeta, text]}>
                             {t("dailyTimeLimits.deviceContext", {
-                              childName: selectedChild.name,
-                              deviceName: selectedDevice.name ?? "",
+                              childName: selectedChild?.name ?? "",
+                              deviceName: selectedDeviceName,
                             })}
                           </AppText>
                         </View>
@@ -410,10 +520,7 @@ export default function DailyTimeLimitsScreen() {
 
                       <View style={[styles.timePillsRow, row]}>
                         <View style={styles.timePill}>
-                          <AppText
-                            weight="medium"
-                            style={[styles.timePillLabel, text]}
-                          >
+                          <AppText weight="medium" style={[styles.timePillLabel, text]}>
                             {t("dailyTimeLimits.range.startLabel")}
                           </AppText>
 
@@ -430,10 +537,7 @@ export default function DailyTimeLimitsScreen() {
                         </View>
 
                         <View style={styles.timePill}>
-                          <AppText
-                            weight="medium"
-                            style={[styles.timePillLabel, text]}
-                          >
+                          <AppText weight="medium" style={[styles.timePillLabel, text]}>
                             {t("dailyTimeLimits.range.endLabel")}
                           </AppText>
 
@@ -445,7 +549,9 @@ export default function DailyTimeLimitsScreen() {
                               isRTL && styles.timePillValueRtl,
                             ]}
                           >
-                            {formatHoursToClock(effectiveMaxHours)}
+                            {isWeeklyCard || isEnabled
+                              ? formatHoursToClock(effectiveMaxHours)
+                              : t("dailyTimeLimits.noLimit", "No limit")}
                           </AppText>
                         </View>
                       </View>
@@ -457,18 +563,14 @@ export default function DailyTimeLimitsScreen() {
                           isRTL && styles.progressMetaRowRtl,
                         ]}
                       >
-                        <AppText
-                          weight="medium"
-                          style={[styles.progressMetaText, text]}
-                        >
+                        <AppText weight="medium" style={[styles.progressMetaText, text]}>
                           {t("dailyTimeLimits.usedLabel")}
                         </AppText>
 
-                        <AppText
-                          weight="bold"
-                          style={[styles.progressMetaValue, text]}
-                        >
-                          {`${Math.round(progress * 100)}%`}
+                        <AppText weight="bold" style={[styles.progressMetaValue, text]}>
+                          {isWeeklyCard || isEnabled
+                            ? `${Math.round(progress * 100)}%`
+                            : t("dailyTimeLimits.off", "Off")}
                         </AppText>
                       </View>
 
@@ -476,25 +578,27 @@ export default function DailyTimeLimitsScreen() {
                         <View
                           style={[
                             styles.progressFill,
-                            isRTL
-                              ? styles.progressFillRtl
-                              : styles.progressFillLtr,
-                            { width: `${progress * 100}%` },
+                            isRTL ? styles.progressFillRtl : styles.progressFillLtr,
+                            { width: `${(isWeeklyCard || isEnabled ? progress : 0) * 100}%` },
                           ]}
                         />
                       </View>
 
                       <AppText weight="medium" style={[styles.summaryText, text]}>
-                        {t(limitCard.summaryKey, {
-                          value: formatHoursToClock(effectiveMaxHours),
-                        })}
+                        {isWeeklyCard || isEnabled
+                          ? t(limitCard.summaryKey, {
+                              value: formatHoursToClock(effectiveMaxHours),
+                            })
+                          : t("dailyTimeLimits.disabledSummary", "This daily limit is turned off.")}
                       </AppText>
 
                       <View style={styles.actionsRow}>
                         <View
                           style={[
                             styles.statusChip,
-                            progress >= 0.8
+                            !isWeeklyCard && !isEnabled
+                              ? styles.statusChipNormal
+                              : progress >= 0.8
                               ? styles.statusChipWarning
                               : styles.statusChipNormal,
                           ]}
@@ -503,13 +607,17 @@ export default function DailyTimeLimitsScreen() {
                             weight="bold"
                             style={[
                               styles.statusChipText,
-                              progress >= 0.8
+                              !isWeeklyCard && !isEnabled
+                                ? styles.statusChipTextNormal
+                                : progress >= 0.8
                                 ? styles.statusChipTextWarning
                                 : styles.statusChipTextNormal,
                             ]}
                           >
-                            {progress >= 0.8
-                              ? t("dailyTimeLimits.almostReached")
+                            {!isWeeklyCard && !isEnabled
+                              ? t("dailyTimeLimits.off", "Off")
+                              : progress >= 0.8
+                              ? t("dailyTimeLimits.status.almostReached")
                               : t("dailyTimeLimits.status.ok")}
                           </AppText>
                         </View>
@@ -530,21 +638,14 @@ export default function DailyTimeLimitsScreen() {
                                 pressed && styles.editButtonPressed,
                               ]}
                             >
-                              <AppText
-                                weight="bold"
-                                style={styles.editButtonText}
-                              >
+                              <AppText weight="bold" style={styles.editButtonText}>
                                 {isWeeklyCard
                                   ? t("dailyTimeLimits.editWeekly")
                                   : t("dailyTimeLimits.edit")}
                               </AppText>
 
                               <MaterialCommunityIcons
-                                name={
-                                  isWeeklyCard
-                                    ? "chevron-left"
-                                    : "pencil-outline"
-                                }
+                                name={isWeeklyCard ? "chevron-left" : "pencil-outline"}
                                 size={18}
                                 color="#FFFFFF"
                               />
@@ -553,10 +654,7 @@ export default function DailyTimeLimitsScreen() {
                         ) : (
                           <View style={styles.editorWrap}>
                             <View style={[styles.editorHeaderRow, row]}>
-                              <AppText
-                                weight="bold"
-                                style={[styles.editorTitle, text]}
-                              >
+                              <AppText weight="bold" style={[styles.editorTitle, text]}>
                                 {t("dailyTimeLimits.edit")}
                               </AppText>
 
@@ -571,19 +669,71 @@ export default function DailyTimeLimitsScreen() {
                                   pressed && styles.doneButtonPressed,
                                 ]}
                               >
-                                <AppText
-                                  weight="bold"
-                                  style={styles.doneButtonText}
-                                >
+                                <AppText weight="bold" style={styles.doneButtonText}>
                                   {t("dailyTimeLimits.done")}
                                 </AppText>
                               </Pressable>
                             </View>
 
+                            {!isWeeklyCard && (
+                              <View
+                                style={[
+                                  row,
+                                  {
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    marginBottom: 12,
+                                  },
+                                ]}
+                              >
+                                <AppText weight="medium" style={text}>
+                                  {t("dailyTimeLimits.limitEnabled", "Daily limit enabled")}
+                                </AppText>
+
+                                <Pressable
+                                  onPress={() =>
+                                    setTempLimitEnabled((prev) => ({
+                                      ...prev,
+                                      [limitCard.id]:
+                                        !(prev[limitCard.id] ??
+                                        selectedDevice?.screenTime?.isLimitEnabled ??
+                                        false),
+                                    }))
+                                  }
+                                  accessibilityRole="button"
+                                  accessibilityLabel={t(
+                                    "dailyTimeLimits.a11y.toggleDailyLimit",
+                                    "Toggle daily limit"
+                                  )}
+                                  style={({ pressed }) => [
+                                    {
+                                      paddingHorizontal: 14,
+                                      paddingVertical: 8,
+                                      borderRadius: 999,
+                                      backgroundColor: isEnabled ? "#3D6BF2" : "#E5E7EB",
+                                    },
+                                    pressed && { opacity: 0.85 },
+                                  ]}
+                                >
+                                  <AppText
+                                    weight="bold"
+                                    style={{
+                                      color: isEnabled ? "#FFFFFF" : "#1F2937",
+                                    }}
+                                  >
+                                    {isEnabled
+                                      ? t("dailyTimeLimits.enabled", "Enabled")
+                                      : t("dailyTimeLimits.disabled", "Disabled")}
+                                  </AppText>
+                                </Pressable>
+                              </View>
+                            )}
+
                             <View
                               style={[
                                 styles.editorControlsRow,
                                 isRTL && styles.editorControlsRowRtl,
+                                !isWeeklyCard && !isEnabled && { opacity: 0.5 },
                               ]}
                             >
                               <Pressable
@@ -611,8 +761,7 @@ export default function DailyTimeLimitsScreen() {
                                   weight="bold"
                                   style={[
                                     styles.stepButtonTextSecondary,
-                                    !canDecrease &&
-                                      styles.stepButtonTextDisabled,
+                                    !canDecrease && styles.stepButtonTextDisabled,
                                   ]}
                                 >
                                   5-
@@ -631,7 +780,9 @@ export default function DailyTimeLimitsScreen() {
                                   weight="extraBold"
                                   style={styles.currentValueText}
                                 >
-                                  {formatHoursToClock(effectiveMaxHours)}
+                                  {!isWeeklyCard && !isEnabled
+                                    ? t("dailyTimeLimits.noLimit", "No limit")
+                                    : formatHoursToClock(effectiveMaxHours)}
                                 </AppText>
                               </View>
 
@@ -639,6 +790,7 @@ export default function DailyTimeLimitsScreen() {
                                 onPress={() =>
                                   updateLimitByStep(limitCard.id, STEP_HOURS)
                                 }
+                                disabled={!isWeeklyCard && !isEnabled}
                                 accessibilityRole="button"
                                 accessibilityLabel={t(
                                   "dailyTimeLimits.a11y.increaseByFiveMinutes"
@@ -647,16 +799,28 @@ export default function DailyTimeLimitsScreen() {
                                   styles.stepButton,
                                   styles.stepButtonPrimary,
                                   pressed && styles.stepButtonPressed,
+                                  !isWeeklyCard &&
+                                    !isEnabled &&
+                                    styles.stepButtonDisabled,
                                 ]}
                               >
                                 <MaterialCommunityIcons
                                   name="plus"
                                   size={18}
-                                  color="#FFFFFF"
+                                  color={
+                                    !isWeeklyCard && !isEnabled
+                                      ? "#A8B3C7"
+                                      : "#FFFFFF"
+                                  }
                                 />
                                 <AppText
                                   weight="bold"
-                                  style={styles.stepButtonTextPrimary}
+                                  style={[
+                                    styles.stepButtonTextPrimary,
+                                    !isWeeklyCard &&
+                                      !isEnabled &&
+                                      styles.stepButtonTextDisabled,
+                                  ]}
                                 >
                                   5+
                                 </AppText>

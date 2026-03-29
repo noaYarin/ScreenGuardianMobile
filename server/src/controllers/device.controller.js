@@ -226,9 +226,8 @@ export async function updateDeviceLocationController(req, res, next) {
     try {
       const { deviceId } = req.params;
       const { location } = req.body;
-      const { parentId, childId } = req.user; 
-      console.log("📥 Incoming Device ID:", req.params.deviceId);
-      console.log("👤 User from Token:", req.user);
+      const parentId = req.user.parentId;
+      const childId = req.user.childId;
       const data = await updateDeviceLocation(deviceId, location, parentId, childId);
   
       res.status(200).json({ ok: true, data });

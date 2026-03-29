@@ -23,6 +23,8 @@ import { NativeModules } from "react-native";
 const { DeviceControl } = NativeModules;
 import * as Location from "expo-location";
 import { updateDeviceLocation } from "@/src/redux/thunks/deviceThunks";
+import { connectSocket, emitEvent, onEvent } from "@/src/services/socket";
+import { REQUEST_CHILD_LOCATION } from "@/src/constants/socketEvents";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -77,38 +79,57 @@ export default function HomeScreen() {
     return list.find((c: Child) => String(c._id) === String(activeChildId));
   }, [childrenList, activeChildId]);
   const deviceId = useSelector((state: RootState) => state.auth.deviceId);
+  const parentId = useSelector((state: RootState) => state.auth.parentId);
+
+  
+  const handleSyncLocation = async (requestData?: any) => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const locationData = { lat: loc.coords.latitude, lng: loc.coords.longitude };
+
+      const targetParentId = requestData?.parentId || parentId;
+      if (targetParentId) {
+        emitEvent(REQUEST_CHILD_LOCATION, {
+          parentId: targetParentId,
+          childId: String(activeChildId),
+          location: locationData,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      if (deviceId) {
+        dispatch(updateDeviceLocation({
+          childId: String(activeChildId),
+          deviceId,
+          location: locationData
+        }));
+      }
+    } catch (error) {
+      Alert.alert(t("common.error"), t("common.error_message", "Failed to sync location"));
+    }
+  };
 
   useEffect(() => {
-    if (activeChildId == null || String(activeChildId).trim() === "") return;
+    if (!activeChildId) return;
   
-    dispatch(fetchCurrentChildProfileThunk());
+    connectSocket(String(activeChildId));
   
-    const syncLocation = async () => {
-      try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') return;
+    const unsubscribe = onEvent(REQUEST_CHILD_LOCATION, (data) => {
+        handleSyncLocation(data);
+    });
   
-        const loc = await Location.getCurrentPositionAsync({ 
-          accuracy: Location.Accuracy.Balanced 
-        });
-  
-        if (deviceId) {
-          await dispatch(updateDeviceLocation({
-            childId: String(activeChildId),
-            deviceId: deviceId,
-            location: {
-              lat: loc.coords.latitude,
-              lng: loc.coords.longitude,
-            }
-          })).unwrap();
-        }
-      } catch (error) {
-        Alert.alert(t("home.location_sync_error"), t("home.location_sync_error_message", "Failed to sync location"));
-      }
+    return () => {
+      if (unsubscribe) unsubscribe();
     };
-  
-    syncLocation();
-  }, [dispatch, activeChildId, deviceId]);
+  }, [activeChildId]);
+
+
+  useEffect(() => {
+    dispatch(fetchCurrentChildProfileThunk());
+  }, [dispatch]);
 
   const loadScreenTime = async () => {
     try {

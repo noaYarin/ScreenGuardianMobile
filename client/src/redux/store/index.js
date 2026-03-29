@@ -4,7 +4,7 @@ import authReducer from '../../redux/slices/auth-slice';
 import childrenReducer from "../slices/children-slice";
 import devicesReducer from "../slices/device-slice";
 import requestsReducer from "../slices/requests-slice";
-
+import parentHomeReducer from "../slices/parentHome-slice";
 import { injectDispatch } from '../../api/request';
 
 export const store = configureStore({
@@ -14,7 +14,7 @@ export const store = configureStore({
     children: childrenReducer,
     devices: devicesReducer,
     requests: requestsReducer,
-
+    parentHome: parentHomeReducer,
   },
 });
 

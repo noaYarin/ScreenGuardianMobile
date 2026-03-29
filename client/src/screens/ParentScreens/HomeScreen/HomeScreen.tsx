@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { View, Pressable, ActivityIndicator } from "react-native";
 import { router, Stack, type Href, useFocusEffect } from "expo-router";
 import { useTranslation } from "react-i18next";
@@ -9,19 +9,10 @@ import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
-import * as parentApi from "@/src/api/parent";
-
-type HomeSummaryChild = {
-  childId: string;
-  name: string;
-  deviceId: string | null;
-  deviceName: string | null;
-  usedTodayMinutes: number | null;
-  dailyLimitMinutes: number | null;
-  remainingMinutes: number | null;
-  status: "good" | "warn" | "bad";
-  isLocked: boolean;
-};
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { connectSocket } from "@/src/services/socket";
+import { fetchParentHomeSummaryThunk } from "@/src/redux/thunks/parentHomeThunks";
 
 type ChildCard = {
   id: string;
@@ -42,45 +33,31 @@ const ICON = {
 export default function HomeParentScreen() {
   const { t } = useTranslation();
   const { row, text, isRTL } = useLocaleLayout();
+  const dispatch = useDispatch<AppDispatch>();
 
-  const [children, setChildren] = useState<HomeSummaryChild[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { parentId } = useSelector((state: RootState) => state.auth ?? {});
 
-  const parentName = t("homeParent.parent_name_fallback");
+  const { childrenSummary, isLoading, isRefreshing, error } = useSelector(
+    (state: RootState) => state.parentHome
+  );
 
-  const fetchSummary = useCallback(async (background = false) => {
-    try {
-      if (background) {
-        setIsRefreshing(true);
-      } else {
-        setIsLoading(true);
-      }
-
-      setError(null);
-
-      const response = await parentApi.getHomeSummary();
-      setChildren(Array.isArray(response.children) ? response.children : []);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "homeParent.fetch_summary_failed";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, []);
+  const children = Array.isArray(childrenSummary) ? childrenSummary : [];
 
   useEffect(() => {
-    fetchSummary(false);
-  }, [fetchSummary]);
+    dispatch(fetchParentHomeSummaryThunk());
+
+    if (parentId) {
+      connectSocket(parentId);
+    }
+  }, [dispatch, parentId]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchSummary(true);
-    }, [fetchSummary])
+      dispatch(fetchParentHomeSummaryThunk());
+    }, [dispatch])
   );
+
+  const parentName = t("homeParent.parent_name_fallback");
 
   const formatMinutes = (minutes: number | null) => {
     if (minutes == null) return null;

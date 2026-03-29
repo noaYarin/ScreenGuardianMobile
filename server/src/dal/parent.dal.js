@@ -179,3 +179,20 @@ export async function setParentLastLogoutAt(parentId, lastLogoutAt = new Date())
 
   return updated;
 }
+
+export async function deleteChildByParentId(parentId, childId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+  const updated = await ParentModel.findOneAndUpdate(
+    { _id: parentId, "children._id": childId },
+    { $pull: { children: { _id: childId } } },
+    { new: true, projection: { children: 1 } }
+  ).lean();
+
+  if (!updated) {
+    return null;
+  }
+
+  return updated;
+}

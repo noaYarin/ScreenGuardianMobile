@@ -15,7 +15,7 @@ type Child = {
   updatedAt?: string;
 };
 
-type HomeSummaryChild = {
+export type HomeSummaryChild = {
   childId: string;
   name: string;
   deviceId: string | null;
@@ -54,6 +54,8 @@ export async function getChildById(
   );
 }
 
+
+
 export async function setChildActive(
   childId: string,
   isActive: boolean
@@ -66,12 +68,19 @@ export async function setChildActive(
 }
 
 
-
 export async function getHomeSummary(): Promise<{
   children: HomeSummaryChild[];
 }> {
   return api.get<{ children: HomeSummaryChild[] }>(
     `${URL}/home-summary`,
+    { requireAuth: true, role: "PARENT" }
+  );
+}
+export async function deleteChild(
+  childId: string
+): Promise<{ deletedChildId: string }> {
+  return api.delete<{ deletedChildId: string }>(
+    `${URL}/children/${encodeURIComponent(childId)}`,
     { requireAuth: true, role: "PARENT" }
   );
 }

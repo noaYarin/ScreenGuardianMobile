@@ -1,6 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from "react";
-import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
+import React, { useMemo, useState } from "react";
+import {
+  View,
+  Pressable,
+  ScrollView,
+  useWindowDimensions,
+  Alert,
+} from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,6 +19,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { getAgeInFullYearsFromBirthDate } from "../../../../hooks/use-child-profile-labels";
 import { parseRouteParam } from "../ChildDetailsScreen/childDetailsRouteParams";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import { deleteChildThunk } from "@/src/redux/thunks/childrenThunks";
 
 type ActionCard = {
   key: string;
@@ -67,20 +73,22 @@ export default function ChildProfileScreen() {
   const { isRTL, text } = useLocaleLayout();
   const dispatch = useDispatch<AppDispatch>();
   const params = useLocalSearchParams<{ id?: string; name?: string }>();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const childId = useMemo(() => parseRouteParam(params.id), [params.id]);
   const nameFromRoute = useMemo(() => parseRouteParam(params.name), [params.name]);
 
   const { childrenList } = useSelector((state: RootState) => state.children ?? {});
-  
+
   const child = useMemo(() => {
     if (!childrenList) return null;
-    return childrenList.find((c) => String(c._id) === childId) || null;
+    return childrenList.find((c) => String(c._id) === String(childId)) || null;
   }, [childrenList, childId]);
 
-
   const displayName =
-    (child?.name && child.name.trim()) || nameFromRoute || t("childProfile.name_fallback");
+    (child?.name && child.name.trim()) ||
+    nameFromRoute ||
+    t("childProfile.name_fallback");
 
   const ageYears = useMemo(
     () => getAgeInFullYearsFromBirthDate(child?.birthDate),
@@ -89,6 +97,58 @@ export default function ChildProfileScreen() {
 
   const isTablet = width >= 900;
   const contentMaxWidth = width >= 1200 ? 980 : width >= 900 ? 840 : undefined;
+
+  const onPressDeleteChild = () => {
+    if (!childId || isDeleting) {
+      return;
+    }
+
+    Alert.alert(
+      t("childProfile.delete_confirm_title", "Delete child"),
+      t(
+        "childProfile.delete_confirm_message",
+        "Are you sure you want to delete this child? This action cannot be undone."
+      ),
+      [
+        {
+          text: t("common.cancel", "Cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("common.delete", "Delete"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              setIsDeleting(true);
+
+              await dispatch(deleteChildThunk(childId)).unwrap();
+
+              Alert.alert(
+                t("childProfile.delete_success_title", "Deleted"),
+                t(
+                  "childProfile.delete_success_message",
+                  "The child was deleted successfully."
+                )
+              );
+
+              router.replace("/Parent/(tabs)/children");
+            } catch (error: any) {
+              Alert.alert(
+                t("common.error", "Error"),
+                error?.message ||
+                  t(
+                    "childProfile.delete_error_message",
+                    "Could not delete the child."
+                  )
+              );
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <>
@@ -130,26 +190,66 @@ export default function ChildProfileScreen() {
                 </AppText>
               ) : null}
 
-             <Pressable
-                onPress={() => router.push({ pathname: "/Parent/editChildProfile", params: { childId: childId } } as never)}
-                accessibilityRole="button"
-                accessibilityLabel={t("childProfile.edit_a11y")}
-                style={({ pressed }) => [
-                  styles.editButton,
-                  pressed && styles.pressedSoft,
+              <View
+                style={[
+                  styles.profileActionsRow,
+                  isRTL ? styles.profileActionsRowRtl : styles.profileActionsRowLtr,
                 ]}
               >
-                <View style={styles.editButtonContent}>
-                  <MaterialCommunityIcons
-                    name="pencil-outline"
-                    size={18}
-                    color="#3B5B7A"
-                  />
-                  <AppText weight="bold" style={styles.editButtonText}>
-                    {t("childProfile.edit")}
-                  </AppText>
-                </View>
-              </Pressable>
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: "/Parent/editChildProfile",
+                      params: { childId: childId },
+                    } as never)
+                  }
+                  accessibilityRole="button"
+                  accessibilityLabel={t("childProfile.edit_a11y")}
+                  style={({ pressed }) => [
+                    styles.editButton,
+                    pressed && styles.pressedSoft,
+                  ]}
+                >
+                  <View style={styles.editButtonContent}>
+                    <MaterialCommunityIcons
+                      name="pencil-outline"
+                      size={18}
+                      color="#3B5B7A"
+                    />
+                    <AppText weight="bold" style={styles.editButtonText}>
+                      {t("childProfile.edit")}
+                    </AppText>
+                  </View>
+                </Pressable>
+
+                <Pressable
+                  onPress={onPressDeleteChild}
+                  disabled={isDeleting}
+                  accessibilityRole="button"
+                  accessibilityLabel={t(
+                    "childProfile.delete_a11y",
+                    "Delete child"
+                  )}
+                  style={({ pressed }) => [
+                    styles.deleteButton,
+                    pressed && styles.pressedSoft,
+                    isDeleting && styles.deleteButtonDisabled,
+                  ]}
+                >
+                  <View style={styles.deleteButtonContent}>
+                    <MaterialCommunityIcons
+                      name="trash-can-outline"
+                      size={18}
+                      color="#B42318"
+                    />
+                    <AppText weight="bold" style={styles.deleteButtonText}>
+                      {isDeleting
+                        ? t("common.deleting", "Deleting...")
+                        : t("common.delete", "Delete")}
+                    </AppText>
+                  </View>
+                </Pressable>
+              </View>
             </View>
 
             <View style={[styles.cardsGrid, isTablet && styles.cardsGridTablet]}>

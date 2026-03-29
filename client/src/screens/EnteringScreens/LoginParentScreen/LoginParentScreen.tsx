@@ -19,6 +19,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { AppDispatch } from "@/src/redux/store/types";
 import { setError } from "@/src/redux/slices/auth-slice";
 import { enteringFormStyles as styles } from "@/src/components/AuthFormCard/AuthFormCard.styles";
+import { connectSocket } from "@/src/services/socket";
 
 const ICON = {
   email: "email-outline",
@@ -45,7 +46,10 @@ export default function LoginParentScreen() {
         dispatch(setError(errorKey));
         return;
       }
-      await dispatch(loginParent({ email, password })).unwrap();
+     const result = await dispatch(loginParent({ email, password })).unwrap();
+      if (result?.parentId) {
+        connectSocket(result.parentId);
+      }
       router.replace("/Parent/(tabs)/home" as any);
     } catch (err: any) {
       if (typeof err === "string") {
