@@ -19,6 +19,8 @@ import { fetchCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import * as Location from "expo-location";
 import { updateDeviceLocation } from "@/src/redux/thunks/deviceThunks";
+import { connectSocket, emitEvent, onEvent } from "@/src/services/socket";
+import { REQUEST_CHILD_LOCATION } from "@/src/constants/socketEvents";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -64,6 +66,53 @@ export default function HomeScreen() {
     return list.find((c: Child) => String(c._id) === String(activeChildId));
   }, [childrenList, activeChildId]);
   const deviceId = useSelector((state: RootState) => state.auth.deviceId);
+  const parentId = useSelector((state: RootState) => state.auth.parentId);
+
+  
+  const handleSyncLocation = async (requestData?: any) => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') return;
+
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const locationData = { lat: loc.coords.latitude, lng: loc.coords.longitude };
+
+      const targetParentId = requestData?.parentId || parentId;
+      if (targetParentId) {
+        emitEvent(REQUEST_CHILD_LOCATION, {
+          parentId: targetParentId,
+          childId: String(activeChildId),
+          location: locationData,
+          lastUpdated: new Date().toISOString()
+        });
+      }
+
+      if (deviceId) {
+        dispatch(updateDeviceLocation({
+          childId: String(activeChildId),
+          deviceId,
+          location: locationData
+        }));
+      }
+    } catch (error) {
+      Alert.alert(t("common.error"), t("common.error_message", "Failed to sync location"));
+    }
+  };
+
+  useEffect(() => {
+    if (!activeChildId) return;
+  
+    connectSocket(String(activeChildId));
+  
+    const unsubscribe = onEvent(REQUEST_CHILD_LOCATION, (data) => {
+        handleSyncLocation(data);
+    });
+  
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [activeChildId]);
+
 
   // Load profile once when we have a session child but no matching row yet (e.g. after link, cold start, or stale list).
   useEffect(() => {
