@@ -1,20 +1,24 @@
 import { io, type Socket } from "socket.io-client";
 import { API_BASE_URL } from "../config/env";
+import { JOIN_PARENT, JOIN_CHILD } from "@/src/constants/socketEvents";
 
 let socket: Socket | null = null;
-export const connectSocket = (userId: string) => {
+export const connectSocket = (userId: string, userType: "parent" | "child") => {
     if (!socket) {
       console.log("Creating Singleton Socket...");
       socket = io(API_BASE_URL);
     }
-  
+    const joinEvent = userType === "parent" ? JOIN_PARENT : JOIN_CHILD;
+
+    const emitJoin = () => {
+        socket?.emit(joinEvent, userId);
+    };
+
     if (socket.connected) {
-      socket.emit("join", userId);
+        emitJoin();
     } else {
-        // Child is joining the socket or reconnecting
-      socket.once("connect", () => {
-        socket?.emit("join", userId);
-      });
+        socket.off("connect", emitJoin);
+        socket.on("connect", emitJoin);
     }
   
     return socket;
