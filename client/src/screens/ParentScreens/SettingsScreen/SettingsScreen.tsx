@@ -16,10 +16,12 @@ import { styles } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
-import { logout, setError, setAuthLoading, logoutParent } from "../../../redux/slices/auth-slice";
+import { logoutParent } from "@/src/redux/thunks/authThunks";
+import { logoutParentReducer, setError, setAuthLoading } from "../../../redux/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
-import { clearAuthTokens } from "../../../services/authStorage";
-import { disconnectSocket } from "../../../services/socket";
+import { disconnectSocket, emitEvent } from "../../../services/socket";
+import { PARENT_LOGOUT } from "@/src/constants/socketEvents";
+import { removeParentToken } from "@/src/services/authStorage";
 type SettingRow = {
   key: string;
   titleKey: string;
@@ -34,6 +36,8 @@ export default function SettingsScreen() {
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isLoggingOut = useSelector((state: any) => state.auth.isLoading);
+  const parentId = useSelector((state: any) => state.auth.parentId);
+  const childrenIds = useSelector((state: any) => state.children.childrenList);
   const isTablet = width >= 900;
   const iconTextRow = {
     flexDirection: isRTL ? "row-reverse" : "row",
@@ -68,20 +72,26 @@ export default function SettingsScreen() {
     await changeLanguage(nextLanguage);
   };
 
+
   const onPressLogout = async () => {
     dispatch(setAuthLoading(true));
     dispatch(setError(null));
-
     try {
+        if (childrenIds && childrenIds.length > 0) {
+        emitEvent(PARENT_LOGOUT, { 
+          parentId: parentId, 
+          childrenIds: childrenIds.map((child: any) => child._id) 
+        });
+      }
       await (dispatch as any)(logoutParent()).unwrap();
     } catch (error) {
       const message = (error as Error)?.message ?? "settings.logout.failed";
       dispatch(setError(message));
       Alert.alert("", t(message));
     } finally {
+      dispatch(logoutParentReducer()); 
+      await removeParentToken(); 
       disconnectSocket();
-      await clearAuthTokens();
-      dispatch(logout());
       router.replace("/" as Href);
       dispatch(setAuthLoading(false));
     }

@@ -27,10 +27,10 @@ router.post("/logout", authJwt, requireParent, logoutParentController);
 
 // POST /api/v1/auth/forgot-password
 // Trigger forgot password email flow
-router.post("/forgot-password", requireParent, forgotPasswordController);
+router.post("/forgot-password", forgotPasswordController);
 
 // POST /api/v1/auth/reset-password-confirm 
 // Confirm reset token and set new password
-router.post("/reset-password-confirm", requireParent, resetPasswordController);
+router.post("/reset-password-confirm", resetPasswordController);
 
 export default router;

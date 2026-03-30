@@ -102,7 +102,7 @@ export default function HomeScreen() {
   useEffect(() => {
     if (!activeChildId) return;
   
-    connectSocket(String(activeChildId));
+    connectSocket(String(activeChildId), "child");
   
     const unsubscribe = onEvent(REQUEST_CHILD_LOCATION, (data) => {
         handleSyncLocation(data);

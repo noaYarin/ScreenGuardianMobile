@@ -9,7 +9,7 @@ import {
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { loginParent } from "@/src/redux/slices/auth-slice";
+import { loginParent } from "@/src/redux/thunks/authThunks";
 import { useDispatch, useSelector } from "react-redux";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -48,7 +48,7 @@ export default function LoginParentScreen() {
       }
      const result = await dispatch(loginParent({ email, password })).unwrap();
       if (result?.parentId) {
-        connectSocket(result.parentId);
+        connectSocket(result.parentId, "parent");
       }
       router.replace("/Parent/(tabs)/home" as any);
     } catch (err: any) {

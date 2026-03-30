@@ -16,7 +16,8 @@ import AppText from "../../../components/AppText/AppText";
 import AuthFormCard from "../../../components/AuthFormCard/AuthFormCard";
 import { validateRegister } from "@/src/validation/authValidation";
 import { AppDispatch } from "@/src/redux/store/types";
-import { registerParent, setError } from "@/src/redux/slices/auth-slice";
+import { registerParent } from "@/src/redux/thunks/authThunks";
+import { setError } from "@/src/redux/slices/auth-slice";
 import { enteringFormStyles as styles } from "@/src/components/AuthFormCard/AuthFormCard.styles";
 
 const ICON = {

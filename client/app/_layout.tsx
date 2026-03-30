@@ -1,104 +1,88 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Href, Stack, useRouter, useSegments } from "expo-router";
-import { I18nextProvider, useTranslation } from "react-i18next";
 import { Provider as ReduxProvider, useDispatch, useSelector } from "react-redux";
-import { View, ActivityIndicator } from "react-native";
+import { I18nextProvider, useTranslation } from "react-i18next";
+import { View, Alert } from "react-native";
 import { HeaderBackButton } from "@react-navigation/elements";
 
-import { COLORS } from "@/constants/theme";
 import store from "../src/redux/store";
-import {
-  hydrateChildSession,
-  hydrateParentSession,
-} from "../src/redux/slices/auth-slice";
-import { getChildToken, getParentToken } from "../src/services/authStorage";
+import i18n from "../src/locales/i18n";
+import { COLORS } from "@/constants/theme";
+import Initializer from "../src/components/Initializer";
 
-import i18n, { initLanguage } from "../src/locales/i18n";
-import { connectSocket, onEvent } from "@/src/services/socket";
-import {LOCATION_LIVE_UPDATE } from "@/src/constants/socketEvents";
-import { updateDeviceFromSocket } from "@/src/redux/slices/device-slice";
+import { connectSocket, onEvent, disconnectSocket } from "@/src/services/socket";
+import { LOCATION_LIVE_UPDATE, FORCE_CHILD_LOGOUT } from "@/src/constants/socketEvents";
+import { clearAllDevices, updateDeviceFromSocket } from "@/src/redux/slices/device-slice";
+import { logoutChildReducer } from "@/src/redux/slices/auth-slice";
+import { removeChildToken } from "@/src/services/authStorage";
+import { clearChildrenList } from "@/src/redux/slices/children-slice";
 
 function AppStack() {
   const { i18n } = useTranslation();
   const isRTL = i18n.language?.startsWith("he") ?? false;
-
-  const token = useSelector((state: any) => state.auth.token);
-  const childToken = useSelector((state: any) => state.auth.childToken);
-
-  const dispatch = useDispatch<any>();
-  const parentId = useSelector((state: any) => state.auth.parentId);
-
-
-  // All routes in array
-  const segments = useSegments() as string[];
+  const dispatch = useDispatch();
   const router = useRouter();
+  const segments = useSegments() as string[];
+
+  const { token, childToken, parentId, activeChildId } = useSelector((state: any) => state.auth);
+  useEffect(() => {
+    if (childToken && activeChildId) {
+      connectSocket(String(activeChildId), "child");
+  
+      onEvent(FORCE_CHILD_LOGOUT, async () => {
+        Alert.alert("System Message", "The device has been disconnected by the parent");
+        dispatch(logoutChildReducer());
+        dispatch(clearAllDevices()); 
+        dispatch(clearChildrenList());
+        await removeChildToken();
+        disconnectSocket();
+        router.replace("/" as Href);
+      });
+    }
+  }, [childToken, activeChildId]);
 
   useEffect(() => {
     const isInsideParentScreens = segments.includes("Parent");
-
     if (isInsideParentScreens && parentId) {
-      connectSocket(String(parentId));
-      
+      connectSocket(String(parentId), "parent");
       const unsubscribe = onEvent(LOCATION_LIVE_UPDATE, (data: any) => {
         dispatch(updateDeviceFromSocket(data));
       });
-
-      return () => {
-        if (unsubscribe) unsubscribe();
-      };
+      return () => { if (unsubscribe) unsubscribe(); };
     }
-  }, [segments, token, parentId]);
+  }, [segments, token, parentId, dispatch]);
 
-
-  // Check if the current route is the index route
-  const isIndexRoute =
-    segments.length === 0 || segments[segments.length - 1] === "index";
   useEffect(() => {
-
+    const isIndexRoute = segments.length === 0 || segments[segments.length - 1] === "index";
     if (isIndexRoute) {
       if (childToken) {
         router.replace("/Child" as Href);
-        return;
       } else if (token) {
         router.replace("/Parent" as Href);
-        return;
       }
     }
-  }, [childToken, token, isIndexRoute, router]);
+  }, [childToken, token, segments, router]);
 
   return (
     <Stack
-    // header options
-      screenOptions={({ navigation }) =>
-        ({
-          contentStyle: { backgroundColor: COLORS.light.background },
-          headerStyle: {
-            backgroundColor: COLORS.light.tint,
-          },
-          headerTitleAlign: "center",
-          headerDirection: isRTL ? "rtl" : "ltr",
-          ...(isRTL
-            ? {
-                headerBackVisible: false,
-                headerLeft: () => null,
-                headerRight: (props: any) =>
-                  navigation.canGoBack() ? (
-                    <View style={{ transform: [{ scaleX: -1 }] }}>
-                      <HeaderBackButton
-                        {...props}
-                        onPress={navigation.goBack}
-                      />
-                    </View>
-                  ) : null,
-              }
-            : {
-              // default back button
-                headerBackVisible: true,
-              }),
-        } as any)
-      }
+      screenOptions={({ navigation }) => ({
+        contentStyle: { backgroundColor: COLORS.light.background },
+        headerStyle: { backgroundColor: COLORS.light.tint },
+        headerTitleAlign: "center",
+        headerDirection: isRTL ? "rtl" : "ltr",
+        ...(isRTL ? {
+          headerBackVisible: false,
+          headerLeft: () => null,
+          headerRight: (props: any) =>
+            navigation.canGoBack() ? (
+              <View style={{ transform: [{ scaleX: -1 }] }}>
+                <HeaderBackButton {...props} onPress={navigation.goBack} />
+              </View>
+            ) : null,
+        } : { headerBackVisible: true }),
+      } as any)}
     >
-      <Stack.Screen name="index" options={{ headerShown: false}} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="Parent" options={{ headerShown: false, title: "", headerShadowVisible: false }} />
       <Stack.Screen name="Child" options={{ headerShown: true, title: "", headerShadowVisible: false }} />
     </Stack>
@@ -106,68 +90,12 @@ function AppStack() {
 }
 
 export default function RootLayout() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-
-    (async () => {
-      try {
-        await initLanguage();
-        const [parent, child] = await Promise.all([
-          getParentToken(),
-          getChildToken(),
-        ]);
-        if (parent) {
-          store.dispatch(
-            hydrateParentSession({
-              token: parent.token,
-              parentId: parent.parentId,
-            })
-          )
-          if (child) {
-            store.dispatch(
-              hydrateChildSession({
-                childToken: child.childToken,
-                parentId: child.parentId,
-                childId: child.childId,
-                deviceId: child.deviceId,
-                physicalId: child.physicalId,
-              })
-            );
-          } 
-        }
-       
-        if (mounted) setReady(true);
-      } catch (e: any) {
-        console.error("initLanguage failed:", e);
-        }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  if (!ready) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: COLORS.light.background,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-          <ActivityIndicator size="large" color={COLORS.light.tint} />
-      </View>
-    );
-  }
-
   return (
     <ReduxProvider store={store}>
       <I18nextProvider i18n={i18n}>
-        <AppStack />
+        <Initializer>
+          <AppStack />
+        </Initializer>
       </I18nextProvider>
     </ReduxProvider>
   );

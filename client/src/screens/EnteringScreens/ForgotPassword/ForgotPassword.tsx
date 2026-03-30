@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-import { forgotPassword } from "@/src/redux/slices/auth-slice";
+import { forgotPassword } from "@/src/redux/thunks/authThunks";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import AuthFormCard from "../../../components/AuthFormCard/AuthFormCard";

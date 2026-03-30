@@ -1,5 +1,13 @@
 import { Server } from "socket.io";
-import { REQUEST_CHILD_LOCATION, REQUEST_REFRESH_FROM_PARENT, LOCATION_LIVE_UPDATE } from "./constants/socketEvents.js";
+import { 
+  REQUEST_CHILD_LOCATION, 
+  REQUEST_REFRESH_FROM_PARENT, 
+  LOCATION_LIVE_UPDATE, 
+  PARENT_LOGOUT, 
+  FORCE_CHILD_LOGOUT,
+  JOIN_PARENT,
+  JOIN_CHILD
+} from "./constants/socketEvents.js";
 
 let io = null;
 
@@ -12,27 +20,62 @@ export function initSocket(httpServer) {
   });
 
   io.on("connection", (socket) => {
-    socket.on("join", (userId) => {
-      if (!userId) return;
-      socket.join(String(userId));
-      console.log(`User ${userId} joined room`);
+    console.log(`New connection established: ${socket.id}`);
+
+    // Join Parent Room
+    socket.on(JOIN_PARENT, (parentId) => {
+      if (!parentId) return;
+      const room = `parent_${parentId}`;
+      socket.join(room);
+      console.log(`[Join] Parent ${parentId} joined room: ${room}`);
     });
 
+    // Join Child Room
+    socket.on(JOIN_CHILD, (childId) => {
+      if (!childId) return;
+      const room = `child_${childId}`;
+      socket.join(room);
+      console.log(`[Join] Child ${childId} joined room: ${room}`);
+    });
+
+    // Parent requesting location from child
     socket.on(REQUEST_REFRESH_FROM_PARENT, (data) => {
-      console.log(`Parent ${data.parentId} requesting location from ${data.childId}`);
-      io.to(String(data.childId)).emit(REQUEST_CHILD_LOCATION, { parentId: data.parentId });
+      const { parentId, childId } = data;
+      console.log(`[Request] Parent ${parentId} requesting location from child ${childId}`);
+      io.to(`child_${childId}`).emit(REQUEST_CHILD_LOCATION, { parentId });
     });
   
+    // Child sending location to parent
     socket.on(REQUEST_CHILD_LOCATION, (data) => {
       const { parentId, location, childId, lastUpdated } = data;
+      console.log(`[LocationUpdate] Child ${childId} sending location to parent ${parentId}`);
       
-      console.log(`Child ${childId} sent location directly to parent ${parentId}`);
-      
-      io.to(String(parentId)).emit(LOCATION_LIVE_UPDATE, {
+      io.to(`parent_${parentId}`).emit(LOCATION_LIVE_UPDATE, {
         childId,
         location,
         lastUpdated
       });
+    });
+
+    // Parent Logout - Force disconnect all linked children
+    socket.on(PARENT_LOGOUT, (data) => {
+      const { parentId, childrenIds } = data;
+      console.log(`[Logout] Parent ${parentId} logged out. Processing children disconnection...`);
+      
+      if (childrenIds && Array.isArray(childrenIds)) {
+        childrenIds.forEach(childId => {
+          const childRoom = `child_${childId}`;
+          console.log(`[ForceLogout] Emitting logout to child room: ${childRoom}`);
+          
+          io.to(childRoom).emit(FORCE_CHILD_LOGOUT, {
+            message: "The parent logged out, the application will close now."
+          });
+        });
+      }
+    });
+
+    socket.on("disconnect", () => {
+      console.log(`Socket disconnected: ${socket.id}`);
     });
   });
 
