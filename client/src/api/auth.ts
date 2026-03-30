@@ -36,7 +36,6 @@ export async function apiForgotPassword(
   const data = await api.post<{ message: string }>(
     `${URL}/forgot-password`,
     { email },
-    { role: "PARENT" }
   );
   return data;
 }
@@ -47,7 +46,6 @@ export async function apiResetPassword(
   const data = await api.post<{ token: string; parentId: string }>(
     `${URL}/reset-password-confirm`,
     params,
-    { role: "PARENT" }
   );
 
   if (data.token) {
