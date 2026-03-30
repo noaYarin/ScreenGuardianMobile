@@ -12,7 +12,6 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-import { connectSocket } from "@/src/services/socket";
 
 type ChildCard = {
   id: string;
@@ -42,9 +41,6 @@ export default function HomeParentScreen() {
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
-    if (parentId) {
-      connectSocket(parentId);
-    }
   }, [dispatch, parentId]);
 
   const parentName = t("homeParent.parent_name_fallback");

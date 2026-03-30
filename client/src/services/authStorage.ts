@@ -43,9 +43,3 @@ export async function setChildToken(childAuthData: ChildAuthData): Promise<void>
 export async function removeChildToken(): Promise<void> {
   await SecureStore.deleteItemAsync(CHILD_TOKEN_KEY);
 }
-
-// Removes both parent and child tokens from storage.
-// Used for a full logout regardless of current role.
-export async function clearAuthTokens(): Promise<void> {
-  await Promise.all([removeParentToken(), removeChildToken()]);
-}
