@@ -85,9 +85,6 @@ const authSlice = createSlice({
       const p = action.payload;
       state.token = p.token;
       state.parentId = p.parentId;
-      state.activeChildId = null;
-      state.childToken = null;
-      state.deviceId = null;
     },
     hydrateChildSession: (
       state,
@@ -108,15 +105,15 @@ const authSlice = createSlice({
       state.deviceId = p.deviceId;
       state.physicalId = p.physicalId ?? null;
     },
-    logout: (state) => {
+    logoutParentReducer: (state) => {
       state.parentId = null;
       state.token = null;
+    },
+    logoutChildReducer: (state) => {
       state.activeChildId = null;
       state.childToken = null;
       state.deviceId = null;
       state.physicalId = null;
-      state.isLoading = false;
-      state.error = null;
     },
   },
   // extraReducers for async operations - thunks response
@@ -165,18 +162,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setError, setAuthLoading, hydrateParentSession, hydrateChildSession, logout } =
+export const { setError, setAuthLoading, hydrateParentSession, hydrateChildSession, logoutChildReducer, logoutParentReducer } =
   authSlice.actions;
-
-// Export all auth thunks, now the components use it from this slice 
-export {
-  loginParent,
-  registerParent,
-  resetPassword,
-  forgotPassword,
-  generateCodeForPairingChild,
-  linkDevice,
-  logoutParent,
-} from "../thunks/authThunks";
 
 export default authSlice.reducer;

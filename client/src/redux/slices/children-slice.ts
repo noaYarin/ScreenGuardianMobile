@@ -6,7 +6,6 @@ import {
   updateCurrentChildProfileThunk,
   deleteChildThunk,
 } from "../thunks/childrenThunks";
-import { logout } from "./auth-slice";
 
 export type ChildGender = "boy" | "girl" | "other";
 
@@ -53,6 +52,9 @@ const childrenSlice = createSlice({
     },
     clearChildrenError(state) {
       state.error = null;
+    },
+    clearChildrenList(state) {
+      state.childrenList = [];
     },
   },
   extraReducers: (builder) => {
@@ -140,14 +142,8 @@ const childrenSlice = createSlice({
           action.error.message ||
           "Update failed";
       })
-
-      .addCase(logout, (state) => {
-        state.childrenList = [];
-        state.isLoading = false;
-        state.error = null;
-      });
   },
 });
 
-export const { setChildrenError, clearChildrenError } = childrenSlice.actions;
+export const { setChildrenError, clearChildrenError, clearChildrenList } = childrenSlice.actions;
 export default childrenSlice.reducer;

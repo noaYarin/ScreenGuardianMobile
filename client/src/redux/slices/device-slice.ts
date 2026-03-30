@@ -6,7 +6,6 @@ import {
   updateDeviceLocation,
   updateDeviceDailyLimitThunk
 } from "../thunks/deviceThunks";
-import { logout } from "./auth-slice"; 
 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -31,6 +30,11 @@ const devicesSlice = createSlice({
       delete state.byChildId[id];
       delete state.statusByChildId[id];
       delete state.errorByChildId[id];
+    },
+    clearAllDevices: (state) => {
+      state.byChildId = {};
+      state.statusByChildId = {};
+      state.errorByChildId = {};
     },
     setDeviceLockLocal: (
       state,
@@ -128,18 +132,12 @@ const devicesSlice = createSlice({
       extraMinutesToday: updatedLimit.extraMinutesToday,
       usedTodayMinutes: updatedLimit.usedTodayMinutes,
     },
-  };
-})
-      .addCase(logout, (state) => {
-        state.byChildId = {};
-        state.statusByChildId = {};
-        state.errorByChildId = {};
-      });
-      
+    };
+  })
+  
   },
 });
 
-export const { clearDevicesForChild, setDeviceLockLocal, updateDeviceFromSocket  } =
+export const { clearDevicesForChild, clearAllDevices, setDeviceLockLocal, updateDeviceFromSocket  } =
   devicesSlice.actions;
-export { fetchDevicesByChild, deleteDeviceForChild } from "../thunks/deviceThunks";
 export default devicesSlice.reducer;
