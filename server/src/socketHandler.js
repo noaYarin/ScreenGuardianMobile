@@ -9,6 +9,7 @@ import {
   JOIN_CHILD
 } from "./constants/socketEvents.js";
 
+import { notifyParent } from "./services/notification.service.js";
 let io = null;
 
 export function initSocket(httpServer) {
@@ -26,14 +27,22 @@ export function initSocket(httpServer) {
     socket.on(JOIN_PARENT, (parentId) => {
       if (!parentId) return;
       const room = `parent_${parentId}`;
+      socket.data.parentId = String(parentId);
       socket.join(room);
       console.log(`[Join] Parent ${parentId} joined room: ${room}`);
     });
 
     // Join Child Room
-    socket.on(JOIN_CHILD, (childId) => {
+    socket.on(JOIN_CHILD, (payload) => {
+      const childId =
+        payload && typeof payload === "object" ? payload.childId : payload;
+      const parentId =
+        payload && typeof payload === "object" ? payload.parentId : null;
+
       if (!childId) return;
       const room = `child_${childId}`;
+      socket.data.childId = String(childId);
+      if (parentId) socket.data.parentId = String(parentId);
       socket.join(room);
       console.log(`[Join] Child ${childId} joined room: ${room}`);
     });
@@ -76,8 +85,25 @@ export function initSocket(httpServer) {
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);
+
+      const parentId = socket.data?.parentId;
+      const childId = socket.data?.childId;
+      if (parentId && childId) {
+        notifyParent({
+          parentId,
+          childId,
+          type: NotificationType.CHILD_DISCONNECTED,
+          severity: NotificationSeverity.WARNING,
+          title: "Child Disconnected",
+          description: "The child's device disconnected"
+        });
+      }
     });
   });
 
+  return io;
+}
+
+export function getIO() {
   return io;
 }

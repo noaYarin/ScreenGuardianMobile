@@ -3,6 +3,9 @@ import { Common as CommonErrors } from "../constants/errors.js";
 import { Role } from "../constants/role.js";
 import { Gender } from "../constants/gender.js";
 import { updateCurrentChildProfileByParentId } from "../dal/parent.dal.js";
+import { notifyParent } from "./notification.service.js";
+import { NotificationType } from "../constants/notificationType.js";
+import { NotificationSeverity } from "../constants/severity.js";
 
 export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;
@@ -48,6 +51,19 @@ export async function updateCurrentChildProfile(parentId, childId, birthDate, ge
 
   if (!updated) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.CHILD_PROFILE_UPDATED,
+      severity: NotificationSeverity.INFO,
+      title: "Child Profile Updated",
+      description: "Child profile details were updated"
+    });
+  } catch (err) {
+    console.error("notifyParent failed in updateCurrentChildProfile:", err.message);
   }
 
   return { child: updated };

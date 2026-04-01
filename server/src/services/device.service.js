@@ -1,6 +1,6 @@
 import { AppError } from "../utils/appError.js";
 import { Common as CommonErrors } from "../constants/errors.js";
-import { notifyChild } from "./notification.service.js";
+import { notifyChild, notifyParent } from "./notification.service.js";
 import { NotificationSeverity } from "../constants/severity.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { sendAuditLog } from "./audit.service.js";
@@ -492,6 +492,20 @@ export async function updateDeviceLocation(deviceId, location, parentId, childId
   };
 
   const updatedDevice = await updateDeviceById(deviceId, fieldsToUpdate);
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.CHILD_LOCATION_UPDATED,
+      severity: NotificationSeverity.INFO,
+      title: "Location Updated",
+      description: "Your child's location was updated"
+    });
+  } catch (err) {
+    console.error("notifyParent failed in updateDeviceLocation:", err.message);
+  }
+
   return updatedDevice;
 
 }
