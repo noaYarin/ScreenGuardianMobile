@@ -41,6 +41,8 @@ function pickIcon(
       return "account-plus-outline";
     case "CHILD_PROFILE_UPDATED":
       return "account-edit-outline";
+    case "CHILD_DELETED":
+      return "account-remove-outline";
     case "CHILD_DISCONNECTED":
       return "account-off-outline";
     case "CHILD_LOCATION_UPDATED":
@@ -55,6 +57,10 @@ function pickIcon(
       return "lock-outline";
     case "DEVICE_UNLOCKED":
       return "lock-open-outline";
+    case "DEVICE_ADDED":
+      return "cellphone-link";
+    case "DEVICE_DELETED":
+      return "cellphone-remove";
     case "SCREEN_TIME_UPDATED":
       return "clock-edit-outline";
     case "SCREEN_TIME_ENDING":

@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Pressable, Alert, useWindowDimensions } from "react-native";
+import { View, Pressable, useWindowDimensions } from "react-native";
 import { Stack } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -8,6 +8,7 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import { showAppToast } from "@/src/utils/appToast";
 
 export default function DistressScreen() {
   const { t } = useTranslation();
@@ -19,7 +20,7 @@ export default function DistressScreen() {
   const buttonSize = Math.round(areaSize * (230 / 320));
 
   const onSOSPress = () => {
-    Alert.alert(t("distress.alert_title"), t("distress.alert_desc"));
+    showAppToast(t("distress.alert_desc"), t("distress.alert_title"));
   };
 
   return (

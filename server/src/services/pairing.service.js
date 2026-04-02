@@ -146,14 +146,16 @@ if (currentDevice) {
   const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
   const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
 
+  const displayDeviceName = deviceName != null && String(deviceName).trim() !== "" ? String(deviceName).trim() : "New device";
+
   try {
     await notifyParent({
       parentId,
       childId,
-      type: NotificationType.CHILD_LOGGED_IN,
+      type: NotificationType.DEVICE_ADDED,
       severity: NotificationSeverity.INFO,
-      title: "Child Connected",
-      description: `${childName || "Your child"} connected a device`
+      title: "Device Added",
+      description: `${displayDeviceName} was linked${childName ? ` to ${childName}` : ""}`
     });
   } catch (err) {
     console.error("notifyParent failed in linkByCodeOrToken:", err.message);

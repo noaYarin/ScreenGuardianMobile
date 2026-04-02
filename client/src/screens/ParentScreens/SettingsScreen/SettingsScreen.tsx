@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  Alert,
   View,
   ScrollView,
   Pressable,
@@ -22,6 +21,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { disconnectSocket, emitEvent } from "../../../services/socket";
 import { PARENT_LOGOUT } from "@/src/constants/socketEvents";
 import { removeParentToken } from "@/src/services/authStorage";
+import { showAppToast } from "@/src/utils/appToast";
 type SettingRow = {
   key: string;
   titleKey: string;
@@ -87,7 +87,7 @@ export default function SettingsScreen() {
     } catch (error) {
       const message = (error as Error)?.message ?? "settings.logout.failed";
       dispatch(setError(message));
-      Alert.alert("", t(message));
+      showAppToast(t(message));
     } finally {
       dispatch(logoutParentReducer()); 
       await removeParentToken(); 

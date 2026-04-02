@@ -361,6 +361,7 @@
     "delete_device_confirm": "הסרה",
     "delete_device_cancel": "ביטול",
     "delete_device_error": "לא ניתן להסיר את המכשיר. נסו שוב.",
+    "delete_device_success": "המכשיר {{device}} הוסר.",
     "view_limits": "צפייה בהגבלות",
     "view_limits_a11y": "צפייה בהגבלות של {{name}}",
     "child_profile": "פרופיל ילד/ה",

@@ -314,8 +314,26 @@ export async function getDeviceByChild(parentId, childId, deviceId) {
 export async function deleteDeviceForParent(parentId, childId, deviceId) {
   const childList = await getChildrenByParentId(parentId);
   ensureChildBelongsToParent(childList, childId);
-  await validateDeviceAccess({ deviceId, parentId, childId });
+  const device = await validateDeviceAccess({ deviceId, parentId, childId });
+  const deviceLabel =
+    device?.deviceName != null && String(device.deviceName).trim() !== ""
+      ? String(device.deviceName).trim()
+      : "A device";
+
   await deleteDeviceById(deviceId);
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.DEVICE_DELETED,
+      severity: NotificationSeverity.WARNING,
+      title: "Device Removed",
+      description: `${deviceLabel} was removed from this child profile`
+    });
+  } catch (err) {
+    console.error("notifyParent failed in deleteDeviceForParent:", err.message);
+  }
 }
 
 

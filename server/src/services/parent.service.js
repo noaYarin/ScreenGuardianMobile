@@ -184,6 +184,8 @@ export async function deleteChild(parentId, childId) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   }
 
+  const childName = child?.name != null ? String(child.name) : "";
+
   const devices = await findDevicesByChildId(childId);
 
   if (devices && devices.length > 0) {
@@ -198,6 +200,19 @@ export async function deleteChild(parentId, childId) {
 
   if (!updatedParent) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.CHILD_DELETED,
+      severity: NotificationSeverity.WARNING,
+      title: "Child Deleted",
+      description: childName ? `Child profile removed: ${childName}` : "A child profile was removed"
+    });
+  } catch (err) {
+    console.error("notifyParent failed in deleteChild:", err.message);
   }
 
   return {
