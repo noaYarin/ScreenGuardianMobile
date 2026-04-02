@@ -134,7 +134,7 @@ export default function ChildLocationScreen() {
                 title={t("childLocation.addDeviceButton")}
                 onPress={() =>
                   router.push({
-                    pathname: "/Parent/childDetails" as Href,
+                    pathname: "/Parent/(tabs)/children" as Href,
                     params: { id: selectedChildId, name: selectedChild.name },
                   } as never)
                 }
