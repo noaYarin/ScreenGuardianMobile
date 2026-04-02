@@ -14,7 +14,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-import { fetchDevicesByChild } from "@/src/redux/slices/device-slice";
+import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
 
 type ScreenLimitCard = {
   id: string;
