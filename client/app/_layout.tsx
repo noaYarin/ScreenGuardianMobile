@@ -2,8 +2,10 @@ import React, { useEffect } from "react";
 import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { Provider as ReduxProvider, useDispatch, useSelector } from "react-redux";
 import { I18nextProvider, useTranslation } from "react-i18next";
-import { View, Alert } from "react-native";
+import { View } from "react-native";
 import { HeaderBackButton } from "@react-navigation/elements";
+import Toast from "react-native-root-toast";
+import { RootSiblingParent } from 'react-native-root-siblings';
 
 import store from "../src/redux/store";
 import i18n from "../src/locales/i18n";
@@ -11,11 +13,12 @@ import { COLORS } from "@/constants/theme";
 import Initializer from "../src/components/Initializer";
 
 import { connectSocket, onEvent, disconnectSocket } from "@/src/services/socket";
-import { LOCATION_LIVE_UPDATE, FORCE_CHILD_LOGOUT } from "@/src/constants/socketEvents";
+import { LOCATION_LIVE_UPDATE, FORCE_CHILD_LOGOUT, NOTIFICATION_CREATED } from "@/src/constants/socketEvents";
 import { clearAllDevices, updateDeviceFromSocket } from "@/src/redux/slices/device-slice";
 import { logoutChildReducer } from "@/src/redux/slices/auth-slice";
 import { removeChildToken } from "@/src/services/authStorage";
 import { clearChildrenList } from "@/src/redux/slices/children-slice";
+import { addNotificationFromSocket } from "@/src/redux/slices/notification-slice";
 
 function AppStack() {
   const { i18n } = useTranslation();
@@ -27,10 +30,13 @@ function AppStack() {
   const { token, childToken, parentId, activeChildId } = useSelector((state: any) => state.auth);
   useEffect(() => {
     if (childToken && activeChildId) {
-      connectSocket(String(activeChildId), "child");
+      connectSocket(String(activeChildId), "child", parentId ? { parentId: String(parentId) } : undefined);
   
       onEvent(FORCE_CHILD_LOGOUT, async () => {
-        Alert.alert("System Message", "The device has been disconnected by the parent");
+        Toast.show("System Message\nThe device has been disconnected by the parent", {
+          duration: Toast.durations.LONG,
+          position: Toast.positions.TOP,
+        });
         dispatch(logoutChildReducer());
         dispatch(clearAllDevices()); 
         dispatch(clearChildrenList());
@@ -48,7 +54,19 @@ function AppStack() {
       const unsubscribe = onEvent(LOCATION_LIVE_UPDATE, (data: any) => {
         dispatch(updateDeviceFromSocket(data));
       });
-      return () => { if (unsubscribe) unsubscribe(); };
+      const unsubscribeNotifications = onEvent(NOTIFICATION_CREATED, (data: any) => {
+        dispatch(addNotificationFromSocket(data));
+        const title = data?.title ? String(data.title) : "New notification";
+        const description = data?.description ? String(data.description) : "";
+        Toast.show(description ? `${title}\n${description}` : title, {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.TOP,
+        });
+      });
+      return () => {
+        if (unsubscribe) unsubscribe();
+        if (unsubscribeNotifications) unsubscribeNotifications();
+      };
     }
   }, [segments, token, parentId, dispatch]);
 
@@ -93,9 +111,11 @@ export default function RootLayout() {
   return (
     <ReduxProvider store={store}>
       <I18nextProvider i18n={i18n}>
+      <RootSiblingParent>
         <Initializer>
           <AppStack />
         </Initializer>
+        </RootSiblingParent>
       </I18nextProvider>
     </ReduxProvider>
   );
