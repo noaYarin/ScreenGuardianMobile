@@ -8,6 +8,8 @@ import {
   JOIN_PARENT,
   JOIN_CHILD
 } from "./constants/socketEvents.js";
+import {NotificationType} from "./constants/notificationType.js";
+import {NotificationSeverity} from "./constants/severity.js";
 
 import { notifyParent } from "./services/notification.service.js";
 let io = null;

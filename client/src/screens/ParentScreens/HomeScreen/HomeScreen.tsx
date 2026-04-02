@@ -12,6 +12,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+import { fetchParentNotificationsThunk } from "@/src/redux/thunks/notificationThunks";
 
 type ChildCard = {
   id: string;
@@ -37,10 +38,13 @@ export default function HomeParentScreen() {
     (state: RootState) => state.children ?? {}
   );
   const { parentId } = useSelector((state: RootState) => state.auth ?? {});
+  const notifications = useSelector((state: RootState) => state.notifications?.items ?? []);
   const children = Array.isArray(childrenList) ? childrenList : [];
+  const unreadNotificationsCount = notifications.filter((n: any) => !n?.isRead).length;
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
+    dispatch(fetchParentNotificationsThunk());
   }, [dispatch, parentId]);
 
   const parentName = t("homeParent.parent_name_fallback");
@@ -82,7 +86,16 @@ const bellButton = (
       pressed && styles.headerMenuButtonPressed,
     ]}
   >
-    <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
+    <View style={styles.bellWrap}>
+      <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
+      {unreadNotificationsCount > 0 ? (
+        <View style={styles.bellBadge} pointerEvents="none">
+          <AppText weight="bold" style={styles.bellBadgeText}>
+            {unreadNotificationsCount > 99 ? "99+" : String(unreadNotificationsCount)}
+          </AppText>
+        </View>
+      ) : null}
+    </View>
   </Pressable>
 );
   const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);

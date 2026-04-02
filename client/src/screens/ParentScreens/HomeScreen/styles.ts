@@ -27,6 +27,34 @@ export const styles = StyleSheet.create({
     opacity: 0.72,
   },
 
+  bellWrap: {
+    width: 24,
+    height: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  bellBadge: {
+    position: "absolute",
+    top: -7,
+    right: -10,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    paddingHorizontal: 5,
+    backgroundColor: "#EF4444",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: COLORS.light.background,
+  },
+
+  bellBadgeText: {
+    fontSize: 10,
+    lineHeight: 12,
+    color: "#FFFFFF",
+  },
+
   header: {
     flexDirection: "column",
     justifyContent: "center",

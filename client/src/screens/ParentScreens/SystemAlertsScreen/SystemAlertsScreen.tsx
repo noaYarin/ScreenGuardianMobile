@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, ScrollView, Pressable } from "react-native";
 import { Stack } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -9,93 +10,106 @@ import { styles, ALERT_COLORS } from "./styles";
 
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
+import type { AppDispatch, RootState } from "@/src/redux/store/types";
+import type { Notification } from "@/src/api/notification";
+import {
+  fetchParentNotificationsThunk,
+  markParentNotificationReadThunk,
+} from "@/src/redux/thunks/notificationThunks";
 
-type AlertSeverity = "critical" | "warning" | "info" | "success";
 type AlertFilter = "all" | "unread" | "critical";
 
-type AlertItem = {
-  id: string;
-  titleKey: string;
-  descriptionKey: string;
-  timeKey: string;
-  severity: AlertSeverity;
-  isUnread: boolean;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-};
+type AlertSeverity = "critical" | "warning" | "info" | "success";
 
-const STATIC_ALERTS: AlertItem[] = [
-  {
-    id: "1",
-    titleKey: "systemAlerts.alerts.securityAttempt.title",
-    descriptionKey: "systemAlerts.alerts.securityAttempt.description",
-    timeKey: "systemAlerts.time.minutesAgo10",
-    severity: "critical",
-    isUnread: true,
-    icon: "shield-alert-outline",
-  },
-  {
-    id: "2",
-    titleKey: "systemAlerts.alerts.dailyLimit.title",
-    descriptionKey: "systemAlerts.alerts.dailyLimit.description",
-    timeKey: "systemAlerts.time.minutesAgo25",
-    severity: "warning",
-    isUnread: true,
-    icon: "clock-alert-outline",
-  },
-  {
-    id: "3",
-    titleKey: "systemAlerts.alerts.unusualActivity.title",
-    descriptionKey: "systemAlerts.alerts.unusualActivity.description",
-    timeKey: "systemAlerts.time.hourAgo1",
-    severity: "warning",
-    isUnread: false,
-    icon: "chart-line-variant",
-  },
-  {
-    id: "4",
-    titleKey: "systemAlerts.alerts.newApp.title",
-    descriptionKey: "systemAlerts.alerts.newApp.description",
-    timeKey: "systemAlerts.time.hoursAgo3",
-    severity: "info",
-    isUnread: false,
-    icon: "cellphone-arrow-down",
-  },
-  {
-    id: "5",
-    titleKey: "systemAlerts.alerts.requestApproved.title",
-    descriptionKey: "systemAlerts.alerts.requestApproved.description",
-    timeKey: "systemAlerts.time.hoursAgo5",
-    severity: "success",
-    isUnread: false,
-    icon: "check-decagram-outline",
-  },
-];
+function toAlertSeverity(severity: string): AlertSeverity {
+  const s = String(severity || "").toUpperCase();
+  if (s === "CRITICAL" || s === "ERROR") return "critical";
+  if (s === "WARNING") return "warning";
+  if (s === "SUCCESS") return "success";
+  return "info";
+}
+
+function pickIcon(
+  type: string,
+  severity: string
+): React.ComponentProps<typeof MaterialCommunityIcons>["name"] {
+  const t = String(type || "").toUpperCase();
+  switch (t) {
+    case "CHILD_LOGGED_IN":
+      return "account-check-outline";
+    case "CHILD_ADDED":
+      return "account-plus-outline";
+    case "CHILD_PROFILE_UPDATED":
+      return "account-edit-outline";
+    case "CHILD_DISCONNECTED":
+      return "account-off-outline";
+    case "CHILD_LOCATION_UPDATED":
+      return "map-marker-check-outline";
+    case "EXTENSION_REQUEST_CREATED":
+      return "clock-plus-outline";
+    case "EXTENSION_REQUEST_APPROVED":
+      return "check-decagram-outline";
+    case "EXTENSION_REQUEST_REJECTED":
+      return "close-octagon-outline";
+    case "DEVICE_LOCKED":
+      return "lock-outline";
+    case "DEVICE_UNLOCKED":
+      return "lock-open-outline";
+    case "SCREEN_TIME_UPDATED":
+      return "clock-edit-outline";
+    case "SCREEN_TIME_ENDING":
+      return "clock-alert-outline";
+    case "SCREEN_TIME_ENDED":
+      return "clock-remove-outline";
+    default:
+      return toAlertSeverity(severity) === "critical"
+        ? "shield-alert-outline"
+        : "bell-outline";
+  }
+}
+
+function formatCreatedAt(createdAt?: string) {
+  if (!createdAt) return "";
+  const d = new Date(createdAt);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString();
+}
 
 const FILTERS: AlertFilter[] = ["all", "unread", "critical"];
 
 export default function SystemAlertsScreen() {
   const { t } = useTranslation();
   const { text, row, isRTL } = useLocaleLayout();
+  const dispatch = useDispatch<AppDispatch>();
+  const notifications = useSelector(
+    (state: RootState) => state.notifications?.items ?? []
+  );
 
   const [selectedFilter, setSelectedFilter] = useState<AlertFilter>("all");
+
+  useEffect(() => {
+    dispatch(fetchParentNotificationsThunk());
+  }, [dispatch]);
 
   const filteredAlerts = useMemo(() => {
     switch (selectedFilter) {
       case "unread":
-        return STATIC_ALERTS.filter((alert) => alert.isUnread);
+        return notifications.filter((n: Notification) => !n.isRead);
       case "critical":
-        return STATIC_ALERTS.filter((alert) => alert.severity === "critical");
+        return notifications.filter(
+          (n: Notification) => toAlertSeverity(n.severity) === "critical"
+        );
       case "all":
       default:
-        return STATIC_ALERTS;
+        return notifications;
     }
-  }, [selectedFilter]);
+  }, [selectedFilter, notifications]);
 
-  const unreadCount = STATIC_ALERTS.filter((alert) => alert.isUnread).length;
-  const criticalCount = STATIC_ALERTS.filter(
-    (alert) => alert.severity === "critical"
+  const unreadCount = notifications.filter((n: Notification) => !n.isRead).length;
+  const criticalCount = notifications.filter(
+    (n: Notification) => toAlertSeverity(n.severity) === "critical"
   ).length;
-  const totalCount = STATIC_ALERTS.length;
+  const totalCount = notifications.length;
 
   return (
     <>
@@ -225,24 +239,32 @@ export default function SystemAlertsScreen() {
                   </AppText>
                 </View>
               ) : (
-                filteredAlerts.map((alert) => {
-                  const palette = ALERT_COLORS[alert.severity];
+                filteredAlerts.map((alert: Notification) => {
+                  const severity: AlertSeverity = toAlertSeverity(alert.severity);
+                  const palette = ALERT_COLORS[severity];
+                  const isUnread = !alert.isRead;
+                  const title = alert.title ?? "";
+                  const createdAtText = formatCreatedAt(alert.createdAt);
 
                   return (
                     <Pressable
-                      key={alert.id}
+                      key={alert._id}
                       accessibilityRole="button"
-                      accessibilityLabel={t("systemAlerts.alertCardA11y", {
-                        title: t(alert.titleKey),
-                        time: t(alert.timeKey),
-                      })}
+                      accessibilityLabel={t("systemAlerts.alertCardA11y", { title, time: createdAtText })}
                       onPress={() => {
-                        // Server integration / navigation to alert details can be added here.
+                        const id = alert._id;
+                        if (id && !alert.isRead) {
+                          dispatch(
+                            markParentNotificationReadThunk({
+                              notificationId: String(id),
+                            })
+                          );
+                        }
                       }}
                       style={({ pressed }) => [
                         styles.alertCard,
                         pressed && styles.pressed,
-                        !alert.isUnread && styles.alertCardRead,
+                        !isUnread && styles.alertCardRead,
                       ]}
                     >
                       <View
@@ -260,7 +282,7 @@ export default function SystemAlertsScreen() {
                           ]}
                         >
                           <MaterialCommunityIcons
-                            name={alert.icon}
+                            name={pickIcon(alert.type, alert.severity)}
                             size={22}
                             color={palette.accent}
                           />
@@ -273,10 +295,10 @@ export default function SystemAlertsScreen() {
                               style={[styles.alertTitle, text]}
                               numberOfLines={1}
                             >
-                              {t(alert.titleKey)}
+                              {title}
                             </AppText>
 
-                            {alert.isUnread ? (
+                            {isUnread ? (
                               <View style={styles.unreadDot} />
                             ) : null}
                           </View>
@@ -285,7 +307,7 @@ export default function SystemAlertsScreen() {
                             weight="medium"
                             style={[styles.alertDescription, text]}
                           >
-                            {t(alert.descriptionKey)}
+                            {alert.description ?? ""}
                           </AppText>
 
                           <View style={[styles.alertFooterRow, row]}>
@@ -299,7 +321,7 @@ export default function SystemAlertsScreen() {
                                 weight="medium"
                                 style={[styles.timeText, text]}
                               >
-                                {t(alert.timeKey)}
+                                {createdAtText || t("systemAlerts.time.justNow")}
                               </AppText>
                             </View>
 
@@ -318,7 +340,7 @@ export default function SystemAlertsScreen() {
                                 ]}
                               >
                                 {t(
-                                  `systemAlerts.severityLabels.${alert.severity}`
+                                  `systemAlerts.severityLabels.${severity}`
                                 )}
                               </AppText>
                             </View>
