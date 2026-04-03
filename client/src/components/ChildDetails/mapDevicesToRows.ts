@@ -31,9 +31,13 @@ export function mapDevicesToRows(
 ): ChildDetailsDeviceRow[] {
   return devices.map((d) => {
     const name = d.name?.trim() ? d.name : "—";
+    const lat = typeof d.location?.lat === "number" ? d.location.lat : 0;
+    const lng = typeof d.location?.lng === "number" ? d.location.lng : 0;
     const loc =
-      typeof d.location === "string" && d.location.trim().length > 0
-        ? d.location.trim()
+      Number.isFinite(lat) &&
+      Number.isFinite(lng) &&
+      (lat !== 0 || lng !== 0)
+        ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
         : t("childDetails.location_unknown");
     return {
       id: String(d._id),

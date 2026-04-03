@@ -1,18 +1,10 @@
 import { API_BASE_URL } from "../config/env";
 import { getParentToken, getChildToken, removeParentToken, removeChildToken } from "../services/authStorage";
 import i18n from "../locales/i18n";
-import { logout } from "../redux/slices/auth-slice";
-import store from "../redux/store";
 
 type RequestOptions = {
   requireAuth?: boolean;
   role?: "PARENT" | "CHILD";
-};
-
-let dispatchReference: any = null;
-
-export const injectDispatch = (dispatch: any) => {
-  dispatchReference = dispatch;
 };
 
 
@@ -48,14 +40,15 @@ async function request<T>(
   const result = await response.json().catch(() => ({}));
 
   if (response.status === 401) {
-    await removeParentToken();
-    await removeChildToken();
-    
-    if (dispatchReference) {
-      dispatchReference(logout());
+    if (options.requireAuth) {
+      await removeParentToken();
+      await removeChildToken();
+      throw new Error(i18n.t("api.session_expired"));
     }
-    throw new Error(i18n.t("api.unauthorized"));
-  }
+  
+    const errorMessage = result?.error?.message || result?.message || i18n.t("api.unauthorized");
+    throw new Error(errorMessage);    
+}
 
   if (!response.ok) {
     const errorMessage =

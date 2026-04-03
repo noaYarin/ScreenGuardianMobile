@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, ScrollView, useWindowDimensions, Alert, Linking, Platform, Button } from "react-native";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { View, ScrollView, useWindowDimensions, Linking, Platform, Button } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { Href, router } from "expo-router";
+import Toast from "react-native-root-toast";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import ChildSelector from "../../../components/ChildSelector/ChildSelector";
@@ -80,7 +81,14 @@ export default function ChildLocationScreen() {
 
   const onNavigate = async () => {
     if (!deviceSnapshot) {
-      return Alert.alert(t("childLocation.navigateNoCoordsTitle"), t("childLocation.navigateNoCoordsMessage"));
+      Toast.show(
+        `${t("childLocation.navigateNoCoordsTitle")}\n${t("childLocation.navigateNoCoordsMessage")}`,
+        {
+          duration: Toast.durations.SHORT,
+          position: Toast.positions.TOP,
+        }
+      );
+      return;
     }
   
     const { latitude, longitude } = deviceSnapshot;
@@ -126,7 +134,7 @@ export default function ChildLocationScreen() {
                 title={t("childLocation.addDeviceButton")}
                 onPress={() =>
                   router.push({
-                    pathname: "/Parent/childDetails" as Href,
+                    pathname: "/Parent/(tabs)/children" as Href,
                     params: { id: selectedChildId, name: selectedChild.name },
                   } as never)
                 }

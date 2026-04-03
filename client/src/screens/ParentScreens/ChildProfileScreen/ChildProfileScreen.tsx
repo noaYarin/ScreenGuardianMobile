@@ -4,7 +4,6 @@ import {
   Pressable,
   ScrollView,
   useWindowDimensions,
-  Alert,
 } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -20,6 +19,8 @@ import { getAgeInFullYearsFromBirthDate } from "../../../../hooks/use-child-prof
 import { parseRouteParam } from "../ChildDetailsScreen/childDetailsRouteParams";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { deleteChildThunk } from "@/src/redux/thunks/childrenThunks";
+import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
+import { showAppToast } from "@/src/utils/appToast";
 
 type ActionCard = {
   key: string;
@@ -74,6 +75,7 @@ export default function ChildProfileScreen() {
   const dispatch = useDispatch<AppDispatch>();
   const params = useLocalSearchParams<{ id?: string; name?: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
 
   const childId = useMemo(() => parseRouteParam(params.id), [params.id]);
   const nameFromRoute = useMemo(() => parseRouteParam(params.name), [params.name]);
@@ -99,59 +101,43 @@ export default function ChildProfileScreen() {
   const contentMaxWidth = width >= 1200 ? 980 : width >= 900 ? 840 : undefined;
 
   const onPressDeleteChild = () => {
-    if (!childId || isDeleting) {
-      return;
+    if (!childId || isDeleting) return;
+    setDeleteConfirmVisible(true);
+  };
+
+  const confirmDeleteChild = async () => {
+    if (!childId || isDeleting) return;
+    setDeleteConfirmVisible(false);
+    try {
+      setIsDeleting(true);
+      await dispatch(deleteChildThunk(childId)).unwrap();
+      router.replace("/Parent/(tabs)/children");
+    } catch (error: any) {
+      showAppToast(
+        error?.message ||
+          t("childProfile.delete_error_message", "Could not delete the child."),
+        t("common.error", "Error")
+      );
+    } finally {
+      setIsDeleting(false);
     }
-
-    Alert.alert(
-      t("childProfile.delete_confirm_title", "Delete child"),
-      t(
-        "childProfile.delete_confirm_message",
-        "Are you sure you want to delete this child? This action cannot be undone."
-      ),
-      [
-        {
-          text: t("common.cancel", "Cancel"),
-          style: "cancel",
-        },
-        {
-          text: t("common.delete", "Delete"),
-          style: "destructive",
-          onPress: async () => {
-            try {
-              setIsDeleting(true);
-
-              await dispatch(deleteChildThunk(childId)).unwrap();
-
-              Alert.alert(
-                t("childProfile.delete_success_title", "Deleted"),
-                t(
-                  "childProfile.delete_success_message",
-                  "The child was deleted successfully."
-                )
-              );
-
-              router.replace("/Parent/(tabs)/children");
-            } catch (error: any) {
-              Alert.alert(
-                t("common.error", "Error"),
-                error?.message ||
-                  t(
-                    "childProfile.delete_error_message",
-                    "Could not delete the child."
-                  )
-              );
-            } finally {
-              setIsDeleting(false);
-            }
-          },
-        },
-      ]
-    );
   };
 
   return (
     <>
+      <ConfirmDialog
+        visible={deleteConfirmVisible}
+        title={t("childProfile.delete_confirm_title", "Delete child")}
+        message={t(
+          "childProfile.delete_confirm_message",
+          "Are you sure you want to delete this child? This action cannot be undone."
+        )}
+        cancelLabel={t("common.cancel", "Cancel")}
+        confirmLabel={t("common.delete", "Delete")}
+        destructive
+        onCancel={() => setDeleteConfirmVisible(false)}
+        onConfirm={confirmDeleteChild}
+      />
       <Stack.Screen
         options={{
           title: t("childProfile.title"),

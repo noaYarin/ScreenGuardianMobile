@@ -12,8 +12,10 @@ import {
 } from "../dal/pairing.dal.js";
 import { getChildByParentId, getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
-import { createDevice, findDeviceByBarcodeOrCode, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
-import { DeviceType } from "../constants/deviceType.js";
+import { createDevice, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
+import { notifyParent } from "./notification.service.js";
+import { NotificationType } from "../constants/notificationType.js";
+import { NotificationSeverity } from "../constants/severity.js";
 
 const PAIRING_TTL_MINUTES = 5;
 const SHORT_CODE_MAX_ATTEMPTS = 20;
@@ -143,6 +145,21 @@ if (currentDevice) {
 
   const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
   const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
+
+  const displayDeviceName = deviceName != null && String(deviceName).trim() !== "" ? String(deviceName).trim() : "New device";
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.DEVICE_ADDED,
+      severity: NotificationSeverity.INFO,
+      title: "Device Added",
+      description: `${displayDeviceName} was linked${childName ? ` to ${childName}` : ""}`
+    });
+  } catch (err) {
+    console.error("notifyParent failed in linkByCodeOrToken:", err.message);
+  }
 
   return {
     ...tokenData,

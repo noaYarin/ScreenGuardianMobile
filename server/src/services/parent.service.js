@@ -14,11 +14,28 @@ import {
 import { validateAndBuildChildDoc } from "./child.service.js";
 import { assertBoolean } from "../utils/validators.js";
 import { findDevicesByChildId } from "../dal/device.dal.js";
+import { notifyParent } from "./notification.service.js";
+import { NotificationType } from "../constants/notificationType.js";
+import { NotificationSeverity } from "../constants/severity.js";
 
 export async function addChild(parentId, body) {
   const childDoc = validateAndBuildChildDoc(body);
   const updated = await pushChildToParent(parentId, childDoc);
   const addedChild = updated.children[updated.children.length - 1];
+
+  try {
+    await notifyParent({
+      parentId,
+      childId: addedChild?._id,
+      type: NotificationType.CHILD_ADDED,
+      severity: NotificationSeverity.INFO,
+      title: "Child Added",
+      description: `A new child profile was added${addedChild?.name ? `: ${addedChild.name}` : ""}`
+    });
+  } catch (err) {
+    console.error("notifyParent failed in addChild:", err.message);
+  }
+
   return { child: addedChild };
 }
 
@@ -207,6 +224,8 @@ export async function deleteChild(parentId, childId) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);
   }
 
+  const childName = child?.name != null ? String(child.name) : "";
+
   const devices = await findDevicesByChildId(childId);
 
   if (devices && devices.length > 0) {
@@ -221,6 +240,19 @@ export async function deleteChild(parentId, childId) {
 
   if (!updatedParent) {
     throw new AppError(CommonErrors.CHILD_NOT_FOUND);
+  }
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.CHILD_DELETED,
+      severity: NotificationSeverity.WARNING,
+      title: "Child Deleted",
+      description: childName ? `Child profile removed: ${childName}` : "A child profile was removed"
+    });
+  } catch (err) {
+    console.error("notifyParent failed in deleteChild:", err.message);
   }
 
   return {

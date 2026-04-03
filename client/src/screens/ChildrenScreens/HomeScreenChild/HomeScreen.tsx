@@ -1,10 +1,11 @@
 // client/src/screens/ChildrenScreens/HomeScreenChild/HomeScreen.tsx
 
 import React, { useEffect, useMemo, useState } from "react";
-import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle, Alert } from "react-native";
+import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
 import { router, Stack, useLocalSearchParams, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Toast from "react-native-root-toast";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -108,14 +109,17 @@ export default function HomeScreen() {
         }));
       }
     } catch (error) {
-      Alert.alert(t("common.error"), t("common.error_message", "Failed to sync location"));
+      Toast.show(`${t("common.error")}\n${t("common.error_message", "Failed to sync location")}`, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+      });
     }
   };
 
   useEffect(() => {
     if (!activeChildId) return;
   
-    connectSocket(String(activeChildId));
+    connectSocket(String(activeChildId), "child", parentId ? { parentId: String(parentId) } : undefined);
   
     const unsubscribe = onEvent(REQUEST_CHILD_LOCATION, (data) => {
         handleSyncLocation(data);

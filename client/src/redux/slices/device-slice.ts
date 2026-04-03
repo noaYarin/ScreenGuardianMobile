@@ -8,7 +8,7 @@ import {
   updateDeviceLocation
 } from "../thunks/deviceThunks";
 
-import { logout } from "./auth-slice";
+
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
 type DevicesState = {
@@ -32,6 +32,11 @@ const devicesSlice = createSlice({
       delete state.byChildId[id];
       delete state.statusByChildId[id];
       delete state.errorByChildId[id];
+    },
+    clearAllDevices: (state) => {
+      state.byChildId = {};
+      state.statusByChildId = {};
+      state.errorByChildId = {};
     },
     setDeviceLockLocal: (
       state,
@@ -131,19 +136,15 @@ const devicesSlice = createSlice({
         state.byChildId[childId][idx] = device;
       })
 
-      .addCase(logout, (state) => {
-        state.byChildId = {};
-        state.statusByChildId = {};
-        state.errorByChildId = {};
-      });
   },
 });
 
-export const { clearDevicesForChild, setDeviceLockLocal, updateDeviceFromSocket  } =
+export const { clearDevicesForChild, clearAllDevices, setDeviceLockLocal, updateDeviceFromSocket  } =
   devicesSlice.actions;
 export {
   fetchDevicesByChild,
   deleteDeviceForChild,
   updateDeviceScreenTimeThunk,
 } from "../thunks/deviceThunks";
+
 export default devicesSlice.reducer;

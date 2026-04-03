@@ -6,7 +6,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./linkDeviceScreen.styles";
-import { generateCodeForPairingChild, setError } from "@/src/redux/slices/auth-slice";
+import { generateCodeForPairingChild } from "@/src/redux/thunks/authThunks";
+import { setError } from "@/src/redux/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Pressable, useWindowDimensions, Platform, Alert, ActivityIndicator, TouchableOpacity } from "react-native";
+import { View, ScrollView, Pressable, useWindowDimensions, Platform, ActivityIndicator, TouchableOpacity } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
 import { router } from "expo-router"; 
 import { AppDispatch } from "@/src/redux/store/types";
+import { showAppToast } from "@/src/utils/appToast";
 
 type GenderValue = "boy" | "girl" | "other";
 
@@ -89,14 +90,13 @@ export default function EditChildProfileScreen() {
         birthDate: birthDate.toISOString(),
         gender,
       })).unwrap();
-      Alert.alert(
-      t("common.success"), 
-      t("common.success_message"),
-      [{ text: "OK", onPress: () => router.back() }]
-    );
-      
+
+      router.back();
     } catch (error) {
-      Alert.alert(t("common.error"), error as string || t("common.error_message"));
+      showAppToast(
+        typeof error === "string" ? error : t("common.error_message"),
+        t("common.error")
+      );
     }
   };
 

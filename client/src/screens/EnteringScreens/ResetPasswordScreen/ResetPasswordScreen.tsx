@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, TextInput, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
+import { View, TextInput, Pressable, KeyboardAvoidingView, Platform } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -8,8 +8,10 @@ import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AuthFormCard from "../../../components/AuthFormCard/AuthFormCard";
 import { validateResetPassword } from "@/src/validation/authValidation";
 import { AppDispatch } from "@/src/redux/store/types";
-import { setError, resetPassword } from "@/src/redux/slices/auth-slice";
+import { resetPassword } from "@/src/redux/thunks/authThunks";
+import { setError } from "@/src/redux/slices/auth-slice";
 import { enteringFormStyles as styles } from "@/src/components/AuthFormCard/AuthFormCard.styles";
+import { showAppToast } from "@/src/utils/appToast";
 
 const ICON = {
   lock: "lock-reset",
@@ -50,19 +52,11 @@ export default function ResetPasswordScreen() {
         })
       ).unwrap();
 
-      Alert.alert(
-        t("resetPassword.success_title"),
-        t("resetPassword.success_message"),
-        [
-          {
-            text: t("common.ok"),
-            onPress: () => {
-              dispatch(setError(null));
-              router.replace("/Entering/loginParent" as any);
-            },
-          },
-        ]
-      );
+      showAppToast(t("resetPassword.success_message"), t("resetPassword.success_title"));
+      dispatch(setError(null));
+      setTimeout(() => {
+        router.replace("/Entering/loginParent" as any);
+      }, 600);
     } catch {
       dispatch(setError("resetPassword.generic_error"));
     }

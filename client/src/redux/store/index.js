@@ -6,6 +6,7 @@ import devicesReducer from "../slices/device-slice";
 import requestsReducer from "../slices/requests-slice";
 import parentHomeReducer from "../slices/parentHome-slice";
 import { injectDispatch } from '../../api/request';
+import notificationsReducer from "../slices/notification-slice";
 
 export const store = configureStore({
   reducer: {
@@ -15,9 +16,9 @@ export const store = configureStore({
     devices: devicesReducer,
     requests: requestsReducer,
     parentHome: parentHomeReducer,
+    notifications: notificationsReducer,
   },
 });
 
-injectDispatch(store.dispatch);
 export default store;
 

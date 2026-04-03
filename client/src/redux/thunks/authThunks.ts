@@ -8,7 +8,6 @@ import {
   apiLinkDevice,
   apiLogoutParent,
 } from "../../api/auth";
-import { getMyChildren } from "../../api/parent";
 
 // Payload when auth succeeds (login, register, reset password)
 type AuthSuccessPayload = {

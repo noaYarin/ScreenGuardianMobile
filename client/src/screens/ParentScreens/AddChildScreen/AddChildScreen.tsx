@@ -4,7 +4,6 @@ import {
   Pressable,
   TextInput,
   I18nManager,
-  Alert,
   useWindowDimensions,
   ActivityIndicator,
 } from "react-native";
@@ -21,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "@/src/redux/store/types";
 import { addChildThunk } from "@/src/redux/thunks/childrenThunks";
 import { clearChildrenError } from "@/src/redux/slices/children-slice";
+import { showAppToast } from "@/src/utils/appToast";
 
 function HeaderIconButton({
   name,
@@ -95,15 +95,12 @@ export default function AddChildScreen() {
       dispatch(clearChildrenError());
 
       if (!childName.trim()) {
-        Alert.alert(t("addChild.validation_title"), t("addChild.validation_name"));
+        showAppToast(t("addChild.validation_name"), t("addChild.validation_title"));
         return;
       }
 
       if (!isValidDate(birthDate)) {
-        Alert.alert(
-          t("addChild.validation_title"),
-          t("addChild.validation_birthdate")
-        );
+        showAppToast(t("addChild.validation_birthdate"), t("addChild.validation_title"));
         return;
       }
 
@@ -115,12 +112,11 @@ export default function AddChildScreen() {
         })
       ).unwrap();
 
-      Alert.alert(t("addChild.success_title"), t("addChild.success_message"));
       router.back();
     } catch (err: any) {
-      Alert.alert(
-        t("addChild.validation_title"),
-        typeof err === "string" ? t(err) : t("common.generic_error")
+      showAppToast(
+        typeof err === "string" ? t(err) : t("common.generic_error"),
+        t("addChild.validation_title")
       );
     }
   };

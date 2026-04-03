@@ -1,5 +1,7 @@
 import {  createNotification, findNotificationsByParentId, markNotificationAsReadById, markAllNotificationsAsRead} from "../dal/notification.dal.js";
 import { TargetRole } from "../constants/role.js";
+import { getIO } from "../socketHandler.js";
+import { NOTIFICATION_CREATED } from "../constants/socketEvents.js";
 
 export async function notifyParent({
     parentId,
@@ -9,7 +11,7 @@ export async function notifyParent({
     title,
     description
 }) {
-    return createNotification({
+    const notification = await createNotification({
         parentId,
         childId,
         targetRole: TargetRole.PARENT,
@@ -18,6 +20,17 @@ export async function notifyParent({
         title,
         description
     });
+
+    try {
+        const io = getIO();
+        if (io && parentId) {
+            io.to(`parent_${parentId}`).emit(NOTIFICATION_CREATED, notification);
+        }
+    } catch (err) {
+        console.error("socket emit failed in notifyParent:", err.message);
+    }
+
+    return notification;
 }
 
 export async function notifyChild({
@@ -28,7 +41,7 @@ export async function notifyChild({
     title,
     description
 }) {
-    return createNotification({
+    const notification = await createNotification({
         parentId,
         childId,
         targetRole: TargetRole.CHILD,
@@ -37,6 +50,17 @@ export async function notifyChild({
         title,
         description
     });
+
+    try {
+        const io = getIO();
+        if (io && childId) {
+            io.to(`child_${childId}`).emit(NOTIFICATION_CREATED, notification);
+        }
+    } catch (err) {
+        console.error("socket emit failed in notifyChild:", err.message);
+    }
+
+    return notification;
 }
 
 // Get all notifications for the authenticated parent

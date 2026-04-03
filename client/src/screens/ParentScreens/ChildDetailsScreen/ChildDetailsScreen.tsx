@@ -5,7 +5,6 @@ import {
   RefreshControl,
   useWindowDimensions,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
@@ -18,16 +17,28 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useChildProfileLabels } from "../../../../hooks/use-child-profile-labels";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+<<<<<<< HEAD
 import {
   fetchDevicesByChild,
   deleteDeviceForChild,
   setDeviceLockThunk,
 } from "@/src/redux/thunks/deviceThunks";
+=======
+import { fetchDevicesByChild, deleteDeviceForChild } from "@/src/redux/thunks/deviceThunks";
+import { clearAllDevices, setDeviceLockLocal } from "@/src/redux/slices/device-slice";
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
 import { childDetailsStyles as styles } from "@/src/components/ChildDetails/childDetails.styles";
 import { parseRouteParam } from "./childDetailsRouteParams";
+import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
+import { showAppToast } from "@/src/utils/appToast";
+import { disconnectSocket, emitEvent, onEvent } from "@/src/services/socket";
+import { clearChildrenList } from "@/src/redux/slices/children-slice";
+import { removeChildToken } from "@/src/services/authStorage";
+import Toast from "react-native-root-toast";
+import { DELETE_DEVICE } from "@/src/constants/socketEvents";
 
 export default function ChildDetailsScreen() {
   const { t } = useTranslation();
@@ -58,6 +69,10 @@ export default function ChildDetailsScreen() {
   const [isDevicesExpanded, setIsDevicesExpanded] = useState(false);
   const [devicesRefreshing, setDevicesRefreshing] = useState(false);
   const [deletingDeviceId, setDeletingDeviceId] = useState<string | null>(null);
+  const [deviceDeleteDialog, setDeviceDeleteDialog] = useState<{
+    deviceId: string;
+    displayName: string;
+  } | null>(null);
 
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
@@ -157,6 +172,7 @@ export default function ChildDetailsScreen() {
     } as never);
   }, [effectiveChildId, childName]);
 
+<<<<<<< HEAD
   const handleDeleteDevice = useCallback(
     (deviceId: string, deviceDisplayName: string) => {
       if (!effectiveChildId || deletingDeviceId) return;
@@ -176,6 +192,27 @@ export default function ChildDetailsScreen() {
             style: "destructive",
             onPress: async () => {
               setDeletingDeviceId(deviceId);
+=======
+  const handleDeleteDevice = useCallback((deviceId: string, deviceDisplayName: string) => {
+    if (!effectiveChildId || deletingDeviceId) return;
+    setDeviceDeleteDialog({ deviceId, displayName: deviceDisplayName });
+  }, [effectiveChildId, deletingDeviceId]);
+
+  const confirmDeleteDevice = useCallback(async () => {
+    if (!effectiveChildId || !deviceDeleteDialog || deletingDeviceId) return;
+    const { deviceId } = deviceDeleteDialog;
+    setDeviceDeleteDialog(null);
+    setDeletingDeviceId(deviceId);
+    try {
+      await dispatch(deleteDeviceForChild({ childId: effectiveChildId, deviceId })).unwrap();
+      emitEvent(DELETE_DEVICE, { deviceId: deviceId,childId: effectiveChildId});
+    } catch {
+      showAppToast(t("childDetails.delete_device_error"), t("common.error"));
+    } finally {
+      setDeletingDeviceId(null);
+    }
+  }, [dispatch, effectiveChildId, deviceDeleteDialog, deletingDeviceId, t]);
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
 
               try {
                 await dispatch(
@@ -279,6 +316,22 @@ export default function ChildDetailsScreen() {
 
   return (
     <ScreenLayout>
+      <ConfirmDialog
+        visible={deviceDeleteDialog != null}
+        title={
+          deviceDeleteDialog
+            ? t("childDetails.delete_device_title", { device: deviceDeleteDialog.displayName })
+            : ""
+        }
+        message={t("childDetails.delete_device_message", {
+          child: childName.trim() || t("childDetails.devices_title"),
+        })}
+        cancelLabel={t("childDetails.delete_device_cancel")}
+        confirmLabel={t("childDetails.delete_device_confirm")}
+        destructive
+        onCancel={() => setDeviceDeleteDialog(null)}
+        onConfirm={confirmDeleteDevice}
+      />
       <ScrollView
         style={styles.scrollRoot}
         contentContainerStyle={styles.scrollContent}

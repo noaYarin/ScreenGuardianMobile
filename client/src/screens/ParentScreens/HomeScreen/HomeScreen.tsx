@@ -11,8 +11,13 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
+<<<<<<< HEAD
 import { connectSocket } from "@/src/services/socket";
 import { fetchParentHomeSummaryThunk } from "@/src/redux/thunks/parentHomeThunks";
+=======
+import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
+import { fetchParentNotificationsThunk } from "@/src/redux/thunks/notificationThunks";
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
 
 type ChildCard = {
   id: string;
@@ -36,6 +41,7 @@ export default function HomeParentScreen() {
   const dispatch = useDispatch<AppDispatch>();
 
   const { parentId } = useSelector((state: RootState) => state.auth ?? {});
+<<<<<<< HEAD
 
   const { childrenSummary, isLoading, isRefreshing, error } = useSelector(
     (state: RootState) => state.parentHome
@@ -49,6 +55,15 @@ export default function HomeParentScreen() {
     if (parentId) {
       connectSocket(parentId);
     }
+=======
+  const notifications = useSelector((state: RootState) => state.notifications?.items ?? []);
+  const children = Array.isArray(childrenList) ? childrenList : [];
+  const unreadNotificationsCount = notifications.filter((n: any) => !n?.isRead).length;
+
+  useEffect(() => {
+    dispatch(getMyChildrenThunk());
+    dispatch(fetchParentNotificationsThunk());
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
   }, [dispatch, parentId]);
 
   useFocusEffect(
@@ -114,6 +129,32 @@ export default function HomeParentScreen() {
     </Pressable>
   );
 
+<<<<<<< HEAD
+=======
+const bellButton = (
+  <Pressable
+    onPress={onPressNotifications}
+    accessibilityRole="button"
+    accessibilityLabel={t("homeParent.notifications_a11y")}
+    hitSlop={10}
+    style={({ pressed }) => [
+      styles.headerMenuButton,
+      pressed && styles.headerMenuButtonPressed,
+    ]}
+  >
+    <View style={styles.bellWrap}>
+      <MaterialCommunityIcons name={ICON.bell} size={24} color="#0F172A" />
+      {unreadNotificationsCount > 0 ? (
+        <View style={styles.bellBadge} pointerEvents="none">
+          <AppText weight="bold" style={styles.bellBadgeText}>
+            {unreadNotificationsCount > 99 ? "99+" : String(unreadNotificationsCount)}
+          </AppText>
+        </View>
+      ) : null}
+    </View>
+  </Pressable>
+);
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
   const onPressOpenMenu = () => router.push("/Parent/homeMenu" as Href);
 
   const menuButton = (

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Pressable, TextInput, useWindowDimensions, Alert } from "react-native";
+import { View, Pressable, TextInput, useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -12,9 +12,13 @@ import { buildDeviceConnectionPayload } from "../../../lib/deviceConnectionInfo"
 import { hydrateChildSession } from "../../../redux/slices/auth-slice";
 import type { AppDispatch } from "../../../redux/store/types";
 import { styles } from "./styles";
+<<<<<<< HEAD
 import { NativeModules } from "react-native";
 import * as Location from "expo-location";  
 import { updateDeviceLocation } from "../../../redux/thunks/deviceThunks";
+=======
+import { showAppToast } from "@/src/utils/appToast";
+>>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
 
 /** After a failed link, wait before re-enabling scan so the camera does not instantly re-read the same QR. */
 const ERROR_RELEASE_DELAY = 750;
@@ -101,7 +105,10 @@ export default function LinkChildrenScreen() {
         params: { initialName: res.childName ?? "" }
       });
     } catch(err: any) {
-      Alert.alert(t("linkChildren.error_title"), err?.error?.message );
+      showAppToast(
+        err?.error?.message ?? t("common.error_message"),
+        t("linkChildren.error_title")
+      );
       scheduleFinishLinkAfterError();
       router.replace("Entering/roleSelectionRoute" as any);
     }
