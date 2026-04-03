@@ -4,6 +4,7 @@ import {
   REQUEST_REFRESH_FROM_PARENT, 
   LOCATION_LIVE_UPDATE, 
   PARENT_LOGOUT, 
+  DELETE_DEVICE,
   FORCE_CHILD_LOGOUT,
   JOIN_PARENT,
   JOIN_CHILD
@@ -83,6 +84,23 @@ export function initSocket(httpServer) {
           });
         });
       }
+    });
+
+    socket.on(DELETE_DEVICE, (data) => {
+      const { deviceId, childId } = data; 
+      
+      if (!childId || !deviceId) {
+        console.log("[DeleteDevice] Missing childId or deviceId");
+        return;
+      }
+    
+      const childRoom = `child_${childId}`;
+      console.log(`[DeleteDevice] Parent requesting delete for device ${deviceId} in room: ${childRoom}`);
+    
+      io.to(childRoom).emit(FORCE_CHILD_LOGOUT, { 
+        deviceId,
+        message: "This device has been disconnected by the parent." 
+      });
     });
 
     socket.on("disconnect", () => {

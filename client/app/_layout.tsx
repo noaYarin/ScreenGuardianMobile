@@ -28,11 +28,19 @@ function AppStack() {
   const segments = useSegments() as string[];
 
   const { token, childToken, parentId, activeChildId } = useSelector((state: any) => state.auth);
+  const myCurrentDeviceId = useSelector((state: any) => state.auth.deviceId);
   useEffect(() => {
     if (childToken && activeChildId) {
       connectSocket(String(activeChildId), "child", parentId ? { parentId: String(parentId) } : undefined);
   
-      onEvent(FORCE_CHILD_LOGOUT, async () => {
+      onEvent(FORCE_CHILD_LOGOUT, async (data: any) => {
+        const targetDeviceId = data?.deviceId;
+
+        if (targetDeviceId && targetDeviceId !== myCurrentDeviceId) {
+          console.log("Logout event received for a different device. Ignoring.");
+          return;
+        }
+
         Toast.show("System Message\nThe device has been disconnected by the parent", {
           duration: Toast.durations.LONG,
           position: Toast.positions.TOP,

@@ -19,7 +19,7 @@ import { useChildProfileLabels } from "../../../../hooks/use-child-profile-label
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 import { fetchDevicesByChild, deleteDeviceForChild } from "@/src/redux/thunks/deviceThunks";
-import { setDeviceLockLocal } from "@/src/redux/slices/device-slice";
+import { clearAllDevices, setDeviceLockLocal } from "@/src/redux/slices/device-slice";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
 import { mapDevicesToRows } from "@/src/components/ChildDetails/mapDevicesToRows";
@@ -27,6 +27,11 @@ import { childDetailsStyles as styles } from "@/src/components/ChildDetails/chil
 import { parseRouteParam } from "./childDetailsRouteParams";
 import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
 import { showAppToast } from "@/src/utils/appToast";
+import { disconnectSocket, emitEvent, onEvent } from "@/src/services/socket";
+import { clearChildrenList } from "@/src/redux/slices/children-slice";
+import { removeChildToken } from "@/src/services/authStorage";
+import Toast from "react-native-root-toast";
+import { DELETE_DEVICE } from "@/src/constants/socketEvents";
 
 export default function ChildDetailsScreen() {
   const { t } = useTranslation();
@@ -132,6 +137,7 @@ export default function ChildDetailsScreen() {
     setDeletingDeviceId(deviceId);
     try {
       await dispatch(deleteDeviceForChild({ childId: effectiveChildId, deviceId })).unwrap();
+      emitEvent(DELETE_DEVICE, { deviceId: deviceId,childId: effectiveChildId});
     } catch {
       showAppToast(t("childDetails.delete_device_error"), t("common.error"));
     } finally {
