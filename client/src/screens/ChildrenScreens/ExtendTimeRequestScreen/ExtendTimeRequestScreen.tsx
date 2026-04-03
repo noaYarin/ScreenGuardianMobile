@@ -11,7 +11,7 @@ import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
-
+import { NativeModules } from "react-native";
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
 import { styles } from "./styles";
@@ -23,6 +23,8 @@ import {
   createRequestThunk,
   fetchMyRequestsThunk,
 } from "@/src/redux/thunks/requestThunks";
+
+const { DeviceControl } = NativeModules;
 
 type MinuteOption = {
   minutes: number;
@@ -127,7 +129,14 @@ export default function ExtendTimeRequestScreen() {
         return;
       }
 
-      if (!device?.screenTime?.isLimitEnabled) {
+      await DeviceControl.syncPolicyNow();
+      const nativeState = await DeviceControl.getRemainingTime();
+
+      const hasActiveLimit =
+        !!nativeState?.limitEnabled &&
+        Number(nativeState?.dailyLimitMinutes ?? 0) > 0;
+
+      if (!hasActiveLimit) {
         Alert.alert(
           t("common.error"),
           t(
@@ -399,12 +408,12 @@ export default function ExtendTimeRequestScreen() {
                 <AppText weight="extraBold" style={styles.sendBtnText}>
                   {hasPendingRequestForThisDevice
                     ? t(
-                        "extendTime.alreadyRequested",
-                        "A pending extension request already exists for this device"
-                      )
+                      "extendTime.alreadyRequested",
+                      "A pending extension request already exists for this device"
+                    )
                     : isSubmitting
-                    ? t("extendTime.sending", "Sending...")
-                    : t("extendTime.send")}
+                      ? t("extendTime.sending", "Sending...")
+                      : t("extendTime.send")}
                 </AppText>
               </Pressable>
             </View>
@@ -436,8 +445,8 @@ function MinuteCard({
     tile === "blue"
       ? styles.tileBlue
       : tile === "purple"
-      ? styles.tilePurple
-      : styles.tileGreen;
+        ? styles.tilePurple
+        : styles.tileGreen;
 
   const iconColor =
     tile === "blue" ? "#2F6DEB" : tile === "purple" ? "#6D28D9" : "#0F8A5F";
