@@ -6,7 +6,6 @@ import {
   createRequestThunk,
   fetchMyRequestsThunk,
 } from "../thunks/requestThunks";
-import { logout } from "./auth-slice";
 
 type RequestsState = {
   pending: ParentExtensionRequest[];
@@ -74,12 +73,6 @@ const requestsSlice = createSlice({
         state.pending = state.pending.filter(
           (req) => String(req._id) !== String(action.payload._id)
         );
-      })
-      .addCase(logout, (state) => {
-        state.pending = [];
-        state.mine = [];
-        state.status = "idle";
-        state.error = null;
       });
   },
 });

@@ -115,7 +115,6 @@ export async function lockDevice(parentId, deviceId) {
       parentId,
       childId: device.childId,
       actionType: AuditActionType.LOCK_DEVICE,
-      description: "Device locked"
     });
   } catch (err) {
     console.error("sendAuditLog failed in lockDevice:", err.message);
@@ -150,7 +149,6 @@ export async function unlockDevice(parentId, deviceId) {
       parentId,
       childId: device.childId,
       actionType: AuditActionType.UNLOCK_DEVICE,
-      description: "Device Unlocked"
     });
   } catch (err) {
     console.error("sendAuditLog failed in unlockDevice:", err.message);
@@ -228,7 +226,6 @@ export async function updateDeviceScreenTime(parentId, deviceId, body) {
       parentId,
       childId: device.childId,
       actionType: AuditActionType.UPDATE_SCREEN_TIME,
-      description: "Screen time limits updated"
     });
   } catch (err) {
     console.error("sendAuditLog failed in updateDeviceScreenTime:", err.message);
@@ -451,7 +448,6 @@ export async function updateDeviceDailyLimitService(parentId, deviceId, body) {
       parentId,
       childId: device.childId,
       actionType: AuditActionType.UPDATE_SCREEN_TIME,
-      description: "Daily screen time limit updated"
     });
   } catch (err) {
     console.error("sendAuditLog failed in updateDeviceDailyLimitService:", err.message);
@@ -634,7 +630,6 @@ export async function updateDeviceUsageByChild({
         parentId: lockedDevice.parentId,
         childId: lockedDevice.childId,
         actionType: AuditActionType.LOCK_DEVICE,
-        description: "Device locked due to screen time limit"
       });
     } catch (err) {
       console.error("sendAuditLog failed in updateDeviceUsageByChild (ended):", err.message);

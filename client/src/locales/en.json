@@ -946,59 +946,57 @@
     }
   },
   "activityHistory": {
-    "title": "Activity History",
-    "heading": "Activity History",
-    "subtitle": "A clean and professional view of recent actions across your children",
-    "childSectionTitle": "Choose child",
-    "filterTitle": "Filter activity",
-    "activityListTitle": "Recent activity",
-    "resultCount": "{{count}} results",
-    "activityCardA11y": "{{title}}, child: {{childName}}, time: {{time}}",
+    "title": "היסטוריית פעילות",
+    "heading": "היסטוריית פעילות",
+    "subtitle": "מעקב נוח וברור אחרי פעולות שבוצעו לילדים לאורך היום",
+    "childSectionTitle": "בחירת ילד",
+    "filterTitle": "סינון פעילות",
+    "activityListTitle": "פעילות אחרונה",
+    "resultCount": "{{count}} תוצאות",
+    "activityCardA11y": "{{title}}, ילד: {{childName}}, שעה: {{time}}",
+    "fetch_failed": "טעינת היסטוריית הפעילות נכשלה",
     "filters": {
-      "all": "All",
-      "locks": "Locks",
-      "extensions": "Extensions",
-      "updates": "Updates"
+      "all": "הכל",
+      "locks": "נעילות",
+      "extensions": "הארכות זמן",
+      "updates": "עדכונים"
     },
     "summary": {
-      "today": "Today's events",
-      "locks": "Locks",
-      "extensions": "Extensions"
-    },
-    "children": {
-      "tomerSubtitle": "Active today",
-      "yaelSubtitle": "Balanced usage",
-      "noamSubtitle": "Usage limits"
+      "today": "פעילויות היום",
+      "locks": "נעילות",
+      "extensions": "הארכות"
     },
     "items": {
-      "screenLocked": {
-        "title": "Device locked",
-        "description": "{{childName}}'s device was locked after screen time ended"
+      "lockDevice": {
+        "title": "נעילת מכשיר",
+        "description": "המכשיר של {{childName}} ננעל"
       },
-      "extensionApproved": {
-        "title": "Extension approved",
-        "description": "Extra screen time was approved for {{childName}}"
+      "unlockDevice": {
+        "title": "שחרור נעילת מכשיר",
+        "description": "הנעילה של המכשיר של {{childName}} הוסרה"
       },
-      "dailyLimitUpdated": {
-        "title": "Daily limit updated",
-        "description": "{{childName}}'s daily usage limit was updated"
+      "approveRequest": {
+        "title": "אישור הארכת זמן",
+        "description": "אושרה תוספת זמן מסך עבור {{childName}}"
       },
-      "extensionRequested": {
-        "title": "New extension request",
-        "description": "{{childName}} sent a request for more screen time"
+      "rejectRequest": {
+        "title": "דחיית בקשת הארכה",
+        "description": "בקשת הארכת הזמן של {{childName}} נדחתה"
       },
-      "appLocked": {
-        "title": "App blocked",
-        "description": "An app was blocked on {{childName}}'s device"
+      "updateScreenTime": {
+        "title": "עדכון זמן מסך",
+        "description": "הגדרות זמן המסך של {{childName}} עודכנו"
       },
-      "deviceLocked": {
-        "title": "Remote device lock",
-        "description": "A manual lock was triggered on {{childName}}'s device"
+      "default": {
+        "title": "פעילות",
+        "description": "נרשמה פעילות חדשה עבור {{childName}}"
       }
     },
     "empty": {
-      "title": "No activity found",
-      "subtitle": "Try switching the selected child or changing the filter"
+      "title": "לא נמצאה פעילות",
+      "subtitle": "נסי לבחור ילד אחר או לשנות את הסינון כדי לראות תוצאות",
+      "noChildrenTitle": "לא נמצאו ילדים",
+      "noChildrenSubtitle": "עדיין לא קושרו ילדים לחשבון הזה."
     }
   }
 }

@@ -173,9 +173,6 @@ export async function decideRequest({ parentId, requestId, decision }) {
                 actionType: decision === RequestStatus.APPROVED
                     ? AuditActionType.APPROVE_REQUEST
                     : AuditActionType.REJECT_REQUEST,
-                description: decision === RequestStatus.APPROVED
-                    ? "Parent approved extension request"
-                    : "Parent rejected extension request"
             });
         } catch (err) {
             console.error("sendAuditLog failed in decideRequest:", err.message);
