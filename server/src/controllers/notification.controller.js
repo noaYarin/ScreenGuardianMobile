@@ -9,11 +9,23 @@ import {
 export async function getParentNotificationsController(req, res, next) {
   try {
     const parentId = req.user.parentId;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;  
+    const { notifications, total, pages } = await getParentNotifications(parentId, page, limit);
 
-    const data = await getParentNotifications(parentId);
-
-    res.status(200).json({ ok: true, data });
-  } catch (err) {
+    res.status(200).json({ 
+      ok: true,
+      data: { 
+        notifications,
+        pagination: {
+          total,
+          page,
+          pages,
+          limit
+        }
+      } 
+    }); 
+   } catch (err) {
     next(err);
   }
 }

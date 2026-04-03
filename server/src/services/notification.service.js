@@ -1,4 +1,4 @@
-import {  createNotification, findNotificationsByParentId, markNotificationAsReadById, markAllNotificationsAsRead} from "../dal/notification.dal.js";
+import {  createNotification, findNotificationsWithPagination, markNotificationAsReadById, markAllNotificationsAsRead} from "../dal/notification.dal.js";
 import { TargetRole } from "../constants/role.js";
 import { getIO } from "../socketHandler.js";
 import { NOTIFICATION_CREATED } from "../constants/socketEvents.js";
@@ -64,8 +64,17 @@ export async function notifyChild({
 }
 
 // Get all notifications for the authenticated parent
-export async function getParentNotifications(parentId) {
-    return findNotificationsByParentId(parentId);
+export async function getParentNotifications(parentId, page = 1, limit = 10) {
+    // Calculate the number of documents to skip
+    const skip = (page - 1) * limit;
+
+    const { notifications, total } = await findNotificationsWithPagination(parentId, skip, limit);
+
+    return {
+        notifications,
+        total,
+        pages: Math.ceil(total / limit)
+    };
 }
 
 // Mark a notification as read

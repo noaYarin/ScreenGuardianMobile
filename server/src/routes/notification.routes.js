@@ -4,8 +4,8 @@ import { requireParent } from "../middlewares/requireParent.js";
 
 import {
   getParentNotificationsController,
-  markNotificationAsReadController,
-  readAllNotificationsController
+  readAllNotificationsController,
+  markNotificationAsReadController
 } from "../controllers/notification.controller.js";
 
 const router = Router();

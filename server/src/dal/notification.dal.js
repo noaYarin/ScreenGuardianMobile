@@ -10,13 +10,17 @@ export async function createNotification(doc) {
 }
 
 // Return all notifications that belong to a specific parent
-export async function findNotificationsByParentId(parentId) {
+export async function findNotificationsWithPagination(parentId, skip, limit) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  const [notifications, total] = await Promise.all([
+    NotificationModel.find({ parentId, targetRole: "PARENT" })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+    NotificationModel.countDocuments({ parentId, targetRole: "PARENT" })
+]);
 
-  return NotificationModel
-    .find({ parentId, targetRole: TargetRole.PARENT })
-    .sort({ createdAt: -1 })
-    .lean();
+return { notifications, total };
 }
 
 // Return a notification by its id
