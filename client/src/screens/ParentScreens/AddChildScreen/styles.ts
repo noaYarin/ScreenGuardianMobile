@@ -136,4 +136,93 @@ export const styles = StyleSheet.create({
   bottomSpacer: {
     height: 20,
   },
+  dateFieldButton: {
+  borderRadius: 18,
+  borderWidth: 1,
+  borderColor: "#DCE3F1",
+  backgroundColor: "#F8FAFC",
+  paddingHorizontal: 14,
+  paddingVertical: 14,
+},
+
+dateFieldButtonPressed: {
+  opacity: 0.9,
+},
+
+dateFieldContent: {
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 12,
+},
+
+dateFieldContentRtl: {
+  flexDirection: "row-reverse",
+},
+
+dateFieldContentLtr: {
+  flexDirection: "row",
+},
+
+dateFieldLeft: {
+  flex: 1,
+  alignItems: "center",
+  gap: 12,
+},
+
+dateIconWrap: {
+  width: 40,
+  height: 40,
+  borderRadius: 12,
+  backgroundColor: "#E0E7FF",
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+dateIconEmoji: {
+  fontSize: 18,
+},
+
+dateTextWrap: {
+  flex: 1,
+  gap: 4,
+},
+
+dateFieldLabel: {
+  fontSize: 13,
+  color: "#64748B",
+},
+
+dateFieldValue: {
+  fontSize: 16,
+  color: "#0F172A",
+},
+
+dateFieldChangeText: {
+  fontSize: 13,
+  color: "#2563EB",
+},
+
+iosPickerFooter: {
+  marginTop: 12,
+  alignItems: "flex-end",
+},
+
+iosPickerDoneButton: {
+  minWidth: 96,
+  borderRadius: 12,
+  paddingHorizontal: 16,
+  paddingVertical: 10,
+  backgroundColor: "#2563EB",
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+iosPickerDoneText: {
+  color: "#FFFFFF",
+  fontSize: 14,
+},
+
+pressedSoft: {
+  opacity: 0.9,
+},
 });

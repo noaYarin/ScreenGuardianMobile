@@ -10,7 +10,10 @@
     "success": "הצלחה",
     "success_message": "הפעולה בוצעה בהצלחה.",
     "error": "שגיאה",
-    "error_message": "הפעולה נכשלה. נסו שוב."
+    "error_message": "הפעולה נכשלה. נסו שוב.",
+    "loading": "טוען...",
+    "minutes": "דק׳",
+    "child": "ילד"
   },
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
@@ -314,7 +317,28 @@
     "register_a11y": "כפתור הרשמה",
     "login_a11y": "מעבר למסך התחברות"
   },
+  "chooseChildAge": {
+    "title": "בחירת גיל",
+    "badge": "הגדרת פרופיל ילד",
+    "heading": "מה הגיל של הילד?",
+    "subtitle": "בחרי את גיל הילד כדי שנוכל להתאים בהמשך את ההגדרות, החוויה וההתראות בצורה מדויקת יותר.",
+    "selectedAgeLabel": "הגיל שנבחר",
+    "rangeTitle": "טווח נתמך",
+    "rangeValue": "{{min}}–{{max}}",
+    "continue": "המשך",
+    "continue_a11y": "המשך לשלב הבא",
+    "increase_a11y": "הגדל גיל",
+    "decrease_a11y": "הקטן גיל",
+    "ageGroup": {
+      "young": "מתאים לילדים צעירים",
+      "middle": "מתאים לילדי בית ספר",
+      "teen": "מתאים לבני נוער"
+    }
+  },
   "addChild": {
+    "birthdate_change": "שינוי",
+    "birthdate_done": "סיום",
+    "birthdate_done_a11y": "אישור תאריך לידה",
     "title": "הוספת ילד",
     "back_a11y": "חזרה למסך הקודם",
     "menu_a11y": "פתיחת תפריט",
@@ -463,45 +487,65 @@
   },
   "dailyTimeLimits": {
     "title": "הגבלות זמן מסך",
-    "heroTitle": "ניהול זמן מסך לפי ילד ומכשיר",
-    "heroSubtitle": "בחרי ילד ואז בחרי את המכשיר הרלוונטי כדי לעדכן מגבלות בצורה מדויקת.",
-    "childrenSectionTitle": "בחירת ילד",
-    "devicesSectionTitle": "בחירת מכשיר",
-    "childRole": "ניהול אישי",
-    "deviceContext": "{{childName}} · {{deviceName}}",
-    "usedLabel": "נוצל עד עכשיו",
-    "edit": "עריכת מגבלה",
-    "editA11y": "עריכת מגבלה עבור {{section}}",
-    "childTabA11y": "בחירת הילד {{name}}",
-    "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "heroTitle": "הגבלות זמן מסך",
+    "heroSubtitle": "בחרי ילד ומכשיר, ואז הגדירי כלל יומי לזמן מסך.",
+    "deviceContext": "{{childName}} • {{deviceName}}",
+    "edit": "עריכה",
+    "removeRule": "הסר הגדרה",
+    "usedToday": "נוצל היום",
+    "usedLabel": "נוצל",
+    "limitType": "כלל",
+    "limitLabel": "הגבלה יומית",
+    "unlimitedShort": "ללא הגבלה",
+    "unlimitedInfo": "למכשיר הזה לא תהיה הגבלת זמן מסך יומית.",
+    "minutesPerDay": "כמה דקות מותר ביום",
+    "enterMinutes": "הזיני מספר דקות",
+    "currentLimit": "ההגבלה הנוכחית",
+    "done": "סיום",
+    "createLimited": "הגדרת הגבלה יומית",
+    "createUnlimited": "ללא הגבלה",
     "daily": {
-      "title": "מגבלה יומית",
-      "summary": "המגבלה המוגדרת כרגע היא {{value}} ביום"
+      "title": "זמן מסך יומי"
     },
-    "weekly": {
-      "title": "מגבלה שבועית",
-      "summary": "המגבלה המוגדרת כרגע היא {{value}} בשבוע"
+    "mode": {
+      "limited": "הגבלה לפי דקות",
+      "unlimited": "ללא הגבלה"
     },
-    "range": {
-      "startLabel": "שימוש נוכחי",
-      "endLabel": "מגבלה"
+    "actions": {
+      "setDailyLimit": "הגדרת הגבלה יומית",
+      "noLimit": "ללא הגבלה"
     },
-    "devices": {
-      "phone": "טלפון",
-      "tablet": "טאבלט"
-    },"status": {
-  "ok": "תקין"
- }, "almostReached": "כמעט הגיע למגבלה",
-   "done": "סיום",
-    "currentLimit": "מגבלה נוכחית",
-     "editWeekly": "עריכת שבועי",
-  "a11y": {
-    "editWeeklySchedule": "עריכת לוח זמנים שבועי",
-    "editDailyLimit": "עריכת הגבלה יומית",
-    "doneEditing": "סיום עריכה",
-    "decreaseByFiveMinutes": "הפחתה של חמש דקות",
-    "increaseByFiveMinutes": "הוספה של חמש דקות"
-  }
+    "status": {
+      "ok": "בתוך ההגבלה",
+      "almostReached": "כמעט הגעת להגבלה",
+      "unlimited": "ללא הגבלה"
+    },
+    "summary": {
+      "unlimited": "למכשיר הזה אין כרגע הגבלת זמן מסך יומית.",
+      "limited": "המכשיר הזה מוגבל ל־{{value}} דקות ביום."
+    },
+    "validation": {
+      "invalidMinutes": "צריך להזין מספר דקות תקין שגדול מ־0."
+    },
+    "errors": {
+      "saveFailed": "שמירת הגדרת זמן המסך נכשלה.",
+      "removeFailed": "הסרת הגדרת זמן המסך נכשלה."
+    },
+    "empty": {
+      "noDevicesTitle": "לא נמצאו מכשירים",
+      "noDevicesSubtitle": "עדיין אין מכשירים מחוברים לילד הזה.",
+      "noRuleTitle": "עדיין אין כלל לזמן מסך",
+      "noRuleSubtitle": "אפשר להגדיר הגבלה יומית בדקות, או לבחור שלא תהיה למכשיר הזה הגבלה בכלל."
+    },
+    "a11y": {
+      "setDailyLimit": "הגדרת הגבלת זמן מסך יומית",
+      "setUnlimited": "הגדרת ללא הגבלת זמן מסך",
+      "modeLimited": "בחירה במצב הגבלה לפי דקות",
+      "modeUnlimited": "בחירה במצב ללא הגבלה",
+      "minutesInput": "מספר הדקות המותרות ביום",
+      "editRule": "עריכת כלל זמן מסך",
+      "removeRule": "הסרת כלל זמן מסך"
+    }
   },
   "childDeviceSelector": {
     "childrenSectionTitle": "בחירת ילד",
@@ -596,12 +640,6 @@
     "requestedMinutesLabel": "{{minutes}} דקות נוספות",
     "childSubtitles": {
       "personal": "ניהול אישי"
-    },
-    "devices": {
-      "galaxyS23": "Galaxy S23",
-      "ipadAir": "iPad Air",
-      "iphone13": "iPhone 13",
-      "lenovoTab": "Lenovo Tab"
     },
     "reasons": {
       "studyVideo": "סרטון לימודי",
@@ -744,7 +782,9 @@
   "unauthorized": "ההתחברות פגה, נא להתחבר מחדש.",
   "devices": {
     "fetch_devices_failed": "בעיה בטעינת המכשירים",
-    "fetch_device_failed": "בעיה בטעינת המכשיר"
+    "fetch_device_failed": "בעיה בטעינת המכשיר",
+    "defaultDeviceName": "מכשיר מחובר"
+
   },
   "childSelector": {
     "childrenSectionTitle": "בחירת ילד",

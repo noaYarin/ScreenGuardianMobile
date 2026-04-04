@@ -10,7 +10,10 @@
     "success": "Success",
     "success_message": "The action was successful.",
     "error": "Error",
-    "error_message": "The action failed. Please try again."
+    "error_message": "The action failed. Please try again.",
+    "loading": "Loading...",
+    "minutes": "min",
+    "child": "Child"
 
   },
   "children": {
@@ -354,7 +357,29 @@
       "genderOption": "Select gender: {{gender}}",
       "save": "Save child profile settings"
     },
+ "chooseChildAge": {
+    "title": "Choose Age",
+    "badge": "Child Profile Setup",
+    "heading": "What is the child's age?",
+    "subtitle": "Choose the child's age so we can later tailor settings, experience, and alerts more accurately.",
+    "selectedAgeLabel": "Selected age",
+    "rangeTitle": "Supported range",
+    "rangeValue": "{{min}}–{{max}}",
+    "continue": "Continue",
+    "continue_a11y": "Continue to the next step",
+    "increase_a11y": "Increase age",
+    "decrease_a11y": "Decrease age",
+    "ageGroup": {
+      "young": "Suitable for younger children",
+      "middle": "Suitable for school-age children",
+      "teen": "Suitable for teens"
+    }
+  },
+
   "addChild": {
+    "birthdate_change": "Change",
+    "birthdate_done": "Done",
+    "birthdate_done_a11y": "Confirm birth date",
     "title": "Add Child",
     "back_a11y": "Go back",
     "menu_a11y": "Open menu",
@@ -503,60 +528,67 @@
       "blockedAppsDescription": "Manage apps that should not be allowed."
     }
   },
- "dailyTimeLimits": {
+  "dailyTimeLimits": {
     "title": "Screen Time Limits",
-
-    "heroTitle": "Manage screen time per child and device",
-    "heroSubtitle": "Select a child and then choose the relevant device to adjust limits accurately.",
-
-    "childrenSectionTitle": "Select Child",
-    "devicesSectionTitle": "Select Device",
-
-    "childRole": "Personal Management",
-
-    "deviceContext": "{{childName}} · {{deviceName}}",
-
-    "usedLabel": "Used so far",
-
-    "edit": "Edit Limit",
-    "editA11y": "Edit limit for {{section}}",
-
-    "childTabA11y": "Select child {{name}}",
-    "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
-
+    "heroTitle": "Screen Time Limits",
+    "heroSubtitle": "Choose a child and device, then define a daily screen-time rule.",
+    "deviceContext": "{{childName}} • {{deviceName}}",
+    "edit": "Edit",
+    "removeRule": "Remove rule",
+    "usedToday": "Used today",
+    "usedLabel": "Used",
+    "limitType": "Rule",
+    "limitLabel": "Daily limit",
+    "unlimitedShort": "No limit",
+    "unlimitedInfo": "This device will not have a daily screen-time limit.",
+    "minutesPerDay": "Minutes allowed per day",
+    "enterMinutes": "Enter minutes",
+    "currentLimit": "Current limit",
+    "done": "Done",
+    "createLimited": "Set daily limit",
+    "createUnlimited": "No limit",
     "daily": {
-      "title": "Daily Limit",
-      "summary": "Current limit is {{value}} per day"
+      "title": "Daily screen time"
     },
-
-    "weekly": {
-      "title": "Weekly Limit",
-      "summary": "Current limit is {{value}} per week"
+    "mode": {
+      "limited": "Limit by minutes",
+      "unlimited": "No limit"
     },
-
-    "range": {
-      "startLabel": "Current usage",
-      "endLabel": "Limit"
-    },
-
-    "devices": {
-      "phone": "Phone",
-      "tablet": "Tablet"
+    "actions": {
+      "setDailyLimit": "Set daily limit",
+      "noLimit": "No limit"
     },
     "status": {
-  "ok": "OK"
-},
-  "almostReached": "Almost reached limit",
-      "done": "Done",
-    "currentLimit": "Current limit",
-    "editWeekly": "Edit weekly",
+      "ok": "Within limit",
+      "almostReached": "Almost reached",
+      "unlimited": "Unlimited"
+    },
+    "summary": {
+      "unlimited": "This device currently has no daily screen-time limit.",
+      "limited": "This device is limited to {{value}} minutes per day."
+    },
+    "validation": {
+      "invalidMinutes": "Please enter a valid number of minutes greater than 0."
+    },
+    "errors": {
+      "saveFailed": "Failed to save screen-time rule.",
+      "removeFailed": "Failed to remove the screen-time rule."
+    },
+    "empty": {
+      "noDevicesTitle": "No devices found",
+      "noDevicesSubtitle": "There are no connected devices for this child yet.",
+      "noRuleTitle": "No screen-time rule yet",
+      "noRuleSubtitle": "You can set a daily limit in minutes, or choose not to limit this device at all."
+    },
     "a11y": {
-    "editWeeklySchedule": "Edit weekly schedule",
-    "editDailyLimit": "Edit daily limit",
-    "doneEditing": "Finish editing",
-    "decreaseByFiveMinutes": "Decrease by five minutes",
-    "increaseByFiveMinutes": "Increase by five minutes"
-  }
+      "setDailyLimit": "Set daily screen-time limit",
+      "setUnlimited": "Set no screen-time limit",
+      "modeLimited": "Choose limit by minutes mode",
+      "modeUnlimited": "Choose no limit mode",
+      "minutesInput": "Minutes allowed per day",
+      "editRule": "Edit screen-time rule",
+      "removeRule": "Remove screen-time rule"
+    }
   },
   "childDeviceSelector": {
     "childrenSectionTitle": "Select Child",
@@ -650,12 +682,6 @@
     "requestedMinutesLabel": "{{minutes}} extra minutes",
     "childSubtitles": {
       "personal": "Personal management"
-    },
-    "devices": {
-      "galaxyS23": "Galaxy S23",
-      "ipadAir": "iPad Air",
-      "iphone13": "iPhone 13",
-      "lenovoTab": "Lenovo Tab"
     },
     "reasons": {
       "studyVideo": "Educational video",
@@ -799,7 +825,9 @@
   },
   "devices": {
     "fetch_devices_failed": "Failed to fetch devices",
-    "fetch_device_failed": "Failed to fetch device"
+    "fetch_device_failed": "Failed to fetch device",
+   "defaultDeviceName": "Connected device"
+
   },
   "childSelector": {
     "childrenSectionTitle": "Choose Child",

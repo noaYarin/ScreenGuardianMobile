@@ -1,6 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Pressable } from "react-native";
-import { Stack, router, type Href } from "expo-router";
+import {
+  View,
+  ScrollView,
+  Pressable,
+  TextInput,
+  ActivityIndicator,
+} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -16,56 +21,24 @@ import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
 import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
 
-type ScreenLimitCard = {
-  id: string;
-  titleKey: string;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  currentHours: number;
-  maxHours: number;
-  summaryKey: string;
-  summaryValue: string;
+type DailyLimitMode = "NONE" | "UNLIMITED" | "LIMITED";
+
+type LocalDeviceLimit = {
+  mode: DailyLimitMode;
+  dailyLimitMinutes: number | null;
 };
 
-const STEP_HOURS = 5 / 60;
-const MIN_HOURS = 5 / 60;
-
-// זמני בלבד עד שתחברי את ההגבלות מהשרת / Redux
-const STATIC_LIMITS_BY_DEVICE: Record<string, ScreenLimitCard[]> = {
-  "demo-device-1": [
-    {
-      id: "daily",
-      titleKey: "dailyTimeLimits.daily.title",
-      icon: "clock-outline",
-      currentHours: 0.8,
-      maxHours: 2,
-      summaryKey: "dailyTimeLimits.daily.summary",
-      summaryValue: "2:00",
-    },
-    {
-      id: "weekly",
-      titleKey: "dailyTimeLimits.weekly.title",
-      icon: "calendar-blank-outline",
-      currentHours: 5.2,
-      maxHours: 14,
-      summaryKey: "dailyTimeLimits.weekly.summary",
-      summaryValue: "14:00",
-    },
-  ],
-};
-
-function formatHoursToClock(totalHours: number) {
-  const wholeHours = Math.floor(totalHours);
-  const minutes = Math.round((totalHours - wholeHours) * 60);
-
-  const normalizedHours = minutes === 60 ? wholeHours + 1 : wholeHours;
-  const normalizedMinutes = minutes === 60 ? 0 : minutes;
-
-  return `${normalizedHours}:${String(normalizedMinutes).padStart(2, "0")}`;
-}
+const CHILD_ACCENTS = ["#EC6FB7", "#5B8DEF", "#16C7A1", "#F59E0B", "#8B5CF6"];
 
 function getAccentFromIndex(index: number) {
-  const accents = ["#EC6FB7", "#5B8DEF", "#16C7A1", "#F59E0B", "#8B5CF6"];
-  return accents[index % accents.length];
+  return CHILD_ACCENTS[index % CHILD_ACCENTS.length];
+}
+
+function formatMinutesToClock(totalMinutes: number) {
+  const safeMinutes = Math.max(0, Math.floor(totalMinutes));
+  const hours = Math.floor(safeMinutes / 60);
+  const minutes = safeMinutes % 60;
+  return `${hours}:${String(minutes).padStart(2, "0")}`;
 }
 
 export default function DailyTimeLimitsScreen() {
@@ -85,10 +58,19 @@ export default function DailyTimeLimitsScreen() {
 
   const [selectedChildId, setSelectedChildId] = useState<string>("");
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
 
-  const [limitsByDevice, setLimitsByDevice] =
-    useState<Record<string, ScreenLimitCard[]>>(STATIC_LIMITS_BY_DEVICE);
+  const [isEditing, setIsEditing] = useState(false);
+  const [draftMode, setDraftMode] = useState<Exclude<DailyLimitMode, "NONE">>(
+    "LIMITED"
+  );
+  const [minutesInput, setMinutesInput] = useState("");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  // Local-only storage for now.
+  // Later, this can be replaced with server data / Redux data.
+  const [limitsByDeviceId, setLimitsByDeviceId] = useState<
+    Record<string, LocalDeviceLimit>
+  >({});
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
@@ -133,282 +115,584 @@ export default function DailyTimeLimitsScreen() {
     if (!currentChildDevices.length) {
       if (selectedDeviceId) {
         setSelectedDeviceId("");
-        setEditingCardId(null);
       }
+      setIsEditing(false);
+      setMinutesInput("");
+      setSubmitError(null);
       return;
     }
 
     const selectedStillExists = currentChildDevices.some(
-      (device: any) => String(device._id) === selectedDeviceId
+      (device) => String(device._id) === String(selectedDeviceId)
     );
 
     if (!selectedStillExists) {
-      const firstDeviceId = String(currentChildDevices[0]._id);
-      setSelectedDeviceId(firstDeviceId);
-      setEditingCardId(null);
+      setSelectedDeviceId(String(currentChildDevices[0]._id));
+      setIsEditing(false);
+      setMinutesInput("");
+      setSubmitError(null);
     }
   }, [currentChildDevices, selectedDeviceId]);
 
   const selectedDevice = useMemo(() => {
     return (
       currentChildDevices.find(
-        (device: any) => String(device._id) === selectedDeviceId
+        (device) => String(device._id) === String(selectedDeviceId)
       ) ?? null
     );
   }, [currentChildDevices, selectedDeviceId]);
 
-  const selectedDeviceName = selectedDevice
-    ? String(
-        (selectedDevice as any).deviceName ??
-          (selectedDevice as any).model ??
-          (selectedDevice as any).name ??
-          ""
-      )
-    : "";
+  const selectedDeviceName =
+    selectedDevice?.name || t("devices.defaultDeviceName", "Connected device");
 
-  const selectedLimits = limitsByDevice[selectedDeviceId] ?? [];
-
-  const updateLimitByStep = (limitId: string, deltaHours: number) => {
-    if (!selectedDeviceId) return;
-
-    setLimitsByDevice((prev) => {
-      const deviceLimits = prev[selectedDeviceId] ?? [];
-
-      const updatedDeviceLimits = deviceLimits.map((limit) => {
-        if (limit.id !== limitId) return limit;
-
-        const nextMaxHours = Math.max(MIN_HOURS, limit.maxHours + deltaHours);
-
-        return {
-          ...limit,
-          maxHours: Number(nextMaxHours.toFixed(4)),
-          summaryValue: formatHoursToClock(nextMaxHours),
-        };
-      });
-
-      return {
-        ...prev,
-        [selectedDeviceId]: updatedDeviceLimits,
+  const currentLimit = selectedDeviceId
+    ? limitsByDeviceId[selectedDeviceId] ?? {
+        mode: "NONE" as DailyLimitMode,
+        dailyLimitMinutes: null,
+      }
+    : {
+        mode: "NONE" as DailyLimitMode,
+        dailyLimitMinutes: null,
       };
-    });
 
-    // כאן בהמשך תשלחי לשרת את הערך החדש
-  };
+  const dailyLimitMode = currentLimit.mode;
+  const dailyLimitMinutes = currentLimit.dailyLimitMinutes;
 
-  const handleEditPress = (limitId: string) => {
-    if (limitId === "weekly") {
-      router.push("/Parent/weeklyScheduleLimits" as Href);
-      return;
-    }
+  // Local UI only: usage can come from device.screenTime if it exists,
+  // otherwise stay at 0 for now.
+  const usedTodayMinutes = selectedDevice?.screenTime?.usedTodayMinutes ?? 0;
 
-    setEditingCardId(limitId);
-  };
+  const progress =
+    dailyLimitMode === "LIMITED" &&
+    typeof dailyLimitMinutes === "number" &&
+    dailyLimitMinutes > 0
+      ? Math.min(usedTodayMinutes / dailyLimitMinutes, 1)
+      : 0;
 
-  const heroInitial = String(selectedChild?.name ?? "").trim()[0] ?? "";
+  const heroInitial = String(selectedChild?.name ?? "").trim().charAt(0) || "?";
   const heroAccent = getAccentFromIndex(
     selectedChildIndex >= 0 ? selectedChildIndex : 0
   );
 
+  const handleStartCreateLimited = () => {
+    setDraftMode("LIMITED");
+    setMinutesInput("");
+    setSubmitError(null);
+    setIsEditing(true);
+  };
+
+  const handleStartCreateUnlimited = () => {
+    setDraftMode("UNLIMITED");
+    setMinutesInput("");
+    setSubmitError(null);
+    setIsEditing(true);
+  };
+
+  const handleEditExisting = () => {
+    if (!selectedDeviceId) return;
+
+    if (
+      dailyLimitMode === "LIMITED" &&
+      typeof dailyLimitMinutes === "number" &&
+      dailyLimitMinutes > 0
+    ) {
+      setDraftMode("LIMITED");
+      setMinutesInput(String(dailyLimitMinutes));
+    } else {
+      setDraftMode("UNLIMITED");
+      setMinutesInput("");
+    }
+
+    setSubmitError(null);
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setMinutesInput("");
+    setSubmitError(null);
+  };
+
+  const handleSave = () => {
+    if (!selectedDeviceId) return;
+
+    setSubmitError(null);
+
+    if (draftMode === "UNLIMITED") {
+      setLimitsByDeviceId((prev) => ({
+        ...prev,
+        [selectedDeviceId]: {
+          mode: "UNLIMITED",
+          dailyLimitMinutes: null,
+        },
+      }));
+
+      setIsEditing(false);
+      setMinutesInput("");
+      return;
+    }
+
+    const parsedMinutes = Number(minutesInput.trim());
+
+    if (!Number.isFinite(parsedMinutes) || parsedMinutes <= 0) {
+      setSubmitError(
+        t(
+          "dailyTimeLimits.validation.invalidMinutes",
+          "Please enter a valid number of minutes greater than 0."
+        )
+      );
+      return;
+    }
+
+    setLimitsByDeviceId((prev) => ({
+      ...prev,
+      [selectedDeviceId]: {
+        mode: "LIMITED",
+        dailyLimitMinutes: Math.floor(parsedMinutes),
+      },
+    }));
+
+    setIsEditing(false);
+    setMinutesInput("");
+  };
+
+  const handleRemoveRule = () => {
+    if (!selectedDeviceId) return;
+
+    setLimitsByDeviceId((prev) => ({
+      ...prev,
+      [selectedDeviceId]: {
+        mode: "NONE",
+        dailyLimitMinutes: null,
+      },
+    }));
+
+    setIsEditing(false);
+    setMinutesInput("");
+    setSubmitError(null);
+  };
+
   return (
-    <>
-      <Stack.Screen
-        options={{
-          title: t("dailyTimeLimits.title"),
-          headerTitleAlign: "center",
-          headerShadowVisible: false,
-        }}
-      />
+    <ScreenLayout>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.container}>
+          <View style={styles.heroCard}>
+            <View style={[styles.heroHeader, row]}>
+              <View
+                style={[
+                  styles.heroAvatar,
+                  { backgroundColor: heroAccent },
+                ]}
+              >
+                <AppText weight="extraBold" style={styles.heroAvatarText}>
+                  {heroInitial}
+                </AppText>
+              </View>
 
-      <ScreenLayout>
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={styles.container}>
-            <View style={styles.heroCard}>
-              <View style={[styles.heroHeader, row]}>
-                <View
-                  style={[
-                    styles.heroAvatar,
-                    { backgroundColor: heroAccent },
-                  ]}
-                >
-                  <AppText weight="extraBold" style={styles.heroAvatarText}>
-                    {heroInitial}
-                  </AppText>
-                </View>
+              <View style={styles.heroTextBlock}>
+                <AppText weight="extraBold" style={[styles.heroTitle, text]}>
+                  {t("dailyTimeLimits.heroTitle")}
+                </AppText>
 
-                <View style={styles.heroTextBlock}>
-                  <AppText weight="extraBold" style={[styles.heroTitle, text]}>
-                    {t("dailyTimeLimits.heroTitle")}
-                  </AppText>
-
-                  <AppText weight="medium" style={[styles.heroSubtitle, text]}>
-                    {t("dailyTimeLimits.heroSubtitle")}
-                  </AppText>
-                </View>
+                <AppText weight="medium" style={[styles.heroSubtitle, text]}>
+                  {t("dailyTimeLimits.heroSubtitle")}
+                </AppText>
               </View>
             </View>
+          </View>
 
-            <ChildDeviceSelector
-              selectedChildId={selectedChildId}
-              selectedDeviceId={selectedDeviceId}
-              showDevices
-              onSelectChild={(childId) => {
-                setSelectedChildId(childId);
-                setSelectedDeviceId("");
-                setEditingCardId(null);
-              }}
-              onSelectDevice={(deviceId) => {
-                setSelectedDeviceId(deviceId);
-                setEditingCardId(null);
-              }}
-            />
+          <ChildDeviceSelector
+            selectedChildId={selectedChildId}
+            selectedDeviceId={selectedDeviceId}
+            onSelectChild={(childId) => {
+              setSelectedChildId(childId);
+              setSelectedDeviceId("");
+              setIsEditing(false);
+              setMinutesInput("");
+              setSubmitError(null);
+            }}
+            onSelectDevice={(deviceId) => {
+              setSelectedDeviceId(deviceId);
+              setIsEditing(false);
+              setMinutesInput("");
+              setSubmitError(null);
+            }}
+            showDevices
+          />
 
-            {childrenLoading && (
+          {childrenLoading && (
+            <View style={styles.emptyState}>
+              <ActivityIndicator size="small" color="#3D6BF2" />
+              <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                {t("common.loading", "Loading...")}
+              </AppText>
+            </View>
+          )}
+
+          {!!childrenError && (
+            <View style={styles.emptyState}>
+              <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                {t("common.error", "Something went wrong")}
+              </AppText>
+              <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                {t(childrenError, childrenError)}
+              </AppText>
+            </View>
+          )}
+
+          {!childrenLoading &&
+            !childrenError &&
+            selectedChildId &&
+            devicesStatus === "loading" && (
               <View style={styles.emptyState}>
+                <ActivityIndicator size="small" color="#3D6BF2" />
                 <AppText weight="medium" style={[styles.emptySubtitle, text]}>
                   {t("common.loading", "Loading...")}
                 </AppText>
               </View>
             )}
 
-            {!!childrenError && (
+          {!childrenLoading && !childrenError && !!devicesError && (
+            <View style={styles.emptyState}>
+              <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                {t("common.error", "Something went wrong")}
+              </AppText>
+              <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                {t(devicesError, devicesError)}
+              </AppText>
+            </View>
+          )}
+
+          {!childrenLoading &&
+            !childrenError &&
+            selectedChildId &&
+            devicesStatus !== "loading" &&
+            !devicesError &&
+            currentChildDevices.length === 0 && (
               <View style={styles.emptyState}>
+                <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                  {t("dailyTimeLimits.empty.noDevicesTitle")}
+                </AppText>
+
                 <AppText weight="medium" style={[styles.emptySubtitle, text]}>
-                  {t(childrenError, childrenError)}
+                  {t("dailyTimeLimits.empty.noDevicesSubtitle")}
                 </AppText>
               </View>
             )}
 
-            {!childrenLoading && !childrenError && selectedChildId && devicesStatus === "loading" && (
+          {!childrenLoading &&
+            !childrenError &&
+            !!selectedDeviceId &&
+            currentChildDevices.length > 0 &&
+            dailyLimitMode === "NONE" &&
+            !isEditing && (
               <View style={styles.emptyState}>
-                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
-                  {t("common.loading", "Loading...")}
+                <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                  {t("dailyTimeLimits.empty.noRuleTitle")}
                 </AppText>
-              </View>
-            )}
 
-            {!childrenLoading && !childrenError && !!devicesError && (
-              <View style={styles.emptyState}>
                 <AppText weight="medium" style={[styles.emptySubtitle, text]}>
-                  {t(devicesError, devicesError)}
+                  {t("dailyTimeLimits.empty.noRuleSubtitle")}
                 </AppText>
-              </View>
-            )}
 
-            {!childrenLoading &&
-              !childrenError &&
-              selectedChildId &&
-              devicesStatus !== "loading" &&
-              !devicesError &&
-              currentChildDevices.length === 0 && (
-                <View style={styles.emptyState}>
-                  <AppText weight="bold" style={[styles.emptyTitle, text]}>
-                    {t("dailyTimeLimits.empty.noDevicesTitle", "No devices found")}
-                  </AppText>
+                <View
+                  style={[
+                    styles.emptyActionsRow,
+                    isRTL && styles.emptyActionsRowRtl,
+                  ]}
+                >
+                  <Pressable
+                    onPress={handleStartCreateLimited}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("dailyTimeLimits.a11y.setDailyLimit")}
+                    style={({ pressed }) => [
+                      styles.primaryActionButton,
+                      row,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <AppText weight="bold" style={styles.primaryActionButtonText}>
+                      {t("dailyTimeLimits.actions.setDailyLimit")}
+                    </AppText>
+                  </Pressable>
 
-                  <AppText weight="medium" style={[styles.emptySubtitle, text]}>
-                    {t(
-                      "dailyTimeLimits.empty.noDevicesSubtitle",
-                      "There are no connected devices for this child yet."
-                    )}
-                  </AppText>
+                  <Pressable
+                    onPress={handleStartCreateUnlimited}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("dailyTimeLimits.a11y.setUnlimited")}
+                    style={({ pressed }) => [
+                      styles.secondaryActionButton,
+                      row,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name="infinity"
+                      size={18}
+                      color="#2B4EFF"
+                    />
+                    <AppText weight="bold" style={styles.secondaryActionButtonText}>
+                      {t("dailyTimeLimits.actions.noLimit")}
+                    </AppText>
+                  </Pressable>
                 </View>
-              )}
+              </View>
+            )}
 
-            {!childrenLoading &&
-              !childrenError &&
-              selectedDeviceId &&
-              currentChildDevices.length > 0 &&
-              selectedLimits.length === 0 && (
-                <View style={styles.emptyState}>
-                  <AppText weight="bold" style={[styles.emptyTitle, text]}>
-                    {t("dailyTimeLimits.empty.noLimitsTitle", "No limits yet")}
-                  </AppText>
+          {!childrenLoading &&
+            !childrenError &&
+            !!selectedDeviceId &&
+            currentChildDevices.length > 0 &&
+            isEditing && (
+              <View style={styles.limitCard}>
+                <View style={[styles.limitTopRow, row]}>
+                  <View style={styles.limitTitleWrap}>
+                    <AppText weight="bold" style={[styles.limitTitle, text]}>
+                      {t("dailyTimeLimits.daily.title")}
+                    </AppText>
 
-                  <AppText weight="medium" style={[styles.emptySubtitle, text]}>
-                    {t(
-                      "dailyTimeLimits.empty.noLimitsSubtitle",
-                      "No screen-time limits were found for this device yet."
-                    )}
-                  </AppText>
+                    <AppText weight="medium" style={[styles.limitMeta, text]}>
+                      {t("dailyTimeLimits.deviceContext", {
+                        childName: selectedChild?.name ?? "",
+                        deviceName: selectedDeviceName,
+                      })}
+                    </AppText>
+                  </View>
+
+                  <View style={styles.limitIconBox}>
+                    <MaterialCommunityIcons
+                      name="clock-outline"
+                      size={24}
+                      color="#3D6BF2"
+                    />
+                  </View>
                 </View>
-              )}
 
-            {selectedLimits.length > 0 && (
+                <View
+                  style={[
+                    styles.modeSwitchRow,
+                    isRTL && styles.modeSwitchRowRtl,
+                  ]}
+                >
+                  <Pressable
+                    onPress={() => setDraftMode("LIMITED")}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("dailyTimeLimits.a11y.modeLimited")}
+                    style={({ pressed }) => [
+                      styles.modeChip,
+                      draftMode === "LIMITED" && styles.modeChipActive,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <AppText
+                      weight="bold"
+                      style={[
+                        styles.modeChipText,
+                        draftMode === "LIMITED" && styles.modeChipTextActive,
+                      ]}
+                    >
+                      {t("dailyTimeLimits.mode.limited")}
+                    </AppText>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={() => setDraftMode("UNLIMITED")}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("dailyTimeLimits.a11y.modeUnlimited")}
+                    style={({ pressed }) => [
+                      styles.modeChip,
+                      draftMode === "UNLIMITED" && styles.modeChipActive,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <AppText
+                      weight="bold"
+                      style={[
+                        styles.modeChipText,
+                        draftMode === "UNLIMITED" && styles.modeChipTextActive,
+                      ]}
+                    >
+                      {t("dailyTimeLimits.mode.unlimited")}
+                    </AppText>
+                  </Pressable>
+                </View>
+
+                {draftMode === "LIMITED" && (
+                  <View style={styles.inputBlock}>
+                    <AppText weight="medium" style={[styles.inputLabel, text]}>
+                      {t("dailyTimeLimits.minutesPerDay")}
+                    </AppText>
+
+                    <TextInput
+                      value={minutesInput}
+                      onChangeText={(value) => {
+                        setMinutesInput(value);
+                        if (submitError) setSubmitError(null);
+                      }}
+                      keyboardType="number-pad"
+                      placeholder={t("dailyTimeLimits.enterMinutes")}
+                      placeholderTextColor="#94A3B8"
+                      style={[
+                        styles.minutesInput,
+                        text,
+                        isRTL && styles.minutesInputRtl,
+                      ]}
+                      accessibilityLabel={t("dailyTimeLimits.a11y.minutesInput")}
+                    />
+                  </View>
+                )}
+
+                {draftMode === "UNLIMITED" && (
+                  <View style={styles.infoBanner}>
+                    <MaterialCommunityIcons
+                      name="information-outline"
+                      size={18}
+                      color="#2B4EFF"
+                    />
+                    <AppText weight="medium" style={[styles.infoBannerText, text]}>
+                      {t("dailyTimeLimits.unlimitedInfo")}
+                    </AppText>
+                  </View>
+                )}
+
+                {!!submitError && (
+                  <View style={styles.inlineErrorBox}>
+                    <AppText weight="medium" style={[styles.inlineErrorText, text]}>
+                      {submitError}
+                    </AppText>
+                  </View>
+                )}
+
+                <View
+                  style={[
+                    styles.editorButtonsRow,
+                    isRTL && styles.editorButtonsRowRtl,
+                  ]}
+                >
+                  <Pressable
+                    onPress={handleSave}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("common.save")}
+                    style={({ pressed }) => [
+                      styles.primaryActionButton,
+                      row,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name="content-save-outline"
+                      size={18}
+                      color="#FFFFFF"
+                    />
+                    <AppText weight="bold" style={styles.primaryActionButtonText}>
+                      {t("common.save")}
+                    </AppText>
+                  </Pressable>
+
+                  <Pressable
+                    onPress={handleCancelEdit}
+                    accessibilityRole="button"
+                    accessibilityLabel={t("common.cancel")}
+                    style={({ pressed }) => [
+                      styles.secondaryActionButton,
+                      row,
+                      pressed && styles.buttonPressed,
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name="close"
+                      size={18}
+                      color="#2B4EFF"
+                    />
+                    <AppText weight="bold" style={styles.secondaryActionButtonText}>
+                      {t("common.cancel")}
+                    </AppText>
+                  </Pressable>
+                </View>
+              </View>
+            )}
+
+          {!childrenLoading &&
+            !childrenError &&
+            !!selectedDeviceId &&
+            currentChildDevices.length > 0 &&
+            dailyLimitMode !== "NONE" &&
+            !isEditing && (
               <View style={styles.cardsList}>
-                {selectedLimits.map((limitCard) => {
-                  const progress =
-                    limitCard.maxHours > 0
-                      ? Math.min(limitCard.currentHours / limitCard.maxHours, 1)
-                      : 0;
+                <View style={styles.limitCard}>
+                  <View style={[styles.limitTopRow, row]}>
+                    <View style={styles.limitTitleWrap}>
+                      <AppText weight="bold" style={[styles.limitTitle, text]}>
+                        {t("dailyTimeLimits.daily.title")}
+                      </AppText>
 
-                  const isEditing = editingCardId === limitCard.id;
-                  const canDecrease = limitCard.maxHours > MIN_HOURS;
-                  const isWeeklyCard = limitCard.id === "weekly";
+                      <AppText weight="medium" style={[styles.limitMeta, text]}>
+                        {t("dailyTimeLimits.deviceContext", {
+                          childName: selectedChild?.name ?? "",
+                          deviceName: selectedDeviceName,
+                        })}
+                      </AppText>
+                    </View>
 
-                  return (
-                    <View key={limitCard.id} style={styles.limitCard}>
-                      <View style={[styles.limitTopRow, row]}>
-                        <View style={styles.limitTitleWrap}>
-                          <AppText weight="bold" style={[styles.limitTitle, text]}>
-                            {t(limitCard.titleKey)}
-                          </AppText>
+                    <View style={styles.limitIconBox}>
+                      <MaterialCommunityIcons
+                        name="clock-outline"
+                        size={24}
+                        color="#3D6BF2"
+                      />
+                    </View>
+                  </View>
 
-                          <AppText weight="medium" style={[styles.limitMeta, text]}>
-                            {t("dailyTimeLimits.deviceContext", {
-                              childName: selectedChild?.name ?? "",
-                              deviceName: selectedDeviceName,
-                            })}
-                          </AppText>
-                        </View>
+                  <View style={[styles.timePillsRow, row]}>
+                    <View style={styles.timePill}>
+                      <AppText weight="medium" style={[styles.timePillLabel, text]}>
+                        {t("dailyTimeLimits.usedToday")}
+                      </AppText>
 
-                        <View style={styles.limitIconBox}>
-                          <MaterialCommunityIcons
-                            name={limitCard.icon}
-                            size={24}
-                            color="#3D6BF2"
-                          />
-                        </View>
-                      </View>
+                      <AppText
+                        weight="bold"
+                        style={[
+                          styles.timePillValue,
+                          text,
+                          isRTL && styles.timePillValueRtl,
+                        ]}
+                      >
+                        {formatMinutesToClock(usedTodayMinutes)}
+                      </AppText>
+                    </View>
 
-                      <View style={[styles.timePillsRow, row]}>
-                        <View style={styles.timePill}>
-                          <AppText weight="medium" style={[styles.timePillLabel, text]}>
-                            {t("dailyTimeLimits.range.startLabel")}
-                          </AppText>
+                    <View style={styles.timePill}>
+                      <AppText weight="medium" style={[styles.timePillLabel, text]}>
+                        {dailyLimitMode === "UNLIMITED"
+                          ? t("dailyTimeLimits.limitType")
+                          : t("dailyTimeLimits.limitLabel")}
+                      </AppText>
 
-                          <AppText
-                            weight="bold"
-                            style={[
-                              styles.timePillValue,
-                              text,
-                              isRTL && styles.timePillValueRtl,
-                            ]}
-                          >
-                            {formatHoursToClock(limitCard.currentHours)}
-                          </AppText>
-                        </View>
+                      <AppText
+                        weight="bold"
+                        style={[
+                          styles.timePillValue,
+                          text,
+                          isRTL && styles.timePillValueRtl,
+                        ]}
+                      >
+                        {dailyLimitMode === "UNLIMITED"
+                          ? t("dailyTimeLimits.unlimitedShort")
+                          : `${dailyLimitMinutes ?? 0} ${t("common.minutes")}`}
+                      </AppText>
+                    </View>
+                  </View>
 
-                        <View style={styles.timePill}>
-                          <AppText weight="medium" style={[styles.timePillLabel, text]}>
-                            {t("dailyTimeLimits.range.endLabel")}
-                          </AppText>
-
-                          <AppText
-                            weight="bold"
-                            style={[
-                              styles.timePillValue,
-                              text,
-                              isRTL && styles.timePillValueRtl,
-                            ]}
-                          >
-                            {formatHoursToClock(limitCard.maxHours)}
-                          </AppText>
-                        </View>
-                      </View>
-
+                  {dailyLimitMode === "LIMITED" && (
+                    <>
                       <View
                         style={[
                           styles.progressMetaRow,
@@ -434,163 +718,97 @@ export default function DailyTimeLimitsScreen() {
                           ]}
                         />
                       </View>
+                    </>
+                  )}
 
-                      <AppText weight="medium" style={[styles.summaryText, text]}>
-                        {t(limitCard.summaryKey, {
-                          value: limitCard.summaryValue,
+                  <AppText weight="medium" style={[styles.summaryText, text]}>
+                    {dailyLimitMode === "UNLIMITED"
+                      ? t("dailyTimeLimits.summary.unlimited")
+                      : t("dailyTimeLimits.summary.limited", {
+                          value: dailyLimitMinutes ?? 0,
                         })}
+                  </AppText>
+
+                  <View style={styles.actionsRow}>
+                    <View
+                      style={[
+                        styles.statusChip,
+                        row,
+                        isRTL && styles.statusChipRtl,
+                        dailyLimitMode === "UNLIMITED"
+                          ? styles.statusChipNormal
+                          : progress >= 0.8
+                          ? styles.statusChipWarning
+                          : styles.statusChipNormal,
+                      ]}
+                    >
+                      <AppText
+                        weight="bold"
+                        style={[
+                          styles.statusChipText,
+                          dailyLimitMode === "UNLIMITED"
+                            ? styles.statusChipTextNormal
+                            : progress >= 0.8
+                            ? styles.statusChipTextWarning
+                            : styles.statusChipTextNormal,
+                        ]}
+                      >
+                        {dailyLimitMode === "UNLIMITED"
+                          ? t("dailyTimeLimits.status.unlimited")
+                          : progress >= 0.8
+                          ? t("dailyTimeLimits.status.almostReached")
+                          : t("dailyTimeLimits.status.ok")}
                       </AppText>
-
-                      <View style={styles.actionsRow}>
-                        <View
-                          style={[
-                            styles.statusChip,
-                            progress >= 0.8
-                              ? styles.statusChipWarning
-                              : styles.statusChipNormal,
-                          ]}
-                        >
-                          <AppText
-                            weight="bold"
-                            style={[
-                              styles.statusChipText,
-                              progress >= 0.8
-                                ? styles.statusChipTextWarning
-                                : styles.statusChipTextNormal,
-                            ]}
-                          >
-                            {progress >= 0.8
-                              ? t("dailyTimeLimits.status.almostReached")
-                              : t("dailyTimeLimits.status.ok")}
-                          </AppText>
-                        </View>
-
-                        {!isEditing ? (
-                          <View style={styles.editButtonWrap}>
-                            <Pressable
-                              onPress={() => handleEditPress(limitCard.id)}
-                              accessibilityRole="button"
-                              accessibilityLabel={
-                                isWeeklyCard
-                                  ? t("dailyTimeLimits.a11y.editWeeklySchedule")
-                                  : t("dailyTimeLimits.a11y.editDailyLimit")
-                              }
-                              style={({ pressed }) => [
-                                styles.editButton,
-                                row,
-                                pressed && styles.editButtonPressed,
-                              ]}
-                            >
-                              <AppText weight="bold" style={styles.editButtonText}>
-                                {isWeeklyCard
-                                  ? t("dailyTimeLimits.editWeekly")
-                                  : t("dailyTimeLimits.edit")}
-                              </AppText>
-
-                              <MaterialCommunityIcons
-                                name={isWeeklyCard ? "chevron-left" : "pencil-outline"}
-                                size={18}
-                                color="#FFFFFF"
-                              />
-                            </Pressable>
-                          </View>
-                        ) : (
-                          <View style={styles.editorWrap}>
-                            <View style={[styles.editorHeaderRow, row]}>
-                              <AppText weight="bold" style={[styles.editorTitle, text]}>
-                                {t("dailyTimeLimits.edit")}
-                              </AppText>
-
-                              <Pressable
-                                onPress={() => setEditingCardId(null)}
-                                accessibilityRole="button"
-                                accessibilityLabel={t("dailyTimeLimits.a11y.doneEditing")}
-                                style={({ pressed }) => [
-                                  styles.doneButton,
-                                  pressed && styles.doneButtonPressed,
-                                ]}
-                              >
-                                <AppText weight="bold" style={styles.doneButtonText}>
-                                  {t("dailyTimeLimits.done")}
-                                </AppText>
-                              </Pressable>
-                            </View>
-
-                            <View
-                              style={[
-                                styles.editorControlsRow,
-                                isRTL && styles.editorControlsRowRtl,
-                              ]}
-                            >
-                              <Pressable
-                                onPress={() => updateLimitByStep(limitCard.id, -STEP_HOURS)}
-                                disabled={!canDecrease}
-                                accessibilityRole="button"
-                                accessibilityLabel={t("dailyTimeLimits.a11y.decreaseByFiveMinutes")}
-                                style={({ pressed }) => [
-                                  styles.stepButton,
-                                  styles.stepButtonSecondary,
-                                  pressed && styles.stepButtonPressed,
-                                  !canDecrease && styles.stepButtonDisabled,
-                                ]}
-                              >
-                                <MaterialCommunityIcons
-                                  name="minus"
-                                  size={18}
-                                  color={canDecrease ? "#1F2A44" : "#A8B3C7"}
-                                />
-                                <AppText
-                                  weight="bold"
-                                  style={[
-                                    styles.stepButtonTextSecondary,
-                                    !canDecrease && styles.stepButtonTextDisabled,
-                                  ]}
-                                >
-                                  5-
-                                </AppText>
-                              </Pressable>
-
-                              <View style={styles.currentValueBox}>
-                                <AppText weight="medium" style={[styles.currentValueLabel, text]}>
-                                  {t("dailyTimeLimits.currentLimit")}
-                                </AppText>
-
-                                <AppText weight="extraBold" style={styles.currentValueText}>
-                                  {formatHoursToClock(limitCard.maxHours)}
-                                </AppText>
-                              </View>
-
-                              <Pressable
-                                onPress={() => updateLimitByStep(limitCard.id, STEP_HOURS)}
-                                accessibilityRole="button"
-                                accessibilityLabel={t("dailyTimeLimits.a11y.increaseByFiveMinutes")}
-                                style={({ pressed }) => [
-                                  styles.stepButton,
-                                  styles.stepButtonPrimary,
-                                  pressed && styles.stepButtonPressed,
-                                ]}
-                              >
-                                <MaterialCommunityIcons
-                                  name="plus"
-                                  size={18}
-                                  color="#FFFFFF"
-                                />
-                                <AppText weight="bold" style={styles.stepButtonTextPrimary}>
-                                  5+
-                                </AppText>
-                              </Pressable>
-                            </View>
-                          </View>
-                        )}
-                      </View>
                     </View>
-                  );
-                })}
+
+                    <View style={styles.actionButtonsWrap}>
+                      <Pressable
+                        onPress={handleEditExisting}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("dailyTimeLimits.a11y.editRule")}
+                        style={({ pressed }) => [
+                          styles.editButton,
+                          row,
+                          pressed && styles.editButtonPressed,
+                        ]}
+                      >
+                        <AppText weight="bold" style={styles.editButtonText}>
+                          {t("dailyTimeLimits.edit")}
+                        </AppText>
+
+                        <MaterialCommunityIcons
+                          name="pencil-outline"
+                          size={18}
+                          color="#FFFFFF"
+                        />
+                      </Pressable>
+
+                      <Pressable
+                        onPress={handleRemoveRule}
+                        accessibilityRole="button"
+                        accessibilityLabel={t("dailyTimeLimits.a11y.removeRule")}
+                        style={({ pressed }) => [
+                          styles.removeButton,
+                          row,
+                          pressed && styles.buttonPressed,
+                        ]}
+                      >
+                        <MaterialCommunityIcons
+                          name="delete-outline"
+                          size={18}
+                          color="#DC2626"
+                        />
+                        <AppText weight="bold" style={styles.removeButtonText}>
+                          {t("dailyTimeLimits.removeRule")}
+                        </AppText>
+                      </Pressable>
+                    </View>
+                  </View>
+                </View>
               </View>
             )}
-          </View>
-        </ScrollView>
-      </ScreenLayout>
-    </>
+        </View>
+      </ScrollView>
+    </ScreenLayout>
   );
 }

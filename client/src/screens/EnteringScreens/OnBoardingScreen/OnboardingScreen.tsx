@@ -28,11 +28,11 @@ export const OnboardingScreen: React.FC = () => {
   const flatListRef = useRef<FlatList<OnboardingSlide> | null>(null);
 
   const handleStartUsingApp = () => {
-    router.replace('Entering/roleSelectionRoute' as any);
+    router.push('Entering/chooseChildAge' as any);
   };
 
   const handleSkipOnboarding = () => {
-    router.replace('Entering/roleSelectionRoute' as any);
+    router.push('Entering/chooseChildAge' as any);
   };
 
   const handleNext = () => {
