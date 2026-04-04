@@ -27,21 +27,47 @@ function normalizeNotification(raw: unknown): Notification {
   };
 }
 
-export const fetchParentNotificationsThunk = createAsyncThunk<
-  Notification[],
-  void,
-  { rejectValue: string }
->("notifications/fetchParent", async (_, thunkAPI) => {
-  try {
-    const list = await apiGetParentNotifications();
-    if (!Array.isArray(list)) return thunkAPI.rejectWithValue("notifications.fetch_failed");
-    return list.map(normalizeNotification);
-  } catch (error) {
-    const message = (error as Error)?.message ?? "notifications.fetch_failed";
-    return thunkAPI.rejectWithValue(message);
-  }
-});
+function normalizePagination(
+  raw: unknown,
+  fallback: { page: number; limit: number }
+) {
+  const p = raw != null && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  return {
+    total: Math.max(0, Number(p.total) || 0),
+    page: Math.max(1, Number(p.page) || fallback.page),
+    pages: Math.max(1, Number(p.pages) || 1),
+    limit: Math.max(1, Number(p.limit) || fallback.limit),
+  };
+}
 
+export const fetchParentNotificationsThunk = createAsyncThunk(
+  "notifications/fetchAll",
+  async ({ page = 1, limit = 10 }: { page?: number; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await apiGetParentNotifications(page, limit);
+      const rawList = Array.isArray(response?.notifications) ? response.notifications : [];
+      const data = rawList
+        .map((row) => {
+          try {
+            return normalizeNotification(row);
+          } catch {
+            return null;
+          }
+        })
+        .filter((n): n is Notification => n != null);
+
+      const pagination = normalizePagination(response?.pagination, { page, limit });
+
+      return { data, pagination };
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error && typeof error.message === "string"
+          ? error.message
+          : "Failed to fetch notifications";
+      return rejectWithValue(message);
+    }
+  }
+);
 export const markParentNotificationReadThunk = createAsyncThunk<
   Notification,
   { notificationId: string },

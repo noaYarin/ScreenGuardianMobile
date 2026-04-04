@@ -14,9 +14,25 @@ export type Notification = {
   isRead: boolean;
   createdAt?: string;
 };
+  
+export type ParentNotificationsPayload = {
+  notifications: Notification[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
+  };
+};
 
-export async function apiGetParentNotifications(): Promise<Notification[]> {
-  return api.get<Notification[]>(`${URL}/parent`, { requireAuth: true, role: "PARENT" });
+export async function apiGetParentNotifications(
+  page: number = 1, 
+  limit: number = 10
+): Promise<ParentNotificationsPayload> {
+  return api.get<ParentNotificationsPayload>(`${URL}/parent?page=${page}&limit=${limit}`, { 
+    requireAuth: true, 
+    role: "PARENT"
+  });
 }
 
 export async function apiMarkParentNotificationRead(notificationId: string): Promise<Notification> {

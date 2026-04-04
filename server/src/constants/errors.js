@@ -55,7 +55,8 @@ export const Common = {
   INVALID_DEVICE_PLATFORM: { status: 400, code: "VALIDATION_ERROR", message: "platform is invalid" },
   VALIDATION_ERROR: { status: 400, code: "VALIDATION_ERROR", message: "Validation error" },
   APP_NOT_FOUND: { status: 404, code: "APP_NOT_FOUND", message: "Application not found" },
-
+  VALIDATION_CHILD_AGE_OUT_OF_RANGE: { status: 400, code: "VALIDATION_ERROR", message: "child age must be between 6 and 17" },
+  VALIDATION_AT_LEAST_ONE_FIELD_REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "At least one field is required to update"},
 };
 
 export const Request = {
