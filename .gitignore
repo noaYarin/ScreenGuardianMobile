@@ -44,3 +44,11 @@ app-example
 # server
 server/node_modules/
 server/.env*
+
+# C# / .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.log
