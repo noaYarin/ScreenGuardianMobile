@@ -171,7 +171,31 @@ export async function updateDeviceName(parentId, childId, deviceId, name) {
   if (device != null && device.name === name) {
     return device;
   }
-  return await updateDeviceById(deviceId, { name });
+
+  const previousName =
+    device?.name != null && String(device.name).trim() !== ""
+      ? String(device.name).trim()
+      : "";
+  const newName = String(name ?? "").trim();
+
+  const updated = await updateDeviceById(deviceId, { name: newName });
+
+  try {
+    await notifyParent({
+      parentId,
+      childId,
+      type: NotificationType.DEVICE_RENAMED,
+      severity: NotificationSeverity.INFO,
+      title: "Device Renamed",
+      description: previousName
+        ? `"${previousName}" was renamed to "${newName}"`
+        : `A device was renamed to "${newName}"`
+    });
+  } catch (err) {
+    console.error("notifyParent failed in updateDeviceName:", err.message);
+  }
+
+  return updated;
 }
 
 

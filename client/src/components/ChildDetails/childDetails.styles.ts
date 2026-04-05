@@ -290,6 +290,13 @@ export const childDetailsStyles = StyleSheet.create({
     color: "#111827",
   },
 
+  deviceDetailNameInput: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    margin: 0,
+    minHeight: 24,
+  },
+
   deviceDetailRowDivider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: "#E2E8F0",

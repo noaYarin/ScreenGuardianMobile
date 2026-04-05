@@ -1,5 +1,12 @@
-import React from "react";
-import { View, Pressable, StyleProp, ViewStyle, TextStyle } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  View,
+  TextInput,
+  Pressable,
+  StyleProp,
+  ViewStyle,
+  TextStyle,
+} from "react-native";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
@@ -10,6 +17,8 @@ import {
   childDetailsIconColors,
 } from "./childDetails.styles";
 
+const DEVICE_NAME_MAX_LEN = 20;
+
 type DeviceDetailRowProps = {
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
   label: string;
@@ -17,6 +26,11 @@ type DeviceDetailRowProps = {
   row: StyleProp<ViewStyle>;
   text: StyleProp<TextStyle>;
   valueLines?: number;
+  isDeviceNameRow?: boolean;
+  nameInputValue?: string;
+  onNameInputChange?: (text: string) => void;
+  onNameInputCommit?: () => void;
+  nameInputDisabled?: boolean;
 };
 
 function DeviceDetailRow({
@@ -26,7 +40,14 @@ function DeviceDetailRow({
   row,
   text,
   valueLines = 2,
+  isDeviceNameRow,
+  nameInputValue,
+  onNameInputChange,
+  onNameInputCommit,
+  nameInputDisabled,
 }: DeviceDetailRowProps) {
+  const { t } = useTranslation();
+
   return (
     <View style={[styles.deviceDetailRow, row]}>
       <View style={styles.deviceDetailIconColumn}>
@@ -38,12 +59,35 @@ function DeviceDetailRow({
       </View>
       <View style={styles.deviceDetailTextColumn}>
         <AppText style={[styles.deviceDetailLabel, text]}>{label}</AppText>
-        <AppText
-          style={[styles.deviceDetailValue, text]}
-          numberOfLines={valueLines}
-        >
-          {value}
-        </AppText>
+        {isDeviceNameRow &&
+        nameInputValue != null &&
+        onNameInputChange != null ? (
+          <TextInput
+            value={nameInputValue}
+            onChangeText={(v) =>
+              onNameInputChange(v.slice(0, DEVICE_NAME_MAX_LEN))
+            }
+            onSubmitEditing={() => onNameInputCommit?.()}
+            onBlur={() => onNameInputCommit?.()}
+            editable={!nameInputDisabled}
+            maxLength={DEVICE_NAME_MAX_LEN}
+            returnKeyType="done"
+            accessibilityLabel={t("childDetails.device_detail_name")}
+            style={[
+              styles.deviceDetailValue,
+              styles.deviceDetailNameInput,
+              text,
+              nameInputDisabled && { opacity: 0.45 },
+            ]}
+          />
+        ) : (
+          <AppText
+            style={[styles.deviceDetailValue, text]}
+            numberOfLines={valueLines}
+          >
+            {value}
+          </AppText>
+        )}
       </View>
     </View>
   );
@@ -55,8 +99,10 @@ type Props = {
   text: StyleProp<TextStyle>;
   deleteDisabled: boolean;
   lockDisabled: boolean;
+  renameDisabled: boolean;
   onDelete: (deviceId: string, displayName: string) => void;
   onSetDeviceLocked: (deviceId: string, locked: boolean) => void;
+  onRenameDevice: (deviceId: string, newName: string) => Promise<void>;
 };
 
 export function ChildDetailsDeviceCard({
@@ -65,10 +111,43 @@ export function ChildDetailsDeviceCard({
   text,
   deleteDisabled,
   lockDisabled,
+  renameDisabled,
   onDelete,
   onSetDeviceLocked,
+  onRenameDevice,
 }: Props) {
   const { t } = useTranslation();
+  const [nameDraft, setNameDraft] = useState(device.name);
+  const [nameSaving, setNameSaving] = useState(false);
+
+  useEffect(() => {
+    setNameDraft(device.name);
+  }, [device.id, device.name]);
+
+  const commitDeviceName = useCallback(async () => {
+    if (renameDisabled || nameSaving) return;
+    const trimmed = nameDraft.trim();
+    if (trimmed.length === 0) {
+      setNameDraft(device.name);
+      return;
+    }
+    if (trimmed === device.name) return;
+    setNameSaving(true);
+    try {
+      await onRenameDevice(device.id, trimmed);
+    } catch {
+      setNameDraft(device.name);
+    } finally {
+      setNameSaving(false);
+    }
+  }, [
+    device.id,
+    device.name,
+    nameDraft,
+    nameSaving,
+    onRenameDevice,
+    renameDisabled,
+  ]);
 
   return (
     <View style={styles.deviceCard}>
@@ -103,6 +182,13 @@ export function ChildDetailsDeviceCard({
               row={row}
               text={text}
               valueLines={2}
+              isDeviceNameRow
+              nameInputValue={nameDraft}
+              onNameInputChange={setNameDraft}
+              onNameInputCommit={() => {
+                void commitDeviceName();
+              }}
+              nameInputDisabled={renameDisabled || nameSaving}
             />
             <View style={styles.deviceDetailRowDivider} />
             <DeviceDetailRow

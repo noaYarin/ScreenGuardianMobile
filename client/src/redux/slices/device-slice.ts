@@ -4,6 +4,7 @@ import {
   deleteDeviceForChild,
   fetchDevicesByChild,
   updateDeviceLocation,
+  updateDeviceName,
 } from "../thunks/deviceThunks";
 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
@@ -99,6 +100,16 @@ const devicesSlice = createSlice({
         const idx = list.findIndex((d) => String(d._id) === String(deviceId));
         if (idx !== -1) {
           state.byChildId[childId][idx] = updatedDevice;
+        }
+      })
+      .addCase(updateDeviceName.fulfilled, (state, action) => {
+        const { childId, deviceId } = action.meta.arg;
+        const updated = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;
+        const idx = list.findIndex((d) => String(d._id) === String(deviceId));
+        if (idx !== -1) {
+          state.byChildId[childId][idx] = updated;
         }
       })
       .addCase(deleteDeviceForChild.fulfilled, (state, action) => {

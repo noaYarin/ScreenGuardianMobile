@@ -43,6 +43,7 @@ function pickIcon(type: string, severity: string): React.ComponentProps<typeof M
     case "DEVICE_UNLOCKED": return "lock-open-outline";
     case "DEVICE_ADDED": return "cellphone-link";
     case "DEVICE_DELETED": return "cellphone-remove";
+    case "DEVICE_RENAMED": return "rename-outline";
     case "SCREEN_TIME_UPDATED": return "clock-edit-outline";
     case "SCREEN_TIME_ENDING": return "clock-alert-outline";
     case "SCREEN_TIME_ENDED": return "clock-remove-outline";

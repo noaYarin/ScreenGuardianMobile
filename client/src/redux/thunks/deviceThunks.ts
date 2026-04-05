@@ -91,7 +91,7 @@ export const updateDeviceName = createAsyncThunk<
     if (response == null) {
       return thunkAPI.rejectWithValue("devices.update_device_name_failed");
     }
-    return response;
+    return normalizeDevice(response);
   } catch (error) {
     const message =
       (error as Error)?.message ?? "devices.update_device_name_failed";

@@ -18,7 +18,11 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { useChildProfileLabels } from "../../../../hooks/use-child-profile-labels";
 import { RootState, AppDispatch } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-import { fetchDevicesByChild, deleteDeviceForChild } from "@/src/redux/thunks/deviceThunks";
+import {
+  fetchDevicesByChild,
+  deleteDeviceForChild,
+  updateDeviceName,
+} from "@/src/redux/thunks/deviceThunks";
 import { clearAllDevices, setDeviceLockLocal } from "@/src/redux/slices/device-slice";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
@@ -150,6 +154,27 @@ export default function ChildDetailsScreen() {
     dispatch(setDeviceLockLocal({ childId: effectiveChildId, deviceId, isLocked: locked }));
   }, [dispatch, effectiveChildId]);
 
+  const handleRenameDevice = useCallback(
+    async (deviceId: string, newName: string) => {
+      if (!effectiveChildId) {
+        throw new Error("no_child");
+      }
+      try {
+        await dispatch(
+          updateDeviceName({
+            childId: effectiveChildId,
+            deviceId,
+            name: newName,
+          })
+        ).unwrap();
+      } catch {
+        showAppToast(t("childDetails.rename_device_error"), t("common.error"));
+        throw new Error("rename_failed");
+      }
+    },
+    [dispatch, effectiveChildId, t]
+  );
+
   if (isLoading && children.length === 0) {
     return (
       <ScreenLayout scrollable={false}>
@@ -215,6 +240,7 @@ export default function ChildDetailsScreen() {
             deletingDeviceId={deletingDeviceId}
             onDeleteDevice={handleDeleteDevice}
             onSetDeviceLocked={handleSetDeviceLocked}
+            onRenameDevice={handleRenameDevice}
           />
         </View>
       </ScrollView>

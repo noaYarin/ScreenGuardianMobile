@@ -15,6 +15,7 @@ import {
   updateDeviceUsageByChild,
   deleteDeviceForParent,
   updateDeviceLocation,
+  updateDeviceName,
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {

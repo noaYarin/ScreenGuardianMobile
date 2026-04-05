@@ -3,6 +3,7 @@ import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { DevicePlatform } from "../constants/devicePlatform.js";
+import { DeviceType } from "../constants/deviceType.js";
 
 import {
   createPairingSession,
@@ -92,7 +93,8 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER",deviceId = "" }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType, platform,deviceId = "" }) {
+  console.log("linkByCodeOrToken", { code, barcodeToken, deviceName, deviceType, platform, deviceId });
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -128,7 +130,7 @@ if (currentDevice) {
   currentDevice = await createDevice({
     deviceId,
     deviceName,
-    deviceType,
+    type: deviceType,
     platform,
     isLocked: false,
     code: sessionCode || "",
@@ -139,7 +141,6 @@ if (currentDevice) {
     parentId: String(session.parentId),
     childId: String(session.childId),
     screenTime: {},
-    isActive: true
   });
 }
 

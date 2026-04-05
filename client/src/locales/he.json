@@ -410,6 +410,8 @@
     "device_lock_a11y": "נעילת המכשיר {{name}}",
     "device_unlock_a11y": "שחרור נעילת המכשיר {{name}}",
     "device_lock_error": "לא ניתן לעדכן את מצב הנעילה. נסו שוב.",
+    "rename_device_success": "שם המכשיר עודכן.",
+    "rename_device_error": "לא ניתן לעדכן את שם המכשיר. נסו שוב.",
     "device_type": {
       "phone": "טלפון",
       "tablet": "טאבלט",
@@ -417,7 +419,7 @@
     },
     "device_platform": {
       "android": "אנדרואיד",
-      "ios": "iOS",
+      "ios": "IOS",
       "other": "אחר"
     }
   },
@@ -794,6 +796,7 @@
   "devices": {
     "fetch_devices_failed": "בעיה בטעינת המכשירים",
     "fetch_device_failed": "בעיה בטעינת המכשיר",
+    "update_device_name_failed": "לא ניתן לעדכן את שם המכשיר.",
     "defaultDeviceName": "מכשיר מחובר"
 
   },

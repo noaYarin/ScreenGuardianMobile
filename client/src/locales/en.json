@@ -451,6 +451,8 @@
     "device_lock_a11y": "Lock device {{name}}",
     "device_unlock_a11y": "Unlock device {{name}}",
     "device_lock_error": "Could not update lock. Please try again.",
+    "rename_device_success": "Device name updated.",
+    "rename_device_error": "Could not update the device name. Please try again.",
     "device_type": {
       "phone": "Phone",
       "tablet": "Tablet",
@@ -458,7 +460,7 @@
     },
     "device_platform": {
       "android": "Android",
-      "ios": "iOS",
+      "ios": "IOS",
       "other": "Other"
     }
   },
@@ -837,6 +839,7 @@
   "devices": {
     "fetch_devices_failed": "Failed to fetch devices",
     "fetch_device_failed": "Failed to fetch device",
+    "update_device_name_failed": "Could not update the device name.",
    "defaultDeviceName": "Connected device"
 
   },
