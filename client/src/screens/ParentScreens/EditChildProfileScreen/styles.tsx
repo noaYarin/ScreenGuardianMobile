@@ -277,9 +277,5 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "#2C6FD6",
   },
-
-  pressedSoft: {
-    opacity: 0.92,
-  },
 });
 
