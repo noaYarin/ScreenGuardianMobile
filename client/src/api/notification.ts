@@ -23,6 +23,7 @@ export type ParentNotificationsPayload = {
     pages: number;
     limit: number;
   };
+  unreadCount: number;
 };
 
 export async function apiGetParentNotifications(

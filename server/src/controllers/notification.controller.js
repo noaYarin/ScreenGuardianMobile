@@ -1,9 +1,8 @@
 import {
   getParentNotifications,
   markNotificationAsRead,
-  readAllNotifications 
-}
- from "../services/notification.service.js";
+  readAllNotifications,
+} from "../services/notification.service.js";
 
 // Return notifications for the logged-in parent
 export async function getParentNotificationsController(req, res, next) {
@@ -11,8 +10,9 @@ export async function getParentNotificationsController(req, res, next) {
     const parentId = req.user.parentId;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;  
-    const { notifications, total, pages } = await getParentNotifications(parentId, page, limit);
+    const { notifications, total, pages, unreadCount } = await getParentNotifications(parentId, page, limit);
 
+    
     res.status(200).json({ 
       ok: true,
       data: { 
@@ -22,7 +22,8 @@ export async function getParentNotificationsController(req, res, next) {
           page,
           pages,
           limit
-        }
+        },
+        unreadCount
       } 
     }); 
    } catch (err) {

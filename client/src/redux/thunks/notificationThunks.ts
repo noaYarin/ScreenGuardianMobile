@@ -45,6 +45,7 @@ export const fetchParentNotificationsThunk = createAsyncThunk(
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number }, { rejectWithValue }) => {
     try {
       const response = await apiGetParentNotifications(page, limit);
+      const unreadCount = response?.unreadCount??0;
       const rawList = Array.isArray(response?.notifications) ? response.notifications : [];
       const data = rawList
         .map((row) => {
@@ -58,7 +59,7 @@ export const fetchParentNotificationsThunk = createAsyncThunk(
 
       const pagination = normalizePagination(response?.pagination, { page, limit });
 
-      return { data, pagination };
+      return { data, pagination, unreadCount };
     } catch (error: unknown) {
       const message =
         error instanceof Error && typeof error.message === "string"

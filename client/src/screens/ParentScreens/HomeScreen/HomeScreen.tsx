@@ -42,9 +42,8 @@ export default function HomeParentScreen() {
     (state: RootState) => state.children ?? {}
   );
   const { parentId } = useSelector((state: RootState) => state.auth ?? {});
-  const notifications = useSelector((state: RootState) => state.notifications?.items ?? []);
   const children = Array.isArray(childrenList) ? childrenList : [];
-  const unreadNotificationsCount = notifications.filter((n: any) => !n?.isRead).length;
+  const unreadNotificationsCount = useSelector((state: RootState) => state.notifications?.unreadCount ?? 0);
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());

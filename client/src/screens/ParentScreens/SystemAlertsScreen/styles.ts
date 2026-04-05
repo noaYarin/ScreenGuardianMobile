@@ -110,6 +110,30 @@ export const styles = StyleSheet.create({
     width: "100%",
   },
 
+  listTitleRow: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+
+  markAllReadPressable: {
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+
+  markAllReadText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#3D5AFE",
+  },
+
+  alertListItemWrap: {
+    width: "100%",
+    marginBottom: 12,
+  },
+
   sectionTitle: {
     fontSize: 16,
     color: "#111827",

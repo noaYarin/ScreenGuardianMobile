@@ -14,7 +14,9 @@ import type { Notification } from "@/src/api/notification";
 import {
   fetchParentNotificationsThunk,
   markParentNotificationReadThunk,
+  markAllParentNotificationsReadThunk,
 } from "@/src/redux/thunks/notificationThunks";
+import { showAppToast } from "@/src/utils/appToast";
 
 type AlertFilter = "all" | "unread" | "critical";
 type AlertSeverity = "critical" | "warning" | "info" | "success";
@@ -79,7 +81,7 @@ export default function SystemAlertsScreen() {
   const { t } = useTranslation();
   const { text, row, isRTL } = useLocaleLayout();
   const dispatch = useDispatch<AppDispatch>();
-  
+
   const notificationsState = useSelector((state: RootState) => state.notifications);
   const notifications = Array.isArray(notificationsState?.items)
     ? notificationsState.items
@@ -87,9 +89,11 @@ export default function SystemAlertsScreen() {
   const pagination = notificationsState?.pagination ?? DEFAULT_PAGINATION;
   const status = notificationsState?.status ?? "idle";
   const error = notificationsState?.error ?? null;
+  const unreadCount = notificationsState?.unreadCount ?? 0;
 
   const [selectedFilter, setSelectedFilter] = useState<AlertFilter>("all");
   const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const [markAllReadBusy, setMarkAllReadBusy] = useState(false);
 
   const loadData = useCallback((page: number) => {
     dispatch(fetchParentNotificationsThunk({ page, limit: 10 }));
@@ -99,13 +103,24 @@ export default function SystemAlertsScreen() {
     loadData(1);
   }, [loadData]);
 
+  const handleMarkAllRead = useCallback(async () => {
+    setMarkAllReadBusy(true);
+    try {
+      await dispatch(markAllParentNotificationsReadThunk()).unwrap();
+    } catch {
+      showAppToast(t("systemAlerts.markAllReadFailed"), t("common.error"));
+    } finally {
+      setMarkAllReadBusy(false);
+    }
+  }, [dispatch, t]);
+
   const handleLoadMore = useCallback(async () => {
     if (isFetchingMore || status === "loading" || !pagination || (pagination?.page || 1) >= (pagination?.pages || 1)) return;
 
     setIsFetchingMore(true);
-    await dispatch(fetchParentNotificationsThunk({ 
-      page: (pagination?.page || 1) + 1, 
-      limit: 10 
+    await dispatch(fetchParentNotificationsThunk({
+      page: (pagination?.page || 1) + 1,
+      limit: 10,
     }));
     setIsFetchingMore(false);
   }, [dispatch, pagination, isFetchingMore, status]);
@@ -144,7 +159,7 @@ export default function SystemAlertsScreen() {
 
           <View style={styles.statCard}>
             <AppText weight="extraBold" style={styles.statValue}>
-              {(notifications || []).filter((n: Notification) => !n.isRead).length}
+              {unreadCount}
             </AppText>
             <AppText weight="medium" style={[styles.statLabel, text]}>
               {t("systemAlerts.stats.unread")}
@@ -184,13 +199,34 @@ export default function SystemAlertsScreen() {
       </View>
 
       {status === "failed" && (notifications || []).length > 0 && (
-        <View style={{ padding: 10, backgroundColor: '#FEE2E2', borderRadius: 8, marginHorizontal: 16, marginBottom: 10 }}>
-           <AppText style={{ color: '#B91C1C' }}>{safeErrorText(error)}</AppText>
+        <View style={{ padding: 10, backgroundColor: "#FEE2E2", borderRadius: 8, marginHorizontal: 16, marginBottom: 10 }}>
+          <AppText style={{ color: "#B91C1C" }}>{safeErrorText(error)}</AppText>
         </View>
       )}
 
-      <View style={styles.sectionHeader}>
-        <AppText weight="bold" style={[styles.sectionTitle, text]}>{t("systemAlerts.listTitle")}</AppText>
+      <View style={[styles.listTitleRow, row]}>
+        <AppText weight="bold" style={[styles.sectionTitle, text]}>
+          {t("systemAlerts.listTitle")}
+        </AppText>
+        {unreadCount > 0 && (
+          <Pressable
+            onPress={() => {
+              void handleMarkAllRead();
+            }}
+            disabled={markAllReadBusy}
+            accessibilityRole="button"
+            accessibilityLabel={t("systemAlerts.markAllRead_a11y")}
+            style={({ pressed }) => [
+              styles.markAllReadPressable,
+              pressed && !markAllReadBusy && { opacity: 0.7 },
+              markAllReadBusy && { opacity: 0.45 },
+            ]}
+          >
+            <AppText weight="bold" style={styles.markAllReadText}>
+              {t("systemAlerts.markAllRead")}
+            </AppText>
+          </Pressable>
+        )}
       </View>
     </View>
   );
@@ -204,52 +240,75 @@ export default function SystemAlertsScreen() {
     );
   };
 
-  const renderItem = ({ item: alert }: { item: Notification }) => {
-    const severity = toAlertSeverity(alert.severity);
-    const palette = ALERT_COLORS[severity];
-    const isUnread = !alert.isRead;
+  const renderItem = useCallback(
+    ({ item: alert }: { item: Notification }) => {
+      const severity = toAlertSeverity(alert.severity);
+      const palette = ALERT_COLORS[severity];
+      const isUnread = !alert.isRead;
 
-    return (
-      <Pressable
-        onPress={() => {
-          if (alert._id && !alert.isRead) {
-            dispatch(markParentNotificationReadThunk({ notificationId: String(alert._id) }));
-          }
-        }}
-        style={({ pressed }) => [styles.alertCard, pressed && styles.pressed, !isUnread && styles.alertCardRead]}
-      >
-        <View style={[styles.alertAccent, { backgroundColor: palette.accent }]} />
-        <View style={[styles.alertContentRow, row]}>
-          <View style={[styles.alertIconWrap, { backgroundColor: palette.soft }]}>
-            <MaterialCommunityIcons name={pickIcon(alert.type, alert.severity)} size={22} color={palette.accent} />
-          </View>
-          <View style={styles.alertTextWrap}>
-            <View style={[styles.alertHeaderRow, row]}>
-              <AppText weight="bold" style={[styles.alertTitle, text]} numberOfLines={1}>
-              {String(alert.title ?? "")}
-            </AppText>
-              {isUnread && <View style={styles.unreadDot} />}
-            </View>
-            <AppText weight="medium" style={[styles.alertDescription, text]}>
-              {String(alert.description ?? "")}
-            </AppText>
-            <View style={[styles.alertFooterRow, row]}>
-              <View style={styles.timeBadge}>
-                <MaterialCommunityIcons name="clock-time-four-outline" size={14} color="#6B7280" />
-                <AppText weight="medium" style={[styles.timeText, text]}>{formatCreatedAt(alert.createdAt) || t("systemAlerts.time.justNow")}</AppText>
+      return (
+        <View style={styles.alertListItemWrap}>
+          <Pressable
+            onPress={() => {
+              if (alert._id && !alert.isRead) {
+                dispatch(
+                  markParentNotificationReadThunk({
+                    notificationId: String(alert._id),
+                  })
+                );
+              }
+            }}
+            style={({ pressed }) => [
+              styles.alertCard,
+              pressed && styles.pressed,
+              !isUnread && styles.alertCardRead,
+            ]}
+          >
+            <View style={[styles.alertAccent, { backgroundColor: palette.accent }]} />
+            <View style={[styles.alertContentRow, row]}>
+              <View style={[styles.alertIconWrap, { backgroundColor: palette.soft }]}>
+                <MaterialCommunityIcons
+                  name={pickIcon(alert.type, alert.severity)}
+                  size={22}
+                  color={palette.accent}
+                />
               </View>
-              <View style={[styles.severityBadge, { backgroundColor: palette.soft }]}>
-                <AppText weight="bold" style={[styles.severityText, text, { color: palette.accent }]}>
-                  {t(`systemAlerts.severityLabels.${severity}`)}
+              <View style={styles.alertTextWrap}>
+                <View style={[styles.alertHeaderRow, row]}>
+                  <AppText weight="bold" style={[styles.alertTitle, text]} numberOfLines={1}>
+                    {String(alert.title ?? "")}
+                  </AppText>
+                  {isUnread && <View style={styles.unreadDot} />}
+                </View>
+                <AppText weight="medium" style={[styles.alertDescription, text]}>
+                  {String(alert.description ?? "")}
                 </AppText>
+                <View style={[styles.alertFooterRow, row]}>
+                  <View style={styles.timeBadge}>
+                    <MaterialCommunityIcons name="clock-time-four-outline" size={14} color="#6B7280" />
+                    <AppText weight="medium" style={[styles.timeText, text]}>
+                      {formatCreatedAt(alert.createdAt) || t("systemAlerts.time.justNow")}
+                    </AppText>
+                  </View>
+                  <View style={[styles.severityBadge, { backgroundColor: palette.soft }]}>
+                    <AppText weight="bold" style={[styles.severityText, text, { color: palette.accent }]}>
+                      {t(`systemAlerts.severityLabels.${severity}`)}
+                    </AppText>
+                  </View>
+                </View>
               </View>
+              <MaterialCommunityIcons
+                name={isRTL ? "chevron-left" : "chevron-right"}
+                size={22}
+                color="#C0C6D4"
+              />
             </View>
-          </View>
-          <MaterialCommunityIcons name={isRTL ? "chevron-left" : "chevron-right"} size={22} color="#C0C6D4" />
+          </Pressable>
         </View>
-      </Pressable>
-    );
-  };
+      );
+    },
+    [dispatch, isRTL, row, t, text]
+  );
 
   if (status === "loading" && (notifications?.length || 0) === 0) {
     return (
@@ -271,16 +330,16 @@ export default function SystemAlertsScreen() {
         }
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}
-        ListHeaderComponentStyle={{ width: '100%' }}
+        ListHeaderComponentStyle={{ width: "100%" }}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         initialNumToRender={10}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
         refreshControl={
-          <RefreshControl 
-            refreshing={status === "loading" && (notifications?.length || 0) > 0} 
-            onRefresh={() => loadData(1)} 
+          <RefreshControl
+            refreshing={status === "loading" && (notifications?.length || 0) > 0}
+            onRefresh={() => loadData(1)}
             colors={["#3D5AFE"]}
           />
         }
@@ -288,8 +347,12 @@ export default function SystemAlertsScreen() {
           status !== "loading" ? (
             <View style={styles.emptyState}>
               <MaterialCommunityIcons name="bell-outline" size={28} color="#9CA3AF" />
-              <AppText weight="bold" style={[styles.emptyTitle, text]}>{t("systemAlerts.empty.title")}</AppText>
-              <AppText weight="medium" style={[styles.emptySubtitle, text]}>{t("systemAlerts.empty.subtitle")}</AppText>
+              <AppText weight="bold" style={[styles.emptyTitle, text]}>
+                {t("systemAlerts.empty.title")}
+              </AppText>
+              <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                {t("systemAlerts.empty.subtitle")}
+              </AppText>
             </View>
           ) : null
         }

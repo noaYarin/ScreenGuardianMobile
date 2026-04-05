@@ -624,6 +624,9 @@
     "heading": "System Alerts",
     "subtitle": "Track important updates, unusual activity, and system notifications in one place.",
     "listTitle": "Recent Alerts",
+    "markAllRead": "Mark all read",
+    "markAllRead_a11y": "Mark all notifications as read",
+    "markAllReadFailed": "Could not mark all notifications as read.",
     "stats": {
       "total": "Total",
       "unread": "Unread",
@@ -654,6 +657,7 @@
       "subtitle": "New alerts will appear here as soon as they arrive."
     },
     "time": {
+      "justNow": "Just now",
       "minutesAgo10": "10 minutes ago",
       "minutesAgo25": "25 minutes ago",
       "hourAgo1": "1 hour ago",
