@@ -3,6 +3,9 @@ import { View, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -20,6 +23,7 @@ type ChildCard = {
   usedText: string;
   limitText: string;
   status: "good" | "warn" | "bad";
+  avatarUri: string | null;
 };
 
 const ICON = {
@@ -57,6 +61,7 @@ export default function HomeParentScreen() {
       usedText: "00:00",
       limitText: "00:00",
       status: "good" as const,
+      avatarUri: getChildProfileImageUri(child?.img),
     }));
   }, [children]);
 
@@ -221,16 +226,25 @@ const bellButton = (
                       <View
                         style={[
                           styles.avatarCircle,
-                          c.status === "good" && styles.avatarGood,
-                          c.status === "warn" && styles.avatarWarn,
-                          c.status === "bad" && styles.avatarBad,
+                          !c.avatarUri && c.status === "good" && styles.avatarGood,
+                          !c.avatarUri && c.status === "warn" && styles.avatarWarn,
+                          !c.avatarUri && c.status === "bad" && styles.avatarBad,
                         ]}
                       >
-                        <MaterialCommunityIcons
-                          name={ICON.user}
-                          size={22}
-                          color="#0F172A"
-                        />
+                        {c.avatarUri ? (
+                          <Image
+                            source={{ uri: c.avatarUri }}
+                            style={styles.avatarImage}
+                            contentFit="cover"
+                            transition={120}
+                          />
+                        ) : (
+                          <MaterialCommunityIcons
+                            name={ICON.user}
+                            size={22}
+                            color="#0F172A"
+                          />
+                        )}
                       </View>
 
                       <View style={styles.cardCenter}>

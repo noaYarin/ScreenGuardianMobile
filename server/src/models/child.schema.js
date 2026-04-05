@@ -7,6 +7,7 @@ import { AvatarSchema } from "./avatar.schema.js";
 export const ChildSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 30 },
+    img: { type: String, default: "" },
     birthDate: { type: Date },
     gender: { type: String, enum: Object.values(Gender), default: Gender.OTHER },
     interests: { type: [String], default: [] },

@@ -1,6 +1,9 @@
 import React, { useMemo } from "react";
 import { View, Pressable, ScrollView, useWindowDimensions } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 import { CHILD_ACCENT_COLORS } from "../../../../client/constants/childAccentColors";
 
@@ -75,7 +78,11 @@ export default function ChildSelector({
               const childId = String(child._id);
               const accentColor = accentColorForChildId(childId);
               const childName = String(child.name ?? "");
-              const childInitial = childName.trim()[0] ?? "";
+              const childInitial =
+                childName.trim().length > 0
+                  ? (Array.from(childName.trim())[0] ?? "")
+                  : "";
+              const avatarUri = getChildProfileImageUri(child.img);
               const isSelected = childId === selectedChildId;
 
               return (
@@ -104,12 +111,25 @@ export default function ChildSelector({
                     <View
                       style={[
                         styles.childAvatarCircle,
-                      { backgroundColor: accentColor },
+                        !avatarUri && { backgroundColor: accentColor },
                       ]}
                     >
-                      <AppText weight="extraBold" style={styles.childAvatarText}>
-                      {childInitial}
-                      </AppText>
+                      {avatarUri ? (
+                        <Image
+                          source={{ uri: avatarUri }}
+                          style={styles.childAvatarImage}
+                          contentFit="cover"
+                          transition={120}
+                          accessibilityLabel={childName}
+                        />
+                      ) : (
+                        <AppText
+                          weight="extraBold"
+                          style={styles.childAvatarText}
+                        >
+                          {childInitial || "?"}
+                        </AppText>
+                      )}
                     </View>
                   </View>
 

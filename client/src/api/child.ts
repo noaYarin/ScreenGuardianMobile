@@ -17,3 +17,14 @@ export async function updateCurrentChildProfile(childId: string, birthDate: stri
     role: "PARENT",
   });
 }
+
+export async function updateChildProfileImage(
+  childId: string,
+  img: string
+): Promise<{ child: Child }> {
+  return api.put<{ child: Child }>(
+    `/api/v1/child/${childId}/profile-image`,
+    { img },
+    { requireAuth: true, role: "PARENT" }
+  );
+}

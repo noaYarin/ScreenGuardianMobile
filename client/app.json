@@ -62,6 +62,13 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow ScreenGuardian to use your location to keep your child safe."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow access to your photos to set your child's profile picture.",
+          "cameraPermission": "Allow camera access to take a photo for your child's profile picture."
+        }
       ]
     ],
     "experiments": {

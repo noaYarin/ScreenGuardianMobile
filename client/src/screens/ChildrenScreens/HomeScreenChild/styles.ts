@@ -91,6 +91,11 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
+  avatarPhoto: {
+    width: "100%",
+    height: "100%",
+  },
+
   avatarLetter: {
     color: "#FFFFFF",
     fontSize: 42,

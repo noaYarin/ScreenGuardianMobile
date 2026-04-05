@@ -13,6 +13,8 @@ import childRoutes from "./routes/child.routes.js";
 
 
 const app = express();
+// Maximum allowed characters 
+app.use(express.json({ limit: '5mb' }));
 
 app.use(cors());
 app.use(express.json());

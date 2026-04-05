@@ -19,7 +19,9 @@
   "children": {
     "fetch_failed": "Could not load children.",
     "add_failed": "Could not add the child.",
-    "profile_failed": "Could not load the child profile."
+    "profile_failed": "Could not load the child profile.",
+    "avatar_update_failed": "Could not update the profile photo.",
+    "profile_image_update_failed": "Could not update the profile photo."
   },
   "language": {
     "he": "עברית",
@@ -469,6 +471,15 @@
     "edit": "Edit Details",
     "edit_a11y": "Edit child details",
     "age": "Age {{age}}",
+    "change_photo": "Profile photo",
+    "change_photo_message": "Choose how to add a photo",
+    "take_photo": "Take photo",
+    "choose_from_library": "Choose from library",
+    "photo_edit_a11y": "Change profile photo",
+    "photo_permission_denied": "Permission is required to use the camera or photo library.",
+    "photo_no_data": "Could not read the image. Try another photo.",
+    "photo_updated": "Profile photo updated",
+    "photo_upload_failed": "Could not upload the photo",
     "actions": {
       "apps": {
         "title": "Apps on Device",

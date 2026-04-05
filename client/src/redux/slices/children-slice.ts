@@ -4,6 +4,7 @@ import {
   getMyChildrenThunk,
   fetchCurrentChildProfileThunk,
   updateCurrentChildProfileThunk,
+  updateChildProfileImageThunk,
   deleteChildThunk,
 } from "../thunks/childrenThunks";
 
@@ -21,6 +22,7 @@ export type ChildAvatar = {
 export type Child = {
   _id: string;
   name: string;
+  img?: string;
   birthDate?: string;
   gender?: ChildGender;
   interests?: string[];
@@ -141,6 +143,13 @@ const childrenSlice = createSlice({
           (action.payload as string) ||
           action.error.message ||
           "Update failed";
+      })
+
+      .addCase(updateChildProfileImageThunk.fulfilled, (state, action) => {
+        const updatedChild = action.payload;
+        state.childrenList = state.childrenList.map((c) =>
+          String(c._id) === String(updatedChild._id) ? updatedChild : c
+        );
       })
   },
 });

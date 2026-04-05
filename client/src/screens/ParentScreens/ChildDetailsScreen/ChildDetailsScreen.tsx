@@ -198,6 +198,7 @@ export default function ChildDetailsScreen() {
             childName={childName}
             birthDateLabel={birthDateLabel}
             genderLabel={genderLabel}
+            profileImg={selectedChild?.img}
             row={row}
             text={text}
             onOpenProfile={handleOpenChildProfile}

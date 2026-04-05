@@ -69,3 +69,9 @@ export const Request = {
   INVALID_REQUEST_STATUS: { status: 400, code: "VALIDATION_ERROR", message: "Invalid request status" },
 };
 
+
+export const ChildProfileImage = {
+  REQUIRED: { status: 400, code: "VALIDATION_ERROR", message: "img is required" },
+  TOO_LARGE: { status: 400, code: "VALIDATION_ERROR", message: "Profile image is too large" },
+  INVALID: { status: 400, code: "VALIDATION_ERROR", message: "img must be a data URL image (data:image/...)" },
+};

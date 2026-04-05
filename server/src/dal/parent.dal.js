@@ -163,6 +163,26 @@ export async function updateCurrentChildProfileByParentId(parentId, childId, bir
   return updated;
 }
 
+export async function updateChildProfileImgByParentId(parentId, childId, img) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(childId, CommonErrors.INVALID_CHILD_ID);
+
+  const updated = await ParentModel.findOneAndUpdate(
+    { _id: parentId, "children._id": childId },
+    { $set: { "children.$.img": img } },
+    {
+      new: true,
+      projection: { children: { $elemMatch: { _id: childId } } },
+    }
+  ).lean();
+
+  if (!updated || !updated.children || updated.children.length === 0) {
+    return null;
+  }
+
+  return updated.children[0];
+}
+
 // Secure logout: revoke all existing JWTs issued before `lastLogoutAt`.
 export async function setParentLastLogoutAt(parentId, lastLogoutAt = new Date()) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);

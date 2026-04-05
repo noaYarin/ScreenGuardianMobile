@@ -18,7 +18,9 @@
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
     "add_failed": "לא ניתן להוסיף את הילד.",
-    "profile_failed": "לא ניתן לטעון את פרופיל הילד."
+    "profile_failed": "לא ניתן לטעון את פרופיל הילד.",
+    "avatar_update_failed": "לא ניתן לעדכן את תמונת הפרופיל.",
+    "profile_image_update_failed": "לא ניתן לעדכן את תמונת הפרופיל."
   },
   "language": {
     "he": "עברית",
@@ -428,6 +430,15 @@
     "edit": "עריכת פרטים",
     "edit_a11y": "עריכת פרטי הילד/ה",
     "age": "גיל {{age}}",
+    "change_photo": "תמונת פרופיל",
+    "change_photo_message": "איך להוסיף תמונה?",
+    "take_photo": "צילום",
+    "choose_from_library": "בחירה מהגלריה",
+    "photo_edit_a11y": "שינוי תמונת פרופיל",
+    "photo_permission_denied": "נדרשת הרשאה לשימוש במצלמה או בגלריה.",
+    "photo_no_data": "לא ניתן לקרוא את התמונה. נסו תמונה אחרת.",
+    "photo_updated": "תמונת הפרופיל עודכנה",
+    "photo_upload_failed": "לא ניתן להעלות את התמונה",
     "actions": {
       "apps": {
         "title": "אפליקציות במכשיר",

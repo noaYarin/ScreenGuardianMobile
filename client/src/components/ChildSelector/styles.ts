@@ -68,9 +68,15 @@ export const styles = StyleSheet.create({
   childAvatarCircle: {
     width: 44,
     height: 44,
-    borderRadius: 26,
+    borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+
+  childAvatarImage: {
+    width: "100%",
+    height: "100%",
   },
 
   childAvatarText: {

@@ -3,6 +3,7 @@ import { api } from "./request";
 type Child = {
   _id: string;
   name: string;
+  img?: string;
   birthDate: string;
   gender?: string;
   interests?: string[];

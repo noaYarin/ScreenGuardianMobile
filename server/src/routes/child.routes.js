@@ -6,6 +6,7 @@ import {
   getCurrentChildProfileController,
   updateChildInterestsController,
   updateCurrentChildProfileController,
+  updateChildProfileImageController,
 } from "../controllers/child.controller.js";
 
 const router = Router();
@@ -19,5 +20,7 @@ router.patch("/interests", authJwt, requireChild, updateChildInterestsController
 
 // PUT /api/v1/child/profile
 router.put("/:childId/profile", authJwt, requireParent, updateCurrentChildProfileController);
+
+router.put("/:childId/profile-image", authJwt, requireParent, updateChildProfileImageController);
 
 export default router;
