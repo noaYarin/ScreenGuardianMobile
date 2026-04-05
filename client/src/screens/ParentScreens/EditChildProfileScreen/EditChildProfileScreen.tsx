@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { View, ScrollView, Pressable, useWindowDimensions, Platform, ActivityIndicator, TouchableOpacity } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { View, ScrollView, Pressable, useWindowDimensions, ActivityIndicator, TouchableOpacity } from "react-native";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
+import InlineDatePicker from "../../../components/InlineDatePicker/InlineDatePicker";
 import ChildSelector from "../../../components/ChildSelector/ChildSelector";
 import { styles } from "./styles";
 
@@ -192,42 +192,20 @@ export default function EditChildProfileScreen() {
                   </View>
                 </Pressable>
 
-                {showDatePicker ? (
-                  <DateTimePicker
-                    value={birthDate ?? new Date()}
-                    mode="date"
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
-                    maximumDate={new Date()}
-                    onChange={(event, selectedDate) => {
-                      if (Platform.OS === "android") {
-                        setShowDatePicker(false);
-                      }
-                      if (selectedDate) {
-                        setBirthDate(selectedDate);
-                      }
-                    }}
-                  />
-                ) : null}
-
-                {Platform.OS === "ios" && showDatePicker ? (
-                  <View style={styles.iosPickerFooter}>
-                    <Pressable
-                      onPress={() => setShowDatePicker(false)}
-                      accessibilityRole="button"
-                      accessibilityLabel={t(
-                        "defineChildProfile.accessibility.confirmBirthDate"
-                      )}
-                      style={({ pressed }) => [
-                        styles.iosPickerDoneButton,
-                        pressed && styles.pressedSoft,
-                      ]}
-                    >
-                      <AppText weight="bold" style={styles.iosPickerDoneText}>
-                        {t("defineChildProfile.birthDate.done")}
-                      </AppText>
-                    </Pressable>
-                  </View>
-                ) : null}
+                <InlineDatePicker
+                  visible={showDatePicker}
+                  value={birthDate ?? new Date()}
+                  maximumDate={new Date()}
+                  onChange={setBirthDate}
+                  onRequestClose={() => setShowDatePicker(false)}
+                  doneLabel={t("defineChildProfile.birthDate.done")}
+                  doneAccessibilityLabel={t(
+                    "defineChildProfile.accessibility.confirmBirthDate"
+                  )}
+                  footerContainerStyle={styles.iosPickerFooter}
+                  donePressableStyle={styles.iosPickerDoneButton}
+                  doneLabelStyle={styles.iosPickerDoneText}
+                />
               </View>
 
               <View style={[styles.sectionCard, isTablet && styles.sectionCardHalf]}>

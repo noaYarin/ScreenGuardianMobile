@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { View, Pressable, StyleProp, ViewStyle, TextStyle } from "react-native";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
 
 import AppText from "@/src/components/AppText/AppText";
 import { childDetailsStyles as styles } from "./childDetails.styles";
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 type Props = {
   childName: string;
   birthDateLabel: string;
   genderLabel: string;
+  profileImg?: string | null;
   row: StyleProp<ViewStyle>;
   text: StyleProp<TextStyle>;
   onOpenProfile: () => void;
@@ -19,22 +22,34 @@ export function ChildDetailsProfileCard({
   childName,
   birthDateLabel,
   genderLabel,
+  profileImg,
   row,
   text,
   onOpenProfile,
 }: Props) {
   const { t } = useTranslation();
+  const avatarUri = useMemo(() => getChildProfileImageUri(profileImg), [profileImg]);
 
   return (
     <View style={styles.profileCard}>
       <View style={[styles.profileHeader, row]}>
         <View style={styles.avatarColumn}>
           <View style={styles.avatarWrap}>
-            <MaterialCommunityIcons
-              name="human-child"
-              size={22}
-              color="#0F172A"
-            />
+            {avatarUri ? (
+              <Image
+                source={{ uri: avatarUri }}
+                style={styles.avatarImage}
+                contentFit="cover"
+                transition={120}
+                accessibilityIgnoresInvertColors
+              />
+            ) : (
+              <MaterialCommunityIcons
+                name="account-outline"
+                size={22}
+                color="#0F172A"
+              />
+            )}
           </View>
 
           <Pressable

@@ -1,10 +1,9 @@
-import { Dimensions, Platform } from "react-native";
+import { Platform } from "react-native";
 import * as Application from 'expo-application';
+import * as Device from 'expo-device';
 
 export type DevicePlatformValue = "ANDROID" | "IOS" | "OTHER";
 export type DeviceTypeValue = "PHONE" | "TABLET" | "OTHER";
-
-const TABLET_MIN_DIMENSION_PX = 600;
 
 export function detectConnectionPlatform(): DevicePlatformValue {
   if (Platform.OS === "android") return "ANDROID";
@@ -12,16 +11,13 @@ export function detectConnectionPlatform(): DevicePlatformValue {
   return "OTHER";
 }
 
-export function detectConnectionDeviceType(options?: {
-  width?: number;
-  height?: number;
-}): DeviceTypeValue {
-  const win = Dimensions.get("window");
-  const width = options?.width ?? win.width;
-  const height = options?.height ?? win.height;
+export function detectConnectionDeviceType(): DeviceTypeValue {
+  const type = Device.deviceType;
 
-  const minDimension = Math.min(width, height);
-  return minDimension >= TABLET_MIN_DIMENSION_PX ? "TABLET" : "PHONE";
+  if (type === Device.DeviceType.TABLET) return "TABLET";
+  if (type === Device.DeviceType.PHONE) return "PHONE";
+  
+  return "OTHER";
 }
 
 

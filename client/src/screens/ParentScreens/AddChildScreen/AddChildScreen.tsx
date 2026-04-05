@@ -5,15 +5,14 @@ import {
   TextInput,
   useWindowDimensions,
   ActivityIndicator,
-  Platform,
 } from "react-native";
-import DateTimePicker from "@react-native-community/datetimepicker";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
+import InlineDatePicker from "../../../components/InlineDatePicker/InlineDatePicker";
 import { styles } from "./styles";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
@@ -198,41 +197,15 @@ export default function AddChildScreen() {
                   </View>
                 </Pressable>
 
-                {showDatePicker ? (
-                  <DateTimePicker
-                    value={birthDate}
-                    mode="date"
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
-                    maximumDate={new Date()}
-                    onChange={(event, selectedDate) => {
-                      if (Platform.OS === "android") {
-                        setShowDatePicker(false);
-                      }
-
-                      if (selectedDate) {
-                        setBirthDate(selectedDate);
-                      }
-                    }}
-                  />
-                ) : null}
-
-                {Platform.OS === "ios" && showDatePicker ? (
-                  <View style={styles.iosPickerFooter}>
-                    <Pressable
-                      onPress={() => setShowDatePicker(false)}
-                      accessibilityRole="button"
-                      accessibilityLabel={t("addChild.birthdate_done_a11y")}
-                      style={({ pressed }) => [
-                        styles.iosPickerDoneButton,
-                        pressed && styles.pressedSoft,
-                      ]}
-                    >
-                      <AppText weight="bold" style={styles.iosPickerDoneText}>
-                        {t("addChild.birthdate_done")}
-                      </AppText>
-                    </Pressable>
-                  </View>
-                ) : null}
+                <InlineDatePicker
+                  visible={showDatePicker}
+                  value={birthDate}
+                  maximumDate={new Date()}
+                  onChange={setBirthDate}
+                  onRequestClose={() => setShowDatePicker(false)}
+                  doneLabel={t("addChild.birthdate_done")}
+                  doneAccessibilityLabel={t("addChild.birthdate_done_a11y")}
+                />
               </View>
 
               <View style={styles.fieldBlock}>

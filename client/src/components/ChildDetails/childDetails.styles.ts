@@ -8,6 +8,7 @@ export const childDetailsIconColors = {
 
 export const childDetailsStyles = StyleSheet.create({
   container: {
+    flex: 1,
     width: "100%",
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -22,6 +23,7 @@ export const childDetailsStyles = StyleSheet.create({
   },
 
   scrollContent: {
+    flexGrow: 1,
     width: "100%",
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -114,6 +116,12 @@ export const childDetailsStyles = StyleSheet.create({
     backgroundColor: "#EFF6FF",
     alignItems: "center",
     justifyContent: "center",
+    overflow: "hidden",
+  },
+
+  avatarImage: {
+    width: "100%",
+    height: "100%",
   },
 
   childProfileButton: {
@@ -203,9 +211,14 @@ export const childDetailsStyles = StyleSheet.create({
     width: "100%",
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    backgroundColor: "#F3F4F6",
+    borderColor: "#E7EFFA",
+    backgroundColor: "#FFFFFF",
     padding: 14,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 1,
   },
 
   deviceHeaderRow: {
@@ -275,6 +288,13 @@ export const childDetailsStyles = StyleSheet.create({
     fontSize: 15,
     lineHeight: 22,
     color: "#111827",
+  },
+
+  deviceDetailNameInput: {
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    margin: 0,
+    minHeight: 24,
   },
 
   deviceDetailRowDivider: {

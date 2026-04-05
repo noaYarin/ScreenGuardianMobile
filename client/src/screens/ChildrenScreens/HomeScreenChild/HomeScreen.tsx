@@ -1,9 +1,11 @@
 // client/src/screens/ChildrenScreens/HomeScreenChild/HomeScreen.tsx
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { View, Pressable, useWindowDimensions, StyleProp, ViewStyle } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { router, Stack, useLocalSearchParams, type Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import Toast from "react-native-root-toast";
 
@@ -26,6 +28,7 @@ import * as Location from "expo-location";
 import { updateDeviceLocation } from "@/src/redux/thunks/deviceThunks";
 import { connectSocket, emitEvent, onEvent } from "@/src/services/socket";
 import { REQUEST_CHILD_LOCATION } from "@/src/constants/socketEvents";
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 const ICON = {
   accessibility: "human-wheelchair",
@@ -128,12 +131,14 @@ export default function HomeScreen() {
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, [activeChildId]);
+  }, [activeChildId], );
 
 
-  useEffect(() => {
-    dispatch(fetchCurrentChildProfileThunk());
-  }, [dispatch]);
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(fetchCurrentChildProfileThunk());
+    }, [dispatch])
+  );
 
   const loadScreenTime = async () => {
     try {
@@ -159,7 +164,7 @@ export default function HomeScreen() {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [deviceId]);
 
   const userName = (
     activeChildData?.name?.trim() ||
@@ -167,6 +172,10 @@ export default function HomeScreen() {
     t("home.default_child_display_name")
   ).trim();
   const avatarLetter = userName.length ? (Array.from(userName)[0] ?? "?") : "?";
+  const profileImageUri = useMemo(
+    () => getChildProfileImageUri(activeChildData?.img),
+    [activeChildData?.img]
+  );
   const pointsValue = activeChildData?.avatar?.currentXp ?? 0;
   const levelValue = activeChildData?.avatar?.level ?? 0;
   const coinsValue =
@@ -254,16 +263,26 @@ export default function HomeScreen() {
           <View style={styles.headerCard}>
             <View style={[styles.headerRow, row]}>
               <View style={[styles.avatarWrap, { width: avatarSize, height: avatarSize }]}>
-                <LinearGradient
-                  colors={["#3B82F6", "#BDE0FE"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={styles.avatarGradient}
-                >
-                  <AppText weight="extraBold" style={styles.avatarLetter}>
-                    {avatarLetter}
-                  </AppText>
-                </LinearGradient>
+                {profileImageUri ? (
+                  <Image
+                    source={{ uri: profileImageUri }}
+                    style={styles.avatarPhoto}
+                    contentFit="cover"
+                    transition={160}
+                    accessibilityLabel={userName}
+                  />
+                ) : (
+                  <LinearGradient
+                    colors={["#3B82F6", "#BDE0FE"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={styles.avatarGradient}
+                  >
+                    <AppText weight="extraBold" style={styles.avatarLetter}>
+                      {avatarLetter}
+                    </AppText>
+                  </LinearGradient>
+                )}
               </View>
 
               <View style={styles.helloBlock}>

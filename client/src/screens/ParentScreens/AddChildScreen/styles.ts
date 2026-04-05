@@ -201,28 +201,4 @@ dateFieldChangeText: {
   fontSize: 13,
   color: "#2563EB",
 },
-
-iosPickerFooter: {
-  marginTop: 12,
-  alignItems: "flex-end",
-},
-
-iosPickerDoneButton: {
-  minWidth: 96,
-  borderRadius: 12,
-  paddingHorizontal: 16,
-  paddingVertical: 10,
-  backgroundColor: "#2563EB",
-  alignItems: "center",
-  justifyContent: "center",
-},
-
-iosPickerDoneText: {
-  color: "#FFFFFF",
-  fontSize: 14,
-},
-
-pressedSoft: {
-  opacity: 0.9,
-},
 });

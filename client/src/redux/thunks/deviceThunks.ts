@@ -53,9 +53,9 @@ function normalizeDevice(raw: unknown): Device {
 }
 
 export const fetchDevicesByChild = createAsyncThunk<
-  Device[],
-  string,
-  { rejectValue: string }
+  Device[], // What returned
+  string, // Payload - the childId
+  { rejectValue: string } // Reject value when the API returns an error
 >("devices/fetchByChild", async (childId, thunkAPI) => {
   try {
     const list = await apiGetDevicesByChild(childId);
@@ -94,7 +94,7 @@ export const updateDeviceName = createAsyncThunk<
     if (response == null) {
       return thunkAPI.rejectWithValue("devices.update_device_name_failed");
     }
-    return response;
+    return normalizeDevice(response);
   } catch (error) {
     const message =
       (error as Error)?.message ?? "devices.update_device_name_failed";

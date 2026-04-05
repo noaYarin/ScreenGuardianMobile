@@ -3,6 +3,7 @@ import { api } from "./request";
 type Child = {
   _id: string;
   name: string;
+  img?: string;
   birthDate: string;
   gender?: string;
   interests?: string[];
@@ -18,6 +19,7 @@ type Child = {
 export type HomeSummaryChild = {
   childId: string;
   name: string;
+  img?: string;
   deviceId: string | null;
   deviceName: string | null;
   usedTodayMinutes: number | null;

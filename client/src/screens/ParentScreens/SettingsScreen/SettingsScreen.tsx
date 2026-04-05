@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import {
   View,
   ScrollView,
   Pressable,
-  Switch,
   useWindowDimensions,
+  Linking,
+  Platform,
+  Share,
 } from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Href, router } from "expo-router";
@@ -16,372 +18,201 @@ import { styles } from "./styles";
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { logoutParent } from "@/src/redux/thunks/authThunks";
-import { logoutParentReducer, setError, setAuthLoading } from "../../../redux/slices/auth-slice";
+import {
+  logoutParentReducer,
+  setAuthLoading,
+} from "../../../redux/slices/auth-slice";
 import { useDispatch, useSelector } from "react-redux";
 import { disconnectSocket, emitEvent } from "../../../services/socket";
 import { PARENT_LOGOUT } from "@/src/constants/socketEvents";
 import { removeParentToken } from "@/src/services/authStorage";
 import { showAppToast } from "@/src/utils/appToast";
-type SettingRow = {
-  key: string;
-  titleKey: string;
-  subtitleKey?: string;
-  icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  route?: string;
-};
+import { getAppInviteDownloadUrl } from "@/src/constants/appLinks";
 
 export default function SettingsScreen() {
-  const { t, changeLanguage, currentLanguage } = useTranslation();
-  const { isRTL, row, text } = useLocaleLayout();
+  const { t } = useTranslation();
+  const { row, text, isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
   const dispatch = useDispatch();
   const isLoggingOut = useSelector((state: any) => state.auth.isLoading);
   const parentId = useSelector((state: any) => state.auth.parentId);
   const childrenIds = useSelector((state: any) => state.children.childrenList);
   const isTablet = width >= 900;
-  const iconTextRow = {
-    flexDirection: isRTL ? "row-reverse" : "row",
-  } as const;
 
-  const [appAlertsEnabled, setAppAlertsEnabled] = useState(true);
-  const [locationAccessEnabled, setLocationAccessEnabled] = useState(true);
-  const [pushEnabled, setPushEnabled] = useState(true);
-
-  const preferenceRows: SettingRow[] = useMemo(
-    () => [
-      {
-        key: "privacy",
-        titleKey: "settings.rows.privacy.title",
-        subtitleKey: "settings.rows.privacy.subtitle",
-        icon: "shield-check-outline",
-        route: "/Parent/privacySettings",
-      },
-      {
-        key: "help",
-        titleKey: "settings.rows.help.title",
-        subtitleKey: "settings.rows.help.subtitle",
-        icon: "lifebuoy",
-        route: "/Parent/helpSupport",
-      },
-    ],
-    []
-  );
-
-  const onToggleLanguage = async () => {
-    const nextLanguage = currentLanguage === "he" ? "en" : "he";
-    await changeLanguage(nextLanguage);
+  const onPressOpenDeviceAppSettings = async () => {
+    try {
+      await Linking.openSettings();
+    } catch {
+      showAppToast(t("settings.deviceApp.openFailed"));
+    }
   };
 
+  const onPressInviteFriend = async () => {
+    const url = getAppInviteDownloadUrl();
+    if (!url) {
+      showAppToast(t("settings.inviteFriend.noLink"));
+      return;
+    }
+    const message = t("settings.inviteFriend.shareMessage", { url });
+    try {
+      await Share.share(
+        Platform.OS === "android"
+          ? { message, title: t("settings.inviteFriend.shareTitle") }
+          : { message }
+      );
+    } catch {
+      showAppToast(t("settings.inviteFriend.shareFailed"));
+    }
+  };
 
   const onPressLogout = async () => {
     dispatch(setAuthLoading(true));
-    dispatch(setError(null));
     try {
-        if (childrenIds && childrenIds.length > 0) {
-        emitEvent(PARENT_LOGOUT, { 
-          parentId: parentId, 
-          childrenIds: childrenIds.map((child: any) => child._id) 
+      if (childrenIds?.length) {
+        emitEvent(PARENT_LOGOUT, {
+          parentId: parentId,
+          childrenIds: childrenIds.map((child: any) => child._id),
         });
       }
       await (dispatch as any)(logoutParent()).unwrap();
     } catch (error) {
       const message = (error as Error)?.message ?? "settings.logout.failed";
-      dispatch(setError(message));
       showAppToast(t(message));
     } finally {
-      dispatch(logoutParentReducer()); 
-      await removeParentToken(); 
+      dispatch(logoutParentReducer());
+      await removeParentToken();
       disconnectSocket();
       router.replace("/" as Href);
       dispatch(setAuthLoading(false));
     }
   };
 
-  const onPressRow = (route?: string) => {
-    if (!route) return;
-    router.push(route as Href);
-  };
-
   return (
-    <ScreenLayout>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.container, isTablet && styles.containerTablet]}>
-          <View style={styles.heroCard}>
-            <View style={[styles.heroTopRow, row]}>
-              <View style={styles.heroTextWrap}>
-                <AppText weight="extraBold" style={[styles.heroTitle, text]}>
-                  {t("settings.heading")}
-                </AppText>
-
-                <AppText weight="medium" style={[styles.heroSubtitle, text]}>
-                  {t("settings.subtitle")}
-                </AppText>
-              </View>
-
-              <View style={styles.heroIconBadge}>
-                <MaterialCommunityIcons
-                  name="cog-outline"
-                  size={28}
-                  color="#315AEF"
-                />
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.sectionCard}>
-            <View style={[styles.sectionHeaderRow, row]}>
-              <View style={styles.sectionHeaderIcon}>
-                <MaterialCommunityIcons
-                  name="translate"
-                  size={22}
-                  color="#315AEF"
-                />
-              </View>
-
-              <View style={styles.sectionHeaderTextWrap}>
-                <AppText weight="bold" style={[styles.sectionTitle, text]}>
-                  {t("settings.language.title")}
-                </AppText>
-
-                <AppText weight="medium" style={[styles.sectionSubtitle, text]}>
-                  {t("settings.language.subtitle")}
-                </AppText>
-              </View>
-            </View>
-
-            <Pressable
-              onPress={onToggleLanguage}
-              accessibilityRole="button"
-              accessibilityLabel={t("settings.language.buttonA11y")}
-              style={({ pressed }) => [
-                styles.languageButton,
-                pressed && styles.pressed,
-              ]}
-            >
-              <View style={[styles.languageButtonContent, row]}>
-                <View style={[styles.languageButtonLeft, iconTextRow]}>
-                  <View style={styles.languageActionIcon}>
-                    <MaterialCommunityIcons
-                      name="translate"
-                      size={22}
-                      color="#FFFFFF"
-                    />
-                  </View>
-
-                  <View style={styles.languageTextWrap}>
-                    <AppText
-                      weight="bold"
-                      style={[styles.languageButtonTitle, text]}
-                    >
-                      {t("settings.language.button")}
-                    </AppText>
-
-                    <AppText
-                      weight="medium"
-                      style={[styles.languageButtonSubtitle, text]}
-                    >
-                      {currentLanguage === "he"
-                        ? t("settings.language.current.he")
-                        : t("settings.language.current.en")}
-                    </AppText>
-                  </View>
-                </View>
-
-                <MaterialCommunityIcons
-                  name={isRTL ? "chevron-left" : "chevron-right"}
-                  size={24}
-                  color="#7A8599"
-                />
-              </View>
-            </Pressable>
-          </View>
-
-          <View style={styles.sectionCard}>
-            <View style={[styles.sectionHeaderRow, row]}>
-              <View style={styles.sectionHeaderIcon}>
-                <MaterialCommunityIcons
-                  name="bell-outline"
-                  size={22}
-                  color="#315AEF"
-                />
-              </View>
-
-              <View style={styles.sectionHeaderTextWrap}>
-                <AppText weight="bold" style={[styles.sectionTitle, text]}>
-                  {t("settings.notifications.title")}
-                </AppText>
-
-                <AppText weight="medium" style={[styles.sectionSubtitle, text]}>
-                  {t("settings.notifications.subtitle")}
-                </AppText>
-              </View>
-            </View>
-
-            <View style={styles.switchList}>
-              <View style={[styles.switchRow, row]}>
-                <View style={[styles.switchTextWrap, isRTL && styles.switchTextWrapRtl]}>
-                  <AppText weight="bold" style={[styles.switchTitle, text]}>
-                    {t("settings.notifications.rows.appAlerts.title")}
-                  </AppText>
-
-                  <AppText weight="medium" style={[styles.switchSubtitle, text]}>
-                    {t("settings.notifications.rows.appAlerts.subtitle")}
-                  </AppText>
-                </View>
-
-                <Switch
-                  value={appAlertsEnabled}
-                  onValueChange={setAppAlertsEnabled}
-                  accessibilityLabel={t("settings.notifications.rows.appAlerts.a11y")}
-                  trackColor={{ false: "#D8DCE6", true: "#AFC1FF" }}
-                  thumbColor={appAlertsEnabled ? "#315AEF" : "#FFFFFF"}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={[styles.switchRow, row]}>
-                <View style={[styles.switchTextWrap, isRTL && styles.switchTextWrapRtl]}>
-                  <AppText weight="bold" style={[styles.switchTitle, text]}>
-                    {t("settings.notifications.rows.location.title")}
-                  </AppText>
-
-                  <AppText weight="medium" style={[styles.switchSubtitle, text]}>
-                    {t("settings.notifications.rows.location.subtitle")}
-                  </AppText>
-                </View>
-
-                <Switch
-                  value={locationAccessEnabled}
-                  onValueChange={setLocationAccessEnabled}
-                  accessibilityLabel={t("settings.notifications.rows.location.a11y")}
-                  trackColor={{ false: "#D8DCE6", true: "#AFC1FF" }}
-                  thumbColor={locationAccessEnabled ? "#315AEF" : "#FFFFFF"}
-                />
-              </View>
-
-              <View style={styles.divider} />
-
-              <View style={[styles.switchRow, row]}>
-                <View style={[styles.switchTextWrap, isRTL && styles.switchTextWrapRtl]}>
-                  <AppText weight="bold" style={[styles.switchTitle, text]}>
-                    {t("settings.notifications.rows.push.title")}
-                  </AppText>
-
-                  <AppText weight="medium" style={[styles.switchSubtitle, text]}>
-                    {t("settings.notifications.rows.push.subtitle")}
-                  </AppText>
-                </View>
-
-                <Switch
-                  value={pushEnabled}
-                  onValueChange={setPushEnabled}
-                  accessibilityLabel={t("settings.notifications.rows.push.a11y")}
-                  trackColor={{ false: "#D8DCE6", true: "#AFC1FF" }}
-                  thumbColor={pushEnabled ? "#315AEF" : "#FFFFFF"}
-                />
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.sectionCard}>
-            <View style={[styles.sectionHeaderRow, row]}>
-              <View style={styles.sectionHeaderIcon}>
-                <MaterialCommunityIcons
-                  name="shield-lock-outline"
-                  size={22}
-                  color="#315AEF"
-                />
-              </View>
-
-              <View style={styles.sectionHeaderTextWrap}>
-                <AppText weight="bold" style={[styles.sectionTitle, text]}>
-                  {t("settings.preferences.title")}
-                </AppText>
-
-                <AppText weight="medium" style={[styles.sectionSubtitle, text]}>
-                  {t("settings.preferences.subtitle")}
-                </AppText>
-              </View>
-            </View>
-
-            <View style={styles.rowsList}>
-              {preferenceRows.map((item, index) => (
-                <View key={item.key}>
-                  <Pressable
-                    onPress={() => onPressRow(item.route)}
-                    accessibilityRole="button"
-                    accessibilityLabel={t(`settings.rows.${item.key}.a11y`)}
-                    style={({ pressed }) => [
-                      styles.rowButton,
-                      pressed && styles.pressed,
-                    ]}
-                  >
-                    <View style={[styles.rowButtonContent, row]}>
-                      <View style={[styles.rowMainSide, iconTextRow]}>
-                        <View style={styles.rowIconBadge}>
-                          <MaterialCommunityIcons
-                            name={item.icon}
-                            size={22}
-                            color="#315AEF"
-                          />
-                        </View>
-
-                        <View style={styles.rowTexts}>
-                          <AppText weight="bold" style={[styles.rowTitle, text]}>
-                            {t(item.titleKey)}
-                          </AppText>
-
-                          {!!item.subtitleKey && (
-                            <AppText
-                              weight="medium"
-                              style={[styles.rowSubtitle, text]}
-                            >
-                              {t(item.subtitleKey)}
-                            </AppText>
-                          )}
-                        </View>
-                      </View>
-
-                      <MaterialCommunityIcons
-                        name={isRTL ? "chevron-left" : "chevron-right"}
-                        size={24}
-                        color="#98A2B3"
-                      />
-                    </View>
-                  </Pressable>
-
-                  {index !== preferenceRows.length - 1 && (
-                    <View style={styles.divider} />
-                  )}
-                </View>
-              ))}
+    <ScreenLayout scrollable={false}>
+      <View style={[styles.screenRoot, isTablet && styles.containerTablet]}>
+        <ScrollView
+          style={styles.mainScroll}
+          contentContainerStyle={styles.mainScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          <View
+            style={styles.heroIconOnly}
+            accessibilityRole="image"
+            accessibilityLabel={t("settings.heading")}
+          >
+            <View style={styles.heroIconBadge}>
+              <MaterialCommunityIcons
+                name="cog-outline"
+                size={28}
+                color="#315AEF"
+              />
             </View>
           </View>
 
           <Pressable
-            onPress={onPressLogout}
-            disabled={isLoggingOut}
+            onPress={onPressOpenDeviceAppSettings}
             accessibilityRole="button"
-            accessibilityLabel={t("settings.logout.a11y")}
+            accessibilityLabel={t("settings.deviceApp.a11y")}
+            accessibilityHint={t("settings.deviceApp.subtitle")}
             style={({ pressed }) => [
-              styles.logoutButton,
-              !isLoggingOut && pressed && styles.logoutPressed,
-              isLoggingOut ? { opacity: 0.7 } : null,
+              styles.deviceAppButton,
+              pressed && styles.deviceAppButtonPressed,
             ]}
           >
-            <View style={[styles.logoutContent, row]}>
-              <MaterialCommunityIcons name="logout" size={22} color="#FFFFFF" />
-              <AppText weight="bold" style={styles.logoutText}>
-                {t("settings.logout.button")}
-              </AppText>
+            <View style={[styles.deviceAppButtonContent, row]}>
+              <View style={[styles.deviceAppButtonMain, row]}>
+                <View style={styles.deviceAppIconWrap}>
+                  <MaterialCommunityIcons
+                    name="cellphone-cog"
+                    size={22}
+                    color="#FFFFFF"
+                  />
+                </View>
+                <View style={styles.deviceAppTexts}>
+                  <AppText
+                    weight="bold"
+                    style={[styles.deviceAppTitle, text]}
+                  >
+                    {t("settings.deviceApp.button")}
+                  </AppText>
+                  <AppText
+                    weight="medium"
+                    style={[styles.deviceAppSubtitle, text]}
+                  >
+                    {t("settings.deviceApp.subtitle")}
+                  </AppText>
+                </View>
+              </View>
+              <MaterialCommunityIcons
+                name={isRTL ? "chevron-left" : "chevron-right"}
+                size={24}
+                color="#7A8599"
+              />
             </View>
           </Pressable>
-        </View>
-      </ScrollView>
+
+          <Pressable
+            onPress={onPressInviteFriend}
+            accessibilityRole="button"
+            accessibilityLabel={t("settings.inviteFriend.a11y")}
+            accessibilityHint={t("settings.inviteFriend.subtitle")}
+            style={({ pressed }) => [
+              styles.deviceAppButton,
+              pressed && styles.deviceAppButtonPressed,
+            ]}
+          >
+            <View style={[styles.deviceAppButtonContent, row]}>
+              <View style={[styles.deviceAppButtonMain, row]}>
+                <View style={styles.deviceAppIconWrap}>
+                  <MaterialCommunityIcons
+                    name="account-plus-outline"
+                    size={22}
+                    color="#FFFFFF"
+                  />
+                </View>
+                <View style={styles.deviceAppTexts}>
+                  <AppText
+                    weight="bold"
+                    style={[styles.deviceAppTitle, text]}
+                  >
+                    {t("settings.inviteFriend.button")}
+                  </AppText>
+                  <AppText
+                    weight="medium"
+                    style={[styles.deviceAppSubtitle, text]}
+                  >
+                    {t("settings.inviteFriend.subtitle")}
+                  </AppText>
+                </View>
+              </View>
+              <MaterialCommunityIcons
+                name={isRTL ? "chevron-left" : "chevron-right"}
+                size={24}
+                color="#7A8599"
+              />
+            </View>
+          </Pressable>
+        </ScrollView>
+
+        <Pressable
+          onPress={onPressLogout}
+          disabled={isLoggingOut}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.logout.a11y")}
+          style={({ pressed }) => [
+            styles.logoutButton,
+            !isLoggingOut && pressed && styles.logoutPressed,
+            isLoggingOut ? { opacity: 0.7 } : null,
+          ]}
+        >
+          <View style={[styles.logoutContent, row]}>
+            <MaterialCommunityIcons name="logout" size={22} color="#FFFFFF" />
+            <AppText weight="bold" style={styles.logoutText}>
+              {t("settings.logout.button")}
+            </AppText>
+          </View>
+        </Pressable>
+      </View>
     </ScreenLayout>
   );
 }

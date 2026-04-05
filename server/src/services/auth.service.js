@@ -27,6 +27,7 @@ function issueAuthResponse(parent) {
   return { token, parentId };
 }
 
+// Token for child to access the app with scan the QR 
 export async function issueChildToken(parentId, childId, deviceId) {
   const parentIdStr = parentId != null ? String(parentId) : null;
   const childIdStr = childId != null ? String(childId) : null;

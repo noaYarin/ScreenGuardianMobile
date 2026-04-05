@@ -1,3 +1,4 @@
+import "react-native-gesture-handler";
 import React, { useEffect } from "react";
 import { Href, Stack, useRouter, useSegments } from "expo-router";
 import { Provider as ReduxProvider, useDispatch, useSelector } from "react-redux";

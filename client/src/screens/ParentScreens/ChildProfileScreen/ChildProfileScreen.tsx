@@ -1,12 +1,16 @@
-import React, { useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Pressable,
   ScrollView,
   useWindowDimensions,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import * as ImagePicker from "expo-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
@@ -18,9 +22,10 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { getAgeInFullYearsFromBirthDate } from "../../../../hooks/use-child-profile-labels";
 import { parseRouteParam } from "../ChildDetailsScreen/childDetailsRouteParams";
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
-import { deleteChildThunk } from "@/src/redux/thunks/childrenThunks";
+import { deleteChildThunk, updateChildProfileImageThunk } from "@/src/redux/thunks/childrenThunks";
 import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
 import { showAppToast } from "@/src/utils/appToast";
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 type ActionCard = {
   key: string;
@@ -76,6 +81,7 @@ export default function ChildProfileScreen() {
   const params = useLocalSearchParams<{ id?: string; name?: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteConfirmVisible, setDeleteConfirmVisible] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   const childId = useMemo(() => parseRouteParam(params.id), [params.id]);
   const nameFromRoute = useMemo(() => parseRouteParam(params.name), [params.name]);
@@ -99,6 +105,107 @@ export default function ChildProfileScreen() {
 
   const isTablet = width >= 900;
   const contentMaxWidth = width >= 1200 ? 980 : width >= 900 ? 840 : undefined;
+
+  const avatarUri = useMemo(
+    () => getChildProfileImageUri(child?.img),
+    [child?.img]
+  );
+
+  const launchAvatarPicker = useCallback(
+    async (mode: "camera" | "library") => {
+      if (!childId || uploadingAvatar) return;
+      try {
+        if (mode === "camera") {
+          const cam = await ImagePicker.requestCameraPermissionsAsync();
+          if (cam.status !== "granted") {
+            showAppToast(
+              t("childProfile.photo_permission_denied"),
+              t("common.error")
+            );
+            return;
+          }
+        } else {
+          const lib = await ImagePicker.requestMediaLibraryPermissionsAsync();
+          if (lib.status !== "granted") {
+            showAppToast(
+              t("childProfile.photo_permission_denied"),
+              t("common.error")
+            );
+            return;
+          }
+        }
+
+        const options: ImagePicker.ImagePickerOptions = {
+          mediaTypes: ["images"],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 0.1,
+          base64: true,
+        };
+
+        // Launch the camera or image library
+        const result =
+          mode === "camera"
+            ? await ImagePicker.launchCameraAsync(options)
+            : await ImagePicker.launchImageLibraryAsync(options);
+
+        if (result.canceled || !result.assets?.[0]) return;
+
+        const asset = result.assets[0];
+        const mime = asset.mimeType ?? "image/jpeg";
+        if (!asset.base64) {
+          showAppToast(t("childProfile.photo_no_data"), t("common.error"));
+          return;
+        }
+
+        const dataUrl = `data:${mime};base64,${asset.base64}`;
+        setUploadingAvatar(true);
+        await dispatch(
+          updateChildProfileImageThunk({ childId, img: dataUrl })
+        ).unwrap();
+        showAppToast(t("childProfile.photo_updated"));
+      } catch (err: unknown) {
+        const rejected =
+          typeof err === "string"
+            ? err
+            : err instanceof Error
+              ? err.message
+              : "";
+        const toastKey =
+          rejected === "children.profile_image_update_failed"
+            ? "children.profile_image_update_failed"
+            : "childProfile.photo_upload_failed";
+        showAppToast(t(toastKey), t("common.error"));
+      } finally {
+        setUploadingAvatar(false);
+      }
+    },
+    [childId, uploadingAvatar, dispatch, t]
+  );
+
+  // Click on the pen to change the avatar
+  const onPressChangeAvatar = useCallback(() => {
+    if (!childId || uploadingAvatar) return;
+    Alert.alert(
+      t("childProfile.change_photo"),
+      t("childProfile.change_photo_message"),
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: t("childProfile.take_photo"),
+          onPress: () => {
+            void launchAvatarPicker("camera");
+          },
+        },
+        {
+          text: t("childProfile.choose_from_library"),
+          onPress: () => {
+            void launchAvatarPicker("library");
+          },
+        },
+      ]
+    );
+  }, [childId, uploadingAvatar, launchAvatarPicker]);
 
   const onPressDeleteChild = () => {
     if (!childId || isDeleting) return;
@@ -158,13 +265,51 @@ export default function ChildProfileScreen() {
             ]}
           >
             <View style={styles.heroCard}>
-              <View style={styles.avatarCircle}>
-                <MaterialCommunityIcons
-                  name="account-outline"
-                  size={58}
-                  color="#4F93D2"
-                />
-              </View>
+              <Pressable
+                onPress={onPressChangeAvatar}
+                disabled={!childId || uploadingAvatar}
+                accessibilityRole="button"
+                accessibilityLabel={t("childProfile.photo_edit_a11y")}
+                style={({ pressed }) => [
+                  styles.avatarTouchable,
+                  pressed && !uploadingAvatar && { opacity: 0.92 },
+                ]}
+              >
+                <View style={styles.avatarCircle}>
+                  {avatarUri ? (
+                    <Image
+                      source={{ uri: avatarUri }}
+                      style={styles.avatarImage}
+                      contentFit="cover"
+                      transition={120}
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name="account-outline"
+                      size={58}
+                      color="#4F93D2"
+                    />
+                  )}
+                  {uploadingAvatar ? (
+                    <View style={styles.avatarUploadingOverlay}>
+                      <ActivityIndicator color="#315AEF" />
+                    </View>
+                  ) : null}
+                </View>
+                <View
+                  style={[
+                    styles.avatarEditBadge,
+                    isRTL && styles.avatarEditBadgeRtl,
+                  ]}
+                  pointerEvents="none"
+                >
+                  <MaterialCommunityIcons
+                    name="pencil"
+                    size={18}
+                    color="#FFFFFF"
+                  />
+                </View>
+              </Pressable>
 
               <AppText weight="extraBold" style={[styles.childName, text]}>
                 {displayName}

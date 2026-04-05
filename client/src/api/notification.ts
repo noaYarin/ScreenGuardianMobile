@@ -23,6 +23,7 @@ export type ParentNotificationsPayload = {
     pages: number;
     limit: number;
   };
+  unreadCount: number;
 };
 
 export async function apiGetParentNotifications(
@@ -47,5 +48,17 @@ export async function apiMarkAllParentNotificationsRead(): Promise<{ success: bo
     requireAuth: true,
     role: "PARENT"
   });
+}
+
+export async function apiDeleteParentNotification(
+  notificationId: string
+): Promise<{ success: boolean }> {
+  return api.delete<{ success: boolean }>(
+    `${URL}/parent/${encodeURIComponent(notificationId)}`,
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
 }
 

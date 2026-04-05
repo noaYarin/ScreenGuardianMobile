@@ -18,7 +18,9 @@
   "children": {
     "fetch_failed": "לא ניתן לטעון את רשימת הילדים.",
     "add_failed": "לא ניתן להוסיף את הילד.",
-    "profile_failed": "לא ניתן לטעון את פרופיל הילד."
+    "profile_failed": "לא ניתן לטעון את פרופיל הילד.",
+    "avatar_update_failed": "לא ניתן לעדכן את תמונת הפרופיל.",
+    "profile_image_update_failed": "לא ניתן לעדכן את תמונת הפרופיל."
   },
   "language": {
     "he": "עברית",
@@ -423,6 +425,8 @@
     "device_lock_a11y": "נעילת המכשיר {{name}}",
     "device_unlock_a11y": "שחרור נעילת המכשיר {{name}}",
     "device_lock_error": "לא ניתן לעדכן את מצב הנעילה. נסו שוב.",
+    "rename_device_success": "שם המכשיר עודכן.",
+    "rename_device_error": "לא ניתן לעדכן את שם המכשיר. נסו שוב.",
     "device_type": {
       "phone": "טלפון",
       "tablet": "טאבלט",
@@ -430,7 +434,7 @@
     },
     "device_platform": {
       "android": "אנדרואיד",
-      "ios": "iOS",
+      "ios": "IOS",
       "other": "אחר"
     }
   },
@@ -443,6 +447,15 @@
     "edit": "עריכת פרטים",
     "edit_a11y": "עריכת פרטי הילד/ה",
     "age": "גיל {{age}}",
+    "change_photo": "תמונת פרופיל",
+    "change_photo_message": "איך להוסיף תמונה?",
+    "take_photo": "צילום",
+    "choose_from_library": "בחירה מהגלריה",
+    "photo_edit_a11y": "שינוי תמונת פרופיל",
+    "photo_permission_denied": "נדרשת הרשאה לשימוש במצלמה או בגלריה.",
+    "photo_no_data": "לא ניתן לקרוא את התמונה. נסו תמונה אחרת.",
+    "photo_updated": "תמונת הפרופיל עודכנה",
+    "photo_upload_failed": "לא ניתן להעלות את התמונה",
     "actions": {
       "apps": {
         "title": "אפליקציות במכשיר",
@@ -554,6 +567,7 @@
       "noDevicesTitle": "לא נמצאו מכשירים",
       "noDevicesSubtitle": "עדיין אין מכשירים מחוברים לילד הזה."
     },
+<<<<<<< HEAD
     "childDeviceSelector": {
       "childrenSectionTitle": "בחירת ילד",
       "devicesSectionTitle": "בחירת מכשיר",
@@ -568,6 +582,49 @@
         "phone": "טלפון",
         "tablet": "טאבלט"
       }
+=======
+    "a11y": {
+      "setDailyLimit": "הגדרת הגבלת זמן מסך יומית",
+      "setUnlimited": "הגדרת ללא הגבלת זמן מסך",
+      "modeLimited": "בחירה במצב הגבלה לפי דקות",
+      "modeUnlimited": "בחירה במצב ללא הגבלה",
+      "minutesInput": "מספר הדקות המותרות ביום",
+      "editRule": "עריכת כלל זמן מסך",
+      "removeRule": "הסרת כלל זמן מסך"
+    }
+  },
+  "childDeviceSelector": {
+    "childrenSectionTitle": "בחירת ילד",
+    "devicesSectionTitle": "בחירת מכשיר",
+    "defaultChildSubtitle": "ניהול אישי",
+    "allChildren": "כל הילדים",
+    "allDevices": "כל המכשירים",
+   "allChildrenSubtitle": "כל הילדים",
+   "allDevicesSubtitle":"כל המכשירים",
+
+    "childTabA11y": "בחירת הילד {{name}}",
+    "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "devices": {
+      "phone": "טלפון",
+      "tablet": "טאבלט"
+    }
+    
+  },
+  "systemAlerts": {
+    "title": "התראות מערכת",
+    "heading": "התראות מערכת",
+    "subtitle": "עקבו אחרי עדכונים חשובים, חריגות שימוש והודעות מערכת במקום אחד.",
+    "listTitle": "התראות אחרונות",
+    "markAllRead": "סמן הכול כנקרא",
+    "markAllRead_a11y": "סימון כל ההתראות כנקראו",
+    "markAllReadFailed": "לא ניתן לסמן את כל ההתראות כנקראו.",
+    "delete_a11y": "מחיקת התראה",
+    "deleteFailed": "לא ניתן למחוק את ההתראה.",
+    "stats": {
+      "total": "סה״כ",
+      "unread": "לא נקראו",
+      "critical": "קריטיות"
+>>>>>>> 71710143dee16a6da35c93ae908de123a2289584
     },
     "systemAlerts": {
       "title": "התראות מערכת",
@@ -579,6 +636,7 @@
         "unread": "לא נקראו",
         "critical": "קריטיות"
       },
+<<<<<<< HEAD
       "filters": {
         "title": "סינון התראות",
         "items": {
@@ -677,6 +735,263 @@
         "approveRequest": "אישור בקשת הארכה של {{childName}} עבור {{appName}}",
         "declineRequest": "דחיית בקשת הארכה של {{childName}} עבור {{appName}}"
       }
+=======
+      "a11y": {
+        "all": "הצגת כל ההתראות",
+        "unread": "הצגת התראות שלא נקראו",
+        "critical": "הצגת התראות קריטיות בלבד"
+      }
+    },
+    "severityLabels": {
+      "critical": "קריטית",
+      "warning": "אזהרה",
+      "info": "מידע",
+      "success": "אושר"
+    },
+    "alertCardA11y": "פתיחת התראה {{title}} מזמן {{time}}",
+    "empty": {
+      "title": "אין התראות להצגה",
+      "subtitle": "ברגע שתתקבל התראה חדשה היא תופיע כאן."
+    },
+    "time": {
+      "justNow": "עכשיו",
+      "minutesAgo10": "לפני 10 דקות",
+      "minutesAgo25": "לפני 25 דקות",
+      "hourAgo1": "לפני שעה",
+      "hoursAgo3": "לפני 3 שעות",
+      "hoursAgo5": "לפני 5 שעות"
+    },
+    "alerts": {
+      "securityAttempt": {
+        "title": "ניסיון עקיפה",
+        "description": "זוהה ניסיון לעקוף את מגבלת זמן המסך במכשיר של הילד."
+      },
+      "dailyLimit": {
+        "title": "סיום זמן יומי",
+        "description": "הילד הגיע למכסת זמן המסך היומית שהוגדרה."
+      },
+      "unusualActivity": {
+        "title": "פעילות חריגה",
+        "description": "זוהה שימוש ממושך מהרגיל באפליקציית YouTube."
+      },
+      "newApp": {
+        "title": "התראת מערכת",
+        "description": "אפליקציה חדשה הותקנה במכשיר ומומלץ לבדוק אותה."
+      },
+      "requestApproved": {
+        "title": "בקשת הארכה אושרה",
+        "description": "בקשת הארכת זמן המסך אושרה ונוספו 15 דקות."
+      }
+    }
+  },
+  "extensionRequests": {
+    "title": "בקשות להארכת זמן",
+    "heading": "בקשות זמן פעילות",
+    "subtitle": "כאן אפשר לבדוק מי ביקש עוד זמן, מאיזה מכשיר, עבור איזו אפליקציה, ולאשר או לדחות בלחיצה אחת.",
+    "pendingSectionTitle": "בקשות ממתינות לאישור",
+    "pendingSectionSubtitle": "הבקשות מסוננות לפי הילד והמכשיר שנבחרו כרגע.",
+    "approve": "אשר",
+    "decline": "דחה",
+    "reasonLabel": "סיבה לבקשה",
+    "requestedMinutesLabel": "{{minutes}} דקות נוספות",
+    "childSubtitles": {
+      "personal": "ניהול אישי"
+    },
+    "reasons": {
+      "studyVideo": "סרטון לימודי",
+      "friendsMission": "סיימתי משימה עם חברים",
+      "chatWithFriends": "לשוחח עם חברים",
+      "finishLesson": "לסיים שיעור"
+    },
+    "requestTimes": {
+      "fiveMinutesAgo": "לפני 5 דקות",
+      "tenMinutesAgo": "לפני 10 דקות",
+      "fifteenMinutesAgo": "לפני 15 דקות",
+      "oneHourAgo": "לפני שעה"
+    },
+    "remaining": {
+      "almostFinished": "הזמן כמעט הסתיים",
+      "timeEnded": "הזמן הסתיים",
+      "twoMinutesLeft": "נשארו 2 דקות",
+      "fiveMinutesLeft": "נשארו 5 דקות"
+    },
+    "empty": {
+      "title": "אין כרגע בקשות פעילות",
+      "subtitle": "כאשר הילד ישלח בקשת הארכה עבור המכשיר הזה, היא תופיע כאן."
+    },
+    "a11y": {
+      "approveRequest": "אישור בקשת הארכה של {{childName}} עבור {{appName}}",
+      "declineRequest": "דחיית בקשת הארכה של {{childName}} עבור {{appName}}"
+    }
+  },
+  "routineLimits": {
+    "title": "שגרה שבועית",
+    "hero": {
+      "title": "ניהול שגרה שבועית",
+      "subtitle": "תכנון נעילה קבועה לפי ימים, שעות והרגלי שימוש"
+    },
+    "overview": {
+      "title": "סקירה מהירה",
+      "subtitle": "לוח השגרה של {{childName}} עבור {{deviceName}}"
+    },
+    "stats": {
+      "rules": "כללים פעילים",
+      "lockedHours": "שעות נעילה",
+      "activeDays": "ימים פעילים"
+    },
+    "scheduler": {
+      "title": "לוח שבועי",
+      "subtitle": "תצוגה חזותית של זמני הנעילה במהלך השבוע"
+    },
+    "legend": {
+      "locked": "חסום",
+      "open": "פתוח"
+    },
+    "presetsSection": {
+      "title": "תבניות מהירות",
+      "subtitle": "בחירה מהירה של סוגי שגרה נפוצים"
+    },
+    "presets": {
+      "schoolHours": "שעות לימודים",
+      "sleep": "שעות שינה",
+      "homework": "זמן שיעורים",
+      "family": "זמן משפחה"
+    },
+    "form": {
+      "title": "הוספת כלל שגרה",
+      "subtitle": "כרגע טופס סטטי עד חיבור מלא לשרת",
+      "ruleName": "כותרת",
+      "start": "מתחיל",
+      "end": "מסתיים",
+      "repeat": "חזרה",
+      "hint": "בהמשך אפשר יהיה לבחור ימים, טווחי זמן, סוג נעילה וחריגים לפי מכשיר.",
+      "addButton": "הוספת שגרה"
+    },
+    "formValues": {
+      "sleepRoutine": "שגרת שינה",
+      "startValue": "כל יום, 20:00",
+      "endValue": "כל יום, 07:00",
+      "weekdays": "א׳–ה׳"
+    },
+    "blockTitles": {
+      "schoolMorning": "בית ספר",
+      "afternoonLock": "אחר הצהריים",
+      "sleepTime": "שינה",
+      "studyWindow": "למידה",
+      "familyTime": "משפחה"
+    },
+    "daysShort": {
+      "sunday": "א",
+      "monday": "ב",
+      "tuesday": "ג",
+      "wednesday": "ד",
+      "thursday": "ה",
+      "friday": "ו",
+      "saturday": "ש"
+    },
+    "a11y": {
+      "gridCell": "תא לוח עבור {{day}} בשעה {{time}}, מצב: {{state}}",
+      "selectPreset": "בחירת תבנית {{name}}",
+      "addRoutine": "הוספת כלל שגרה חדש"
+    }
+  },
+  "weeklySchedule": {
+    "title": "לוח זמנים שבועי",
+    "heading": "הגבלות שעות שבועיות",
+    "subtitle": "הגדרת שעות שימוש עבור {{childName}} במכשיר {{deviceName}}",
+    "dayRailTitle": "קפיצה מהירה ליום",
+    "dayRailHint": "לחיצה תגלול לכרטיס של אותו היום",
+    "startTime": "שעת התחלה",
+    "endTime": "שעת סיום",
+    "copyToAll": "העתקה לכל הימים",
+    "save": "שמירת לוח זמנים",
+    "totalHours": "זמן כולל: {{hours}} שעות",
+    "status": {
+      "enabled": "פעיל",
+      "disabled": "כבוי"
+    },
+    "summary": {
+      "activeDays": "ימים פעילים",
+      "totalHours": "שעות שבועיות"
+    },
+    "days": {
+      "sun": { "short": "א", "full": "ראשון" },
+      "mon": { "short": "ב", "full": "שני" },
+      "tue": { "short": "ג", "full": "שלישי" },
+      "wed": { "short": "ד", "full": "רביעי" },
+      "thu": { "short": "ה", "full": "חמישי" },
+      "fri": { "short": "ו", "full": "שישי" },
+      "sat": { "short": "ש", "full": "שבת" }
+    },
+    "a11y": {
+      "scrollToDay": "מעבר מהיר ליום {{day}}",
+      "toggleDay": "הפעלה או כיבוי של היום {{day}}",
+      "editStartTime": "עריכת שעת התחלה עבור היום {{day}}",
+      "editEndTime": "עריכת שעת סיום עבור היום {{day}}",
+      "copyToAllDays": "העתקת ההגדרות לכל הימים",
+      "saveSchedule": "שמירת לוח הזמנים השבועי"
+    }
+  },      
+  "api": {
+    "generic_error": "משהו השתבש, נסה שוב."
+  },
+  "unauthorized": "ההתחברות פגה, נא להתחבר מחדש.",
+  "devices": {
+    "fetch_devices_failed": "בעיה בטעינת המכשירים",
+    "fetch_device_failed": "בעיה בטעינת המכשיר",
+    "update_device_name_failed": "לא ניתן לעדכן את שם המכשיר.",
+    "defaultDeviceName": "מכשיר מחובר"
+
+  },
+  "childSelector": {
+    "childrenSectionTitle": "בחירת ילד",
+    "defaultChildSubtitle": "ניהול פרופיל אישי",
+    "childTabA11y": "בחירת הילד {{name}}"
+  },
+  "defineChildProfile": {
+    "title": "הגדרת פרופיל ילד",
+    "birthDate": {
+      "title": "תאריך לידה",
+      "fieldLabel": "תאריך הלידה של הילד",
+      "change": "שינוי",
+      "done": "סיום"
+    },
+    "gender": {
+      "title": "מין",
+      "options": {
+        "boy": "ילד",
+        "girl": "ילדה",
+        "other": "אחר"
+      }
+    },
+    "actions": {
+      "save": "שמור הגדרות"
+    },
+    "accessibility": {
+      "birthDate": "בחירת תאריך לידה",
+      "confirmBirthDate": "אישור תאריך לידה",
+      "genderOption": "בחירת מין: {{gender}}",
+      "save": "שמירת הגדרות פרופיל הילד"
+    }
+  },
+  "settings": {
+    "title": "הגדרות",
+    "heading": "הגדרות מתקדמות",
+    "deviceApp": {
+      "button": "הגדרות האפליקציה במכשיר",
+      "subtitle": "התראות, הרשאות ומיקום",
+      "a11y": "פתיחת הגדרות המערכת לאפליקציה",
+      "openFailed": "לא ניתן לפתוח את ההגדרות"
+    },
+    "inviteFriend": {
+      "button": "הזמנת חבר",
+      "subtitle": "שיתוף קישור להורדה",
+      "a11y": "שיתוף קישור הזמנה לאפליקציה",
+      "noLink": "קישור ההורדה אינו זמין",
+      "shareMessage": "נסו את האפליקציה — הורדה: {{url}}",
+      "shareTitle": "הזמנה לאפליקציה",
+      "shareFailed": "לא ניתן לשתף"
+>>>>>>> 71710143dee16a6da35c93ae908de123a2289584
     },
     "routineLimits": {
       "title": "שגרה שבועית",

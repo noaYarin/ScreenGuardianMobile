@@ -1,4 +1,5 @@
 import { StyleSheet } from "react-native";
+import { COLORS } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   scrollContent: {
@@ -6,7 +7,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 18,
     paddingBottom: 28,
-    backgroundColor: "#F8FBFF",
+    backgroundColor: COLORS.light.background,
   },
 
   inner: {
@@ -32,6 +33,14 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
 
+  avatarTouchable: {
+    width: 116,
+    height: 116,
+    marginBottom: 14,
+    alignSelf: "center",
+    position: "relative",
+  },
+
   avatarCircle: {
     width: 116,
     height: 116,
@@ -39,9 +48,40 @@ export const styles = StyleSheet.create({
     backgroundColor: "#EEF7FF",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 14,
     borderWidth: 1,
     borderColor: "#DDECF9",
+    overflow: "hidden",
+  },
+
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+  },
+
+  avatarEditBadge: {
+    position: "absolute",
+    bottom: 4,
+    right: 4,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#315AEF",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#FFFFFF",
+  },
+
+  avatarEditBadgeRtl: {
+    right: undefined,
+    left: 4,
+  },
+
+  avatarUploadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(255,255,255,0.65)",
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   childName: {

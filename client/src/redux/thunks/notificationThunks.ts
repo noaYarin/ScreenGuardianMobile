@@ -3,6 +3,7 @@ import {
   apiGetParentNotifications,
   apiMarkAllParentNotificationsRead,
   apiMarkParentNotificationRead,
+  apiDeleteParentNotification,
   type Notification
 } from "@/src/api/notification";
 
@@ -45,6 +46,7 @@ export const fetchParentNotificationsThunk = createAsyncThunk(
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number }, { rejectWithValue }) => {
     try {
       const response = await apiGetParentNotifications(page, limit);
+      const unreadCount = response?.unreadCount??0;
       const rawList = Array.isArray(response?.notifications) ? response.notifications : [];
       const data = rawList
         .map((row) => {
@@ -58,7 +60,7 @@ export const fetchParentNotificationsThunk = createAsyncThunk(
 
       const pagination = normalizePagination(response?.pagination, { page, limit });
 
-      return { data, pagination };
+      return { data, pagination, unreadCount };
     } catch (error: unknown) {
       const message =
         error instanceof Error && typeof error.message === "string"
@@ -91,6 +93,21 @@ export const markAllParentNotificationsReadThunk = createAsyncThunk<
     return await apiMarkAllParentNotificationsRead();
   } catch (error) {
     const message = (error as Error)?.message ?? "notifications.mark_all_read_failed";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const deleteParentNotificationThunk = createAsyncThunk<
+  { notificationId: string },
+  { notificationId: string },
+  { rejectValue: string }
+>("notifications/delete", async ({ notificationId }, thunkAPI) => {
+  try {
+    await apiDeleteParentNotification(notificationId);
+    return { notificationId };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "notifications.delete_failed";
     return thunkAPI.rejectWithValue(message);
   }
 });

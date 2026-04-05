@@ -10,18 +10,19 @@ export async function createNotification(doc) {
 }
 
 // Return all notifications that belong to a specific parent
-export async function findNotificationsWithPagination(parentId, skip, limit) {
-  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
-  const [notifications, total] = await Promise.all([
-    NotificationModel.find({ parentId, targetRole: "PARENT" })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-    NotificationModel.countDocuments({ parentId, targetRole: "PARENT" })
-]);
+  export async function findNotificationsWithPagination(parentId, skip, limit) {
+    assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+    const [notifications, total, unreadCount] = await Promise.all([
+      NotificationModel.find({ parentId, targetRole: "PARENT" })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit),
+      NotificationModel.countDocuments({ parentId, targetRole: "PARENT" }),
+      NotificationModel.countDocuments({ parentId, targetRole: "PARENT", isRead: false })
+  ]);
 
-return { notifications, total };
-}
+  return { notifications, total, unreadCount };
+  }
 
 // Return a notification by its id
 export async function findNotificationById(notificationId) {
@@ -46,7 +47,18 @@ export async function markAllNotificationsAsRead(parentId) {
   assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
 
   return NotificationModel.updateMany(
-    { parentId, isRead: false },
+    { parentId, targetRole: TargetRole.PARENT, isRead: false },
     { $set: { isRead: true } }
   );
+}
+
+export async function deleteNotificationByIdForParent(parentId, notificationId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(notificationId, CommonErrors.INVALID_ID);
+
+  return NotificationModel.findOneAndDelete({
+    _id: notificationId,
+    parentId,
+    targetRole: TargetRole.PARENT
+  }).lean();
 }

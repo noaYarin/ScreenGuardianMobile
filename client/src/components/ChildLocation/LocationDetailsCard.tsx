@@ -13,8 +13,8 @@ interface LocationDetailsCardProps {
   updatedLabel: string;
   selectedChildLabel: string;
   selectedChildName: string;
-  locationSharingEnabled: boolean;
   deviceSnapshot: any;
+  locationSharingEnabled?: boolean;
   disabledAddressValue?: string;
 }
 
@@ -26,8 +26,8 @@ export default function LocationDetailsCard({
   updatedLabel,
   selectedChildLabel,
   selectedChildName,
-  locationSharingEnabled,
   deviceSnapshot,
+  locationSharingEnabled = true,
   disabledAddressValue,
 }: LocationDetailsCardProps) {
   const [resolvedAddress, setResolvedAddress] = useState<string | null>(null);

@@ -3,6 +3,7 @@ import { AppError } from "../utils/appError.js";
 import { Pairing as PairingErrors } from "../constants/errors.js";
 import { Common as CommonErrors } from "../constants/errors.js";
 import { DevicePlatform } from "../constants/devicePlatform.js";
+import { DeviceType } from "../constants/deviceType.js";
 
 import {
   createPairingSession,
@@ -95,6 +96,7 @@ function validateLinkPayload(payload) {
 
 // Link device to child using code or barcode token
 export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER", deviceId = "" }) {
+  console.log("linkByCodeOrToken", { code, barcodeToken, deviceName, deviceType, platform, deviceId });
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
 
@@ -126,6 +128,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
 
     await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
 
+    currentDevice = await findDeviceByDeviceId(deviceId); 
+    
   } else {
     const devices = await findDevicesByChildId(childId);
     const activeDevices = devices.filter(d => d.isActive);
@@ -136,8 +140,8 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
 
     currentDevice = await createDevice({
       deviceId,
-      deviceName,
-      deviceType,
+      name: deviceName,
+      type: deviceType,
       platform,
       isLocked: false,
       code: sessionCode || "",
@@ -148,11 +152,11 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
       parentId: String(session.parentId),
       childId: String(session.childId),
       screenTime: {},
-      isActive: true
     });
   }
 
   const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
+  // Issue a token for the child to access the app with scan the QR
   const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
 
   const displayDeviceName = deviceName != null && String(deviceName).trim() !== "" ? String(deviceName).trim() : "New device";

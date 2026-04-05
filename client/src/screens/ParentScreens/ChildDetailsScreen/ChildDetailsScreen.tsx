@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   View,
   ScrollView,
-  RefreshControl,
+ RefreshControl,
   useWindowDimensions,
   ActivityIndicator,
 } from "react-native";
@@ -21,6 +21,7 @@ import {
   fetchDevicesByChild,
   deleteDeviceForChild,
   setDeviceLockThunk,
+  updateDeviceName,
 } from "@/src/redux/thunks/deviceThunks";
 import { ChildDetailsProfileCard } from "@/src/components/ChildDetails/ChildDetailsProfileCard";
 import { ChildDetailsDevicesSection } from "@/src/components/ChildDetails/ChildDetailsDevicesSection";
@@ -220,6 +221,28 @@ export default function ChildDetailsScreen() {
     [dispatch, effectiveChildId, deletingDeviceId, t]
   );
 
+  const handleRenameDevice = useCallback(
+    async (deviceId: string, newName: string) => {
+      if (!effectiveChildId) {
+        throw new Error("no_child");
+      }
+
+      try {
+        await dispatch(
+          updateDeviceName({
+            childId: effectiveChildId,
+            deviceId,
+            name: newName,
+          })
+        ).unwrap();
+      } catch {
+        showAppToast(t("childDetails.rename_device_error"), t("common.error"));
+        throw new Error("rename_failed");
+      }
+    },
+    [dispatch, effectiveChildId, t]
+  );
+
   const showFullScreenLoader = isLoading && children.length === 0;
 
   const showChildrenFetchError =
@@ -233,7 +256,7 @@ export default function ChildDetailsScreen() {
 
   if (showFullScreenLoader) {
     return (
-      <ScreenLayout>
+      <ScreenLayout scrollable={false}>
         <View style={[styles.container, { alignItems: "center", paddingTop: 40 }]}>
           <ActivityIndicator />
           <AppText style={[styles.loadingHint, text]}>
@@ -275,7 +298,7 @@ export default function ChildDetailsScreen() {
   }
 
   return (
-    <ScreenLayout>
+    <ScreenLayout scrollable={false}>
       <ConfirmDialog
         visible={deviceDeleteDialog != null}
         title={
@@ -319,6 +342,7 @@ export default function ChildDetailsScreen() {
             childName={childName}
             birthDateLabel={birthDateLabel}
             genderLabel={genderLabel}
+            profileImg={selectedChild?.img}
             row={row}
             text={text}
             onOpenProfile={handleOpenChildProfile}
@@ -335,6 +359,7 @@ export default function ChildDetailsScreen() {
             deletingDeviceId={deletingDeviceId}
             onDeleteDevice={handleDeleteDevice}
             onSetDeviceLocked={handleSetDeviceLocked}
+            onRenameDevice={handleRenameDevice}
           />
         </View>
       </ScrollView>

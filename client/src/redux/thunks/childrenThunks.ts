@@ -3,12 +3,6 @@ import * as parentApi from "@/src/api/parent";
 import * as childApi from "@/src/api/child";
 import type { Child } from "@/src/redux/slices/children-slice";
 
-type UpdateCurrentChildProfilePayload = {
-  childId: string;
-  birthDate: string;
-  gender: string;
-};
-
 type AddChildPayload = {
   name: string;
   birthDate: string;
@@ -72,9 +66,9 @@ export const deleteChildThunk = createAsyncThunk<
 
 // Get current child profile by id
 export const fetchCurrentChildProfileThunk = createAsyncThunk<
-  Child,
-  void,
-  { rejectValue: string }
+  Child,// What we return
+  void,// Payload - no parameters
+  { rejectValue: string } // Reject value when the API returns an error
 >("children/fetchCurrentChildProfile", async (_, thunkAPI) => {
   try {
     const response = await childApi.fetchCurrentChildProfile();
@@ -95,10 +89,9 @@ export const fetchCurrentChildProfileThunk = createAsyncThunk<
 });
 
 // Update current child profile by id
-// בתוך childrenThunks.ts
 
 export const updateCurrentChildProfileThunk = createAsyncThunk<
-  Child, // טיפוס ההחזרה (מה שיגיע ל-Slice)
+  Child, // What returned
   { childId: string; birthDate: string; gender: string }, // Payload
   { rejectValue: string }
 >("children/updateCurrentChildProfile", async (payload, thunkAPI) => {
@@ -121,5 +114,30 @@ export const updateCurrentChildProfileThunk = createAsyncThunk<
 
   } catch (error) {
     return thunkAPI.rejectWithValue("children.profile_failed");
+  }
+});
+
+
+export const updateChildProfileImageThunk = createAsyncThunk<
+  Child,
+  { childId: string; img: string },
+  { rejectValue: string }
+>("children/updateChildProfileImage", async ({ childId, img }, { rejectWithValue }) => {
+  try {
+    const response = await childApi.updateChildProfileImage(childId, img);
+    const childData = response.child;
+
+    if (!childData) {
+      return rejectWithValue("children.profile_image_update_failed");
+    }
+
+    return {
+      ...childData,
+      _id: String((childData as Child)._id),
+    } as Child;
+  } catch (error) {
+    return rejectWithValue(
+      (error as Error)?.message ?? "children.profile_image_update_failed"
+    );
   }
 });

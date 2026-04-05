@@ -1,8 +1,12 @@
 import React, { useCallback, useEffect, useMemo } from "react";
-import { View, Pressable, ActivityIndicator } from "react-native";
+import { View, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { router, Stack, type Href, useFocusEffect } from "expo-router";
+
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { Image } from "expo-image";
+
+import { getChildProfileImageUri } from "@/src/utils/childProfileImage";
 
 import ScreenLayout from "../../../layouts/ScreenLayout/ScreenLayout";
 import AppText from "../../../components/AppText/AppText";
@@ -23,6 +27,7 @@ type ChildCard = {
   isLocked: boolean;
   usedText: string | null;
   limitText: string | null;
+  avatarUri: string | null;
 };
 
 const ICON = {
@@ -47,16 +52,16 @@ export default function HomeParentScreen() {
 
 
   const notifications = useSelector((state: RootState) => state.notifications?.items ?? []);
-  const unreadNotificationsCount = notifications.filter((n: any) => !n?.isRead).length;
+  const unreadNotificationsCount = useSelector((state: RootState) => state.notifications?.unreadCount ?? 0);
 
   useEffect(() => {
     dispatch(fetchParentHomeSummaryThunk());
     dispatch(getMyChildrenThunk());
-    dispatch(fetchParentNotificationsThunk({}));
 
-    if (parentId) {
-      connectSocket(parentId, "parent");
-    }
+    //if (parentId) {
+    //connectSocket(parentId, "parent");
+    //}
+    dispatch(fetchParentNotificationsThunk({ page: 1, limit: 10 }));
   }, [dispatch, parentId]);
 
   useFocusEffect(
@@ -89,6 +94,8 @@ export default function HomeParentScreen() {
         child.dailyLimitMinutes == null
           ? null
           : formatMinutes(child.dailyLimitMinutes),
+      avatarUri: getChildProfileImageUri(child.img),
+
     }));
   }, [children]);
 
@@ -148,8 +155,7 @@ export default function HomeParentScreen() {
       <MaterialCommunityIcons name={ICON.menu} size={24} color="#0F172A" />
     </Pressable>
   );
-
-  return (
+return (
     <>
       <Stack.Screen
         options={{
@@ -159,186 +165,206 @@ export default function HomeParentScreen() {
           headerBackVisible: false,
           ...(isRTL
             ? {
-              headerLeft: () => menuButton,
-              headerRight: () => bellButton,
-            }
+                headerLeft: () => menuButton,
+                headerRight: () => bellButton,
+              }
             : {
-              headerRight: () => menuButton,
-              headerLeft: () => bellButton,
-            }),
+                headerRight: () => menuButton,
+                headerLeft: () => bellButton,
+              }),
         }}
       />
 
-      <ScreenLayout>
+      <ScreenLayout scrollable={false}>
         <View style={styles.container}>
           <View style={styles.content}>
-            <View style={styles.header}>
-              <AppText weight="extraBold" style={[styles.bigHello, text]}>
-                {t("homeParent.hello", { name: parentName })}
-              </AppText>
-
-              <AppText
-                onPress={onPressOverview}
-                weight="bold"
-                style={[styles.overviewLink, text]}
-              >
-                {t("homeParent.overview")}
-              </AppText>
-            </View>
-
-            <View style={styles.summaryCard}>
-              <View style={[styles.summaryRow, row]}>
-                <View style={styles.summaryChip}>
-                  <AppText weight="extraBold" style={styles.summaryChipText}>
-                    {children.length}
-                  </AppText>
-                </View>
-
-                <View style={styles.summaryTextWrap}>
-                  <AppText weight="bold" style={[styles.sectionTitle, text]}>
-                    {t("homeParent.my_kids")}
-                  </AppText>
-
-                  <AppText style={[styles.sectionSub, text]}>
-                    {isRefreshing
-                      ? t("homeParent.refreshing")
-                      : t("homeParent.day_screen_time")}
-                  </AppText>
-                </View>
-              </View>
-            </View>
-
-            {isLoading ? (
-              <View style={styles.loaderWrap}>
-                <ActivityIndicator />
-              </View>
-            ) : error ? (
-              <AppText style={[styles.sectionSub, text]}>{t(error)}</AppText>
-            ) : childCards.length === 0 ? (
-              <View style={styles.emptyState}>
-                <AppText style={[styles.sectionSub, text]}>
-                  {t("homeParent.no_children")}
+            <ScrollView
+              style={styles.mainScroll}
+              contentContainerStyle={styles.mainScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
+              <View style={styles.header}>
+                <AppText weight="extraBold" style={[styles.bigHello, text]}>
+                  {t("homeParent.hello", { name: parentName })}
                 </AppText>
 
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.btnSecondary,
-                    pressed && styles.buttonPressed,
-                  ]}
-                  onPress={onPressAddChild}
-                  accessibilityRole="button"
-                  accessibilityLabel={t("homeParent.add_child_a11y")}
+                <AppText
+                  onPress={onPressOverview}
+                  weight="bold"
+                  style={[styles.overviewLink, text]}
                 >
-                  <AppText weight="extraBold" style={styles.btnSecondaryText}>
-                    {t("homeParent.add_child")}
+                  {t("homeParent.overview")}
+                </AppText>
+              </View>
+
+              <View style={styles.summaryCard}>
+                <View style={[styles.summaryRow, row]}>
+                  <View style={styles.summaryChip}>
+                    <AppText weight="extraBold" style={styles.summaryChipText}>
+                      {children.length}
+                    </AppText>
+                  </View>
+
+                  <View style={styles.summaryTextWrap}>
+                    <AppText weight="bold" style={[styles.sectionTitle, text]}>
+                      {t("homeParent.my_kids")}
+                    </AppText>
+
+                    <AppText style={[styles.sectionSub, text]}>
+                      {isRefreshing
+                        ? t("homeParent.refreshing")
+                        : t("homeParent.day_screen_time")}
+                    </AppText>
+                  </View>
+                </View>
+              </View>
+
+              {isLoading ? (
+                <View style={styles.loaderWrap}>
+                  <ActivityIndicator />
+                </View>
+              ) : error ? (
+                <AppText style={[styles.sectionSub, text]}>
+                  {t(error, { defaultValue: error })}
+                </AppText>
+              ) : childCards.length === 0 ? (
+                <View style={styles.emptyState}>
+                  <AppText style={[styles.sectionSub, text]}>
+                    {t("homeParent.no_children")}
                   </AppText>
-                </Pressable>
-              </View>
-            ) : (
-              <View style={styles.cardsWrap}>
-                {childCards.map((c) => (
+
                   <Pressable
-                    key={c.id}
                     style={({ pressed }) => [
-                      styles.card,
-                      pressed && styles.cardPressed,
+                      styles.btnSecondary,
+                      pressed && styles.buttonPressed,
                     ]}
-                    onPress={() => onPressChildCard(c.id, c.name)}
+                    onPress={onPressAddChild}
                     accessibilityRole="button"
-                    accessibilityLabel={t("homeParent.child_card_a11y", {
-                      name: c.name,
-                    })}
+                    accessibilityLabel={t("homeParent.add_child_a11y")}
                   >
-                    <View style={[styles.cardInner, row]}>
-                      <View
-                        style={[
-                          styles.avatarCircle,
-                          c.isLocked && styles.avatarBad,
-                          !c.isLocked &&
-                          c.status === "good" &&
-                          styles.avatarGood,
-                          !c.isLocked &&
-                          c.status === "warn" &&
-                          styles.avatarWarn,
-                          !c.isLocked &&
-                          c.status === "bad" &&
-                          styles.avatarBad,
-                        ]}
-                      >
-                        <MaterialCommunityIcons
-                          name={c.isLocked ? ICON.lock : ICON.user}
-                          size={22}
-                          color="#0F172A"
-                        />
-                      </View>
-
-                      <View style={styles.cardCenter}>
-                        <AppText
-                          weight="extraBold"
-                          style={[styles.childName, text]}
-                          numberOfLines={1}
-                        >
-                          {c.name}
-                        </AppText>
-
-                        <AppText
-                          style={[styles.childSubtitle, text]}
-                          numberOfLines={1}
-                        >
-                          {c.isLocked
-                            ? t("homeParent.locked_subtitle")
-                            : t("homeParent.day_screen_time")}
-                        </AppText>
-                      </View>
-
-                      <View
-                        style={[
-                          styles.cardEdge,
-                          isRTL ? styles.cardEdgeRtl : styles.cardEdgeLtr,
-                        ]}
-                      >
-                        {c.isLocked ? (
-                          <>
-                            <AppText
-                              weight="extraBold"
-                              style={[styles.timeMain, styles.timeBad]}
-                            >
-                              {t("homeParent.locked")}
-                            </AppText>
-
-                            <AppText style={styles.timeSub}>
-                              {t("homeParent.locked_by_parent")}
-                            </AppText>
-                          </>
-                        ) : (
-                          <>
-                            <AppText
-                              weight="extraBold"
-                              style={[
-                                styles.timeMain,
-                                c.status === "good" && styles.timeGood,
-                                c.status === "warn" && styles.timeWarn,
-                                c.status === "bad" && styles.timeBad,
-                              ]}
-                            >
-                              {c.usedText ?? "--:--"}
-                            </AppText>
-
-                            <AppText style={styles.timeSub}>
-                              {c.limitText == null
-                                ? t("homeParent.no_limit")
-                                : t("homeParent.out_of", {
-                                  limit: c.limitText,
-                                })}
-                            </AppText>
-                          </>
-                        )}
-                      </View>
-                    </View>
+                    <AppText weight="extraBold" style={styles.btnSecondaryText}>
+                      {t("homeParent.add_child")}
+                    </AppText>
                   </Pressable>
-                ))}
-              </View>
-            )}
+                </View>
+              ) : (
+                <View style={styles.cardsWrap}>
+                  {childCards.map((c) => (
+                    <Pressable
+                      key={c.id}
+                      style={({ pressed }) => [
+                        styles.card,
+                        pressed && styles.cardPressed,
+                      ]}
+                      onPress={() => onPressChildCard(c.id, c.name)}
+                      accessibilityRole="button"
+                      accessibilityLabel={t("homeParent.child_card_a11y", {
+                        name: c.name,
+                      })}
+                    >
+                      <View style={[styles.cardInner, row]}>
+                        <View
+                          style={[
+                            styles.avatarCircle,
+                            !c.avatarUri && c.isLocked && styles.avatarBad,
+                            !c.avatarUri &&
+                              !c.isLocked &&
+                              c.status === "good" &&
+                              styles.avatarGood,
+                            !c.avatarUri &&
+                              !c.isLocked &&
+                              c.status === "warn" &&
+                              styles.avatarWarn,
+                            !c.avatarUri &&
+                              !c.isLocked &&
+                              c.status === "bad" &&
+                              styles.avatarBad,
+                          ]}
+                        >
+                          {c.avatarUri ? (
+                            <Image
+                              source={{ uri: c.avatarUri }}
+                              style={styles.avatarImage}
+                              contentFit="cover"
+                              transition={120}
+                            />
+                          ) : (
+                            <MaterialCommunityIcons
+                              name={c.isLocked ? ICON.lock : ICON.user}
+                              size={22}
+                              color="#0F172A"
+                            />
+                          )}
+                        </View>
+
+                        <View style={styles.cardCenter}>
+                          <AppText
+                            weight="extraBold"
+                            style={[styles.childName, text]}
+                            numberOfLines={1}
+                          >
+                            {c.name}
+                          </AppText>
+
+                          <AppText
+                            style={[styles.childSubtitle, text]}
+                            numberOfLines={1}
+                          >
+                            {c.isLocked
+                              ? t("homeParent.locked_subtitle")
+                              : t("homeParent.day_screen_time")}
+                          </AppText>
+                        </View>
+
+                        <View
+                          style={[
+                            styles.cardEdge,
+                            isRTL ? styles.cardEdgeRtl : styles.cardEdgeLtr,
+                          ]}
+                        >
+                          {c.isLocked ? (
+                            <>
+                              <AppText
+                                weight="extraBold"
+                                style={[styles.timeMain, styles.timeBad]}
+                              >
+                                {t("homeParent.locked")}
+                              </AppText>
+
+                              <AppText style={styles.timeSub}>
+                                {t("homeParent.locked_by_parent")}
+                              </AppText>
+                            </>
+                          ) : (
+                            <>
+                              <AppText
+                                weight="extraBold"
+                                style={[
+                                  styles.timeMain,
+                                  c.status === "good" && styles.timeGood,
+                                  c.status === "warn" && styles.timeWarn,
+                                  c.status === "bad" && styles.timeBad,
+                                ]}
+                              >
+                                {c.usedText ?? "--:--"}
+                              </AppText>
+
+                              <AppText style={styles.timeSub}>
+                                {c.limitText == null
+                                  ? t("homeParent.no_limit")
+                                  : t("homeParent.out_of", {
+                                      limit: c.limitText,
+                                    })}
+                              </AppText>
+                            </>
+                          )}
+                        </View>
+                      </View>
+                    </Pressable>
+                  ))}
+                </View>
+              )}
+            </ScrollView>
 
             {childCards.length > 0 && (
               <View style={styles.actionsWrap}>

@@ -110,6 +110,83 @@ export const styles = StyleSheet.create({
     width: "100%",
   },
 
+  listTitleRow: {
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+
+  markAllReadPressable: {
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+  },
+
+  markAllReadText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#3D5AFE",
+  },
+
+  alertListItemWrap: {
+    width: "100%",
+    marginBottom: 12,
+  },
+
+  alertCardInner: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 16,
+  },
+
+  alertCardInnerColumn: {
+    width: "100%",
+    gap: 10,
+  },
+
+  alertUnreadDotRow: {
+    width: "100%",
+    alignItems: "flex-start",
+    marginBottom: 8,
+  },
+
+  alertCardEndSpacer: {
+    flex: 1,
+    minWidth: 0,
+  },
+
+  /** Same width as delete control so the unread dot lines up above the trash. */
+  alertTrashTrack: {
+    width: 38,
+    alignItems: "center",
+  },
+
+  alertCardMainPressable: {
+    width: "100%",
+    alignItems: "flex-start",
+    gap: 14,
+  },
+
+  alertDeleteFooter: {
+    padding: 8,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  alertDeleteFooterPressed: {
+    backgroundColor: "#FEF2F2",
+  },
+
+  alertFooterMetaGroup: {
+    flex: 1,
+    flexWrap: "wrap",
+    gap: 8,
+    alignItems: "center",
+    minWidth: 0,
+  },
+
   sectionTitle: {
     fontSize: 16,
     color: "#111827",
@@ -152,14 +229,16 @@ export const styles = StyleSheet.create({
 
   alertCard: {
     width: "100%",
-    borderRadius: 22,
+    borderRadius: 20,
     backgroundColor: "#FFFFFF",
     overflow: "hidden",
-    shadowColor: "#111827",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.06,
-    shadowRadius: 18,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: "#EEF2F7",
+    shadowColor: "#0F172A",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 2,
   },
 
   alertCardRead: {
@@ -171,66 +250,59 @@ export const styles = StyleSheet.create({
     height: 4,
   },
 
-  alertContentRow: {
-    alignItems: "flex-start",
-    paddingHorizontal: 14,
-    paddingVertical: 16,
-    gap: 12,
-  },
-
   alertIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 16,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
     alignItems: "center",
     justifyContent: "center",
   },
 
   alertTextWrap: {
     flex: 1,
-    gap: 8,
+    gap: 6,
+    minWidth: 0,
   },
 
   alertHeaderRow: {
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
+    minWidth: 0,
   },
 
   alertTitle: {
     flex: 1,
     fontSize: 16,
-    color: "#111827",
+    lineHeight: 22,
+    color: "#0F172A",
+    letterSpacing: -0.2,
   },
 
   unreadDot: {
     width: 10,
     height: 10,
     borderRadius: 999,
-    backgroundColor: "#3D5AFE",
+    backgroundColor: "#3B82F6",
   },
 
   alertDescription: {
     fontSize: 14,
-    lineHeight: 21,
-    color: "#6B7280",
+    lineHeight: 20,
+    color: "#64748B",
+    marginTop: 2,
   },
 
   alertFooterRow: {
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 10,
-    flexWrap: "wrap",
+    width: "100%",
   },
 
   timeBadge: {
-    minHeight: 32,
+    minHeight: 30,
     borderRadius: 999,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: "#F8FAFC",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: "#E2E8F0",
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 6,
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
@@ -242,16 +314,17 @@ export const styles = StyleSheet.create({
   },
 
   severityBadge: {
-    minHeight: 32,
+    minHeight: 30,
     borderRadius: 999,
     paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingVertical: 6,
     alignItems: "center",
     justifyContent: "center",
   },
 
   severityText: {
     fontSize: 12,
+    letterSpacing: 0.2,
   },
 
   emptyState: {

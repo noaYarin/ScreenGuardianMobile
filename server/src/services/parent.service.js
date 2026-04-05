@@ -144,12 +144,14 @@ export async function getParentHomeSummary(parentId) {
       summary.push({
         childId: child._id,
         name: child.name,
+        img: child.img ?? null,
         deviceId: null,
         deviceName: null,
         usedTodayMinutes: null,
         dailyLimitMinutes: null,
         remainingMinutes: null,
-        status: ScreenTimeStatus.GOOD
+        status: ScreenTimeStatus.GOOD,
+        isLocked: false
       });
       continue;
     }
@@ -161,7 +163,7 @@ export async function getParentHomeSummary(parentId) {
 
     const dailyLimitMinutes = isLimitEnabled
       ? Number(screenTime.dailyLimitMinutes || 0) +
-        Number(screenTime.extraMinutesToday || 0)
+      Number(screenTime.extraMinutesToday || 0)
       : null;
 
     const remainingMinutes =
@@ -172,6 +174,7 @@ export async function getParentHomeSummary(parentId) {
     summary.push({
       childId: child._id,
       name: child.name,
+      img: child.img ?? null,
       deviceId: device._id,
       deviceName: device.name || null,
       usedTodayMinutes,
