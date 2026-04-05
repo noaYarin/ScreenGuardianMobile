@@ -27,6 +27,10 @@ type ForgotPasswordSuccessPayload = {
   message: string;
 };
 
+/* AuthSuccessPayload is the payload when auth succeeds,
+{ email: string; password: string } is the credentials we send to the API.
+{ rejectValue: string } is the reject value when the API returns an error.
+*/
 export const loginParent = createAsyncThunk<
   AuthSuccessPayload,
   { email: string; password: string },

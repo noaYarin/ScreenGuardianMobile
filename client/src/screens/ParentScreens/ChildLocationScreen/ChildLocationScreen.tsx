@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { View, ScrollView, useWindowDimensions, Linking, Platform, Button } from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
 import { useSelector, useDispatch } from "react-redux";
 import { Href, router } from "expo-router";
 import Toast from "react-native-root-toast";
@@ -12,7 +11,6 @@ import LocationDetailsCard from "../../../components/ChildLocation/LocationDetai
 import LocationActions from "../../../components/ChildLocation/LocationActions";
 import AppText from "@/src/components/AppText/AppText";
 
-import { getLocationSharingEnabled } from "../../../services/locationSharingPreference";
 import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
 import { styles } from "./styles";
 
@@ -40,10 +38,8 @@ export default function ChildLocationScreen() {
   const { parentId } = useSelector((state: RootState) => state.auth ?? {});
 
   const [selectedChildId, setSelectedChildId] = useState(childrenList[0]?._id ?? "");
-  const [locationSharingEnabled, setLocationSharingEnabled] = useState(true);
   const [deviceSnapshot, setDeviceSnapshot] = useState<DeviceLocationSnapshot | null>(null);
 
-  
   const selectedChild = useMemo(() => 
     childrenList.find(c => c._id === selectedChildId), 
     [childrenList, selectedChildId]
@@ -56,18 +52,6 @@ export default function ChildLocationScreen() {
 
   const isUpdating = statusByChildId[selectedChildId] === "loading";
 
-  const childOption = useMemo(() => selectedChild ? {
-    id: selectedChild._id,
-    name: selectedChild.name,
-    accent: getAccent(selectedChild._id),
-    initial: selectedChild.name?.[0] ?? "",
-  } : null, [selectedChild]);
-
-  
-  useFocusEffect(useCallback(() => { 
-    getLocationSharingEnabled().then(setLocationSharingEnabled); 
-  }, []));
-
   useEffect(() => {
     if (selectedChildId) {
       dispatch(fetchDevicesByChild(selectedChildId));
@@ -79,6 +63,7 @@ export default function ChildLocationScreen() {
     emitEvent(REQUEST_REFRESH_FROM_PARENT, { parentId, childId });
   };
 
+  // Navigate to the location of the child open maps
   const onNavigate = async () => {
     if (!deviceSnapshot) {
       Toast.show(
@@ -91,6 +76,7 @@ export default function ChildLocationScreen() {
       return;
     }
   
+    //Points on the map 
     const { latitude, longitude } = deviceSnapshot;
     const label = selectedChild?.name || "Child";
   
@@ -113,7 +99,14 @@ export default function ChildLocationScreen() {
     }
   };
 
-  if (!selectedChild || !childOption) return null;
+  if (!selectedChild) return null;
+
+  const childOption = {
+    id: selectedChild._id,
+    name: selectedChild.name,
+    accent: getAccent(selectedChild._id),
+    initial: selectedChild.name?.[0] ?? "",
+  };
 
   const hasNoDevices = statusByChildId[selectedChildId] === "succeeded" && devicesForSelectedChild.length === 0;
 
@@ -152,26 +145,22 @@ export default function ChildLocationScreen() {
         <View style={[styles.container, width >= 900 && styles.containerTablet]}>
           <ChildSelector selectedChildId={selectedChildId} onSelectChild={setSelectedChildId} />
           
-          <LocationMapCard 
-            isRTL={isRTL} 
-            text={text} 
-            selectedChild={childOption} 
-            locationSharingEnabled={locationSharingEnabled} 
-            onDeviceLocation={setDeviceSnapshot} 
-            mapDisabledBannerText={t("childLocation.locationSharing.mapBanner")}
+          <LocationMapCard
+            isRTL={isRTL}
+            text={text}
+            selectedChild={childOption}
+            onDeviceLocation={setDeviceSnapshot}
           />
 
-          <LocationDetailsCard 
-            text={text} 
-            row={row} 
+          <LocationDetailsCard
+            text={text}
+            row={row}
             detailsTitle={t("childLocation.detailsTitle")}
             addressLabel={t("childLocation.currentLocationLabel")}
             updatedLabel={t("childLocation.updatedLabel")}
             selectedChildLabel={t("childLocation.selectedChildLabel")}
-            selectedChildName={selectedChild.name} 
-            locationSharingEnabled={locationSharingEnabled} 
-            deviceSnapshot={deviceSnapshot} 
-            disabledAddressValue={t("childLocation.locationDisabled")}
+            selectedChildName={selectedChild.name}
+            deviceSnapshot={deviceSnapshot}
           />
 
           <LocationActions 

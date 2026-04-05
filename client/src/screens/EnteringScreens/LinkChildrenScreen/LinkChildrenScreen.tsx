@@ -73,8 +73,6 @@ export default function LinkChildrenScreen() {
         })
       );
 
-// Need to add socket for location updates
-
       finishLink();
       router.replace({
         pathname: "/Child/home",

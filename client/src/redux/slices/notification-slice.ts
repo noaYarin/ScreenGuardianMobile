@@ -83,6 +83,7 @@ const notificationsSlice = createSlice({
           state.items = data;
         } else {
           const existingIds = new Set(state.items.map((i) => String(i._id)));
+          // Redux Toolkit support for pushing new items to the array
           state.items.push(...data.filter((n) => !existingIds.has(String(n._id))));
         }
       })

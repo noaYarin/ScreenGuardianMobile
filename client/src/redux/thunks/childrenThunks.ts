@@ -3,12 +3,6 @@ import * as parentApi from "@/src/api/parent";
 import * as childApi from "@/src/api/child";
 import type { Child } from "@/src/redux/slices/children-slice";
 
-type UpdateCurrentChildProfilePayload = {
-  childId: string;
-  birthDate: string;
-  gender: string;
-};
-
 type AddChildPayload = {
   name: string;
   birthDate: string;
@@ -72,9 +66,9 @@ export const deleteChildThunk = createAsyncThunk<
 
 // Get current child profile by id
 export const fetchCurrentChildProfileThunk = createAsyncThunk<
-  Child,
-  void,
-  { rejectValue: string }
+  Child,// What we return
+  void,// Payload - no parameters
+  { rejectValue: string } // Reject value when the API returns an error
 >("children/fetchCurrentChildProfile", async (_, thunkAPI) => {
   try {
     const response = await childApi.fetchCurrentChildProfile();
@@ -97,7 +91,7 @@ export const fetchCurrentChildProfileThunk = createAsyncThunk<
 // Update current child profile by id
 
 export const updateCurrentChildProfileThunk = createAsyncThunk<
-  Child, 
+  Child, // What returned
   { childId: string; birthDate: string; gender: string }, // Payload
   { rejectValue: string }
 >("children/updateCurrentChildProfile", async (payload, thunkAPI) => {

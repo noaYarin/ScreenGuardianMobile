@@ -145,6 +145,7 @@ if (currentDevice) {
 }
 
   const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
+  // Issue a token for the child to access the app with scan the QR
   const tokenData = await issueChildToken(parentId, childId, mongoDeviceId);
 
   const displayDeviceName = deviceName != null && String(deviceName).trim() !== "" ? String(deviceName).trim() : "New device";

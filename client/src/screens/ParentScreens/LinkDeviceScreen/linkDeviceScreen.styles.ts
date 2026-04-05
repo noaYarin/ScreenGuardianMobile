@@ -40,12 +40,6 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  segmentRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-
   segmentActive: {
     backgroundColor: "#0B4DFF",
   },
@@ -116,11 +110,6 @@ export const styles = StyleSheet.create({
   qrImage: {
     width: 220,
     height: 220,
-  },
-
-  placeholderText: {
-    textAlign: "center",
-    color: "#0F172A",
   },
 
   codeArea: {

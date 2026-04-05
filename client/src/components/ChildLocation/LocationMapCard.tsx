@@ -15,18 +15,18 @@ type Props = {
   isRTL: boolean;
   text: TextStyle;
   selectedChild: ChildOption;
-  locationSharingEnabled: boolean;
   onDeviceLocation: (snapshot: DeviceLocationSnapshot | null) => void;
-  mapDisabledBannerText: string;
+  locationSharingEnabled?: boolean;
+  mapDisabledBannerText?: string;
 };
 
 export default function LocationMapCard({
   isRTL,
   text,
   selectedChild,
-  locationSharingEnabled,
   onDeviceLocation,
-  mapDisabledBannerText,
+  locationSharingEnabled = true,
+  mapDisabledBannerText = "",
 }: Props) {
   const { t } = useTranslation();
   const mapRef = useRef<MapView | null>(null);
