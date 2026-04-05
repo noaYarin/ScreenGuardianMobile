@@ -19,14 +19,10 @@ import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { useTranslation } from "../../../../hooks/use-translation";
 import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-<<<<<<< HEAD
 import {
   fetchDevicesByChild,
   updateDeviceScreenTimeThunk,
 } from "@/src/redux/thunks/deviceThunks";
-=======
-import { fetchDevicesByChild } from "@/src/redux/thunks/deviceThunks";
->>>>>>> 8c3d1dd6615dabb48b650a383e7d7200cfb23dd9
 
 type ScreenLimitCard = {
   id: string;
