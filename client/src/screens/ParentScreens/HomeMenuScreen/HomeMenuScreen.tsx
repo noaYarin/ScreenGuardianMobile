@@ -30,8 +30,9 @@ export default function HomeMenuScreen() {
   };
 
   return (
-    <ScreenLayout>
+    <ScreenLayout scrollable={false}>
       <ScrollView
+        style={styles.scrollRoot}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
