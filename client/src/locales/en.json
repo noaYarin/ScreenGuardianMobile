@@ -863,53 +863,20 @@
   "settings": {
     "title": "Settings",
     "heading": "Advanced Settings",
-    "subtitle": "Manage personalization, alerts, and language in one place.",
-    "language": {
-      "title": "Language",
-      "subtitle": "Change the app interface language",
-      "button": "Change Language",
-      "buttonA11y": "Change application language",
-      "current": {
-        "he": "Current language: Hebrew",
-        "en": "Current language: English"
-      }
+    "deviceApp": {
+      "button": "App settings on this device",
+      "subtitle": "Notifications, permissions and location",
+      "a11y": "Open system settings for this app",
+      "openFailed": "Could not open settings"
     },
-    "notifications": {
-      "title": "Notifications",
-      "subtitle": "Quick control over the alerts that matter most",
-      "rows": {
-        "appAlerts": {
-          "title": "App alerts",
-          "subtitle": "Receive alerts about activity, restrictions, and updates",
-          "a11y": "Turn app alerts on or off"
-        },
-        "location": {
-          "title": "Location access",
-          "subtitle": "Use location permission for relevant features",
-          "a11y": "Turn location access on or off"
-        },
-        "push": {
-          "title": "Push notifications",
-          "subtitle": "Receive direct alerts on this device",
-          "a11y": "Turn push notifications on or off"
-        }
-      }
-    },
-    "preferences": {
-      "title": "More preferences",
-      "subtitle": "Security, privacy, and support"
-    },
-    "rows": {
-      "privacy": {
-        "title": "Privacy & Security",
-        "subtitle": "Permissions, security, and privacy preferences",
-        "a11y": "Go to privacy and security screen"
-      },
-      "help": {
-        "title": "Help & Support",
-        "subtitle": "FAQ, contact options, and assistance",
-        "a11y": "Go to help and support screen"
-      }
+    "inviteFriend": {
+      "button": "Invite a friend",
+      "subtitle": "Share the download link",
+      "a11y": "Share the app invite link",
+      "noLink": "Download link is not available",
+      "shareMessage": "Try the app — download: {{url}}",
+      "shareTitle": "Invite to the app",
+      "shareFailed": "Could not share"
     },
     "logout": {
       "button": "Log Out",
