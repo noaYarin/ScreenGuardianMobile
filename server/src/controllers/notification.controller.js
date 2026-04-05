@@ -2,6 +2,7 @@ import {
   getParentNotifications,
   markNotificationAsRead,
   readAllNotifications,
+  deleteParentNotification,
 } from "../services/notification.service.js";
 
 // Return notifications for the logged-in parent
@@ -51,6 +52,17 @@ export async function readAllNotificationsController(req, res, next) {
     const parentId = req.user.parentId;
     const data = await readAllNotifications(parentId);
 
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function deleteParentNotificationController(req, res, next) {
+  try {
+    const parentId = req.user.parentId;
+    const { notificationId } = req.params;
+    const data = await deleteParentNotification(parentId, notificationId);
     res.status(200).json({ ok: true, data });
   } catch (err) {
     next(err);

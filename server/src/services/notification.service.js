@@ -3,8 +3,11 @@ import {
   findNotificationsWithPagination,
   markNotificationAsReadById,
   markAllNotificationsAsRead,
+  deleteNotificationByIdForParent,
 } from "../dal/notification.dal.js";
 import { TargetRole } from "../constants/role.js";
+import { AppError } from "../utils/appError.js";
+import { Common as CommonErrors } from "../constants/errors.js";
 import { getIO } from "../socketHandler.js";
 import { NOTIFICATION_CREATED } from "../constants/socketEvents.js";
 
@@ -91,5 +94,13 @@ export async function markNotificationAsRead(parentId, notificationId) {
 export async function readAllNotifications(parentId) {
   await markAllNotificationsAsRead(parentId);
 
+  return { success: true };
+}
+
+export async function deleteParentNotification(parentId, notificationId) {
+  const deleted = await deleteNotificationByIdForParent(parentId, notificationId);
+  if (!deleted) {
+    throw new AppError(CommonErrors.NOT_FOUND);
+  }
   return { success: true };
 }

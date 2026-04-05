@@ -15,6 +15,7 @@ import {
   fetchParentNotificationsThunk,
   markParentNotificationReadThunk,
   markAllParentNotificationsReadThunk,
+  deleteParentNotificationThunk,
 } from "@/src/redux/thunks/notificationThunks";
 import { showAppToast } from "@/src/utils/appToast";
 
@@ -79,7 +80,7 @@ function safeErrorText(value: unknown): string {
 
 export default function SystemAlertsScreen() {
   const { t } = useTranslation();
-  const { text, row, isRTL } = useLocaleLayout();
+  const { text, row } = useLocaleLayout();
   const dispatch = useDispatch<AppDispatch>();
 
   const notificationsState = useSelector((state: RootState) => state.notifications);
@@ -113,6 +114,17 @@ export default function SystemAlertsScreen() {
       setMarkAllReadBusy(false);
     }
   }, [dispatch, t]);
+
+  const handleDeleteNotification = useCallback(
+    async (notificationId: string) => {
+      try {
+        await dispatch(deleteParentNotificationThunk({ notificationId })).unwrap();
+      } catch {
+        showAppToast(t("systemAlerts.deleteFailed"), t("common.error"));
+      }
+    },
+    [dispatch]
+  );
 
   const handleLoadMore = useCallback(async () => {
     if (isFetchingMore || status === "loading" || !pagination || (pagination?.page || 1) >= (pagination?.pages || 1)) return;
@@ -248,66 +260,99 @@ export default function SystemAlertsScreen() {
 
       return (
         <View style={styles.alertListItemWrap}>
-          <Pressable
-            onPress={() => {
-              if (alert._id && !alert.isRead) {
-                dispatch(
-                  markParentNotificationReadThunk({
-                    notificationId: String(alert._id),
-                  })
-                );
-              }
-            }}
-            style={({ pressed }) => [
+          <View
+            style={[
               styles.alertCard,
-              pressed && styles.pressed,
               !isUnread && styles.alertCardRead,
             ]}
           >
             <View style={[styles.alertAccent, { backgroundColor: palette.accent }]} />
-            <View style={[styles.alertContentRow, row]}>
-              <View style={[styles.alertIconWrap, { backgroundColor: palette.soft }]}>
-                <MaterialCommunityIcons
-                  name={pickIcon(alert.type, alert.severity)}
-                  size={22}
-                  color={palette.accent}
-                />
-              </View>
-              <View style={styles.alertTextWrap}>
-                <View style={[styles.alertHeaderRow, row]}>
-                  <AppText weight="bold" style={[styles.alertTitle, text]} numberOfLines={1}>
-                    {String(alert.title ?? "")}
-                  </AppText>
-                  {isUnread && <View style={styles.unreadDot} />}
+            <View style={styles.alertCardInner}>
+              {isUnread ? (
+                <View style={[styles.alertUnreadDotRow, row]}>
+                  <View style={styles.alertCardEndSpacer} />
+                  <View style={styles.alertTrashTrack}>
+                    <View style={styles.unreadDot} />
+                  </View>
                 </View>
-                <AppText weight="medium" style={[styles.alertDescription, text]}>
-                  {String(alert.description ?? "")}
-                </AppText>
+              ) : null}
+              <View style={styles.alertCardInnerColumn}>
+                <Pressable
+                  onPress={() => {
+                    if (alert._id && !alert.isRead) {
+                      dispatch(
+                        markParentNotificationReadThunk({
+                          notificationId: String(alert._id),
+                        })
+                      );
+                    }
+                  }}
+                  style={({ pressed }) => [
+                    styles.alertCardMainPressable,
+                    row,
+                    pressed && styles.pressed,
+                  ]}
+                >
+                  <View style={[styles.alertIconWrap, { backgroundColor: palette.soft }]}>
+                    <MaterialCommunityIcons
+                      name={pickIcon(alert.type, alert.severity)}
+                      size={21}
+                      color={palette.accent}
+                    />
+                  </View>
+                  <View style={styles.alertTextWrap}>
+                    <View style={styles.alertHeaderRow}>
+                      <AppText weight="bold" style={[styles.alertTitle, text]} numberOfLines={2}>
+                        {String(alert.title ?? "")}
+                      </AppText>
+                    </View>
+                    <AppText weight="medium" style={[styles.alertDescription, text]}>
+                      {String(alert.description ?? "")}
+                    </AppText>
+                  </View>
+                </Pressable>
                 <View style={[styles.alertFooterRow, row]}>
-                  <View style={styles.timeBadge}>
-                    <MaterialCommunityIcons name="clock-time-four-outline" size={14} color="#6B7280" />
-                    <AppText weight="medium" style={[styles.timeText, text]}>
-                      {formatCreatedAt(alert.createdAt) || t("systemAlerts.time.justNow")}
-                    </AppText>
+                  <View style={[styles.alertFooterMetaGroup, row]}>
+                    <View style={styles.timeBadge}>
+                      <MaterialCommunityIcons name="clock-time-four-outline" size={14} color="#64748B" />
+                      <AppText weight="medium" style={[styles.timeText, text]}>
+                        {formatCreatedAt(alert.createdAt) || t("systemAlerts.time.justNow")}
+                      </AppText>
+                    </View>
+                    <View style={[styles.severityBadge, { backgroundColor: palette.soft }]}>
+                      <AppText weight="bold" style={[styles.severityText, text, { color: palette.accent }]}>
+                        {t(`systemAlerts.severityLabels.${severity}`)}
+                      </AppText>
+                    </View>
                   </View>
-                  <View style={[styles.severityBadge, { backgroundColor: palette.soft }]}>
-                    <AppText weight="bold" style={[styles.severityText, text, { color: palette.accent }]}>
-                      {t(`systemAlerts.severityLabels.${severity}`)}
-                    </AppText>
+                  <View style={styles.alertTrashTrack}>
+                    <Pressable
+                      onPress={() => {
+                        void handleDeleteNotification(String(alert._id));
+                      }}
+                      accessibilityRole="button"
+                      accessibilityLabel={t("systemAlerts.delete_a11y")}
+                      hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                      style={({ pressed }) => [
+                        styles.alertDeleteFooter,
+                        pressed && styles.alertDeleteFooterPressed,
+                      ]}
+                    >
+                      <MaterialCommunityIcons
+                        name="trash-can-outline"
+                        size={22}
+                        color="#DC2626"
+                      />
+                    </Pressable>
                   </View>
                 </View>
               </View>
-              <MaterialCommunityIcons
-                name={isRTL ? "chevron-left" : "chevron-right"}
-                size={22}
-                color="#C0C6D4"
-              />
             </View>
-          </Pressable>
+          </View>
         </View>
       );
     },
-    [dispatch, isRTL, row, t, text]
+    [dispatch, handleDeleteNotification, row, t, text]
   );
 
   if (status === "loading" && (notifications?.length || 0) === 0) {

@@ -51,3 +51,14 @@ export async function markAllNotificationsAsRead(parentId) {
     { $set: { isRead: true } }
   );
 }
+
+export async function deleteNotificationByIdForParent(parentId, notificationId) {
+  assertValidObjectId(parentId, CommonErrors.INVALID_PARENT_ID);
+  assertValidObjectId(notificationId, CommonErrors.INVALID_ID);
+
+  return NotificationModel.findOneAndDelete({
+    _id: notificationId,
+    parentId,
+    targetRole: TargetRole.PARENT
+  }).lean();
+}

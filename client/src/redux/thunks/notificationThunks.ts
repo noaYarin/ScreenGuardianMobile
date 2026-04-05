@@ -3,6 +3,7 @@ import {
   apiGetParentNotifications,
   apiMarkAllParentNotificationsRead,
   apiMarkParentNotificationRead,
+  apiDeleteParentNotification,
   type Notification
 } from "@/src/api/notification";
 
@@ -92,6 +93,21 @@ export const markAllParentNotificationsReadThunk = createAsyncThunk<
     return await apiMarkAllParentNotificationsRead();
   } catch (error) {
     const message = (error as Error)?.message ?? "notifications.mark_all_read_failed";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const deleteParentNotificationThunk = createAsyncThunk<
+  { notificationId: string },
+  { notificationId: string },
+  { rejectValue: string }
+>("notifications/delete", async ({ notificationId }, thunkAPI) => {
+  try {
+    await apiDeleteParentNotification(notificationId);
+    return { notificationId };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "notifications.delete_failed";
     return thunkAPI.rejectWithValue(message);
   }
 });

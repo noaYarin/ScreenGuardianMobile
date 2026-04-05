@@ -50,3 +50,15 @@ export async function apiMarkAllParentNotificationsRead(): Promise<{ success: bo
   });
 }
 
+export async function apiDeleteParentNotification(
+  notificationId: string
+): Promise<{ success: boolean }> {
+  return api.delete<{ success: boolean }>(
+    `${URL}/parent/${encodeURIComponent(notificationId)}`,
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+}
+

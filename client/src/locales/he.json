@@ -585,6 +585,8 @@
     "markAllRead": "סמן הכול כנקרא",
     "markAllRead_a11y": "סימון כל ההתראות כנקראו",
     "markAllReadFailed": "לא ניתן לסמן את כל ההתראות כנקראו.",
+    "delete_a11y": "מחיקת התראה",
+    "deleteFailed": "לא ניתן למחוק את ההתראה.",
     "stats": {
       "total": "סה״כ",
       "unread": "לא נקראו",
