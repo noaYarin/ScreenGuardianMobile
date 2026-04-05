@@ -31,7 +31,7 @@ export function ChildDetailsProfileCard({
         <View style={styles.avatarColumn}>
           <View style={styles.avatarWrap}>
             <MaterialCommunityIcons
-              name="human-child"
+              name="account-outline"
               size={22}
               color="#0F172A"
             />

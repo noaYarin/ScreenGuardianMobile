@@ -152,7 +152,7 @@ export default function ChildDetailsScreen() {
 
   if (isLoading && children.length === 0) {
     return (
-      <ScreenLayout>
+      <ScreenLayout scrollable={false}>
         <View style={[styles.container, { alignItems: "center", paddingTop: 40 }]}>
           <ActivityIndicator />
           <AppText style={[styles.loadingHint, text]}>{t("childDetails.loading_children")}</AppText>
@@ -162,7 +162,7 @@ export default function ChildDetailsScreen() {
   }
 
   return (
-    <ScreenLayout>
+    <ScreenLayout scrollable={false}>
       <ConfirmDialog
         visible={deviceDeleteDialog != null}
         title={

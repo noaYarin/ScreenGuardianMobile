@@ -88,12 +88,13 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScreenLayout>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.container, isTablet && styles.containerTablet]}>
+    <ScreenLayout scrollable={false}>
+      <View style={[styles.screenRoot, isTablet && styles.containerTablet]}>
+        <ScrollView
+          style={styles.mainScroll}
+          contentContainerStyle={styles.mainScrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           <View
             style={styles.heroIconOnly}
             accessibilityRole="image"
@@ -191,27 +192,27 @@ export default function SettingsScreen() {
               />
             </View>
           </Pressable>
+        </ScrollView>
 
-          <Pressable
-            onPress={onPressLogout}
-            disabled={isLoggingOut}
-            accessibilityRole="button"
-            accessibilityLabel={t("settings.logout.a11y")}
-            style={({ pressed }) => [
-              styles.logoutButton,
-              !isLoggingOut && pressed && styles.logoutPressed,
-              isLoggingOut ? { opacity: 0.7 } : null,
-            ]}
-          >
-            <View style={[styles.logoutContent, row]}>
-              <MaterialCommunityIcons name="logout" size={22} color="#FFFFFF" />
-              <AppText weight="bold" style={styles.logoutText}>
-                {t("settings.logout.button")}
-              </AppText>
-            </View>
-          </Pressable>
-        </View>
-      </ScrollView>
+        <Pressable
+          onPress={onPressLogout}
+          disabled={isLoggingOut}
+          accessibilityRole="button"
+          accessibilityLabel={t("settings.logout.a11y")}
+          style={({ pressed }) => [
+            styles.logoutButton,
+            !isLoggingOut && pressed && styles.logoutPressed,
+            isLoggingOut ? { opacity: 0.7 } : null,
+          ]}
+        >
+          <View style={[styles.logoutContent, row]}>
+            <MaterialCommunityIcons name="logout" size={22} color="#FFFFFF" />
+            <AppText weight="bold" style={styles.logoutText}>
+              {t("settings.logout.button")}
+            </AppText>
+          </View>
+        </Pressable>
+      </View>
     </ScreenLayout>
   );
 }

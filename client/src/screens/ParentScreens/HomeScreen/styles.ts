@@ -3,6 +3,7 @@ import { APP_COLORS, COLORS } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
   container: {
+    flex: 1,
     width: "100%",
     backgroundColor: COLORS.light.background,
     paddingHorizontal: 16,
@@ -10,9 +11,19 @@ export const styles = StyleSheet.create({
   },
 
   content: {
+    flex: 1,
     width: "100%",
     maxWidth: 560,
     alignSelf: "center",
+  },
+
+  mainScroll: {
+    flex: 1,
+  },
+
+  mainScrollContent: {
+    flexGrow: 1,
+    paddingBottom: 8,
   },
 
   headerMenuButton: {
@@ -243,7 +254,8 @@ export const styles = StyleSheet.create({
 
   actionsWrap: {
     width: "100%",
-    marginTop: 18,
+    marginTop: 16,
+    paddingTop: 8,
     gap: 12,
   },
 

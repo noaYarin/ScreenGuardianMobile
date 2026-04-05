@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from "react";
-import { View, Pressable, ActivityIndicator } from "react-native";
+import { View, Pressable, ActivityIndicator, ScrollView } from "react-native";
 import { router, Stack, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -44,7 +44,7 @@ export default function HomeParentScreen() {
 
   useEffect(() => {
     dispatch(getMyChildrenThunk());
-    dispatch(fetchParentNotificationsThunk());
+    dispatch(fetchParentNotificationsThunk({ page: 1, limit: 10 }));
   }, [dispatch, parentId]);
 
   const parentName = t("homeParent.parent_name_fallback");
@@ -135,9 +135,14 @@ const bellButton = (
         }}
       />
 
-      <ScreenLayout>
+      <ScreenLayout scrollable={false}>
         <View style={styles.container}>
           <View style={styles.content}>
+            <ScrollView
+              style={styles.mainScroll}
+              contentContainerStyle={styles.mainScrollContent}
+              showsVerticalScrollIndicator={false}
+            >
           <View style={styles.header}>
             <AppText weight="extraBold" style={[styles.bigHello, text]}>
               {t("homeParent.hello", { name: parentName })}
@@ -272,6 +277,7 @@ const bellButton = (
                 ))}
               </View>
             )}
+            </ScrollView>
 
             {childCards.length > 0 && (
               <View style={styles.actionsWrap}>

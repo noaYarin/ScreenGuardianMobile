@@ -1,21 +1,30 @@
 import { StyleSheet } from "react-native";
+import { COLORS } from "@/constants/theme";
 
 export const styles = StyleSheet.create({
-  scrollContent: {
-    flexGrow: 1,
-    paddingBottom: 32,
-  },
-
-  container: {
+  screenRoot: {
+    flex: 1,
     width: "100%",
     alignSelf: "center",
     paddingHorizontal: 16,
     paddingTop: 16,
+    paddingBottom: 32,
+    backgroundColor: COLORS.light.background,
     gap: 16,
   },
 
   containerTablet: {
     maxWidth: 860,
+  },
+
+  mainScroll: {
+    flex: 1,
+  },
+
+  mainScrollContent: {
+    flexGrow: 1,
+    gap: 16,
+    paddingBottom: 8,
   },
 
   heroIconOnly: {

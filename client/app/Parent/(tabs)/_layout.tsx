@@ -26,6 +26,9 @@ export default function ParentTabsLayout() {
             : undefined;
 
         return {
+          sceneContainerStyle: {
+            backgroundColor: COLORS.light.background,
+          },
           headerStyle: {
             backgroundColor: COLORS.light.tint,
           },
