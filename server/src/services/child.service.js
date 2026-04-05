@@ -28,9 +28,31 @@ function calculateAge(birthDate) {
 }
 
 function validateBirthDate(birthDate) {
-  const parsedBirthDate = new Date(birthDate);
+  if (typeof birthDate !== "string") {
+    throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
+  }
 
-  if (Number.isNaN(parsedBirthDate.getTime())) {
+  const match = birthDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  if (month < 1 || month > 12) {
+    throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
+  }
+
+  const parsedBirthDate = new Date(year, month - 1, day);
+
+  if (
+    parsedBirthDate.getFullYear() !== year ||
+    parsedBirthDate.getMonth() !== month - 1 ||
+    parsedBirthDate.getDate() !== day
+  ) {
     throw new AppError(CommonErrors.VALIDATION_BIRTHDATE_INVALID);
   }
 
@@ -46,7 +68,6 @@ function validateBirthDate(birthDate) {
 
   return parsedBirthDate;
 }
-
 
 export function validateAndBuildChildDoc(body = {}) {
   const { name, birthDate, gender, interests } = body;

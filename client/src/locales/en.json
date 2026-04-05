@@ -405,6 +405,7 @@
     "save_a11y": "Save child",
     "validation_title": "Error",
     "validation_name": "Please enter a name",
+    "validation_age": "Child age must be between 6 and 17",
     "validation_birthdate": "Please enter a date in DD/MM/YYYY format",
     "success_title": "Saved",
     "success_message": "The child was saved successfully"
@@ -846,6 +847,8 @@
     },
     "defineChildProfile": {
       "title": "Child Profile Setup",
+      "validation_age": "Child age must be between 6 and 17",
+      
       "birthDate": {
         "title": "Birth Date",
         "fieldLabel": "Child birth date",

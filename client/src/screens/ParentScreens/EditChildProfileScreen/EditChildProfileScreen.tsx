@@ -12,7 +12,7 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 import type { RootState } from "@/src/redux/store/types";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCurrentChildProfileThunk } from "@/src/redux/thunks/childrenThunks";
-import { router } from "expo-router"; 
+import { router } from "expo-router";
 import { AppDispatch } from "@/src/redux/store/types";
 import { showAppToast } from "@/src/utils/appToast";
 
@@ -37,6 +37,22 @@ function formatDateForDisplay(date: Date, locale: string) {
   }).format(date);
 }
 
+function calculateAge(date: Date) {
+  const today = new Date();
+
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < date.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
+}
+
 export default function EditChildProfileScreen() {
   const { t, currentLanguage } = useTranslation();
   const { width } = useWindowDimensions();
@@ -49,7 +65,7 @@ export default function EditChildProfileScreen() {
   const { isLoading } = useSelector((state: RootState) => state.children);
 
   const [selectedChildId, setSelectedChildId] = useState<string>("");
-  const [birthDate, setBirthDate] = useState<Date>(new Date()); 
+  const [birthDate, setBirthDate] = useState<Date>(new Date());
   const [gender, setGender] = useState<GenderValue>("girl");
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -58,19 +74,19 @@ export default function EditChildProfileScreen() {
 
     const targetId = selectedChildId || String(children[0]._id);
     const currentChild = children.find(c => String(c._id) === targetId);
-  
+
     if (currentChild) {
       if (!selectedChildId) {
         setSelectedChildId(String(currentChild._id));
       }
-  
+
       if (currentChild.birthDate) {
         const newDate = new Date(currentChild.birthDate);
         if (birthDate.getTime() !== newDate.getTime()) {
           setBirthDate(newDate);
         }
       }
-      
+
       if (currentChild.gender && currentChild.gender !== gender) {
         setGender(currentChild.gender as GenderValue);
       }
@@ -79,15 +95,26 @@ export default function EditChildProfileScreen() {
 
   const formattedBirthDate = useMemo(() => {
     const locale = currentLanguage === "he" ? "he-IL" : "en-US";
-      return formatDateForDisplay(birthDate, locale);
+    return formatDateForDisplay(birthDate, locale);
   }, [birthDate, currentLanguage]);
 
   const handleSave = async () => {
     if (!selectedChildId || !birthDate) return;
+
+    const age = calculateAge(birthDate);
+
+    if (age < 6 || age > 17) {
+      showAppToast(
+        t("defineChildProfile.validation_age"),
+        t("common.error")
+      );
+      return;
+    }
+
     try {
       await dispatch(updateCurrentChildProfileThunk({
         childId: selectedChildId,
-        birthDate: birthDate.toISOString(),
+        birthDate: birthDate.toISOString().split("T")[0],
         gender,
       })).unwrap();
 
@@ -260,8 +287,8 @@ export default function EditChildProfileScreen() {
             </View>
 
             <View style={styles.footer}>
-            <TouchableOpacity 
-                onPress={handleSave} 
+              <TouchableOpacity
+                onPress={handleSave}
                 disabled={isLoading}
                 style={[styles.saveButton, isLoading && styles.disabledButton]}
               >

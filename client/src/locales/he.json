@@ -372,6 +372,7 @@
     "save_a11y": "שמירת הילד",
     "validation_title": "שגיאה",
     "validation_name": "יש למלא שם",
+    "validation_age": "גיל הילד חייב להיות בין 6 ל-17",
     "validation_birthdate": "יש להזין תאריך בפורמט DD/MM/YYYY",
     "success_title": "נשמר",
     "success_message": "הילד נשמר בהצלחה"
@@ -816,6 +817,7 @@
       "childTabA11y": "בחירת הילד {{name}}"
     },
     "defineChildProfile": {
+      "validation_age": "גיל הילד חייב להיות בין 6 ל-17",
       "title": "הגדרת פרופיל ילד",
       "birthDate": {
         "title": "תאריך לידה",

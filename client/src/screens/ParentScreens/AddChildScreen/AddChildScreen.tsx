@@ -29,10 +29,10 @@ const GENDER_OPTIONS: {
   key: GenderOption;
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 }[] = [
-  { key: "boy", icon: "human-male" },
-  { key: "girl", icon: "human-female" },
-  { key: "other", icon: "human-greeting-variant" },
-];
+    { key: "boy", icon: "human-male" },
+    { key: "girl", icon: "human-female" },
+    { key: "other", icon: "human-greeting-variant" },
+  ];
 
 function formatDateForDisplay(date: Date, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -40,6 +40,22 @@ function formatDateForDisplay(date: Date, locale: string) {
     month: "2-digit",
     year: "numeric",
   }).format(date);
+}
+
+function calculateAge(date: Date) {
+  const today = new Date();
+
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < date.getDate())
+  ) {
+    age--;
+  }
+
+  return age;
 }
 
 export default function AddChildScreen() {
@@ -74,10 +90,20 @@ export default function AddChildScreen() {
         return;
       }
 
+      const age = calculateAge(birthDate);
+
+      if (age < 6 || age > 17) {
+        showAppToast(
+          t("addChild.validation_age"),
+          t("addChild.validation_title")
+        );
+        return;
+      }
+
       await dispatch(
         addChildThunk({
           name: childName.trim(),
-          birthDate: birthDate.toISOString(),
+          birthDate: birthDate.toISOString().split("T")[0],
           gender,
         })
       ).unwrap();
