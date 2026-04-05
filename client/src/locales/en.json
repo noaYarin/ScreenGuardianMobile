@@ -10,7 +10,10 @@
     "success": "Success",
     "success_message": "The action was successful.",
     "error": "Error",
-    "error_message": "The action failed. Please try again."
+    "error_message": "The action failed. Please try again.",
+    "loading": "Loading...",
+    "minutes": "min",
+    "child": "Child"
   },
   "children": {
     "fetch_failed": "Could not load children.",
@@ -358,7 +361,28 @@
     "genderOption": "Select gender: {{gender}}",
     "save": "Save child profile settings"
   },
+  "chooseChildAge": {
+    "title": "Choose Age",
+    "badge": "Child Profile Setup",
+    "heading": "What is the child's age?",
+    "subtitle": "Choose the child's age so we can later tailor settings, experience, and alerts more accurately.",
+    "selectedAgeLabel": "Selected age",
+    "rangeTitle": "Supported range",
+    "rangeValue": "{{min}}–{{max}}",
+    "continue": "Continue",
+    "continue_a11y": "Continue to the next step",
+    "increase_a11y": "Increase age",
+    "decrease_a11y": "Decrease age",
+    "ageGroup": {
+      "young": "Suitable for younger children",
+      "middle": "Suitable for school-age children",
+      "teen": "Suitable for teens"
+    }
+  },
   "addChild": {
+    "birthdate_change": "Change",
+    "birthdate_done": "Done",
+    "birthdate_done_a11y": "Confirm birth date",
     "title": "Add Child",
     "back_a11y": "Go back",
     "menu_a11y": "Open menu",
@@ -512,7 +536,7 @@
   "dailyTimeLimits": {
     "title": "Screen Time Limits",
     "heroTitle": "Manage screen time per child and device",
-    "heroSubtitle": "Select a child and then choose the relevant device to adjust limits accurately.",
+    "heroSubtitle": "Choose a child and device, then define a daily screen-time rule.",
     "childrenSectionTitle": "Select Child",
     "devicesSectionTitle": "Select Device",
     "childRole": "Personal Management",
@@ -525,8 +549,7 @@
     "update_success": "Limit updated successfully",
     "update_error": "Failed to update limit",
     "daily": {
-      "title": "Daily Limit",
-      "summary": "Current limit is {{value}} per day"
+      "title": "Daily screen time"
     },
     "weekly": {
       "title": "Weekly Limit",
@@ -538,7 +561,10 @@
     },
     "devices": {
       "phone": "Phone",
-      "tablet": "Tablet"
+      "tablet": "Tablet",
+      "fetch_devices_failed": "Failed to fetch devices",
+      "fetch_device_failed": "Failed to fetch device",
+      "defaultDeviceName": "Connected device"
     },
     "status": {
       "ok": "OK"
@@ -551,452 +577,444 @@
       "editWeeklySchedule": "Edit weekly schedule",
       "editDailyLimit": "Edit daily limit",
       "doneEditing": "Finish editing",
-      "decreaseByFiveMinutes": "Decrease by five minutes",
-      "increaseByFiveMinutes": "Increase by five minutes"
-    }
-  },
-  "childDeviceSelector": {
-    "childrenSectionTitle": "Select Child",
-    "devicesSectionTitle": "Select Device",
-    "defaultChildSubtitle": "Personal Management",
-    "allChildren": "all children",
-    "allDevices": "all Devices",
-    "allChildrenSubtitle": "all children",
-    "allDevicesSubtitle": "all devices",
-    "childTabA11y": "Select child {{name}}",
-    "deviceTabA11y": "Select device {{deviceName}} for {{childName}}",
-    "devices": {
-      "phone": "Phone",
-      "tablet": "Tablet"
-    }
-  },
-  "systemAlerts": {
-    "title": "System Alerts",
-    "heading": "System Alerts",
-    "subtitle": "Track important updates, unusual activity, and system notifications in one place.",
-    "listTitle": "Recent Alerts",
-    "stats": {
-      "total": "Total",
-      "unread": "Unread",
-      "critical": "Critical"
+      "decreaseByFiveMinutes": "Decrease by 5 minutes",
+      "increaseByFiveMinutes": "Increase by 5 minutes",
+      "decreaseByThirtyMinutes": "Decrease by 30 minutes",
+      "increaseByThirtyMinutes": "Increase by 30 minutes"
     },
-    "filters": {
-      "title": "Filter Alerts",
-      "items": {
-        "all": "All",
+    "empty": {
+      "noDevicesTitle": "No devices found",
+      "noDevicesSubtitle": "There are no connected devices for this child yet."
+    },
+    "childDeviceSelector": {
+      "childrenSectionTitle": "Select Child",
+      "devicesSectionTitle": "Select Device",
+      "defaultChildSubtitle": "Personal Management",
+      "allChildren": "all children",
+      "allDevices": "all Devices",
+      "allChildrenSubtitle": "all children",
+      "allDevicesSubtitle": "all devices",
+      "childTabA11y": "Select child {{name}}",
+      "deviceTabA11y": "Select device {{deviceName}} for {{childName}}"
+    },
+    "systemAlerts": {
+      "title": "System Alerts",
+      "heading": "System Alerts",
+      "subtitle": "Track important updates, unusual activity, and system notifications in one place.",
+      "listTitle": "Recent Alerts",
+      "stats": {
+        "total": "Total",
         "unread": "Unread",
         "critical": "Critical"
       },
-      "a11y": {
-        "all": "Show all alerts",
-        "unread": "Show unread alerts",
-        "critical": "Show only critical alerts"
-      }
-    },
-    "severityLabels": {
-      "critical": "Critical",
-      "warning": "Warning",
-      "info": "Info",
-      "success": "Approved"
-    },
-    "alertCardA11y": "Open alert {{title}} from {{time}}",
-    "empty": {
-      "title": "No alerts to display",
-      "subtitle": "New alerts will appear here as soon as they arrive."
-    },
-    "time": {
-      "minutesAgo10": "10 minutes ago",
-      "minutesAgo25": "25 minutes ago",
-      "hourAgo1": "1 hour ago",
-      "hoursAgo3": "3 hours ago",
-      "hoursAgo5": "5 hours ago"
-    },
-    "alerts": {
-      "securityAttempt": {
-        "title": "Bypass Attempt",
-        "description": "A screen-time limit bypass attempt was detected on the child device."
-      },
-      "dailyLimit": {
-        "title": "Daily Limit Reached",
-        "description": "The child reached the configured daily screen-time limit."
-      },
-      "unusualActivity": {
-        "title": "Unusual Activity",
-        "description": "Longer-than-usual usage was detected in the YouTube app."
-      },
-      "newApp": {
-        "title": "System Alert",
-        "description": "A new app was installed on the device and should be reviewed."
-      },
-      "requestApproved": {
-        "title": "Extension Approved",
-        "description": "A screen-time extension request was approved and 15 minutes were added."
-      }
-    }
-  },
-  "extensionRequests": {
-    "title": "Time Extension Requests",
-    "heading": "Screen Time Requests",
-    "subtitle": "Review pending extension requests, see which device was used, which app needs more time, and approve or decline with one tap.",
-    "pendingSectionTitle": "Pending requests",
-    "pendingSectionSubtitle": "Requests are filtered by the currently selected child and device.",
-    "approve": "Approve",
-    "decline": "Decline",
-    "unlimited": "Unlimited",
-    "requestApproved": "Request approved successfully",
-    "requestDeclined": "Request declined successfully",
-    "remainingMinutes": "{{minutes}} minutes remaining",
-    "remainingInfoUnavailable": "Remaining time not available",
-    "reasonLabel": "Request reason",
-    "requestedMinutesLabel": "{{minutes}} extra minutes",
-    "childSubtitles": {
-      "personal": "Personal management"
-    },
-    "devices": {
-      "galaxyS23": "Galaxy S23",
-      "ipadAir": "iPad Air",
-      "iphone13": "iPhone 13",
-      "lenovoTab": "Lenovo Tab"
-    },
-    "reasons": {
-      "studyVideo": "Educational video",
-      "friendsMission": "Finishing a mission with friends",
-      "chatWithFriends": "Chatting with friends",
-      "finishLesson": "Finishing a lesson"
-    },
-    "requestTimes": {
-      "fiveMinutesAgo": "5 minutes ago",
-      "tenMinutesAgo": "10 minutes ago",
-      "fifteenMinutesAgo": "15 minutes ago",
-      "oneHourAgo": "1 hour ago"
-    },
-    "remaining": {
-      "almostFinished": "Time is almost over",
-      "timeEnded": "Time has ended",
-      "twoMinutesLeft": "2 minutes left",
-      "fiveMinutesLeft": "5 minutes left"
-    },
-    "empty": {
-      "title": "No active requests right now",
-      "subtitle": "When the child sends a time extension request for this device, it will appear here."
-    },
-    "a11y": {
-      "approveRequest": "Approve extension request of {{childName}} for {{appName}}",
-      "declineRequest": "Decline extension request of {{childName}} for {{appName}}"
-    }
-  },
-  "routineLimits": {
-    "title": "Weekly Routine",
-    "hero": {
-      "title": "Weekly Routine Management",
-      "subtitle": "Plan recurring lock periods by day, hour, and usage habits"
-    },
-    "overview": {
-      "title": "Quick Overview",
-      "subtitle": "{{childName}}'s routine board for {{deviceName}}"
-    },
-    "stats": {
-      "rules": "Active Rules",
-      "lockedHours": "Locked Hours",
-      "activeDays": "Active Days"
-    },
-    "scheduler": {
-      "title": "Weekly Board",
-      "subtitle": "A visual view of device lock periods across the week"
-    },
-    "legend": {
-      "locked": "Locked",
-      "open": "Open"
-    },
-    "presetsSection": {
-      "title": "Quick Presets",
-      "subtitle": "Fast selection of common routine types"
-    },
-    "presets": {
-      "schoolHours": "School Hours",
-      "sleep": "Sleep",
-      "homework": "Homework",
-      "family": "Family Time"
-    },
-    "form": {
-      "title": "Add Routine Rule",
-      "subtitle": "Static form for now until full server integration",
-      "ruleName": "Title",
-      "start": "Starts",
-      "end": "Ends",
-      "repeat": "Repeat",
-      "hint": "Later, this form can support day selection, time ranges, lock types, and device-specific exceptions.",
-      "addButton": "Add Routine"
-    },
-    "formValues": {
-      "sleepRoutine": "Sleep Routine",
-      "startValue": "Every day, 20:00",
-      "endValue": "Every day, 07:00",
-      "weekdays": "Sun–Thu"
-    },
-    "blockTitles": {
-      "schoolMorning": "School",
-      "afternoonLock": "Afternoon",
-      "sleepTime": "Sleep",
-      "studyWindow": "Study",
-      "familyTime": "Family"
-    },
-    "daysShort": {
-      "sunday": "S",
-      "monday": "M",
-      "tuesday": "T",
-      "wednesday": "W",
-      "thursday": "T",
-      "friday": "F",
-      "saturday": "S"
-    },
-    "a11y": {
-      "gridCell": "Grid cell for {{day}} at {{time}}, state: {{state}}",
-      "selectPreset": "Select preset {{name}}",
-      "addRoutine": "Add a new routine rule"
-    }
-  },
-  "weeklySchedule": {
-    "title": "Weekly Schedule",
-    "heading": "Weekly Hour Limits",
-    "subtitle": "Set allowed usage hours for {{childName}} on {{deviceName}}",
-    "dayRailTitle": "Quick jump by day",
-    "dayRailHint": "Tap a day to scroll to its section",
-    "startTime": "Start time",
-    "endTime": "End time",
-    "copyToAll": "Copy to all days",
-    "save": "Save schedule",
-    "totalHours": "Total time: {{hours}} hours",
-    "status": {
-      "enabled": "Enabled",
-      "disabled": "Disabled"
-    },
-    "summary": {
-      "activeDays": "Active days",
-      "totalHours": "Weekly hours"
-    },
-    "days": {
-      "sun": {
-        "short": "S",
-        "full": "Sunday"
-      },
-      "mon": {
-        "short": "M",
-        "full": "Monday"
-      },
-      "tue": {
-        "short": "T",
-        "full": "Tuesday"
-      },
-      "wed": {
-        "short": "W",
-        "full": "Wednesday"
-      },
-      "thu": {
-        "short": "T",
-        "full": "Thursday"
-      },
-      "fri": {
-        "short": "F",
-        "full": "Friday"
-      },
-      "sat": {
-        "short": "S",
-        "full": "Saturday"
-      }
-    },
-    "a11y": {
-      "scrollToDay": "Jump to {{day}}",
-      "toggleDay": "Enable or disable {{day}}",
-      "editStartTime": "Edit start time for {{day}}",
-      "editEndTime": "Edit end time for {{day}}",
-      "copyToAllDays": "Copy current settings to all days",
-      "saveSchedule": "Save weekly schedule"
-    }
-  },
-  "api": {
-    "generic_error": "Something went wrong. Please try again.",
-    "unauthorized": "Session expired. Please log in again."
-  },
-  "devices": {
-    "fetch_devices_failed": "Failed to fetch devices",
-    "fetch_device_failed": "Failed to fetch device"
-  },
-  "childSelector": {
-    "childrenSectionTitle": "Choose Child",
-    "defaultChildSubtitle": "Personal profile settings",
-    "childTabA11y": "Select child {{name}}"
-  },
-  "defineChildProfile": {
-    "title": "Child Profile Setup",
-    "birthDate": {
-      "title": "Birth Date",
-      "fieldLabel": "Child birth date",
-      "change": "Change",
-      "done": "Done"
-    },
-    "gender": {
-      "title": "Gender",
-      "options": {
-        "boy": "Boy",
-        "girl": "Girl",
-        "other": "Other"
-      }
-    },
-    "actions": {
-      "save": "Save Settings"
-    },
-    "accessibility": {
-      "birthDate": "Choose birth date",
-      "confirmBirthDate": "Confirm birth date",
-      "genderOption": "Select gender: {{gender}}",
-      "save": "Save child profile settings"
-    }
-  },
-  "settings": {
-    "title": "Settings",
-    "heading": "Advanced Settings",
-    "subtitle": "Manage personalization, alerts, and language in one place.",
-    "language": {
-      "title": "Language",
-      "subtitle": "Change the app interface language",
-      "button": "Change Language",
-      "buttonA11y": "Change application language",
-      "current": {
-        "he": "Current language: Hebrew",
-        "en": "Current language: English"
-      }
-    },
-    "notifications": {
-      "title": "Notifications",
-      "subtitle": "Quick control over the alerts that matter most",
-      "rows": {
-        "appAlerts": {
-          "title": "App alerts",
-          "subtitle": "Receive alerts about activity, restrictions, and updates",
-          "a11y": "Turn app alerts on or off"
+      "filters": {
+        "title": "Filter Alerts",
+        "items": {
+          "all": "All",
+          "unread": "Unread",
+          "critical": "Critical"
         },
-        "location": {
-          "title": "Location access",
-          "subtitle": "Use location permission for relevant features",
-          "a11y": "Turn location access on or off"
+        "a11y": {
+          "all": "Show all alerts",
+          "unread": "Show unread alerts",
+          "critical": "Show only critical alerts"
+        }
+      },
+      "severityLabels": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "info": "Info",
+        "success": "Approved"
+      },
+      "alertCardA11y": "Open alert {{title}} from {{time}}",
+      "empty": {
+        "title": "No alerts to display",
+        "subtitle": "New alerts will appear here as soon as they arrive."
+      },
+      "time": {
+        "minutesAgo10": "10 minutes ago",
+        "minutesAgo25": "25 minutes ago",
+        "hourAgo1": "1 hour ago",
+        "hoursAgo3": "3 hours ago",
+        "hoursAgo5": "5 hours ago"
+      },
+      "alerts": {
+        "securityAttempt": {
+          "title": "Bypass Attempt",
+          "description": "A screen-time limit bypass attempt was detected on the child device."
         },
-        "push": {
-          "title": "Push notifications",
-          "subtitle": "Receive direct alerts on this device",
-          "a11y": "Turn push notifications on or off"
+        "dailyLimit": {
+          "title": "Daily Limit Reached",
+          "description": "The child reached the configured daily screen-time limit."
+        },
+        "unusualActivity": {
+          "title": "Unusual Activity",
+          "description": "Longer-than-usual usage was detected in the YouTube app."
+        },
+        "newApp": {
+          "title": "System Alert",
+          "description": "A new app was installed on the device and should be reviewed."
+        },
+        "requestApproved": {
+          "title": "Extension Approved",
+          "description": "A screen-time extension request was approved and 15 minutes were added."
         }
       }
     },
-    "preferences": {
-      "title": "More preferences",
-      "subtitle": "Security, privacy, and support"
-    },
-    "rows": {
-      "privacy": {
-        "title": "Privacy & Security",
-        "subtitle": "Permissions, security, and privacy preferences",
-        "a11y": "Go to privacy and security screen"
+    "extensionRequests": {
+      "title": "Time Extension Requests",
+      "heading": "Screen Time Requests",
+      "subtitle": "Review pending extension requests, see which device was used, which app needs more time, and approve or decline with one tap.",
+      "pendingSectionTitle": "Pending requests",
+      "pendingSectionSubtitle": "Requests are filtered by the currently selected child and device.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "unlimited": "Unlimited",
+      "requestApproved": "Request approved successfully",
+      "requestDeclined": "Request declined successfully",
+      "remainingMinutes": "{{minutes}} minutes remaining",
+      "remainingInfoUnavailable": "Remaining time not available",
+      "reasonLabel": "Request reason",
+      "requestedMinutesLabel": "{{minutes}} extra minutes",
+      "childSubtitles": {
+        "personal": "Personal management"
       },
-      "help": {
-        "title": "Help & Support",
-        "subtitle": "FAQ, contact options, and assistance",
-        "a11y": "Go to help and support screen"
+      "reasons": {
+        "studyVideo": "Educational video",
+        "friendsMission": "Finishing a mission with friends",
+        "chatWithFriends": "Chatting with friends",
+        "finishLesson": "Finishing a lesson"
+      },
+      "requestTimes": {
+        "fiveMinutesAgo": "5 minutes ago",
+        "tenMinutesAgo": "10 minutes ago",
+        "fifteenMinutesAgo": "15 minutes ago",
+        "oneHourAgo": "1 hour ago"
+      },
+      "remaining": {
+        "almostFinished": "Time is almost over",
+        "timeEnded": "Time has ended",
+        "twoMinutesLeft": "2 minutes left",
+        "fiveMinutesLeft": "5 minutes left"
+      },
+      "empty": {
+        "title": "No active requests right now",
+        "subtitle": "When the child sends a time extension request for this device, it will appear here."
+      },
+      "a11y": {
+        "approveRequest": "Approve extension request of {{childName}} for {{appName}}",
+        "declineRequest": "Decline extension request of {{childName}} for {{appName}}"
       }
     },
-    "logout": {
-      "button": "Log Out",
-      "a11y": "Log out from the account",
-      "failed": "Logout failed"
-    }
-  },
-  "childLocation": {
-    "title": "Child Location",
-    "heading": "Child Location",
-    "subtitle": "View the latest known location and quickly refresh device data",
-    "live": "Live location",
-    "detailsTitle": "Location Details",
-    "currentLocationLabel": "Current location",
-    "updatedLabel": "Updated",
-    "selectedChildLabel": "Selected child",
-    "refreshButton": "Refresh location",
-    "navigateButton": "Navigate to location",
-    "refreshA11y": "Refresh child location",
-    "navigateA11y": "Open navigation to child location",
-    "noDevicesTitle": "No devices found",
-    "noDevicesMessage": "The child has not added any devices yet. Add a device to start tracking location.",
-    "addDeviceButton": "Add device",
-    "map": {
-      "updating": "Updating...",
-      "waitingForLocation": "Waiting for child's location..."
-    },
-    "locationSharing": {
-      "mapBanner": "Turn on “Location access” in Settings → Notifications to load your position on the map.",
-      "alertTitle": "Location access is off",
-      "alertMessage": "Enable the location toggle under Settings → Notifications, then try again.",
-      "disabledAddressValue": "Location sharing disabled",
-      "disabledAddressHint": "Open Settings and turn on location access to see GPS details here.",
-      "navigateNoCoordsTitle": "No location yet",
-      "navigateNoCoordsMessage": "Allow location in Settings, then refresh. If it still fails, check the system location permission for the app."
-    },
-    "children": {
-      "noaSubtitle": "Active device",
-      "yonatanSubtitle": "At school",
-      "tamarSubtitle": "Currently connected"
-    }
-  },
-  "activityHistory": {
-    "title": "היסטוריית פעילות",
-    "heading": "היסטוריית פעילות",
-    "subtitle": "מעקב נוח וברור אחרי פעולות שבוצעו לילדים לאורך היום",
-    "childSectionTitle": "בחירת ילד",
-    "filterTitle": "סינון פעילות",
-    "activityListTitle": "פעילות אחרונה",
-    "resultCount": "{{count}} תוצאות",
-    "activityCardA11y": "{{title}}, ילד: {{childName}}, שעה: {{time}}",
-    "fetch_failed": "טעינת היסטוריית הפעילות נכשלה",
-    "filters": {
-      "all": "הכל",
-      "locks": "נעילות",
-      "extensions": "הארכות זמן",
-      "updates": "עדכונים"
-    },
-    "summary": {
-      "today": "פעילויות היום",
-      "locks": "נעילות",
-      "extensions": "הארכות"
-    },
-    "items": {
-      "lockDevice": {
-        "title": "נעילת מכשיר",
-        "description": "המכשיר של {{childName}} ננעל"
+    "routineLimits": {
+      "title": "Weekly Routine",
+      "hero": {
+        "title": "Weekly Routine Management",
+        "subtitle": "Plan recurring lock periods by day, hour, and usage habits"
       },
-      "unlockDevice": {
-        "title": "שחרור נעילת מכשיר",
-        "description": "הנעילה של המכשיר של {{childName}} הוסרה"
+      "overview": {
+        "title": "Quick Overview",
+        "subtitle": "{{childName}}'s routine board for {{deviceName}}"
       },
-      "approveRequest": {
-        "title": "אישור הארכת זמן",
-        "description": "אושרה תוספת זמן מסך עבור {{childName}}"
+      "stats": {
+        "rules": "Active Rules",
+        "lockedHours": "Locked Hours",
+        "activeDays": "Active Days"
       },
-      "rejectRequest": {
-        "title": "דחיית בקשת הארכה",
-        "description": "בקשת הארכת הזמן של {{childName}} נדחתה"
+      "scheduler": {
+        "title": "Weekly Board",
+        "subtitle": "A visual view of device lock periods across the week"
       },
-      "updateScreenTime": {
-        "title": "עדכון זמן מסך",
-        "description": "הגדרות זמן המסך של {{childName}} עודכנו"
+      "legend": {
+        "locked": "Locked",
+        "open": "Open"
       },
-      "default": {
-        "title": "פעילות",
-        "description": "נרשמה פעילות חדשה עבור {{childName}}"
+      "presetsSection": {
+        "title": "Quick Presets",
+        "subtitle": "Fast selection of common routine types"
+      },
+      "presets": {
+        "schoolHours": "School Hours",
+        "sleep": "Sleep",
+        "homework": "Homework",
+        "family": "Family Time"
+      },
+      "form": {
+        "title": "Add Routine Rule",
+        "subtitle": "Static form for now until full server integration",
+        "ruleName": "Title",
+        "start": "Starts",
+        "end": "Ends",
+        "repeat": "Repeat",
+        "hint": "Later, this form can support day selection, time ranges, lock types, and device-specific exceptions.",
+        "addButton": "Add Routine"
+      },
+      "formValues": {
+        "sleepRoutine": "Sleep Routine",
+        "startValue": "Every day, 20:00",
+        "endValue": "Every day, 07:00",
+        "weekdays": "Sun–Thu"
+      },
+      "blockTitles": {
+        "schoolMorning": "School",
+        "afternoonLock": "Afternoon",
+        "sleepTime": "Sleep",
+        "studyWindow": "Study",
+        "familyTime": "Family"
+      },
+      "daysShort": {
+        "sunday": "S",
+        "monday": "M",
+        "tuesday": "T",
+        "wednesday": "W",
+        "thursday": "T",
+        "friday": "F",
+        "saturday": "S"
+      },
+      "a11y": {
+        "gridCell": "Grid cell for {{day}} at {{time}}, state: {{state}}",
+        "selectPreset": "Select preset {{name}}",
+        "addRoutine": "Add a new routine rule"
       }
     },
-    "empty": {
-      "title": "לא נמצאה פעילות",
-      "subtitle": "נסי לבחור ילד אחר או לשנות את הסינון כדי לראות תוצאות",
-      "noChildrenTitle": "לא נמצאו ילדים",
-      "noChildrenSubtitle": "עדיין לא קושרו ילדים לחשבון הזה."
+    "weeklySchedule": {
+      "title": "Weekly Schedule",
+      "heading": "Weekly Hour Limits",
+      "subtitle": "Set allowed usage hours for {{childName}} on {{deviceName}}",
+      "dayRailTitle": "Quick jump by day",
+      "dayRailHint": "Tap a day to scroll to its section",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "copyToAll": "Copy to all days",
+      "save": "Save schedule",
+      "totalHours": "Total time: {{hours}} hours",
+      "status": {
+        "enabled": "Enabled",
+        "disabled": "Disabled"
+      },
+      "summary": {
+        "activeDays": "Active days",
+        "totalHours": "Weekly hours"
+      },
+      "days": {
+        "sun": {
+          "short": "S",
+          "full": "Sunday"
+        },
+        "mon": {
+          "short": "M",
+          "full": "Monday"
+        },
+        "tue": {
+          "short": "T",
+          "full": "Tuesday"
+        },
+        "wed": {
+          "short": "W",
+          "full": "Wednesday"
+        },
+        "thu": {
+          "short": "T",
+          "full": "Thursday"
+        },
+        "fri": {
+          "short": "F",
+          "full": "Friday"
+        },
+        "sat": {
+          "short": "S",
+          "full": "Saturday"
+        }
+      },
+      "a11y": {
+        "scrollToDay": "Jump to {{day}}",
+        "toggleDay": "Enable or disable {{day}}",
+        "editStartTime": "Edit start time for {{day}}",
+        "editEndTime": "Edit end time for {{day}}",
+        "copyToAllDays": "Copy current settings to all days",
+        "saveSchedule": "Save weekly schedule"
+      }
+    },
+    "api": {
+      "generic_error": "Something went wrong. Please try again.",
+      "unauthorized": "Session expired. Please log in again."
+    },
+    "childSelector": {
+      "childrenSectionTitle": "Choose Child",
+      "defaultChildSubtitle": "Personal profile settings",
+      "childTabA11y": "Select child {{name}}"
+    },
+    "defineChildProfile": {
+      "title": "Child Profile Setup",
+      "birthDate": {
+        "title": "Birth Date",
+        "fieldLabel": "Child birth date",
+        "change": "Change",
+        "done": "Done"
+      },
+      "gender": {
+        "title": "Gender",
+        "options": {
+          "boy": "Boy",
+          "girl": "Girl",
+          "other": "Other"
+        }
+      },
+      "actions": {
+        "save": "Save Settings"
+      },
+      "accessibility": {
+        "birthDate": "Choose birth date",
+        "confirmBirthDate": "Confirm birth date",
+        "genderOption": "Select gender: {{gender}}",
+        "save": "Save child profile settings"
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "heading": "Advanced Settings",
+      "subtitle": "Manage personalization, alerts, and language in one place.",
+      "language": {
+        "title": "Language",
+        "subtitle": "Change the app interface language",
+        "button": "Change Language",
+        "buttonA11y": "Change application language",
+        "current": {
+          "he": "Current language: Hebrew",
+          "en": "Current language: English"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "subtitle": "Quick control over the alerts that matter most",
+        "rows": {
+          "appAlerts": {
+            "title": "App alerts",
+            "subtitle": "Receive alerts about activity, restrictions, and updates",
+            "a11y": "Turn app alerts on or off"
+          },
+          "location": {
+            "title": "Location access",
+            "subtitle": "Use location permission for relevant features",
+            "a11y": "Turn location access on or off"
+          },
+          "push": {
+            "title": "Push notifications",
+            "subtitle": "Receive direct alerts on this device",
+            "a11y": "Turn push notifications on or off"
+          }
+        }
+      },
+      "preferences": {
+        "title": "More preferences",
+        "subtitle": "Security, privacy, and support"
+      },
+      "rows": {
+        "privacy": {
+          "title": "Privacy & Security",
+          "subtitle": "Permissions, security, and privacy preferences",
+          "a11y": "Go to privacy and security screen"
+        },
+        "help": {
+          "title": "Help & Support",
+          "subtitle": "FAQ, contact options, and assistance",
+          "a11y": "Go to help and support screen"
+        }
+      },
+      "logout": {
+        "button": "Log Out",
+        "a11y": "Log out from the account",
+        "failed": "Logout failed"
+      }
+    },
+    "childLocation": {
+      "title": "Child Location",
+      "heading": "Child Location",
+      "subtitle": "View the latest known location and quickly refresh device data",
+      "live": "Live location",
+      "detailsTitle": "Location Details",
+      "currentLocationLabel": "Current location",
+      "updatedLabel": "Updated",
+      "selectedChildLabel": "Selected child",
+      "refreshButton": "Refresh location",
+      "navigateButton": "Navigate to location",
+      "refreshA11y": "Refresh child location",
+      "navigateA11y": "Open navigation to child location",
+      "noDevicesTitle": "No devices found",
+      "noDevicesMessage": "The child has not added any devices yet. Add a device to start tracking location.",
+      "addDeviceButton": "Add device",
+      "map": {
+        "updating": "Updating...",
+        "waitingForLocation": "Waiting for child's location..."
+      },
+      "locationSharing": {
+        "mapBanner": "Turn on “Location access” in Settings → Notifications to load your position on the map.",
+        "alertTitle": "Location access is off",
+        "alertMessage": "Enable the location toggle under Settings → Notifications, then try again.",
+        "disabledAddressValue": "Location sharing disabled",
+        "disabledAddressHint": "Open Settings and turn on location access to see GPS details here.",
+        "navigateNoCoordsTitle": "No location yet",
+        "navigateNoCoordsMessage": "Allow location in Settings, then refresh. If it still fails, check the system location permission for the app."
+      },
+      "children": {
+        "noaSubtitle": "Active device",
+        "yonatanSubtitle": "At school",
+        "tamarSubtitle": "Currently connected"
+      }
+    },
+    "activityHistory": {
+      "title": "היסטוריית פעילות",
+      "heading": "היסטוריית פעילות",
+      "subtitle": "מעקב נוח וברור אחרי פעולות שבוצעו לילדים לאורך היום",
+      "childSectionTitle": "בחירת ילד",
+      "filterTitle": "סינון פעילות",
+      "activityListTitle": "פעילות אחרונה",
+      "resultCount": "{{count}} תוצאות",
+      "activityCardA11y": "{{title}}, ילד: {{childName}}, שעה: {{time}}",
+      "fetch_failed": "טעינת היסטוריית הפעילות נכשלה",
+      "filters": {
+        "all": "הכל",
+        "locks": "נעילות",
+        "extensions": "הארכות זמן",
+        "updates": "עדכונים"
+      },
+      "summary": {
+        "today": "פעילויות היום",
+        "locks": "נעילות",
+        "extensions": "הארכות"
+      },
+      "items": {
+        "lockDevice": {
+          "title": "נעילת מכשיר",
+          "description": "המכשיר של {{childName}} ננעל"
+        },
+        "unlockDevice": {
+          "title": "שחרור נעילת מכשיר",
+          "description": "הנעילה של המכשיר של {{childName}} הוסרה"
+        },
+        "approveRequest": {
+          "title": "אישור הארכת זמן",
+          "description": "אושרה תוספת זמן מסך עבור {{childName}}"
+        },
+        "rejectRequest": {
+          "title": "דחיית בקשת הארכה",
+          "description": "בקשת הארכת הזמן של {{childName}} נדחתה"
+        },
+        "updateScreenTime": {
+          "title": "עדכון זמן מסך",
+          "description": "הגדרות זמן המסך של {{childName}} עודכנו"
+        },
+        "default": {
+          "title": "פעילות",
+          "description": "נרשמה פעילות חדשה עבור {{childName}}"
+        }
+      },
+      "empty": {
+        "title": "לא נמצאה פעילות",
+        "subtitle": "נסי לבחור ילד אחר או לשנות את הסינון כדי לראות תוצאות",
+        "noChildrenTitle": "לא נמצאו ילדים",
+        "noChildrenSubtitle": "עדיין לא קושרו ילדים לחשבון הזה."
+      }
     }
   }
 }

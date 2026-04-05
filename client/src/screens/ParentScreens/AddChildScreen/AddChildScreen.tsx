@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Pressable,
   TextInput,
-  I18nManager,
   useWindowDimensions,
   ActivityIndicator,
+  Platform,
 } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Stack, router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,73 +23,47 @@ import { addChildThunk } from "@/src/redux/thunks/childrenThunks";
 import { clearChildrenError } from "@/src/redux/slices/children-slice";
 import { showAppToast } from "@/src/utils/appToast";
 
-function HeaderIconButton({
-  name,
-  onPress,
-  accessibilityLabel,
-}: {
-  name: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
-  onPress: () => void;
-  accessibilityLabel: string;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      hitSlop={10}
-      style={({ pressed }) => [
-        styles.headerIconButton,
-        pressed && styles.headerIconButtonPressed,
-      ]}
-    >
-      <MaterialCommunityIcons name={name} size={22} color="#000" />
-    </Pressable>
-  );
-}
-
 type GenderOption = "boy" | "girl" | "other";
 
 const GENDER_OPTIONS: {
   key: GenderOption;
   icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];
 }[] = [
-    { key: "boy", icon: "human-male" },
-    { key: "girl", icon: "human-female" },
-    { key: "other", icon: "human-greeting-variant" },
-  ];
+  { key: "boy", icon: "human-male" },
+  { key: "girl", icon: "human-female" },
+  { key: "other", icon: "human-greeting-variant" },
+];
 
-function isValidDate(value: string) {
-  return /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/.test(value.trim());
-}
-
-function toIsoDate(value: string) {
-  const [day, month, year] = value.trim().split("/");
-
-  if (!day || !month || !year) return "";
-
-  return `${year}-${month}-${day}`;
+function formatDateForDisplay(date: Date, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
 }
 
 export default function AddChildScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const dispatch = useDispatch<AppDispatch>();
-  const { isLoading, error } = useSelector(
+  const { isLoading } = useSelector(
     (state: { children: { isLoading: boolean; error: string | null } }) => state.children
   );
 
-  const { row, text } = useLocaleLayout();
+  const { row, text, isRTL } = useLocaleLayout();
   const { width } = useWindowDimensions();
 
   const [childName, setChildName] = useState("");
-  const [birthDate, setBirthDate] = useState("");
+  const [birthDate, setBirthDate] = useState<Date>(new Date());
   const [gender, setGender] = useState<GenderOption>("boy");
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const maxContentWidth = Math.min(900, Math.max(340, width - 32));
 
-  const backIconName: React.ComponentProps<typeof MaterialCommunityIcons>["name"] =
-    I18nManager.isRTL ? "arrow-left" : "arrow-right";
+  const formattedBirthDate = useMemo(() => {
+    const locale = i18n.language === "he" ? "he-IL" : "en-US";
+    return formatDateForDisplay(birthDate, locale);
+  }, [birthDate, i18n.language]);
 
   const onSave = async () => {
     try {
@@ -99,15 +74,10 @@ export default function AddChildScreen() {
         return;
       }
 
-      if (!isValidDate(birthDate)) {
-        showAppToast(t("addChild.validation_birthdate"), t("addChild.validation_title"));
-        return;
-      }
-
       await dispatch(
         addChildThunk({
           name: childName.trim(),
-          birthDate: toIsoDate(birthDate),
+          birthDate: birthDate.toISOString(),
           gender,
         })
       ).unwrap();
@@ -120,7 +90,6 @@ export default function AddChildScreen() {
       );
     }
   };
-
 
   return (
     <>
@@ -166,16 +135,78 @@ export default function AddChildScreen() {
                   {t("addChild.birthdate_label")}
                 </AppText>
 
-                <TextInput
-                  value={birthDate}
-                  onChangeText={setBirthDate}
-                  placeholder={t("addChild.birthdate_placeholder")}
-                  placeholderTextColor="#94A3B8"
-                  style={[styles.input, text]}
-                  keyboardType="numbers-and-punctuation"
-                  maxLength={10}
+                <Pressable
+                  onPress={() => setShowDatePicker(true)}
+                  accessibilityRole="button"
                   accessibilityLabel={t("addChild.birthdate_a11y")}
-                />
+                  style={({ pressed }) => [
+                    styles.dateFieldButton,
+                    pressed && styles.dateFieldButtonPressed,
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.dateFieldContent,
+                      isRTL ? styles.dateFieldContentRtl : styles.dateFieldContentLtr,
+                    ]}
+                  >
+                    <View style={[styles.dateFieldLeft, row]}>
+                      <View style={styles.dateIconWrap}>
+                        <AppText style={styles.dateIconEmoji}>📅</AppText>
+                      </View>
+
+                      <View style={styles.dateTextWrap}>
+                        <AppText weight="medium" style={[styles.dateFieldLabel, text]}>
+                          {t("addChild.birthdate_label")}
+                        </AppText>
+
+                        <AppText weight="extraBold" style={[styles.dateFieldValue, text]}>
+                          {formattedBirthDate}
+                        </AppText>
+                      </View>
+                    </View>
+
+                    <AppText weight="bold" style={styles.dateFieldChangeText}>
+                      {t("addChild.birthdate_change")}
+                    </AppText>
+                  </View>
+                </Pressable>
+
+                {showDatePicker ? (
+                  <DateTimePicker
+                    value={birthDate}
+                    mode="date"
+                    display={Platform.OS === "ios" ? "spinner" : "default"}
+                    maximumDate={new Date()}
+                    onChange={(event, selectedDate) => {
+                      if (Platform.OS === "android") {
+                        setShowDatePicker(false);
+                      }
+
+                      if (selectedDate) {
+                        setBirthDate(selectedDate);
+                      }
+                    }}
+                  />
+                ) : null}
+
+                {Platform.OS === "ios" && showDatePicker ? (
+                  <View style={styles.iosPickerFooter}>
+                    <Pressable
+                      onPress={() => setShowDatePicker(false)}
+                      accessibilityRole="button"
+                      accessibilityLabel={t("addChild.birthdate_done_a11y")}
+                      style={({ pressed }) => [
+                        styles.iosPickerDoneButton,
+                        pressed && styles.pressedSoft,
+                      ]}
+                    >
+                      <AppText weight="bold" style={styles.iosPickerDoneText}>
+                        {t("addChild.birthdate_done")}
+                      </AppText>
+                    </Pressable>
+                  </View>
+                ) : null}
               </View>
 
               <View style={styles.fieldBlock}>
@@ -224,7 +255,6 @@ export default function AddChildScreen() {
               style={[styles.saveButton, isLoading && { opacity: 0.7 }]}
               onPress={onSave}
               disabled={isLoading}
-
               accessibilityRole="button"
               accessibilityLabel={t("addChild.save_a11y")}
             >
