@@ -5,7 +5,9 @@ import {
   Pressable,
   ActivityIndicator,
   Alert,
+  Switch,
 } from "react-native";
+import { showAppToast } from "@/src/utils/appToast";
 import { Stack, router, type Href } from "expo-router";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
@@ -145,11 +147,11 @@ export default function DailyTimeLimitsScreen() {
 
   const selectedDeviceName = selectedDevice
     ? String(
-        (selectedDevice as any).deviceName ??
-          (selectedDevice as any).model ??
-          (selectedDevice as any).name ??
-          ""
-      )
+      (selectedDevice as any).deviceName ??
+      (selectedDevice as any).model ??
+      (selectedDevice as any).name ??
+      ""
+    )
     : "";
 
   const selectedLimits: ScreenLimitCard[] = useMemo(() => {
@@ -234,7 +236,7 @@ export default function DailyTimeLimitsScreen() {
     }));
   };
 
-  const handleDonePress = async (limitId: string) => {
+  const handleSavePress = async (limitId: string) => {
     if (!selectedDevice || !selectedChildId) return;
 
     const nextMinutes = tempLimits[limitId];
@@ -247,23 +249,23 @@ export default function DailyTimeLimitsScreen() {
           deviceId: selectedDevice._id,
           ...(limitId === "daily"
             ? {
-                isLimitEnabled: nextEnabled ?? false,
-                dailyLimitMinutes:
-                  nextEnabled === false
-                    ? selectedDevice.screenTime?.dailyLimitMinutes ??
-                      MIN_HOURS * 60
-                    : Math.max(MIN_HOURS * 60, nextMinutes ?? MIN_HOURS * 60),
-              }
+              isLimitEnabled: nextEnabled ?? false,
+              dailyLimitMinutes:
+                nextEnabled === false
+                  ? selectedDevice.screenTime?.dailyLimitMinutes ??
+                  MIN_HOURS * 60
+                  : Math.max(MIN_HOURS * 60, nextMinutes ?? MIN_HOURS * 60),
+            }
             : {
-                weeklyLimitMinutes:
-                  nextMinutes ??
-                  selectedDevice.screenTime?.weeklyLimitMinutes ??
-                  0,
-              }),
+              weeklyLimitMinutes:
+                nextMinutes ??
+                selectedDevice.screenTime?.weeklyLimitMinutes ??
+                0,
+            }),
         })
       ).unwrap();
 
-      Alert.alert(t("common.success"), t("dailyTimeLimits.update_success"));
+      showAppToast(t("dailyTimeLimits.update_success"));
 
       setEditingCardId(null);
 
@@ -279,7 +281,7 @@ export default function DailyTimeLimitsScreen() {
         return updated;
       });
     } catch {
-      Alert.alert(t("common.error"), t("dailyTimeLimits.update_error"));
+      showAppToast(t("dailyTimeLimits.update_error"));
     }
   };
 
@@ -479,7 +481,7 @@ export default function DailyTimeLimitsScreen() {
                   const isEnabled = isWeeklyCard
                     ? true
                     : tempLimitEnabled[limitCard.id] ??
-                      (selectedDevice?.screenTime?.isLimitEnabled ?? false);
+                    (selectedDevice?.screenTime?.isLimitEnabled ?? false);
 
                   const effectiveMaxHours = isEditing
                     ? (tempLimits[limitCard.id] ?? limitCard.maxHours * 60) / 60
@@ -587,8 +589,8 @@ export default function DailyTimeLimitsScreen() {
                       <AppText weight="medium" style={[styles.summaryText, text]}>
                         {isWeeklyCard || isEnabled
                           ? t(limitCard.summaryKey, {
-                              value: formatHoursToClock(effectiveMaxHours),
-                            })
+                            value: formatHoursToClock(effectiveMaxHours),
+                          })
                           : t("dailyTimeLimits.disabledSummary", "This daily limit is turned off.")}
                       </AppText>
 
@@ -598,9 +600,11 @@ export default function DailyTimeLimitsScreen() {
                             styles.statusChip,
                             !isWeeklyCard && !isEnabled
                               ? styles.statusChipNormal
-                              : progress >= 0.8
-                              ? styles.statusChipWarning
-                              : styles.statusChipNormal,
+                              : progress >= 1
+                                ? styles.statusChipReached
+                                : progress >= 0.8
+                                  ? styles.statusChipWarning
+                                  : styles.statusChipNormal,
                           ]}
                         >
                           <AppText
@@ -609,16 +613,20 @@ export default function DailyTimeLimitsScreen() {
                               styles.statusChipText,
                               !isWeeklyCard && !isEnabled
                                 ? styles.statusChipTextNormal
-                                : progress >= 0.8
-                                ? styles.statusChipTextWarning
-                                : styles.statusChipTextNormal,
+                                : progress >= 1
+                                  ? styles.statusChipTextReached
+                                  : progress >= 0.8
+                                    ? styles.statusChipTextWarning
+                                    : styles.statusChipTextNormal,
                             ]}
                           >
                             {!isWeeklyCard && !isEnabled
                               ? t("dailyTimeLimits.off", "Off")
-                              : progress >= 0.8
-                              ? t("dailyTimeLimits.status.almostReached")
-                              : t("dailyTimeLimits.status.ok")}
+                              : progress >= 1
+                                ? t("dailyTimeLimits.status.reached")
+                                : progress >= 0.8
+                                  ? t("dailyTimeLimits.status.almostReached")
+                                  : t("dailyTimeLimits.status.ok")}
                           </AppText>
                         </View>
 
@@ -659,73 +667,62 @@ export default function DailyTimeLimitsScreen() {
                               </AppText>
 
                               <Pressable
-                                onPress={() => handleDonePress(limitCard.id)}
+                                onPress={() => handleSavePress(limitCard.id)}
                                 accessibilityRole="button"
-                                accessibilityLabel={t(
-                                  "dailyTimeLimits.a11y.doneEditing"
-                                )}
+                                accessibilityLabel={t("dailyTimeLimits.a11y.saveEditing")}
                                 style={({ pressed }) => [
-                                  styles.doneButton,
-                                  pressed && styles.doneButtonPressed,
+                                  styles.saveButtonStrong,
+                                  pressed && styles.saveButtonStrongPressed,
                                 ]}
                               >
-                                <AppText weight="bold" style={styles.doneButtonText}>
-                                  {t("dailyTimeLimits.done")}
+                                <MaterialCommunityIcons
+                                  name="content-save-outline"
+                                  size={18}
+                                  color="#FFFFFF"
+                                />
+                                <AppText weight="extraBold" style={styles.saveButtonStrongText}>
+                                  {t("dailyTimeLimits.save")}
                                 </AppText>
                               </Pressable>
                             </View>
 
-                            {!isWeeklyCard && (
-                              <View
-                                style={[
-                                  row,
-                                  {
-                                    justifyContent: "space-between",
-                                    alignItems: "center",
-                                    marginBottom: 12,
-                                  },
-                                ]}
-                              >
-                                <AppText weight="medium" style={text}>
-                                  {t("dailyTimeLimits.limitEnabled", "Daily limit enabled")}
-                                </AppText>
+                            <AppText weight="medium" style={[styles.editorHint, text]}>
+                              {t("dailyTimeLimits.saveHint")}
+                            </AppText>
 
-                                <Pressable
-                                  onPress={() =>
+                            {!isWeeklyCard && (
+                              <View style={styles.switchRow}>
+                                <View style={styles.switchTextWrap}>
+                                  <AppText weight="medium" style={text}>
+                                    {t("dailyTimeLimits.limitEnabled", "Daily limit enabled")}
+                                  </AppText>
+
+                                  <AppText weight="medium" style={[styles.switchHint, text]}>
+                                    {isEnabled
+                                      ? t(
+                                        "dailyTimeLimits.limitEnabledHintOn",
+                                        "Turn off the switch to remove the daily limit"
+                                      )
+                                      : t(
+                                        "dailyTimeLimits.limitEnabledHintOff",
+                                        "Turn on the switch to set a daily limit"
+                                      )}
+                                  </AppText>
+                                </View>
+
+                                <Switch
+                                  value={isEnabled}
+                                  onValueChange={(value) =>
                                     setTempLimitEnabled((prev) => ({
                                       ...prev,
-                                      [limitCard.id]:
-                                        !(prev[limitCard.id] ??
-                                        selectedDevice?.screenTime?.isLimitEnabled ??
-                                        false),
+                                      [limitCard.id]: value,
                                     }))
                                   }
-                                  accessibilityRole="button"
                                   accessibilityLabel={t(
                                     "dailyTimeLimits.a11y.toggleDailyLimit",
                                     "Toggle daily limit"
                                   )}
-                                  style={({ pressed }) => [
-                                    {
-                                      paddingHorizontal: 14,
-                                      paddingVertical: 8,
-                                      borderRadius: 999,
-                                      backgroundColor: isEnabled ? "#3D6BF2" : "#E5E7EB",
-                                    },
-                                    pressed && { opacity: 0.85 },
-                                  ]}
-                                >
-                                  <AppText
-                                    weight="bold"
-                                    style={{
-                                      color: isEnabled ? "#FFFFFF" : "#1F2937",
-                                    }}
-                                  >
-                                    {isEnabled
-                                      ? t("dailyTimeLimits.enabled", "Enabled")
-                                      : t("dailyTimeLimits.disabled", "Disabled")}
-                                  </AppText>
-                                </Pressable>
+                                />
                               </View>
                             )}
 
@@ -737,14 +734,10 @@ export default function DailyTimeLimitsScreen() {
                               ]}
                             >
                               <Pressable
-                                onPress={() =>
-                                  updateLimitByStep(limitCard.id, -STEP_HOURS)
-                                }
+                                onPress={() => updateLimitByStep(limitCard.id, -STEP_HOURS)}
                                 disabled={!canDecrease}
                                 accessibilityRole="button"
-                                accessibilityLabel={t(
-                                  "dailyTimeLimits.a11y.decreaseByFiveMinutes"
-                                )}
+                                accessibilityLabel={t("dailyTimeLimits.a11y.decreaseByFiveMinutes")}
                                 style={({ pressed }) => [
                                   styles.stepButton,
                                   styles.stepButtonSecondary,
@@ -787,39 +780,29 @@ export default function DailyTimeLimitsScreen() {
                               </View>
 
                               <Pressable
-                                onPress={() =>
-                                  updateLimitByStep(limitCard.id, STEP_HOURS)
-                                }
+                                onPress={() => updateLimitByStep(limitCard.id, STEP_HOURS)}
                                 disabled={!isWeeklyCard && !isEnabled}
                                 accessibilityRole="button"
-                                accessibilityLabel={t(
-                                  "dailyTimeLimits.a11y.increaseByFiveMinutes"
-                                )}
+                                accessibilityLabel={t("dailyTimeLimits.a11y.increaseByFiveMinutes")}
                                 style={({ pressed }) => [
                                   styles.stepButton,
                                   styles.stepButtonPrimary,
                                   pressed && styles.stepButtonPressed,
-                                  !isWeeklyCard &&
-                                    !isEnabled &&
-                                    styles.stepButtonDisabled,
+                                  !isWeeklyCard && !isEnabled && styles.stepButtonDisabled,
                                 ]}
                               >
                                 <MaterialCommunityIcons
                                   name="plus"
                                   size={18}
-                                  color={
-                                    !isWeeklyCard && !isEnabled
-                                      ? "#A8B3C7"
-                                      : "#FFFFFF"
-                                  }
+                                  color={!isWeeklyCard && !isEnabled ? "#A8B3C7" : "#FFFFFF"}
                                 />
                                 <AppText
                                   weight="bold"
                                   style={[
                                     styles.stepButtonTextPrimary,
                                     !isWeeklyCard &&
-                                      !isEnabled &&
-                                      styles.stepButtonTextDisabled,
+                                    !isEnabled &&
+                                    styles.stepButtonTextDisabled,
                                   ]}
                                 >
                                   5+

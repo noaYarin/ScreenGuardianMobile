@@ -4,6 +4,7 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 
@@ -11,11 +12,15 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
 
     companion object {
         private const val TAG = "ScreenGuardianService"
-        private const val CHECK_INTERVAL_MS = 5000L
+        private const val CHECK_INTERVAL_MS = 5000L // Interval for periodic sync loop
+        private const val LOCK_DEBOUNCE_MS = 2000L // Prevent multiple lock triggers in short time
     }
 
     private val handler = Handler(Looper.getMainLooper())
 
+    private var lastLockTime = 0L
+
+    // List of packages that should not be blocked (e.g. dialer, system UI, own app)
     private val allowedPackages = setOf(
         "com.screenguardianmobile",
         "com.google.android.dialer",
@@ -25,23 +30,35 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         "com.android.incallui"
     )
 
+    // Main periodic loop responsible for:
+    // 1. Fetching latest policy from server
+    // 2. Updating usage stats
+    // 3. Evaluating lock state
+    // 4. Syncing data back to server
     private val lockChecker = object : Runnable {
         override fun run() {
             try {
                 DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext) {
                     try {
+                        // Update today's usage from UsageStatsManager
                         UsageStatsHelper.updateTodayUsage(applicationContext)
-                        checkAndLockIfNeeded(null)
+
+                        // Evaluate lock decision after latest data
+                        evaluateLock(null)
+
+                        // Sync usage and heartbeat to server
                         DeviceServerSyncHelper.sendUsage(applicationContext)
                         DeviceServerSyncHelper.sendHeartbeat(applicationContext)
+
                     } catch (e: Exception) {
                         Log.e(TAG, "Error after policy sync", e)
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Error while checking lock state", e)
+                Log.e(TAG, "Error in lockChecker", e)
             }
 
+            // Schedule next execution
             handler.postDelayed(this, CHECK_INTERVAL_MS)
         }
     }
@@ -49,6 +66,8 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         Log.d(TAG, "Accessibility service connected")
+
+        // Start periodic loop
         handler.post(lockChecker)
     }
 
@@ -57,19 +76,17 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
         val currentPackage = event.packageName?.toString()
-        Log.d(TAG, "Window changed. Current package: $currentPackage")
+        Log.d(TAG, "Window changed: $currentPackage")
 
         try {
-            DevicePolicySyncHelper.fetchAndSavePolicy(applicationContext) {
-                try {
-                    UsageStatsHelper.updateTodayUsage(applicationContext)
-                    checkAndLockIfNeeded(currentPackage)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error after policy+usage refresh", e)
-                }
-            }
+            // Update usage immediately when app changes
+            UsageStatsHelper.updateTodayUsage(applicationContext)
+
+            // Evaluate lock based on current foreground app
+            evaluateLock(currentPackage)
+
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to refresh policy/usage before lock check", e)
+            Log.e(TAG, "Error in accessibility event", e)
         }
     }
 
@@ -79,50 +96,77 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        // Stop periodic loop when service is destroyed
         handler.removeCallbacks(lockChecker)
     }
 
-    private fun checkAndLockIfNeeded(currentPackage: String?) {
+    // Centralized lock decision logic
+    // This method determines whether the device should be locked
+    private fun evaluateLock(currentPackage: String?) {
+
+        val now = SystemClock.elapsedRealtime()
+
+        // Retrieve current state from PolicyStore
+        UsageStatsHelper.updateTodayUsage(applicationContext)
+
         val usedToday = PolicyStore.getUsedToday(applicationContext)
         val remaining = PolicyStore.getRemainingMinutes(applicationContext)
-        val isLockNow = PolicyStore.isLockNow(applicationContext)
-        val isServerLocked = PolicyStore.isServerLocked(applicationContext)
-        val isLimitEnabled = PolicyStore.isLimitEnabled(applicationContext)
         val dailyLimit = PolicyStore.getDailyLimit(applicationContext)
         val extraMinutes = PolicyStore.getExtraMinutes(applicationContext)
 
-        if (isLockNow || isServerLocked) {
-            PolicyStore.setBlockReason(applicationContext, "LOCK_NOW")
-        } else if (isLimitEnabled && remaining <= 0) {
-            PolicyStore.setBlockReason(applicationContext, "DAILY_LIMIT_REACHED")
-        } else {
-            PolicyStore.setBlockReason(applicationContext, "")
+        val isLockNow = PolicyStore.isLockNow(applicationContext)
+        val isServerLocked = PolicyStore.isServerLocked(applicationContext)
+        val isLimitEnabled = PolicyStore.isLimitEnabled(applicationContext)
+
+        // Determine block reason based on priority
+        val blockReason = when {
+            isLockNow || isServerLocked -> "LOCK_NOW"
+            isLimitEnabled && remaining <= 0 -> "DAILY_LIMIT_REACHED"
+            else -> ""
         }
 
+        // Persist block reason for UI usage
+        PolicyStore.setBlockReason(applicationContext, blockReason)
+
+        // Final decision if device should be locked
         val shouldLock = PolicyStore.shouldLockDevice(applicationContext)
-        val blockReason = PolicyStore.getBlockReason(applicationContext)
 
         Log.d(
             TAG,
-            "usedToday=$usedToday, remaining=$remaining, dailyLimit=$dailyLimit, extraMinutes=$extraMinutes, isLimitEnabled=$isLimitEnabled, isLockNow=$isLockNow, isServerLocked=$isServerLocked, shouldLock=$shouldLock, blockReason=$blockReason, currentPackage=$currentPackage"
+            "used=$usedToday remaining=$remaining limit=$dailyLimit extra=$extraMinutes shouldLock=$shouldLock reason=$blockReason pkg=$currentPackage"
         )
 
+        // If no lock is required, exit early
         if (!shouldLock) return
 
+        // Do not block allowed/system packages
         if (currentPackage != null && isPackageAllowed(currentPackage)) {
-            Log.d(TAG, "Allowed package during block: $currentPackage")
+            Log.d(TAG, "Allowed package: $currentPackage")
             return
         }
 
+        // Debounce to avoid rapid repeated launches
+        if (now - lastLockTime < LOCK_DEBOUNCE_MS) {
+            Log.d(TAG, "Skipping lock (debounce)")
+            return
+        }
+
+        // Prevent opening multiple instances of block screen
         if (BlockScreenActivity.isOpen) {
             Log.d(TAG, "Block screen already open")
             return
         }
 
+        lastLockTime = now
+
+        // Launch blocking UI
         val intent = Intent(this, BlockScreenActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+            // Pass relevant data to UI
             putExtra("blockReason", blockReason)
             putExtra("usedTodayMinutes", usedToday)
             putExtra("dailyLimitMinutes", dailyLimit)
@@ -133,7 +177,13 @@ class ScreenGuardianAccessibilityService : AccessibilityService() {
         startActivity(intent)
     }
 
+    // Check if package is allowed (whitelisted)
     private fun isPackageAllowed(packageName: String): Boolean {
-        return allowedPackages.contains(packageName)
-    }
+    val selfPackage = applicationContext.packageName
+
+    return packageName == selfPackage ||
+           allowedPackages.contains(packageName)
+   }
+
+
 }

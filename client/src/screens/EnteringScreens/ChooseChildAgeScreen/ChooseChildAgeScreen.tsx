@@ -97,6 +97,7 @@ export default function ChooseChildAgeScreen() {
               ]}
             >
               <View style={styles.controlsCenter}>
+
                 <Pressable
                   onPress={handleOpenAgeModal}
                   accessibilityRole="button"
@@ -114,26 +115,25 @@ export default function ChooseChildAgeScreen() {
                   {t("chooseChildAge.selectedAgeLabel")}
                 </AppText>
 
-                <View style={[styles.agePickerHintRow, row]}>
-                  <MaterialCommunityIcons name="chevron-down" size={18} color="#6A7C92" />
-                  <AppText style={[styles.agePickerHintText, text]}>
-                    Tap to choose age
-                  </AppText>
-                </View>
-              </View>
+                <Pressable
+                  onPress={handleOpenAgeModal}
+                  accessibilityRole="button"
+                >
+                  <View style={[styles.agePickerHintRow, row]}>
+                    <MaterialCommunityIcons name="chevron-down" size={18} color="#6A7C92" />
+                    <AppText style={[styles.agePickerHintText, text]}>
+                      Tap to choose age
+                    </AppText>
+                  </View>
+                </Pressable>
 
+              </View>
               <View style={styles.rangeCard}>
                 <View style={[styles.rangeHeaderRow, row]}>
                   <AppText weight="bold" style={[styles.rangeTitle, text]}>
                     {t("chooseChildAge.rangeTitle")}
                   </AppText>
 
-                  <AppText weight="medium" style={[styles.rangeValue, text]}>
-                    {t("chooseChildAge.rangeValue", {
-                      min: MIN_AGE,
-                      max: MAX_AGE,
-                    })}
-                  </AppText>
                 </View>
 
                 <View style={styles.track}>
@@ -168,7 +168,7 @@ export default function ChooseChildAgeScreen() {
                 ]}
               >
                 <AppText weight="bold" style={styles.recommendationButtonText}>
-                  {isRecommendationLoading ? "בודק..." : "בדוק המלצה"}
+                  {isRecommendationLoading ? "Loading..." : "Check Recommendation "}
                 </AppText>
               </Pressable>
 
@@ -191,7 +191,7 @@ export default function ChooseChildAgeScreen() {
                       recommendationVariant === "teen" && styles.recommendationTitleTeen,
                     ]}
                   >
-                    זמן מסך מומלץ
+                   Recommended Screen Time
                   </AppText>
 
                   {isRecommendationLoading ? (
@@ -214,7 +214,7 @@ export default function ChooseChildAgeScreen() {
                           recommendationVariant === "teen" && styles.recommendationMinutesTeen,
                         ]}
                       >
-                        {recommendation.recommendedMinutes} דקות
+                        {recommendation.recommendedMinutes} Minutes
                       </AppText>
 
                       <AppText style={[styles.recommendationText, text]}>
@@ -247,7 +247,7 @@ export default function ChooseChildAgeScreen() {
         onRequestClose={handleCloseAgeModal}
       >
         <Pressable style={styles.modalOverlay} onPress={handleCloseAgeModal}>
-          <Pressable style={styles.modalCard} onPress={() => {}}>
+          <Pressable style={styles.modalCard} onPress={() => { }}>
             <View style={styles.modalHeader}>
               <AppText weight="extraBold" style={styles.modalTitle}>
                 בחר גיל

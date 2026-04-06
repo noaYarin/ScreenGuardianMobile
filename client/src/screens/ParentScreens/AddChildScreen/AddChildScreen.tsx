@@ -80,6 +80,14 @@ export default function AddChildScreen() {
     return formatDateForDisplay(birthDate, locale);
   }, [birthDate, i18n.language]);
 
+  function formatDateForApi(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+
   const onSave = async () => {
     try {
       dispatch(clearChildrenError());
@@ -102,7 +110,7 @@ export default function AddChildScreen() {
       await dispatch(
         addChildThunk({
           name: childName.trim(),
-          birthDate: birthDate.toISOString().split("T")[0],
+          birthDate: formatDateForApi(birthDate),
           gender,
         })
       ).unwrap();

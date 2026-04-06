@@ -23,6 +23,8 @@ object PolicyStore {
     private fun prefs(context: Context) =
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    // ---------- Lock State ----------
+
     fun setLockNow(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean(KEY_LOCK_NOW, value).apply()
     }
@@ -38,6 +40,8 @@ object PolicyStore {
     fun isServerLocked(context: Context): Boolean {
         return prefs(context).getBoolean(KEY_SERVER_LOCKED, false)
     }
+
+    // ---------- Limit ----------
 
     fun setLimitEnabled(context: Context, value: Boolean) {
         prefs(context).edit().putBoolean(KEY_LIMIT_ENABLED, value).apply()
@@ -55,6 +59,8 @@ object PolicyStore {
         return prefs(context).getInt(KEY_DAILY_LIMIT, 0)
     }
 
+    // ---------- Usage ----------
+
     fun setUsedToday(context: Context, minutes: Int) {
         prefs(context).edit().putInt(KEY_USED_TODAY, minutes).apply()
     }
@@ -69,14 +75,17 @@ object PolicyStore {
     }
 
     fun addExtraMinutes(context: Context, minutes: Int) {
-        val currentExtraMinutes = getExtraMinutes(context)
-        setExtraMinutes(context, currentExtraMinutes + minutes)
+        val current = getExtraMinutes(context)
+        val newValue = (current + minutes).coerceAtMost(600) 
+        setExtraMinutes(context, newValue)
     }
 
     fun getExtraMinutes(context: Context): Int {
         resetIfNewDay(context)
         return prefs(context).getInt(KEY_EXTRA_MINUTES, 0)
     }
+
+    // ---------- Block Reason ----------
 
     fun setBlockReason(context: Context, reason: String) {
         prefs(context).edit().putString(KEY_BLOCK_REASON, reason).apply()
@@ -86,7 +95,8 @@ object PolicyStore {
         return prefs(context).getString(KEY_BLOCK_REASON, "") ?: ""
     }
 
-    // ✅ תיקון חשוב: שימוש ב-Calendar ולא בחישוב נאיבי
+    // ---------- Reset ----------
+
     fun resetIfNewDay(context: Context) {
         val prefs = prefs(context)
 
@@ -99,21 +109,21 @@ object PolicyStore {
         val todayStart = calendar.timeInMillis
         val lastReset = prefs.getLong(KEY_LAST_RESET, -1)
 
-        if (lastReset != todayStart) {
+        if (lastReset < todayStart) { 
             prefs.edit()
                 .putLong(KEY_LAST_RESET, todayStart)
                 .putInt(KEY_USED_TODAY, 0)
                 .putInt(KEY_EXTRA_MINUTES, 0)
-                .putString(KEY_BLOCK_REASON, "")
+                
                 .apply()
         }
     }
 
+    // ---------- Calculations ----------
+
     fun getEffectiveLimit(context: Context): Int {
         resetIfNewDay(context)
-        val dailyLimit = getDailyLimit(context)
-        val extraMinutes = getExtraMinutes(context)
-        return dailyLimit + extraMinutes
+        return getDailyLimit(context) + getExtraMinutes(context)
     }
 
     fun getRemainingMinutes(context: Context): Int {
@@ -123,19 +133,27 @@ object PolicyStore {
             return Int.MAX_VALUE
         }
 
-        val effectiveLimit = getEffectiveLimit(context)
-        val usedToday = getUsedToday(context)
-        val remaining = effectiveLimit - usedToday
+        val remaining = getEffectiveLimit(context) - getUsedToday(context)
+        return remaining.coerceAtLeast(0) 
+    }
 
-        return if (remaining > 0) remaining else 0
+    fun isLimitReached(context: Context): Boolean {
+        return getRemainingMinutes(context) <= 0
     }
 
     fun shouldLockDevice(context: Context): Boolean {
-        if (isLockNow(context)) return true
-        if (isServerLocked(context)) return true
-        if (!isLimitEnabled(context)) return false
-        return getRemainingMinutes(context) <= 0
+        val manualLock = isLockNow(context)
+        val serverLock = isServerLocked(context)
+        val limitEnabled = isLimitEnabled(context)
+
+        if (manualLock) return true
+        if (serverLock) return true
+        if (!limitEnabled) return false
+
+        return isLimitReached(context)
     }
+
+    // ---------- Heartbeat ----------
 
     fun setHeartbeatBaseUrl(context: Context, value: String) {
         prefs(context).edit().putString(KEY_HEARTBEAT_BASE_URL, value).apply()
@@ -160,6 +178,8 @@ object PolicyStore {
     fun getHeartbeatToken(context: Context): String? {
         return prefs(context).getString(KEY_HEARTBEAT_TOKEN, null)
     }
+
+    // ---------- Clear ----------
 
     fun clearAll(context: Context) {
         prefs(context).edit().clear().apply()

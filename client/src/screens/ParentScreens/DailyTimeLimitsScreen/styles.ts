@@ -224,6 +224,13 @@ export const styles = StyleSheet.create({
     backgroundColor: "#EAF8F2",
   },
 
+  statusChipReached: {
+    backgroundColor: "#FEE2E2",
+  },
+
+  statusChipTextReached: {
+    color: "#DC2626",
+  },
   statusChipWarning: {
     backgroundColor: "#FFF4E5",
   },
@@ -387,24 +394,74 @@ export const styles = StyleSheet.create({
     textAlign: "center",
   },
   emptyState: {
-  width: "100%",
-  alignItems: "center",
-  justifyContent: "center",
-  paddingVertical: 32,
-  paddingHorizontal: 16,
-  gap: 8,
-},
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 32,
+    paddingHorizontal: 16,
+    gap: 8,
+  },
 
-emptyTitle: {
-  fontSize: 16,
-  color: "#1F2A44",
-  textAlign: "center",
-},
+  emptyTitle: {
+    fontSize: 16,
+    color: "#1F2A44",
+    textAlign: "center",
+  },
 
-emptySubtitle: {
-  fontSize: 13,
-  color: "#6B7280",
-  textAlign: "center",
-  lineHeight: 18,
-},
+  editorHint: {
+    fontSize: 13,
+    color: "#6B7890",
+    lineHeight: 19,
+  },
+
+  emptySubtitle: {
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  switchRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+    gap: 12,
+  },
+
+  switchTextWrap: {
+    flex: 1,
+  },
+
+  switchHint: {
+    fontSize: 13,
+    color: "#6B7890",
+    lineHeight: 18,
+    marginTop: 4,
+  },
+
+  saveButtonStrong: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#2563EB",
+    borderRadius: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    shadowColor: "#2563EB",
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+
+  saveButtonStrongPressed: {
+    opacity: 0.9,
+    transform: [{ scale: 0.98 }],
+  },
+
+  saveButtonStrongText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+  },
 });

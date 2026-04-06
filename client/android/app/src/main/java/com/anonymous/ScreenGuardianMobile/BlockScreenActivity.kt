@@ -3,17 +3,24 @@ package com.screenguardianmobile
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
-import android.net.Uri
 
 class BlockScreenActivity : AppCompatActivity() {
 
     companion object {
+        @Volatile
         var isOpen: Boolean = false
     }
+
+    private lateinit var titleText: TextView
+    private lateinit var messageText: TextView
+    private lateinit var hintText: TextView
+    private lateinit var timeDetailsText: TextView
+    private lateinit var iconText: TextView
+
+    private var isMonitoring = false // prevent multiple loops
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,97 +33,115 @@ class BlockScreenActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_block_screen)
 
+        // Disable back button while blocked
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                // Disable back while blocked
+                // Block back navigation
             }
         })
 
-        val blockReason = intent.getStringExtra("blockReason") ?: ""
-        val usedToday = intent.getIntExtra("usedTodayMinutes", 0)
-        val dailyLimit = intent.getIntExtra("dailyLimitMinutes", 0)
-        val extraMinutes = intent.getIntExtra("extraMinutes", 0)
-        val effectiveLimit = dailyLimit + extraMinutes
+        bindViews()
+        updateUIFromIntent(intent)
 
-        val titleText = findViewById<TextView>(R.id.titleText)
-        val messageText = findViewById<TextView>(R.id.messageText)
-        val hintText = findViewById<TextView>(R.id.hintText)
-        val timeDetailsText = findViewById<TextView>(R.id.timeDetailsText)
-        val iconText = findViewById<TextView>(R.id.iconText)
-        val requestMoreTimeButton = findViewById<Button>(R.id.requestMoreTimeButton)
-        val closeButton = findViewById<Button>(R.id.closeButton)
-
-        timeDetailsText.text = "Used today: $usedToday / $effectiveLimit minutes"
-
-        when (blockReason) {
-            "LOCK_NOW" -> {
-                iconText.text = "🔒"
-                titleText.text = "Device locked by parent"
-                messageText.text = "This device has been locked by your parent."
-                hintText.text = "Please wait until your parent unlocks it."
-                requestMoreTimeButton.visibility = View.GONE
-                closeButton.text = "OK"
-            }
-
-            "DAILY_LIMIT_REACHED" -> {
-                iconText.text = "⏳"
-                titleText.text = "Daily screen time limit reached"
-                messageText.text = "You have used all your screen time for today."
-                hintText.text = "You can request more time from your parent."
-                requestMoreTimeButton.visibility = View.VISIBLE
-                closeButton.text = "I understand"
-            }
-
-            else -> {
-                iconText.text = "⛔"
-                titleText.text = "Device is currently blocked"
-                messageText.text = "Access is temporarily restricted."
-                hintText.text = "Please try again later."
-                requestMoreTimeButton.visibility = View.GONE
-                closeButton.text = "OK"
-            }
-        }
-
-        requestMoreTimeButton.setOnClickListener {
-            openAppToExtensionRequest()
-        }
-
-        closeButton.setOnClickListener {
-            if (!PolicyStore.shouldLockDevice(this)) {
-                finish()
-            }
-        }
+      
     }
 
     override fun onResume() {
         super.onResume()
         isOpen = true
-
-        // If the device was already unlocked, close this screen automatically
-        if (!PolicyStore.shouldLockDevice(this)) {
-            finish()
-        }
+        startMonitoringUnlockState()
     }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    updateUIFromIntent(intent)
+  }
 
     override fun onStop() {
         super.onStop()
         isOpen = false
+        isMonitoring = false // stop loop
     }
 
     override fun onDestroy() {
         super.onDestroy()
         isOpen = false
+        isMonitoring = false
     }
 
-    private fun openAppToExtensionRequest() {
-        val intent = Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse("screenguardianmobile://Child/extendTime")
-        ).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+    private fun bindViews() {
+        titleText = findViewById(R.id.titleText)
+        messageText = findViewById(R.id.messageText)
+        hintText = findViewById(R.id.hintText)
+        timeDetailsText = findViewById(R.id.timeDetailsText)
+        iconText = findViewById(R.id.iconText)
+    }
+
+    private fun updateUIFromIntent(intent: Intent) {
+        val blockReason = intent.getStringExtra("blockReason") ?: ""
+        val usedToday = intent.getIntExtra("usedTodayMinutes", 0)
+        val dailyLimit = intent.getIntExtra("dailyLimitMinutes", 0)
+        val extraMinutes = intent.getIntExtra("extraMinutes", 0)
+
+        val effectiveLimit = dailyLimit + extraMinutes
+
+        when (blockReason) {
+
+            //  Full lock → no buttons, no usage
+            "LOCK_NOW" -> {
+                iconText.text = "🔒"
+                titleText.text = "Device locked by parent"
+                messageText.text = "This device has been locked by your parent."
+                hintText.text = "Please wait until your parent unlocks it."
+
+                timeDetailsText.visibility = View.GONE
+            }
+
+            //  Daily limit → show usage + request button
+            "DAILY_LIMIT_REACHED" -> {
+                iconText.text = "⏳"
+                titleText.text = "Daily screen time limit reached"
+                messageText.text = "You have used all your screen time for today."
+                hintText.text =  "Please wait until tomorrow or until your parent unlocks the device."
+
+                timeDetailsText.visibility = View.VISIBLE
+                timeDetailsText.text = "Used today: $usedToday / $effectiveLimit minutes"
+
+            }
+
+            //  Default block
+            else -> {
+                iconText.text = "⛔"
+                titleText.text = "Device is currently blocked"
+                messageText.text = "Access is temporarily restricted."
+                hintText.text = "Please try again later."
+
+                timeDetailsText.visibility = View.GONE
+            }
         }
-
-        startActivity(intent)
     }
+
+    //  Auto-close when unlocked (safe loop)
+    private fun startMonitoringUnlockState() {
+        if (isMonitoring) return
+        isMonitoring = true
+
+        checkUnlockLoop()
+    }
+
+    private fun checkUnlockLoop() {
+        window.decorView.postDelayed({
+            if (!isMonitoring) return@postDelayed
+
+            if (!PolicyStore.shouldLockDevice(this)) {
+                finish()
+                return@postDelayed
+            }
+
+            checkUnlockLoop()
+        }, 1000)
+    }
+
+
 }

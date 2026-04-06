@@ -47,29 +47,6 @@
         android:gravity="center"
         android:layout_marginBottom="10dp" />
 
-    <TextView
-        android:id="@+id/hintText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="You can request more time from your parent."
-        android:textSize="15sp"
-        android:textColor="#AAAAAA"
-        android:gravity="center"
-        android:layout_marginBottom="32dp" />
 
-    <Button
-        android:id="@+id/requestMoreTimeButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Request more time"
-        android:textAllCaps="false"
-        android:layout_marginBottom="12dp" />
-
-    <Button
-        android:id="@+id/closeButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="I understand"
-        android:textAllCaps="false" />
 
 </LinearLayout>
