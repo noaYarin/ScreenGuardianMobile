@@ -1,5 +1,43 @@
 package com.screenguardianmobile
 
+/**
+ * UsageStatsHelper
+ *
+ * This helper is responsible for reading Android Usage Stats data and calculating
+ * how much screen time was used today on the device.
+ *
+ * Main responsibilities:
+ * - Query UsageStatsManager for app usage data from the start of the day until now
+ * - Sum foreground usage time across apps
+ * - Exclude apps that should not count toward screen time
+ * - Save the calculated usage into PolicyStore
+ * - Verify whether the app has permission to access usage statistics
+ *
+ * What it measures:
+ * - Foreground time only (time apps were actively used)
+ * - Daily usage, starting from local midnight
+ *
+ * Excluded packages:
+ * - The app’s own package
+ * - Android system UI and settings
+ * - Permission controller packages
+ * - Home screen / launcher packages
+ *
+ * Safety behavior:
+ * - Clamps total daily minutes to a maximum of 24 hours
+ * - Handles missing or empty usage data safely
+ * - Wraps all logic in try/catch to avoid crashes
+ *
+ * Architecture notes:
+ * - UsageStatsManager is the Android system service used for app usage tracking
+ * - PolicyStore is updated with the latest usedToday value
+ * - This helper is used by native enforcement and sync components
+ *
+ * Important limitation:
+ * - UsageStats data may vary slightly across devices and Android OEMs
+ * - Some manufacturers may report usage differently
+ */
+
 import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.util.Log

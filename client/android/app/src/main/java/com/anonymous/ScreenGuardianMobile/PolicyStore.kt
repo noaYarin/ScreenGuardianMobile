@@ -1,5 +1,67 @@
 package com.screenguardianmobile
 
+/**
+ * PolicyStore
+ *
+ * This object is the local persistence layer for device policy and usage data.
+ * It uses SharedPreferences to store and retrieve all enforcement-related data.
+ *
+ * Main responsibilities:
+ * - Store policy data received from the server (lock state, limits).
+ * - Store local usage data (used minutes, extra time).
+ * - Provide calculated values (remaining time, effective limit).
+ * - Decide whether the device should be locked.
+ * - Support offline behavior when the server is unavailable.
+ *
+ * Architecture role:
+ * - This is the single source of truth on the device.
+ * - It allows the app to enforce restrictions even without network connectivity.
+ * - It works together with:
+ *   - DevicePolicySyncHelper (server → device)
+ *   - DeviceServerSyncHelper (device → server)
+ *
+ * Key features:
+ *
+ * 1. Lock Management:
+ *    - lockNow → manual lock triggered locally
+ *    - serverLocked → lock triggered by backend
+ *
+ * 2. Screen Time Limits:
+ *    - dailyLimit → base limit set by parent
+ *    - extraMinutes → additional time granted (e.g. extension request)
+ *    - effectiveLimit = dailyLimit + extraMinutes
+ *
+ * 3. Usage Tracking:
+ *    - usedToday → minutes used today
+ *    - automatically resets at the start of a new day
+ *
+ * 4. Daily Reset:
+ *    - resetIfNewDay() ensures usage and extra time reset at midnight
+ *    - based on device local time
+ *
+ * 5. Lock Decision Logic:
+ *    shouldLockDevice() returns true if:
+ *      - manual lock is active
+ *      - server lock is active
+ *      - OR limit is enabled AND usage reached the limit
+ *
+ * 6. Offline Support:
+ *    - All data is stored locally
+ *    - Device can enforce limits without server connection
+ *    - Sync happens later when network is available
+ *
+ * Important notes:
+ * - getRemainingMinutes() returns Int.MAX_VALUE if limit is disabled
+ * - Values are clamped to avoid invalid states
+ * - Always calls resetIfNewDay() before returning usage-related data
+ *
+ * Heartbeat configuration:
+ * - Stores baseUrl, deviceId, token for server communication
+ *
+ * This class is critical for ensuring reliable and consistent behavior
+ * across online and offline scenarios.
+ */
+
 import android.content.Context
 import java.util.Calendar
 

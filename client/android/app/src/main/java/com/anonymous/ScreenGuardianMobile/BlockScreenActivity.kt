@@ -1,5 +1,25 @@
 package com.screenguardianmobile
 
+/**
+ * BlockScreenActivity
+ *
+ * This Activity represents a full-screen blocking UI that is displayed on the child's device
+ * when access should be restricted based on parental control policies.
+ *
+ * Main responsibilities:
+ * - Show a lock screen when the device is blocked (either manually by parent or due to daily limit).
+ * - Display the reason for blocking (LOCK_NOW / DAILY_LIMIT_REACHED / default).
+ * - Present usage information (used time vs allowed time) when relevant.
+ * - Prevent the user from exiting the screen (disables back button and uses immersive mode).
+ * - Continuously monitor the device policy and automatically close the screen when the device is unlocked.
+ *
+ * Key behaviors:
+ * - Uses PolicyStore.shouldLockDevice() to determine if the device should remain blocked.
+ * - Runs a periodic check (every 1 second) to detect unlock state.
+ * - Supports dynamic updates via onNewIntent (e.g., when policy changes while screen is open).
+ * - Uses a static flag (isOpen) to indicate whether the block screen is currently active.
+ *
+ * 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View

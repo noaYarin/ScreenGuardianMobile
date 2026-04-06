@@ -1,5 +1,39 @@
 package com.screenguardianmobile
 
+
+/**
+ * DeviceControlModule
+ *
+ * This is a React Native Native Module that acts as a bridge between the JavaScript (React Native)
+ * layer and the native Android layer.
+ *
+ * Main responsibilities:
+ * - Expose native device control and screen-time functionality to the React Native app.
+ * - Allow the client (parent/child app) to control device policies such as locking, limits, and extensions.
+ * - Provide real-time device state data (usage, limits, lock status) back to the JS layer.
+ *
+ * Key features:
+ * - Lock / Unlock device instantly (lockNow / unlockNow)
+ * - Set daily screen time limits
+ * - Approve extra screen time (extensions)
+ * - Sync policy from server to local device (syncPolicyNow)
+ * - Save heartbeat configuration for background communication with the server
+ * - Retrieve current usage and remaining time (getRemainingTime)
+ *
+ * Architecture notes:
+ * - Uses PolicyStore (SharedPreferences) to persist local policy state on device.
+ * - Uses UsageStatsHelper to calculate actual device usage.
+ * - Uses DevicePolicySyncHelper to fetch updated policy from backend.
+ *
+ * Communication:
+ * - All methods are exposed to React Native via @ReactMethod.
+ * - Results are returned using Promise (resolve / reject).
+ *
+ * Important:
+ * - This module enables offline enforcement of screen-time rules (based on locally stored policy).
+ * - It is critical for syncing between server policy and native enforcement logic.
+ */
+
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
