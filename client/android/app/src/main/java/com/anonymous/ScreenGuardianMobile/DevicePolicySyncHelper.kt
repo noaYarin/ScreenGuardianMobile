@@ -1,5 +1,45 @@
 package com.screenguardianmobile
 
+/**
+ * DevicePolicySyncHelper
+ *
+ * This helper is responsible for synchronizing the device policy from the backend server
+ * to the local Android device storage.
+ *
+ * Main responsibilities:
+ * - Fetch the latest policy for the current device from the server.
+ * - Parse the server response safely.
+ * - Save the relevant policy values into PolicyStore.
+ * - Keep the local device aligned with the server, while still supporting offline enforcement.
+ *
+ * What policy data is synced:
+ * - Whether the device is currently locked by the parent
+ * - Whether daily limit enforcement is enabled
+ * - The configured daily screen-time limit
+ * - Extra minutes approved for the current day
+ *
+ * How it works:
+ * - Reads the base URL, device ID, and child token from PolicyStore.
+ * - Sends an authenticated GET request to:
+ *   /api/v1/devices/{deviceId}/policy
+ * - Parses the JSON response from the backend.
+ * - Stores the policy locally so other native components can enforce it.
+ *
+ * Safety and validation:
+ * - Uses optJSONObject / optBoolean / optInt to avoid crashes when fields are missing.
+ * - Clamps numeric values to a valid range (0 to 1440 minutes).
+ * - Handles both success and error responses safely.
+ *
+ * Architecture notes:
+ * - The server is treated as the source of truth for policy values.
+ * - PolicyStore acts as the local cache for native enforcement.
+ * - This helper is typically used by native services/modules that need fresh policy data.
+ *
+ * Offline behavior:
+ * - If syncing fails, the device keeps using the last saved local policy.
+ * - This supports continued enforcement even when the device is temporarily offline.
+ */
+
 import android.content.Context
 import android.util.Log
 import org.json.JSONObject

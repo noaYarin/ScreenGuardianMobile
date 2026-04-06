@@ -1,5 +1,59 @@
 package com.screenguardianmobile
 
+/**
+ * ScreenGuardianAccessibilityService
+ *
+ * This is the core enforcement engine of the application.
+ * It runs as an Android AccessibilityService and is responsible for:
+ * - Monitoring foreground app changes
+ * - Tracking real-time usage
+ * - Enforcing lock conditions
+ * - Syncing with the backend periodically
+ *
+ * Main responsibilities:
+ *
+ * 1. Real-time monitoring:
+ *    - Listens to window/app changes (TYPE_WINDOW_STATE_CHANGED)
+ *    - Updates usage immediately when the foreground app changes
+ *
+ * 2. Periodic sync loop:
+ *    - Fetch latest policy from server (DevicePolicySyncHelper)
+ *    - Update usage stats (UsageStatsHelper)
+ *    - Evaluate lock decision
+ *    - Send usage + heartbeat to server (DeviceServerSyncHelper)
+ *
+ * 3. Lock enforcement:
+ *    - Decides whether device should be locked using PolicyStore
+ *    - Opens BlockScreenActivity if lock is required
+ *
+ * 4. Block logic:
+ *    - Prevents blocking allowed/system apps (whitelist)
+ *    - Uses debounce to avoid repeated lock triggers
+ *    - Ensures only one blocking screen is shown at a time
+ *
+ * 5. Offline support:
+ *    - Even without network, enforcement works using PolicyStore
+ *    - Sync resumes when connection is restored
+ *
+ * Key concepts:
+ *
+ * - Event-driven logic (onAccessibilityEvent)
+ * - Polling loop (Handler + Runnable)
+ * - Local decision making (PolicyStore.shouldLockDevice)
+ *
+ * Lock conditions:
+ * - Manual lock (lockNow)
+ * - Server lock (serverLocked)
+ * - Daily limit reached (remaining <= 0)
+ *
+ * Important notes:
+ * - CHECK_INTERVAL_MS controls sync frequency
+ * - LOCK_DEBOUNCE_MS prevents rapid multiple launches
+ * - Allowed packages prevent blocking critical apps (dialer, own app)
+ *
+ * This class is the heart of the parental control enforcement system.
+ */
+
 import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.os.Handler

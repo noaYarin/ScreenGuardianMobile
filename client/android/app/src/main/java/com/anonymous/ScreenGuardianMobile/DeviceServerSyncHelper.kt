@@ -1,5 +1,6 @@
 package com.screenguardianmobile
 
+
 import android.content.Context
 import android.util.Log
 import java.io.BufferedReader
@@ -8,11 +9,58 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.math.min
 
+
+/**
+ * DeviceServerSyncHelper
+ *
+ * This helper is responsible for sending device state updates to the backend server.
+ * It keeps the server informed about:
+ * - Device heartbeat (online status + permissions)
+ * - Screen time usage (used minutes today)
+ *
+ * Main responsibilities:
+ * 1. sendHeartbeat():
+ *    - Notifies the server that the device is alive.
+ *    - Sends accessibility + usage permissions status.
+ *    - Updates lastSeenAt on the server.
+ *
+ * 2. sendUsage():
+ *    - Sends the current daily screen time usage.
+ *    - Allows the server to stay in sync with the device.
+ *
+ * Architecture role:
+ * - This is the "device → server" communication layer.
+ * - Complements DevicePolicySyncHelper (which is server → device).
+ *
+ * Important notes:
+ * - Runs in background threads (non-blocking).
+ * - Uses HttpURLConnection (no external libraries).
+ * - Values are clamped to avoid invalid data (e.g. > 24h usage).
+ * - Works even if network is unstable (fails silently with logs).
+ *
+ * Offline behavior:
+ * - If network fails → local policy still enforced (PolicyStore).
+ * - Sync resumes automatically when connection is restored.
+ */
+
+
 object DeviceServerSyncHelper {
 
     private const val TAG = "DeviceServerSync"
 
     private const val MAX_MINUTES_PER_DAY = 24 * 60
+
+
+    /**
+     * Sends a heartbeat to the server.
+     *
+     * Purpose:
+     * - Indicate that the device is online.
+     * - Update permission status (accessibility + usage stats).
+     *
+     * Endpoint:
+     * PATCH /api/v1/devices/{deviceId}/heartbeat
+     */
 
     fun sendHeartbeat(context: Context) {
         try {
@@ -61,6 +109,17 @@ object DeviceServerSyncHelper {
         }
     }
 
+     /**
+     * Sends current screen-time usage to the server.
+     *
+     * Purpose:
+     * - Keep backend in sync with actual device usage.
+     * - Used for analytics, limits, and parent dashboard.
+     *
+     * Endpoint:
+     * PATCH /api/v1/devices/{deviceId}/usage
+     */
+    
     fun sendUsage(context: Context) {
         try {
             val baseUrl = PolicyStore.getHeartbeatBaseUrl(context) ?: return
