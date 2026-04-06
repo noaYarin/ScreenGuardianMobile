@@ -127,7 +127,6 @@ function calculateHomeStatus(used, limit) {
   return ScreenTimeStatus.GOOD;
 }
 
-
 export async function getParentHomeSummary(parentId) {
   const childList = await getChildrenByParentId(parentId);
 
@@ -139,33 +138,56 @@ export async function getParentHomeSummary(parentId) {
     }
 
     const devices = await findDevicesByChildId(child._id);
+    const device = pickRepresentativeDevice(devices);
 
-    let usedTodayMinutes = 0;
-    let dailyLimitMinutes = 0;
-
-    for (const device of devices) {
-      if (device.isActive === false) {
-        continue;
-      }
-
-      const screenTime = device.screenTime || {};
-
-      usedTodayMinutes += Number(screenTime.usedTodayMinutes || 0);
-      dailyLimitMinutes += Number(screenTime.dailyLimitMinutes || 0) +
-        Number(screenTime.extraMinutesToday || 0);
+    if (!device) {
+      summary.push({
+        childId: child._id,
+        name: child.name,
+        img: child.img ?? null,
+        deviceId: null,
+        deviceName: null,
+        usedTodayMinutes: null,
+        dailyLimitMinutes: null,
+        remainingMinutes: null,
+        status: ScreenTimeStatus.GOOD,
+        isLocked: false
+      });
+      continue;
     }
+
+    const screenTime = device.screenTime || {};
+    const usedTodayMinutes = Number(screenTime.usedTodayMinutes || 0);
+
+    const isLimitEnabled = screenTime.isLimitEnabled === true;
+
+    const dailyLimitMinutes = isLimitEnabled
+      ? Number(screenTime.dailyLimitMinutes || 0) +
+      Number(screenTime.extraMinutesToday || 0)
+      : null;
+
+    const remainingMinutes =
+      dailyLimitMinutes != null
+        ? Math.max(dailyLimitMinutes - usedTodayMinutes, 0)
+        : null;
 
     summary.push({
       childId: child._id,
       name: child.name,
+      img: child.img ?? null,
+      deviceId: device._id,
+      deviceName: device.name || null,
       usedTodayMinutes,
       dailyLimitMinutes,
-      status: calculateHomeStatus(usedTodayMinutes, dailyLimitMinutes)
+      remainingMinutes,
+      status: calculateHomeStatus(usedTodayMinutes, dailyLimitMinutes),
+      isLocked: device.isLocked === true
     });
   }
 
   return { children: summary };
 }
+
 
 export async function updateCurrentChildProfile(parentId, childId, name, birthDate, gender) {
   const updated = await updateCurrentChildProfileByParentId(parentId, childId, name, birthDate, gender);
@@ -176,6 +198,27 @@ export async function updateCurrentChildProfile(parentId, childId, name, birthDa
 
   return { child: updated };
 }
+
+
+function pickRepresentativeDevice(devices) {
+  if (!Array.isArray(devices) || devices.length === 0) {
+    return null;
+  }
+
+  const activeDevices = devices.filter((device) => device?.isActive !== false);
+
+  if (activeDevices.length === 0) {
+    return devices[0];
+  }
+
+  const lockedDevice = activeDevices.find((device) => device?.isLocked === true);
+  if (lockedDevice) {
+    return lockedDevice;
+  }
+
+  return activeDevices[0];
+}
+
 
 export async function deleteChild(parentId, childId) {
   const child = await getChildByParentId(parentId, childId);

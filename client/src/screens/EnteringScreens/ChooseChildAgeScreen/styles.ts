@@ -36,8 +36,6 @@ export const styles = StyleSheet.create({
     elevation: 3,
   },
 
-
-
   title: {
     marginTop: 4,
     fontSize: 28,
@@ -63,27 +61,14 @@ export const styles = StyleSheet.create({
     paddingVertical: 22,
   },
 
-  controlsRow: {
+  controlsCenter: {
     width: "100%",
     alignItems: "center",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-
-  stepButton: {
-    width: 54,
-    height: 54,
-    borderRadius: 18,
-    backgroundColor: "#F2F7FC",
-    alignItems: "center",
     justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#DCE7F3",
   },
 
-  stepButtonDisabled: {
-    backgroundColor: "#F7F9FC",
-    borderColor: "#E7EDF5",
+  agePickerButton: {
+    borderRadius: 999,
   },
 
   ageCenter: {
@@ -120,8 +105,15 @@ export const styles = StyleSheet.create({
     color: "#1C2B3A",
   },
 
-  ageHint: {
-    fontSize: 14,
+  agePickerHintRow: {
+    marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 4,
+  },
+
+  agePickerHintText: {
+    fontSize: 13,
     color: "#6A7C92",
   },
 
@@ -178,6 +170,181 @@ export const styles = StyleSheet.create({
   trackEdgeLabel: {
     fontSize: 13,
     color: "#6A7C92",
+  },
+
+  recommendationButton: {
+    marginTop: 16,
+    minHeight: 48,
+    borderRadius: 16,
+    backgroundColor: "#365486",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+
+  recommendationButtonDisabled: {
+    opacity: 0.7,
+  },
+
+  recommendationButtonText: {
+    fontSize: 15,
+    color: "#FFFFFF",
+  },
+
+  recommendationCard: {
+    marginTop: 14,
+    backgroundColor: "#F4F8FD",
+    borderRadius: 18,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: "#DCE7F3",
+  },
+
+  recommendationCardYoung: {
+    backgroundColor: "#EEF9F6",
+    borderColor: "#CFEDE4",
+  },
+
+  recommendationCardMiddle: {
+    backgroundColor: "#F4F8FD",
+    borderColor: "#DCE7F3",
+  },
+
+  recommendationCardTeen: {
+    backgroundColor: "#F8F3FF",
+    borderColor: "#E7D9FA",
+  },
+
+  recommendationTitle: {
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: "center",
+    color: "#2B3F55",
+  },
+
+  recommendationTitleYoung: {
+    color: "#216E5B",
+  },
+
+  recommendationTitleMiddle: {
+    color: "#2B3F55",
+  },
+
+  recommendationTitleTeen: {
+    color: "#6A3EA1",
+  },
+
+  recommendationMinutes: {
+    fontSize: 28,
+    lineHeight: 34,
+    textAlign: "center",
+    marginBottom: 6,
+    color: "#243447",
+  },
+
+  recommendationMinutesYoung: {
+    color: "#1F7A67",
+  },
+
+  recommendationMinutesMiddle: {
+    color: "#243447",
+  },
+
+  recommendationMinutesTeen: {
+    color: "#7A4BC2",
+  },
+
+  recommendationText: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#5F738A",
+    textAlign: "center",
+  },
+
+  recommendationError: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#C84B31",
+    textAlign: "center",
+  },
+
+  recommendationLoading: {
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#6A7C92",
+    textAlign: "center",
+  },
+
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(16, 24, 40, 0.38)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 20,
+  },
+
+  modalCard: {
+    width: "100%",
+    maxWidth: 360,
+    maxHeight: "72%",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 24,
+    paddingHorizontal: 18,
+    paddingTop: 18,
+    paddingBottom: 14,
+    borderWidth: 1,
+    borderColor: "#E8EEF6",
+  },
+
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    color: "#1C2B3A",
+  },
+
+  modalCloseButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F2F7FC",
+  },
+
+  modalScrollContent: {
+    gap: 10,
+    paddingBottom: 8,
+  },
+
+  ageOption: {
+    minHeight: 46,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F8FBFF",
+    borderWidth: 1,
+    borderColor: "#E2ECF7",
+  },
+
+  ageOptionSelected: {
+    backgroundColor: "#365486",
+    borderColor: "#365486",
+  },
+
+  ageOptionText: {
+    fontSize: 16,
+    color: "#243447",
+  },
+
+  ageOptionTextSelected: {
+    color: "#FFFFFF",
   },
 
   continueButton: {

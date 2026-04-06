@@ -5,6 +5,9 @@ import {
   apiUpdateDeviceLocation,
   apiUpdateDeviceName,
   type Device,
+  apiUpdateDeviceScreenTime,
+  apiLockDevice,
+  apiUnlockDevice,
 } from "../../api/device";
 
 function normalizeDevice(raw: unknown): Device {
@@ -98,6 +101,72 @@ export const updateDeviceName = createAsyncThunk<
     return thunkAPI.rejectWithValue(message);
   }
 });
+
+
+export const updateDeviceScreenTimeThunk = createAsyncThunk<
+  { childId: string; device: Device },
+  {
+    childId: string;
+    deviceId: string;
+    isLimitEnabled?: boolean;
+    dailyLimitMinutes?: number;
+    weeklyLimitMinutes?: number;
+  },
+  { rejectValue: string }
+>(
+  "devices/updateScreenTime",
+  async (
+    { childId, deviceId, isLimitEnabled, dailyLimitMinutes, weeklyLimitMinutes },
+    thunkAPI
+  ) => {
+    try {
+      const response = await apiUpdateDeviceScreenTime(deviceId, {
+        isLimitEnabled,
+        dailyLimitMinutes,
+        weeklyLimitMinutes,
+      });
+
+      if (response == null) {
+        return thunkAPI.rejectWithValue("devices.update_screen_time_failed");
+      }
+
+      return {
+        childId,
+        device: normalizeDevice(response),
+      };
+    } catch (error) {
+      const message =
+        (error as Error)?.message ?? "devices.update_screen_time_failed";
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const setDeviceLockThunk = createAsyncThunk<
+  { childId: string; device: Device },
+  { deviceId: string; childId: string; isLocked: boolean },
+  { rejectValue: string }
+>("devices/setLock", async ({ deviceId, childId, isLocked }, thunkAPI) => {
+  try {
+    const response = isLocked
+      ? await apiLockDevice(deviceId)
+      : await apiUnlockDevice(deviceId);
+
+    if (!response) {
+      return thunkAPI.rejectWithValue("devices.lock_device_failed");
+    }
+
+    return {
+      childId,
+      device: normalizeDevice(response),
+    };
+  } catch (error) {
+    const message =
+      (error as Error)?.message ?? "devices.lock_device_failed";
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
 export const updateDeviceLocation = createAsyncThunk(
   "devices/updateLocation",
   async (

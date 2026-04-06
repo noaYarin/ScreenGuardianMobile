@@ -10,6 +10,11 @@ import { initSocket } from "./socketHandler.js";
 
 async function bootstrap() {
   await connectMongo();
+
+  // app.listen(env.PORT, "0.0.0.0", () =>
+  //   logger.info(`Server running on port ${env.PORT}`)
+  // );
+
   const httpServer = http.createServer(app);
   initSocket(httpServer);
   httpServer.listen(env.PORT, () => logger.info(`Server running on port ${env.PORT}`));

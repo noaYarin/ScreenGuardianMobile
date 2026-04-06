@@ -14,8 +14,9 @@ import {
   getDeviceCurrentStatusForChild,
   updateDeviceUsageByChild,
   deleteDeviceForParent,
+  handleDeviceHeartbeat,
   updateDeviceLocation,
-  updateDeviceName,
+  updateDeviceName
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
@@ -90,7 +91,7 @@ export async function updateDeviceScreenTimeController(req, res, next) {
   } catch (err) {
     next(err);
   }
-  
+
 }
 
 
@@ -223,17 +224,17 @@ export async function getDeviceCurrentStatusForChildController(req, res, next) {
 
 
 export async function updateDeviceLocationController(req, res, next) {
-    try {
-      const { deviceId } = req.params;
-      const { location } = req.body;
-      const parentId = req.user.parentId;
-      const childId = req.user.childId;
-      const data = await updateDeviceLocation(deviceId, location, parentId, childId);
-  
-      res.status(200).json({ ok: true, data });
-    } catch (err) {
-      next(err);
-    }
+  try {
+    const { deviceId } = req.params;
+    const { location } = req.body;
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+    const data = await updateDeviceLocation(deviceId, location, parentId, childId);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
 }
 export async function updateDeviceUsageByChildController(req, res, next) {
   try {
@@ -247,6 +248,29 @@ export async function updateDeviceUsageByChildController(req, res, next) {
       childId,
       parentId,
       usedTodayMinutes
+    });
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+export async function deviceHeartbeatController(req, res, next) {
+  try {
+    const { deviceId } = req.params;
+    const childId = req.user.childId;
+    const parentId = req.user.parentId;
+
+    const { accessibilityEnabled, usageAccessEnabled } = req.body;
+
+    const data = await handleDeviceHeartbeat({
+      deviceId,
+      childId,
+      parentId,
+      accessibilityEnabled,
+      usageAccessEnabled
     });
 
     res.status(200).json({ ok: true, data });

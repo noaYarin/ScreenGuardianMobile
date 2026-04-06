@@ -10,6 +10,7 @@ import requestRoutes from "./routes/request.routes.js";
 import notificationRoutes from "./routes/notification.routes.js";
 import recommendationRoutes from "./routes/recommendation.routes.js";
 import childRoutes from "./routes/child.routes.js";
+import auditRoutes from "./routes/audit.route.js";
 
 
 const app = express();
@@ -28,6 +29,7 @@ app.use("/api/v1/requests", requestRoutes);
 app.use("/api/v1/notifications", notificationRoutes);
 app.use("/api/v1/recommendations", recommendationRoutes);
 app.use("/api/v1/child", childRoutes);
+app.use("/api/v1/audit", auditRoutes);
 
 app.use(errorHandler);
 

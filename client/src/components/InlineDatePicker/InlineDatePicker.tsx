@@ -1,6 +1,15 @@
 import React from "react";
-import { View, Pressable, Platform } from "react-native";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import {
+  View,
+  Pressable,
+  Platform,
+  type StyleProp,
+  type ViewStyle,
+  type TextStyle,
+} from "react-native";
+import DateTimePicker, {
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import AppText from "../AppText/AppText";
 import { styles } from "./styles";
 
@@ -13,6 +22,9 @@ export interface InlineDatePickerProps {
   doneAccessibilityLabel?: string;
   maximumDate?: Date;
   minimumDate?: Date;
+  footerContainerStyle?: StyleProp<ViewStyle>;
+  donePressableStyle?: StyleProp<ViewStyle>;
+  doneLabelStyle?: StyleProp<TextStyle>;
 }
 
 export default function InlineDatePicker({
@@ -24,17 +36,20 @@ export default function InlineDatePicker({
   doneAccessibilityLabel,
   maximumDate = new Date(),
   minimumDate,
+  footerContainerStyle,
+  donePressableStyle,
+  doneLabelStyle,
 }: InlineDatePickerProps) {
-  
   if (!visible) return null;
 
-  const onPickerChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
-    // Android: Dialog closes automatically on selection
+  const onPickerChange = (
+    _event: DateTimePickerEvent,
+    selectedDate?: Date
+  ) => {
     if (Platform.OS === "android") {
       onRequestClose();
     }
-    
-    // Update date if the user didn't cancel
+
     if (selectedDate) {
       onChange(selectedDate);
     }
@@ -52,23 +67,23 @@ export default function InlineDatePicker({
           onChange={onPickerChange}
           textColor="black"
           themeVariant="light"
-          
           style={Platform.OS === "ios" ? { height: 216, width: "100%" } : undefined}
         />
       </View>
 
       {Platform.OS === "ios" && (
-        <View style={styles.footer}>
+        <View style={[styles.footer, footerContainerStyle]}>
           <Pressable
             onPress={onRequestClose}
             accessibilityRole="button"
             accessibilityLabel={doneAccessibilityLabel}
             style={({ pressed }) => [
               styles.doneButton,
+              donePressableStyle,
               pressed && styles.pressed,
             ]}
           >
-            <AppText weight="bold" style={styles.doneText}>
+            <AppText weight="bold" style={[styles.doneText, doneLabelStyle]}>
               {doneLabel}
             </AppText>
           </Pressable>

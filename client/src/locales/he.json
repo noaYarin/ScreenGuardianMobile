@@ -141,7 +141,13 @@
     "customPlus_a11y": "הגדלת מספר הדקות",
     "customMinus_a11y": "הקטנת מספר הדקות",
     "message_a11y": "שדה הודעה להורה",
-    "send_a11y": "שליחת בקשת הארכה"
+    "send_a11y": "שליחת בקשת הארכה",
+    "noDevice": "לא נמצא מכשיר מחובר",
+    "invalidMinutes": "מספר הדקות לא תקין",
+    "noActiveLimit": "אין כרגע מגבלת זמן פעילה במכשיר הזה",
+    "requestSent": "בקשת ההארכה נשלחה בהצלחה",
+    "sending": "שולח...",
+    "alreadyRequested": "כבר קיימת בקשת הארכה ממתינה עבור המכשיר הזה"
   },
   "selectRole": {
     "title": "מי משתמש באפליקציה?",
@@ -251,6 +257,11 @@
     "out_of": "מתוך {{limit}}",
     "full_watch": "צפייה מלאה",
     "add_child": "הוספת ילד",
+    "locked": "נעול",
+    "locked_by_parent": "נעילה פעילה",
+    "locked_subtitle": "המכשיר נעול כרגע",
+    "no_limit": "ללא הגבלה",
+    "refreshing": "מתעדכן...",
     "overview_a11y": "מעבר לסקירה כללית",
     "full_watch_a11y": "פתיחת צפייה מלאה",
     "add_child_a11y": "הוספת ילד חדש",
@@ -363,6 +374,7 @@
     "save_a11y": "שמירת הילד",
     "validation_title": "שגיאה",
     "validation_name": "יש למלא שם",
+    "validation_age": "גיל הילד חייב להיות בין 6 ל-17",
     "validation_birthdate": "יש להזין תאריך בפורמט DD/MM/YYYY",
     "success_title": "נשמר",
     "success_message": "הילד נשמר בהצלחה"
@@ -395,6 +407,7 @@
     "status_connected": "מחובר",
     "status_disconnected": "לא מחובר",
     "location_unknown": "לא ידוע",
+    "lock_error": "לא הצלחנו לעדכן את מצב הנעילה",
     "select_child_a11y": "הצגת פרטים של {{name}}",
     "loading_children": "טוען ילדים…",
     "loading_sync": "מעדכן…",
@@ -407,6 +420,8 @@
     "device_active_no": "לא",
     "device_lock": "נעילה",
     "device_unlock": "שחרור",
+    "device_locked_success": "המכשיר ננעל בהצלחה",
+    "device_unlocked_success": "המכשיר שוחרר בהצלחה",
     "device_lock_a11y": "נעילת המכשיר {{name}}",
     "device_unlock_a11y": "שחרור נעילת המכשיר {{name}}",
     "device_lock_error": "לא ניתן לעדכן את מצב הנעילה. נסו שוב.",
@@ -480,7 +495,8 @@
       "chatbot": "צ'אט בוט",
       "history": "היסטוריית פעולות"
     }
-  },"limits": {
+  },
+  "limits": {
     "title": "מגבלות",
     "heading": "ניהול מגבלות",
     "subtitle": "כאן אפשר להגדיר זמן מסך, הפסקות והגבלות נוספות בצורה מסודרת.",
@@ -498,25 +514,21 @@
       "blockedAppsDescription": "ניהול אפליקציות שלא יתאפשר להשתמש בהן."
     }
   },
-  "dailyTimeLimits": {
+   "dailyTimeLimits": {
     "title": "הגבלות זמן מסך",
-    "heroTitle": "הגבלות זמן מסך",
-    "heroSubtitle": "בחרי ילד ומכשיר, ואז הגדירי כלל יומי לזמן מסך.",
-    "deviceContext": "{{childName}} • {{deviceName}}",
-    "edit": "עריכה",
-    "removeRule": "הסר הגדרה",
-    "usedToday": "נוצל היום",
-    "usedLabel": "נוצל",
-    "limitType": "כלל",
-    "limitLabel": "הגבלה יומית",
-    "unlimitedShort": "ללא הגבלה",
-    "unlimitedInfo": "למכשיר הזה לא תהיה הגבלת זמן מסך יומית.",
-    "minutesPerDay": "כמה דקות מותר ביום",
-    "enterMinutes": "הזיני מספר דקות",
-    "currentLimit": "ההגבלה הנוכחית",
-    "done": "סיום",
-    "createLimited": "הגדרת הגבלה יומית",
-    "createUnlimited": "ללא הגבלה",
+    "heroTitle": "ניהול זמן מסך לפי ילד ומכשיר",
+    "heroSubtitle": "בחרי ילד ואז בחרי את המכשיר הרלוונטי כדי לעדכן מגבלות בצורה מדויקת.",
+    "childrenSectionTitle": "בחירת ילד",
+    "devicesSectionTitle": "בחירת מכשיר",
+    "childRole": "ניהול אישי",
+    "deviceContext": "{{childName}} · {{deviceName}}",
+    "usedLabel": "נוצל עד עכשיו",
+    "edit": "עריכת מגבלה",
+    "editA11y": "עריכת מגבלה עבור {{section}}",
+    "childTabA11y": "בחירת הילד {{name}}",
+    "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
+    "update_success": "המגבלה עודכנה בהצלחה",
+    "update_error": "שגיאה בעדכון המגבלה",
     "daily": {
       "title": "זמן מסך יומי"
     },
@@ -528,29 +540,28 @@
       "setDailyLimit": "הגדרת הגבלה יומית",
       "noLimit": "ללא הגבלה"
     },
+    "devices": {
+      "phone": "טלפון",
+      "tablet": "טאבלט",
+      "fetch_devices_failed": "בעיה בטעינת המכשירים",
+      "fetch_device_failed": "בעיה בטעינת המכשיר",
+      "defaultDeviceName": "מכשיר מחובר"
+    },
     "status": {
-      "ok": "בתוך ההגבלה",
-      "almostReached": "כמעט הגעת להגבלה",
-      "unlimited": "ללא הגבלה"
+      "ok": "תקין"
     },
-    "summary": {
-      "unlimited": "למכשיר הזה אין כרגע הגבלת זמן מסך יומית.",
-      "limited": "המכשיר הזה מוגבל ל־{{value}} דקות ביום."
-    },
-    "validation": {
-      "invalidMinutes": "צריך להזין מספר דקות תקין שגדול מ־0."
-    },
-    "errors": {
-      "saveFailed": "שמירת הגדרת זמן המסך נכשלה.",
-      "removeFailed": "הסרת הגדרת זמן המסך נכשלה."
-    },
-    "empty": {
-      "noDevicesTitle": "לא נמצאו מכשירים",
-      "noDevicesSubtitle": "עדיין אין מכשירים מחוברים לילד הזה.",
-      "noRuleTitle": "עדיין אין כלל לזמן מסך",
-      "noRuleSubtitle": "אפשר להגדיר הגבלה יומית בדקות, או לבחור שלא תהיה למכשיר הזה הגבלה בכלל."
-    },
+    "almostReached": "כמעט הגיע למגבלה",
+    "done": "סיום",
+    "currentLimit": "מגבלה נוכחית",
+    "editWeekly": "עריכת שבועי",
     "a11y": {
+      "editWeeklySchedule": "עריכת לוח זמנים שבועי",
+      "editDailyLimit": "עריכת הגבלה יומית",
+      "doneEditing": "סיום עריכה",
+      "decreaseByFiveMinutes": "הפחתה של 5 דקות",
+      "increaseByFiveMinutes": "הוספה של 5 דקות",
+      "decreaseByThirtyMinutes": "הפחתה של 30 דקות",
+      "increaseByThirtyMinutes": "הוספה של 30 דקות",
       "setDailyLimit": "הגדרת הגבלת זמן מסך יומית",
       "setUnlimited": "הגדרת ללא הגבלת זמן מסך",
       "modeLimited": "בחירה במצב הגבלה לפי דקות",
@@ -558,6 +569,10 @@
       "minutesInput": "מספר הדקות המותרות ביום",
       "editRule": "עריכת כלל זמן מסך",
       "removeRule": "הסרת כלל זמן מסך"
+    },
+    "empty": {
+      "noDevicesTitle": "לא נמצאו מכשירים",
+      "noDevicesSubtitle": "עדיין אין מכשירים מחוברים לילד הזה."
     }
   },
   "childDeviceSelector": {
@@ -566,16 +581,14 @@
     "defaultChildSubtitle": "ניהול אישי",
     "allChildren": "כל הילדים",
     "allDevices": "כל המכשירים",
-   "allChildrenSubtitle": "כל הילדים",
-   "allDevicesSubtitle":"כל המכשירים",
-
+    "allChildrenSubtitle": "כל הילדים",
+    "allDevicesSubtitle": "כל המכשירים",
     "childTabA11y": "בחירת הילד {{name}}",
     "deviceTabA11y": "בחירת המכשיר {{deviceName}} עבור {{childName}}",
     "devices": {
       "phone": "טלפון",
       "tablet": "טאבלט"
     }
-    
   },
   "systemAlerts": {
     "title": "התראות מערכת",
@@ -655,8 +668,13 @@
     "pendingSectionSubtitle": "הבקשות מסוננות לפי הילד והמכשיר שנבחרו כרגע.",
     "approve": "אשר",
     "decline": "דחה",
+    "unlimited": "ללא הגבלה",
     "reasonLabel": "סיבה לבקשה",
     "requestedMinutesLabel": "{{minutes}} דקות נוספות",
+    "requestApproved": "הבקשה אושרה בהצלחה",
+    "requestDeclined": "הבקשה נדחתה בהצלחה",
+    "remainingMinutes": "נשארו {{minutes}} דקות",
+    "remainingInfoUnavailable": "אין מידע על הזמן שנותר",
     "childSubtitles": {
       "personal": "ניהול אישי"
     },
@@ -778,13 +796,34 @@
       "totalHours": "שעות שבועיות"
     },
     "days": {
-      "sun": { "short": "א", "full": "ראשון" },
-      "mon": { "short": "ב", "full": "שני" },
-      "tue": { "short": "ג", "full": "שלישי" },
-      "wed": { "short": "ד", "full": "רביעי" },
-      "thu": { "short": "ה", "full": "חמישי" },
-      "fri": { "short": "ו", "full": "שישי" },
-      "sat": { "short": "ש", "full": "שבת" }
+      "sun": {
+        "short": "א",
+        "full": "ראשון"
+      },
+      "mon": {
+        "short": "ב",
+        "full": "שני"
+      },
+      "tue": {
+        "short": "ג",
+        "full": "שלישי"
+      },
+      "wed": {
+        "short": "ד",
+        "full": "רביעי"
+      },
+      "thu": {
+        "short": "ה",
+        "full": "חמישי"
+      },
+      "fri": {
+        "short": "ו",
+        "full": "שישי"
+      },
+      "sat": {
+        "short": "ש",
+        "full": "שבת"
+      }
     },
     "a11y": {
       "scrollToDay": "מעבר מהיר ליום {{day}}",
@@ -794,7 +833,7 @@
       "copyToAllDays": "העתקת ההגדרות לכל הימים",
       "saveSchedule": "שמירת לוח הזמנים השבועי"
     }
-  },      
+  },
   "api": {
     "generic_error": "משהו השתבש, נסה שוב."
   },
@@ -804,7 +843,6 @@
     "fetch_device_failed": "בעיה בטעינת המכשיר",
     "update_device_name_failed": "לא ניתן לעדכן את שם המכשיר.",
     "defaultDeviceName": "מכשיר מחובר"
-
   },
   "childSelector": {
     "childrenSectionTitle": "בחירת ילד",
@@ -812,6 +850,7 @@
     "childTabA11y": "בחירת הילד {{name}}"
   },
   "defineChildProfile": {
+    "validation_age": "גיל הילד חייב להיות בין 6 ל-17",
     "title": "הגדרת פרופיל ילד",
     "birthDate": {
       "title": "תאריך לידה",
@@ -840,6 +879,54 @@
   "settings": {
     "title": "הגדרות",
     "heading": "הגדרות מתקדמות",
+    "subtitle": "התאמה אישית של המערכת, התראות ושפה במקום אחד.",
+    "language": {
+      "title": "שפה",
+      "subtitle": "שינוי שפת הממשק של האפליקציה",
+      "button": "שינוי שפה",
+      "buttonA11y": "שינוי שפת האפליקציה",
+      "current": {
+        "he": "השפה הנוכחית: עברית",
+        "en": "השפה הנוכחית: אנגלית"
+      }
+    },
+    "notifications": {
+      "title": "התראות",
+      "subtitle": "שליטה מהירה על סוגי ההתראות החשובים לך",
+      "rows": {
+        "appAlerts": {
+          "title": "התראות אפליקציות",
+          "subtitle": "קבלת התראות על שימוש, חסימות ועדכונים",
+          "a11y": "הפעלת או כיבוי התראות אפליקציות"
+        },
+        "location": {
+          "title": "גישה למיקום",
+          "subtitle": "שימוש בהרשאת מיקום לצורך יכולות רלוונטיות",
+          "a11y": "הפעלת או כיבוי גישה למיקום"
+        },
+        "push": {
+          "title": "Push Notifications",
+          "subtitle": "קבלת התראות ישירות למכשיר",
+          "a11y": "הפעלת או כיבוי התראות פוש"
+        }
+      }
+    },
+    "preferences": {
+      "title": "העדפות נוספות",
+      "subtitle": "אבטחה, פרטיות ועזרה"
+    },
+    "rows": {
+      "privacy": {
+        "title": "פרטיות ואבטחה",
+        "subtitle": "הרשאות, אבטחה והעדפות פרטיות",
+        "a11y": "מעבר למסך פרטיות ואבטחה"
+      },
+      "help": {
+        "title": "עזרה ותמיכה",
+        "subtitle": "שאלות נפוצות, יצירת קשר וסיוע",
+        "a11y": "מעבר למסך עזרה ותמיכה"
+      }
+    },
     "deviceApp": {
       "button": "הגדרות האפליקציה במכשיר",
       "subtitle": "התראות, הרשאות ומיקום",
@@ -953,7 +1040,3 @@
     }
   }
 }
-
-
-
-

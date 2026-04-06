@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authJwt } from "../middlewares/authJwt.js";
-import { requireParent} from "../middlewares/requireParent.js";
+import { requireParent } from "../middlewares/requireParent.js";
 import { requireChild } from "../middlewares/requireChild.js";
 import {
   lockDeviceController,
@@ -19,6 +19,7 @@ import {
   getDeviceCurrentStatusForChildController,
   updateDeviceUsageByChildController,
   updateDeviceNameController,
+  deviceHeartbeatController,
   updateDeviceLocationController
 } from "../controllers/device.controller.js";
 
@@ -46,7 +47,7 @@ router.delete(
 // Parent locks a device (blocks screen usage)
 router.patch("/:deviceId/lock", authJwt, requireParent, lockDeviceController);
 
- //PATCH /api/v1/devices/:deviceId/unlock
+//PATCH /api/v1/devices/:deviceId/unlock
 // Parent unlocks a device
 router.patch("/:deviceId/unlock", authJwt, requireParent, unlockDeviceController);
 
@@ -54,11 +55,11 @@ router.patch("/:deviceId/unlock", authJwt, requireParent, unlockDeviceController
 // Get device policy for child app
 router.get("/:deviceId/policy", authJwt, requireChild, getDevicePolicyController);
 
- //GET /api/v1/devices/:deviceId/screen-time
+//GET /api/v1/devices/:deviceId/screen-time
 // Get current screen-time settings for a device
 router.get("/:deviceId/screen-time", authJwt, requireParent, getDeviceScreenTimeController);
 
- //PATCH /api/v1/devices/:deviceId/screen-time
+//PATCH /api/v1/devices/:deviceId/screen-time
 // Update screen-time settings for a device
 router.patch("/:deviceId/screen-time", authJwt, requireParent, updateDeviceScreenTimeController);
 
@@ -103,6 +104,15 @@ router.patch(
   authJwt,
   requireChild,
   updateDeviceUsageByChildController
+);
+
+// PATCH /api/v1/devices/:deviceId/heartbeat
+// Child app sends heartbeat and protection status
+router.patch(
+  "/:deviceId/heartbeat",
+  authJwt,
+  requireChild,
+  deviceHeartbeatController
 );
 
 export default router;

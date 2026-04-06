@@ -13,10 +13,12 @@ import {
 } from "../dal/pairing.dal.js";
 import { getChildByParentId, getChildrenByParentId } from "../dal/parent.dal.js";
 import { issueChildToken } from "./auth.service.js";
-import { createDevice, findDeviceByDeviceId, updateDeviceActivation } from "../dal/device.dal.js";
+import { createDevice, findDeviceByDeviceId, updateDeviceActivation, findDevicesByChildId } from "../dal/device.dal.js";
 import { notifyParent } from "./notification.service.js";
 import { NotificationType } from "../constants/notificationType.js";
 import { NotificationSeverity } from "../constants/severity.js";
+
+const MAX_DEVICES_PER_CHILD = 8;
 
 const PAIRING_TTL_MINUTES = 5;
 const SHORT_CODE_MAX_ATTEMPTS = 20;
@@ -93,7 +95,7 @@ function validateLinkPayload(payload) {
 }
 
 // Link device to child using code or barcode token
-export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType, platform,deviceId = "" }) {
+export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceName = "", deviceType = "OTHER", platform = "OTHER", deviceId = "" }) {
   console.log("linkByCodeOrToken", { code, barcodeToken, deviceName, deviceType, platform, deviceId });
   const { byCode, value } = validateLinkPayload({ code, barcodeToken });
   const session = byCode ? await findByCode(value) : await findByBarcodeToken(value);
@@ -117,32 +119,41 @@ export async function linkByCodeOrToken({ code = "", barcodeToken = "", deviceNa
   const child = await getChildByParentId(parentId, childId);
   const childName = child?.name != null ? String(child.name) : "";
 
-let currentDevice = await findDeviceByDeviceId(deviceId);
+  let currentDevice = await findDeviceByDeviceId(deviceId);
 
-if (currentDevice) {
-  if (currentDevice.isActive) {
-    throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
+  if (currentDevice) {
+    if (currentDevice.isActive) {
+      throw new AppError(PairingErrors.DEVICE_ALREADY_LINKED);
+    }
+
+    await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
+
+    currentDevice = await findDeviceByDeviceId(deviceId); 
+    
+  } else {
+    const devices = await findDevicesByChildId(childId);
+    const activeDevices = devices.filter(d => d.isActive);
+
+    if (activeDevices.length >= MAX_DEVICES_PER_CHILD) {
+      throw new AppError(CommonErrors.LIMIT_MAX_DEVICES_REACHED);
+    }
+
+    currentDevice = await createDevice({
+      deviceId,
+      name: deviceName,
+      type: deviceType,
+      platform,
+      isLocked: false,
+      code: sessionCode || "",
+      location: { lat: 0, lng: 0, lastUpdated: new Date() },
+      isActive: true,
+      barcodeToken: sessionBarcode || "",
+      applications: [],
+      parentId: String(session.parentId),
+      childId: String(session.childId),
+      screenTime: {},
+    });
   }
-  
-  await updateDeviceActivation(deviceId, { childId, parentId, deviceName });
-
-} else {
-  currentDevice = await createDevice({
-    deviceId,
-    deviceName,
-    type: deviceType,
-    platform,
-    isLocked: false,
-    code: sessionCode || "",
-    location: { lat: 0, lng: 0, lastUpdated: new Date() }, 
-    isActive: true,
-    barcodeToken: sessionBarcode || "",
-    applications: [],
-    parentId: String(session.parentId),
-    childId: String(session.childId),
-    screenTime: {},
-  });
-}
 
   const mongoDeviceId = currentDevice?._id ? String(currentDevice._id) : String(deviceId);
   // Issue a token for the child to access the app with scan the QR

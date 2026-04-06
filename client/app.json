@@ -27,6 +27,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
+      "package": "com.screenguardianmobile",
       "intentFilters": [
         {
           "action": "VIEW",

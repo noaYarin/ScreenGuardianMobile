@@ -18,118 +18,50 @@ import { useLocaleLayout } from "../../../../hooks/use-locale-layout";
 
 import type { AppDispatch, RootState } from "@/src/redux/store/types";
 import { getMyChildrenThunk } from "@/src/redux/thunks/childrenThunks";
-
-type ActivityType =
-  | "app_locked"
-  | "extension_approved"
-  | "extension_requested"
-  | "screen_locked"
-  | "daily_limit_updated"
-  | "device_locked";
-
-type ActivityItem = {
-  id: string;
-  childId: string;
-  type: ActivityType;
-  titleKey: string;
-  descriptionKey: string;
-  time: string;
-};
+import { fetchAuditLogsThunk } from "@/src/redux/thunks/auditThunks";
+import type { AuditActionType } from "@/src/api/audit";
 
 type FilterKey = "all" | "locks" | "extensions" | "updates";
 
 const ALL_CHILDREN_FILTER_ID = "all-children-filter";
 
-// זמני בלבד עד שתחברי את ההיסטוריה האמיתית מהשרת/Redux
-const ACTIVITIES: ActivityItem[] = [
-  {
-    id: "1",
-    childId: "demo-child-1",
-    type: "screen_locked",
-    titleKey: "activityHistory.items.screenLocked.title",
-    descriptionKey: "activityHistory.items.screenLocked.description",
-    time: "21:00",
-  },
-  {
-    id: "2",
-    childId: "demo-child-2",
-    type: "extension_approved",
-    titleKey: "activityHistory.items.extensionApproved.title",
-    descriptionKey: "activityHistory.items.extensionApproved.description",
-    time: "18:30",
-  },
-  {
-    id: "3",
-    childId: "demo-child-3",
-    type: "daily_limit_updated",
-    titleKey: "activityHistory.items.dailyLimitUpdated.title",
-    descriptionKey: "activityHistory.items.dailyLimitUpdated.description",
-    time: "15:45",
-  },
-  {
-    id: "4",
-    childId: "demo-child-1",
-    type: "extension_requested",
-    titleKey: "activityHistory.items.extensionRequested.title",
-    descriptionKey: "activityHistory.items.extensionRequested.description",
-    time: "14:20",
-  },
-  {
-    id: "5",
-    childId: "demo-child-2",
-    type: "app_locked",
-    titleKey: "activityHistory.items.appLocked.title",
-    descriptionKey: "activityHistory.items.appLocked.description",
-    time: "12:10",
-  },
-  {
-    id: "6",
-    childId: "demo-child-3",
-    type: "device_locked",
-    titleKey: "activityHistory.items.deviceLocked.title",
-    descriptionKey: "activityHistory.items.deviceLocked.description",
-    time: "09:35",
-  },
-];
-
-function getActivityMeta(type: ActivityType) {
-  switch (type) {
-    case "app_locked":
-      return {
-        icon: "lock-outline" as const,
-        iconBg: "#FEE2E2",
-        iconColor: "#DC2626",
-      };
-    case "screen_locked":
+function getActivityMeta(actionType: AuditActionType) {
+  switch (actionType) {
+    case "LOCK_DEVICE":
       return {
         icon: "cellphone-lock" as const,
         iconBg: "#FEE2E2",
         iconColor: "#DC2626",
       };
-    case "device_locked":
+
+    case "UNLOCK_DEVICE":
       return {
-        icon: "tablet-cellphone" as const,
-        iconBg: "#FFF7ED",
-        iconColor: "#EA580C",
+        icon: "lock-open-outline" as const,
+        iconBg: "#DCFCE7",
+        iconColor: "#16A34A",
       };
-    case "extension_approved":
+
+    case "APPROVE_REQUEST":
       return {
         icon: "check-circle-outline" as const,
         iconBg: "#DCFCE7",
         iconColor: "#16A34A",
       };
-    case "extension_requested":
+
+    case "REJECT_REQUEST":
       return {
-        icon: "clock-outline" as const,
-        iconBg: "#DBEAFE",
-        iconColor: "#2563EB",
+        icon: "close-circle-outline" as const,
+        iconBg: "#FEE2E2",
+        iconColor: "#DC2626",
       };
-    case "daily_limit_updated":
+
+    case "UPDATE_SCREEN_TIME":
       return {
         icon: "pencil-circle-outline" as const,
         iconBg: "#EDE9FE",
         iconColor: "#7C3AED",
       };
+
     default:
       return {
         icon: "history" as const,
@@ -137,6 +69,53 @@ function getActivityMeta(type: ActivityType) {
         iconColor: "#4B5563",
       };
   }
+}
+
+function getActivityTitleKey(actionType: AuditActionType) {
+  switch (actionType) {
+    case "LOCK_DEVICE":
+      return "activityHistory.items.lockDevice.title";
+    case "UNLOCK_DEVICE":
+      return "activityHistory.items.unlockDevice.title";
+    case "APPROVE_REQUEST":
+      return "activityHistory.items.approveRequest.title";
+    case "REJECT_REQUEST":
+      return "activityHistory.items.rejectRequest.title";
+    case "UPDATE_SCREEN_TIME":
+      return "activityHistory.items.updateScreenTime.title";
+    default:
+      return "activityHistory.items.default.title";
+  }
+}
+
+function getActivityDescriptionKey(actionType: AuditActionType) {
+  switch (actionType) {
+    case "LOCK_DEVICE":
+      return "activityHistory.items.lockDevice.description";
+    case "UNLOCK_DEVICE":
+      return "activityHistory.items.unlockDevice.description";
+    case "APPROVE_REQUEST":
+      return "activityHistory.items.approveRequest.description";
+    case "REJECT_REQUEST":
+      return "activityHistory.items.rejectRequest.description";
+    case "UPDATE_SCREEN_TIME":
+      return "activityHistory.items.updateScreenTime.description";
+    default:
+      return "activityHistory.items.default.description";
+  }
+}
+
+function formatTime(dateString: string) {
+  const date = new Date(dateString);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function ActivityHistoryScreen() {
@@ -158,37 +137,55 @@ export default function ActivityHistoryScreen() {
   );
   const [selectedFilter, setSelectedFilter] = useState<FilterKey>("all");
 
+  const auditLogs = useSelector(
+    (state: RootState) => state.audit.logsByChildId[selectedChildId] ?? []
+  );
+
+  const auditStatus = useSelector(
+    (state: RootState) =>
+      state.audit.statusByChildId[selectedChildId] ?? "idle"
+  );
+
+  const auditError = useSelector(
+    (state: RootState) => state.audit.errorByChildId[selectedChildId]
+  );
+
   useEffect(() => {
     dispatch(getMyChildrenThunk());
   }, [dispatch]);
 
+  useEffect(() => {
+    dispatch(fetchAuditLogsThunk(selectedChildId));
+  }, [dispatch, selectedChildId]);
+
   const filteredActivities = useMemo(() => {
-    return ACTIVITIES.filter((item) => {
-      const matchesChild =
-        selectedChildId === ALL_CHILDREN_FILTER_ID ||
-        item.childId === selectedChildId;
+    return auditLogs.filter((item) => {
+      if (selectedFilter === "all") return true;
 
-      const matchesFilter =
-        selectedFilter === "all"
-          ? true
-          : selectedFilter === "locks"
-          ? ["app_locked", "screen_locked", "device_locked"].includes(item.type)
-          : selectedFilter === "extensions"
-          ? ["extension_requested", "extension_approved"].includes(item.type)
-          : ["daily_limit_updated"].includes(item.type);
+      if (selectedFilter === "locks") {
+        return ["LOCK_DEVICE", "UNLOCK_DEVICE"].includes(item.actionType);
+      }
 
-      return matchesChild && matchesFilter;
+      if (selectedFilter === "extensions") {
+        return ["APPROVE_REQUEST", "REJECT_REQUEST"].includes(item.actionType);
+      }
+
+      if (selectedFilter === "updates") {
+        return ["UPDATE_SCREEN_TIME"].includes(item.actionType);
+      }
+
+      return true;
     });
-  }, [selectedChildId, selectedFilter]);
+  }, [auditLogs, selectedFilter]);
 
   const todayCount = filteredActivities.length;
 
   const lockCount = filteredActivities.filter((item) =>
-    ["app_locked", "screen_locked", "device_locked"].includes(item.type)
+    ["LOCK_DEVICE", "UNLOCK_DEVICE"].includes(item.actionType)
   ).length;
 
   const extensionCount = filteredActivities.filter((item) =>
-    ["extension_requested", "extension_approved"].includes(item.type)
+    ["APPROVE_REQUEST", "REJECT_REQUEST"].includes(item.actionType)
   ).length;
 
   const filters: { key: FilterKey; labelKey: string }[] = [
@@ -419,7 +416,19 @@ export default function ActivityHistoryScreen() {
               </AppText>
             </View>
 
-            {filteredActivities.length === 0 ? (
+            {auditStatus === "loading" ? (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t("common.loading", "Loading...")}
+                </AppText>
+              </View>
+            ) : auditError ? (
+              <View style={styles.emptyState}>
+                <AppText weight="medium" style={[styles.emptySubtitle, text]}>
+                  {t(auditError, auditError)}
+                </AppText>
+              </View>
+            ) : filteredActivities.length === 0 ? (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIconWrap}>
                   <MaterialCommunityIcons
@@ -442,16 +451,21 @@ export default function ActivityHistoryScreen() {
                 const child = childrenList.find(
                   (c) => String(c._id) === String(item.childId)
                 );
-                const meta = getActivityMeta(item.type);
+                const meta = getActivityMeta(item.actionType);
+                const titleKey = getActivityTitleKey(item.actionType);
+                const descriptionKey = getActivityDescriptionKey(
+                  item.actionType
+                );
+                const time = formatTime(item.createdAt);
 
                 return (
                   <Pressable
-                    key={item.id}
+                    key={item._id}
                     accessibilityRole="button"
                     accessibilityLabel={t("activityHistory.activityCardA11y", {
-                      title: t(item.titleKey),
+                      title: t(titleKey),
                       childName: child?.name ?? "",
-                      time: item.time,
+                      time,
                     })}
                     style={({ pressed }) => [
                       styles.activityCard,
@@ -485,14 +499,14 @@ export default function ActivityHistoryScreen() {
                               weight="bold"
                               style={[styles.activityTitle, text]}
                             >
-                              {t(item.titleKey)}
+                              {t(titleKey)}
                             </AppText>
 
                             <AppText
                               weight="medium"
                               style={[styles.activityDescription, text]}
                             >
-                              {t(item.descriptionKey, {
+                              {t(descriptionKey, {
                                 childName: child?.name ?? "",
                               })}
                             </AppText>
@@ -502,7 +516,7 @@ export default function ActivityHistoryScreen() {
 
                       <View style={styles.timeWrap}>
                         <AppText weight="bold" style={styles.timeText}>
-                          {item.time}
+                          {time}
                         </AppText>
                       </View>
                     </View>

@@ -3,9 +3,12 @@ import type { Device } from "../../api/device";
 import {
   deleteDeviceForChild,
   fetchDevicesByChild,
+  updateDeviceScreenTimeThunk,
+  setDeviceLockThunk,
   updateDeviceLocation,
-  updateDeviceName,
+  updateDeviceName
 } from "../thunks/deviceThunks";
+
 
 export type DeviceFetchStatus = "idle" | "loading" | "succeeded" | "failed";
 
@@ -96,7 +99,7 @@ const devicesSlice = createSlice({
         const { childId, deviceId } = action.meta.arg;
         const updatedDevice = action.payload;
         const list = state.byChildId[childId];
-        if (!list) return;   
+        if (!list) return;
         const idx = list.findIndex((d) => String(d._id) === String(deviceId));
         if (idx !== -1) {
           state.byChildId[childId][idx] = updatedDevice;
@@ -120,9 +123,39 @@ const devicesSlice = createSlice({
           (d) => String(d._id) !== String(deviceId)
         );
       })
+      .addCase(updateDeviceScreenTimeThunk.fulfilled, (state, action) => {
+        const { childId, device } = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;
+
+        const idx = list.findIndex((d) => String(d._id) === String(device._id));
+        if (idx < 0) return;
+
+        state.byChildId[childId][idx] = device;
+      })
+
+      .addCase(setDeviceLockThunk.fulfilled, (state, action) => {
+        const { childId, device } = action.payload;
+        const list = state.byChildId[childId];
+        if (!list) return;
+
+        const idx = list.findIndex(
+          (d) => String(d._id) === String(device._id)
+        );
+        if (idx < 0) return;
+
+        state.byChildId[childId][idx] = device;
+      })
+
   },
 });
 
 export const { clearDevicesForChild, clearAllDevices, setDeviceLockLocal, updateDeviceFromSocket  } =
   devicesSlice.actions;
+export {
+  fetchDevicesByChild,
+  deleteDeviceForChild,
+  updateDeviceScreenTimeThunk,
+} from "../thunks/deviceThunks";
+
 export default devicesSlice.reducer;

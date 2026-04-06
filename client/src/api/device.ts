@@ -89,6 +89,26 @@ export async function apiUpdateDeviceName(
   return data;
 }
 
+
+export async function apiUpdateDeviceScreenTime(
+  deviceId: string,
+  payload: {
+    isLimitEnabled?: boolean;
+    dailyLimitMinutes?: number;
+    weeklyLimitMinutes?: number;
+  }
+): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/screen-time`,
+    payload,
+    {
+      requireAuth: true,
+      role: "PARENT",
+          }
+  );
+  return data;
+}
+
 export async function apiUpdateDeviceLocation(
   deviceId: string,
   location: { lat: number; lng: number }
@@ -104,3 +124,26 @@ export async function apiUpdateDeviceLocation(
   return data;
 }
 
+export async function apiLockDevice(deviceId: string): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/lock`,
+    {},
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
+
+export async function apiUnlockDevice(deviceId: string): Promise<Device> {
+  const data = await api.patch<Device>(
+    `${URL}/${encodeURIComponent(deviceId)}/unlock`,
+    {},
+    {
+      requireAuth: true,
+      role: "PARENT",
+    }
+  );
+  return data;
+}
