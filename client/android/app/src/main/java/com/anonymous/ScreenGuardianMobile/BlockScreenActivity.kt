@@ -19,7 +19,8 @@ package com.screenguardianmobile
  * - Supports dynamic updates via onNewIntent (e.g., when policy changes while screen is open).
  * - Uses a static flag (isOpen) to indicate whether the block screen is currently active.
  *
- * 
+ *
+ */
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
