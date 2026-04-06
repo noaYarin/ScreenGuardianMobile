@@ -13,15 +13,10 @@ import {
   getDeviceByChild,
   getDeviceCurrentStatusForChild,
   updateDeviceUsageByChild,
-<<<<<<< HEAD
-  deleteDeviceForParent, 
-  handleDeviceHeartbeat,
-  updateDeviceLocation
-=======
   deleteDeviceForParent,
+  handleDeviceHeartbeat,
   updateDeviceLocation,
-  updateDeviceName,
->>>>>>> 71710143dee16a6da35c93ae908de123a2289584
+  updateDeviceName
 } from "../services/device.service.js";
 
 export async function getDevicesByChildController(req, res, next) {
@@ -96,7 +91,7 @@ export async function updateDeviceScreenTimeController(req, res, next) {
   } catch (err) {
     next(err);
   }
-  
+
 }
 
 
@@ -229,17 +224,17 @@ export async function getDeviceCurrentStatusForChildController(req, res, next) {
 
 
 export async function updateDeviceLocationController(req, res, next) {
-    try {
-      const { deviceId } = req.params;
-      const { location } = req.body;
-      const parentId = req.user.parentId;
-      const childId = req.user.childId;
-      const data = await updateDeviceLocation(deviceId, location, parentId, childId);
-  
-      res.status(200).json({ ok: true, data });
-    } catch (err) {
-      next(err);
-    }
+  try {
+    const { deviceId } = req.params;
+    const { location } = req.body;
+    const parentId = req.user.parentId;
+    const childId = req.user.childId;
+    const data = await updateDeviceLocation(deviceId, location, parentId, childId);
+
+    res.status(200).json({ ok: true, data });
+  } catch (err) {
+    next(err);
+  }
 }
 export async function updateDeviceUsageByChildController(req, res, next) {
   try {
